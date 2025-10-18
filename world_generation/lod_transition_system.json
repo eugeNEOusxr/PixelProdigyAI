@@ -1,0 +1,30 @@
+{
+  "enabled": true,
+  "method": "alpha-blend",
+  "duration": 500,
+  "easing": "ease-in-out",
+  "minDistance": 2,
+  "cooldown": 2000,
+  "antiPopping": {
+    "enabled": true,
+    "method": "dithered-blend",
+    "ditherSize": 4,
+    "temporalAntialiasing": true
+  },
+  "geometryMorphing": {
+    "enabled": true,
+    "maxVertexShift": 0.1,
+    "preserveNormals": true,
+    "preserveUVs": true
+  },
+  "textureFading": {
+    "enabled": true,
+    "method": "mipmap-blend",
+    "crossfadeDuration": 300
+  },
+  "bufferSwapping": {
+    "enabled": true,
+    "doubleBuffer": true,
+    "preloadNext": true
+  }
+}

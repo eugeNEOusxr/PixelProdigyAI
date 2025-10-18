@@ -1,0 +1,26 @@
+{
+  "4K_hero": {
+    "vertexCompression": "delta-quantized-16bit",
+    "normalCompression": "oct-encoded-10bit",
+    "colorCompression": "palette-indexed-8bit",
+    "ratio": 100,
+    "lossless": false,
+    "quality": 0.98
+  },
+  "4K_cinematic": {
+    "vertexCompression": "delta-quantized-16bit",
+    "normalCompression": "oct-encoded-12bit",
+    "colorCompression": "rgb-8bit",
+    "ratio": 80,
+    "lossless": false,
+    "quality": 0.99
+  },
+  "4K_lossless": {
+    "vertexCompression": "float32",
+    "normalCompression": "float32",
+    "colorCompression": "rgba-8bit",
+    "ratio": 1,
+    "lossless": true,
+    "quality": 1
+  }
+}

@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy - Complete Anatomical Human Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        #container {
+            display: grid;
+            grid-template-columns: 320px 1fr 280px;
+            height: 100vh;
+        }
+        
+        /* Left Panel */
+        #controls-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 3px solid #00ffaa;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            color: #00ffaa;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .section {
+            background: rgba(0, 255, 170, 0.05);
+            border: 1px solid #00ffaa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .section h3 {
+            color: #00ffaa;
+            font-size: 13px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        
+        button {
+            width: 100%;
+            background: #00ffaa;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 8px 0;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #00ffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 170, 0.5);
+        }
+        
+        button.secondary {
+            background: #667eea;
+        }
+        
+        button.secondary:hover {
+            background: #764ba2;
+        }
+        
+        .control-row {
+            margin: 10px 0;
+        }
+        
+        .control-label {
+            color: #aaa;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        
+        .value-display {
+            background: rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+            padding: 3px 8px;
+            border-radius: 3px;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+            float: right;
+        }
+        
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: 2px solid #00ffaa;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ffaa;
+            border: 1px solid #00ffaa;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+        
+        /* Center - 3D Viewport */
+        #viewport {
+            position: relative;
+            background: linear-gradient(180deg, #0a0a1e 0%, #1a1a2e 100%);
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #stats {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ffaa;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            min-width: 200px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+        }
+        
+        .stat-label {
+            color: #aaa;
+        }
+        
+        .stat-value {
+            color: #00ffaa;
+            font-weight: bold;
+        }
+        
+        #progress {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ffaa;
+            border-radius: 8px;
+            padding: 15px 30px;
+            display: none;
+        }
+        
+        #progress.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 300px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffaa, #00ffff);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        /* Right Panel - Anatomy List */
+        #anatomy-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 3px solid #00ffaa;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .anatomy-section {
+            margin: 15px 0;
+        }
+        
+        .anatomy-title {
+            color: #00ffaa;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .anatomy-item {
+            background: rgba(0, 255, 170, 0.05);
+            border-left: 3px solid #00ffaa;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .anatomy-item:hover {
+            background: rgba(0, 255, 170, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .anatomy-item.generated {
+            border-left-color: #00ff00;
+        }
+        
+        .anatomy-item .vertex-count {
+            float: right;
+            color: #666;
+            font-size: 9px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Left Controls -->
+        <div id="controls-panel">
+            <h1>🧬 ANATOMICAL HUMAN GENERATOR</h1>
+            
+            <div class="section">
+                <h3>🎯 Quick Generate</h3>
+                <button onclick="generateCompleteHuman()">🧍 GENERATE FULL HUMAN</button>
+                <button class="secondary" onclick="generateSkeleton()">🦴 Skeleton Only</button>
+                <button class="secondary" onclick="generateMuscles()">💪 Muscles Only</button>
+            </div>
+            
+            <div class="section">
+                <h3>⚙️ Body Settings</h3>
+                <div class="control-row">
+                    <span class="control-label">Height (cm)</span>
+                    <input type="range" id="height" min="140" max="210" value="175" step="1">
+                    <span class="value-display" id="height-val">175</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Build</span>
+                    <select id="build">
+                        <option value="slim">Slim</option>
+                        <option value="average" selected>Average</option>
+                        <option value="athletic">Athletic</option>
+                        <option value="muscular">Muscular</option>
+                        <option value="heavy">Heavy</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Gender</span>
+                    <select id="gender">
+                        <option value="male" selected>Male</option>
+                        <option value="female">Female</option>
+                        <option value="neutral">Neutral</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>🎨 Appearance</h3>
+                <div class="control-row">
+                    <span class="control-label">Skin Tone</span>
+                    <input type="color" id="skin-color" value="#ffdbac">
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Detail Level</span>
+                    <select id="detail-level">
+                        <option value="low">Low (Fast)</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High (Detailed)</option>
+                        <option value="ultra">Ultra (Slow)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>🔧 Advanced</h3>
+                <button class="secondary" onclick="toggleWireframe()">🔲 Toggle Wireframe</button>
+                <button class="secondary" onclick="toggleXRay()">👁️ X-Ray Mode</button>
+                <button class="secondary" onclick="exportHuman()">💾 Export OBJ</button>
+                <button class="secondary" onclick="randomizeHuman()">🎲 Randomize</button>
+            </div>
+        </div>
+        
+        <!-- Center Viewport -->
+        <div id="viewport">
+            <canvas id="canvas"></canvas>
+            
+            <div id="stats">
+                <div class="stat-row">
+                    <span class="stat-label">Total Vertices:</span>
+                    <span class="stat-value" id="total-verts">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Faces:</span>
+                    <span class="stat-value" id="total-faces">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Body Parts:</span>
+                    <span class="stat-value" id="body-parts">0 / 28</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Render Time:</span>
+                    <span class="stat-value" id="render-time">0ms</span>
+                </div>
+            </div>
+            
+            <div id="progress">
+                <div style="color: #00ffaa; margin-bottom: 10px;">Generating Human...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div id="progress-text" style="color: #aaa; font-size: 11px; margin-top: 5px;">Initializing...</div>
+            </div>
+        </div>
+        
+        <!-- Right Anatomy List -->
+        <div id="anatomy-panel">
+            <h1>📋 ANATOMY</h1>
+            
+            <div class="anatomy-section">
+                <div class="anatomy-title">💀 Skeletal System</div>
+                <div class="anatomy-item" data-part="skull">Skull <span class="vertex-count">~800v</span></div>
+                <div class="anatomy-item" data-part="spine">Spine <span class="vertex-count">~600v</span></div>
+                <div class="anatomy-item" data-part="ribcage">Ribcage <span class="vertex-count">~1200v</span></div>
+                <div class="anatomy-item" data-part="pelvis">Pelvis <span class="vertex-count">~400v</span></div>
+            </div>
+            
+            <div class="anatomy-section">
+                <div class="anatomy-title">💪 Muscular System</div>
+                <div class="anatomy-item" data-part="chest">Chest (Pectorals) <span class="vertex-count">~500v</span></div>
+                <div class="anatomy-item" data-part="abs">Abs (Rectus Abdominis) <span class="vertex-count">~400v</span></div>
+                <div class="anatomy-item" data-part="shoulders">Shoulders (Deltoids) <span class="vertex-count">~600v</span></div>
+                <div class="anatomy-item" data-part="biceps">Biceps <span class="vertex-count">~300v</span></div>
+                <div class="anatomy-item" data-part="triceps">Triceps <span class="vertex-count">~300v</span></div>
+                <div class="anatomy-item" data-part="forearms">Forearms <span class="vertex-count">~400v</span></div>
+                <div class="anatomy-item" data-part="quads">Quadriceps <span class="vertex-count">~800v</span></div>
+                <div class="anatomy-item" data-part="hamstrings">Hamstrings <span class="vertex-count">~600v</span></div>
+                <div class="anatomy-item" data-part="calves">Calves <span class="vertex-count">~400v</span></div>
+            </div>
+            
+            <div class="anatomy-section">
+                <div class="anatomy-title">🎯 Body Parts</div>
+                <div class="anatomy-item" data-part="head">Head <span class="vertex-count">~2000v</span></div>
+                <div class="anatomy-item" data-part="neck">Neck <span class="vertex-count">~200v</span></div>
+                <div class="anatomy-item" data-part="torso">Torso <span class="vertex-count">~1500v</span></div>
+                <div class="anatomy-item" data-part="arms">Arms (Both) <span class="vertex-count">~1200v</span></div>
+                <div class="anatomy-item" data-part="hands">Hands (Both) <span class="vertex-count">~1600v</span></div>
+                <div class="anatomy-item" data-part="legs">Legs (Both) <span class="vertex-count">~2000v</span></div>
+                <div class="anatomy-item" data-part="feet">Feet (Both) <span class="vertex-count">~800v</span></div>
+            </div>
+            
+            <div class="anatomy-section">
+                <div class="anatomy-title">👤 Facial Features</div>
+                <div class="anatomy-item" data-part="eyes">Eyes <span class="vertex-count">~600v</span></div>
+                <div class="anatomy-item" data-part="nose">Nose <span class="vertex-count">~300v</span></div>
+                <div class="anatomy-item" data-part="mouth">Mouth <span class="vertex-count">~400v</span></div>
+                <div class="anatomy-item" data-part="ears">Ears <span class="vertex-count">~500v</span></div>
+                <div class="anatomy-item" data-part="hair">Hair <span class="vertex-count">~2000v</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════
+        // COMPLETE ANATOMICAL HUMAN GENERATOR
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        let scene, camera, renderer, controls;
+        let humanGroup = null;
+        let wireframeMode = false;
+        let xrayMode = false;
+        
+        const generatedParts = new Set();
+        
+        // Initialize Three.js
+        function init() {
+            const canvas = document.getElementById('canvas');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1e);
+            scene.fog = new THREE.Fog(0x0a0a1e, 10, 50);
+            
+            camera = new THREE.PerspectiveCamera(
+                60,
+                canvas.parentElement.clientWidth / canvas.parentElement.clientHeight,
+                0.1,
+                100
+            );
+            camera.position.set(0, 1.5, 4);
+            camera.lookAt(0, 1, 0);
+            
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            keyLight.position.set(5, 10, 5);
+            keyLight.castShadow = true;
+            keyLight.shadow.mapSize.width = 2048;
+            keyLight.shadow.mapSize.height = 2048;
+            scene.add(keyLight);
+            
+            const fillLight = new THREE.DirectionalLight(0x8899ff, 0.3);
+            fillLight.position.set(-5, 5, -5);
+            scene.add(fillLight);
+            
+            const rimLight = new THREE.DirectionalLight(0xffaa77, 0.4);
+            rimLight.position.set(0, 5, -10);
+            scene.add(rimLight);
+            
+            // Ground
+            const groundGeometry = new THREE.CircleGeometry(10, 32);
+            const groundMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1a2e,
+                roughness: 0.9
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00ffaa, 0x004444);
+            gridHelper.position.y = 0.01;
+            scene.add(gridHelper);
+            
+            // Controls
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(0, 1, 0);
+            controls.minDistance = 1;
+            controls.maxDistance = 10;
+            
+            animate();
+            
+            // Update value displays
+            document.getElementById('height').addEventListener('input', (e) => {
+                document.getElementById('height-val').textContent = e.target.value;
+            });
+            
+            console.log('✅ Anatomical Human Generator initialized');
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // HUMAN GENERATION
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        async function generateCompleteHuman() {
+            const startTime = performance.now();
+            showProgress(true);
+            
+            // Clear existing
+            if (humanGroup) {
+                scene.remove(humanGroup);
+            }
+            generatedParts.clear();
+            document.querySelectorAll('.anatomy-item').forEach(item => {
+                item.classList.remove('generated');
+            });
+            
+            humanGroup = new THREE.Group();
+            humanGroup.name = 'CompleteHuman';
+            
+            const height = parseInt(document.getElementById('height').value) / 100; // cm to meters
+            const build = document.getElementById('build').value;
+            const gender = document.getElementById('gender').value;
+            const skinColor = document.getElementById('skin-color').value;
+            const detailLevel = document.getElementById('detail-level').value;
+            
+            const parts = [
+                // Skeleton
+                { name: 'skull', fn: () => createSkull(height, detailLevel) },
+                { name: 'spine', fn: () => createSpine(height) },
+                { name: 'ribcage', fn: () => createRibcage(height) },
+                { name: 'pelvis', fn: () => createPelvis(height) },
+                
+                // Main body
+                { name: 'head', fn: () => createHead(height, skinColor, detailLevel) },
+                { name: 'neck', fn: () => createNeck(height, skinColor) },
+                { name: 'torso', fn: () => createTorso(height, build, skinColor, detailLevel) },
+                { name: 'arms', fn: () => createArms(height, build, skinColor, detailLevel) },
+                { name: 'hands', fn: () => createHands(height, skinColor, detailLevel) },
+                { name: 'legs', fn: () => createLegs(height, build, skinColor, detailLevel) },
+                { name: 'feet', fn: () => createFeet(height, skinColor) },
+                
+                // Muscles
+                { name: 'chest', fn: () => createChestMuscles(height, build) },
+                { name: 'abs', fn: () => createAbsMuscles(height, build) },
+                { name: 'shoulders', fn: () => createShoulderMuscles(height, build) },
+                { name: 'biceps', fn: () => createBiceps(height, build) },
+                { name: 'triceps', fn: () => createTriceps(height, build) },
+                { name: 'forearms', fn: () => createForearms(height, build) },
+                { name: 'quads', fn: () => createQuads(height, build) },
+                { name: 'hamstrings', fn: () => createHamstrings(height, build) },
+                { name: 'calves', fn: () => createCalves(height, build) },
+                
+                // Facial features
+                { name: 'eyes', fn: () => createEyes(height) },
+                { name: 'nose', fn: () => createNose(height, skinColor) },
+                { name: 'mouth', fn: () => createMouth(height, skinColor) },
+                { name: 'ears', fn: () => createEars(height, skinColor) },
+                { name: 'hair', fn: () => createHair(height, gender) }
+            ];
+            
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                updateProgress((i / parts.length) * 100, `Generating ${part.name}...`);
+                
+                const mesh = part.fn();
+                if (mesh) {
+                    humanGroup.add(mesh);
+                    generatedParts.add(part.name);
+                    
+                    const item = document.querySelector(`[data-part="${part.name}"]`);
+                    if (item) item.classList.add('generated');
+                }
+                
+                await sleep(50); // Small delay for smooth progress
+            }
+            
+            scene.add(humanGroup);
+            
+            updateStats();
+            showProgress(false);
+            
+            const endTime = performance.now();
+            document.getElementById('render-time').textContent = Math.round(endTime - startTime) + 'ms';
+            
+            console.log('✅ Complete human generated with', generatedParts.size, 'parts');
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // BODY PART GENERATORS
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function createHead(height, skinColor, detailLevel) {
+            const segments = detailLevel === 'ultra' ? 64 : detailLevel === 'high' ? 32 : 16;
+            const geometry = new THREE.SphereGeometry(0.12 * height, segments, segments);
+            const material = new THREE.MeshStandardMaterial({
+                color: skinColor,
+                roughness: 0.6,
+                metalness: 0
+            });
+            const head = new THREE.Mesh(geometry, material);
+            head.position.y = 1.55 * height;
+            head.castShadow = true;
+            head.name = 'Head';
+            return head;
+        }
+        
+        function createNeck(height, skinColor) {
+            const geometry = new THREE.CylinderGeometry(0.06 * height, 0.07 * height, 0.15 * height, 16);
+            const material = new THREE.MeshStandardMaterial({
+                color: skinColor,
+                roughness: 0.6
+            });
+            const neck = new THREE.Mesh(geometry, material);
+            neck.position.y = 1.4 * height;
+            neck.castShadow = true;
+            neck.name = 'Neck';
+            return neck;
+        }
+        
+        function createTorso(height, build, skinColor, detailLevel) {
+            const buildMultiplier = build === 'slim' ? 0.9 : build === 'heavy' ? 1.2 : build === 'muscular' ? 1.15 : 1;
+            const geometry = new THREE.CapsuleGeometry(0.15 * height * buildMultiplier, 0.5 * height, 8, 16);
+            const material = new THREE.MeshStandardMaterial({
+                color: skinColor,
+                roughness: 0.7
+            });
+            const torso = new THREE.Mesh(geometry, material);
+            torso.position.y = 1.0 * height;
+            torso.castShadow = true;
+            torso.name = 'Torso';
+            return torso;
+        }
+        
+        function createArms(height, build, skinColor, detailLevel) {
+            const group = new THREE.Group();
+            const buildMultiplier = build === 'slim' ? 0.8 : build === 'muscular' ? 1.3 : 1;
+            
+            // Upper arms
+            for (let side = -1; side <= 1; side += 2) {
+                const upperArmGeometry = new THREE.CapsuleGeometry(0.04 * height * buildMultiplier, 0.25 * height, 6, 12);
+                const upperArm = new THREE.Mesh(upperArmGeometry, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 }));
+                upperArm.position.set(side * 0.22 * height, 1.05 * height, 0);
+                upperArm.castShadow = true;
+                group.add(upperArm);
+                
+                // Forearms
+                const forearmGeometry = new THREE.CapsuleGeometry(0.035 * height * buildMultiplier, 0.25 * height, 6, 12);
+                const forearm = new THREE.Mesh(forearmGeometry, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 }));
+                forearm.position.set(side * 0.22 * height, 0.75 * height, 0);
+                forearm.castShadow = true;
+                group.add(forearm);
+            }
+            
+            group.name = 'Arms';
+            return group;
+        }
+        
+        function createHands(height, skinColor, detailLevel) {
+            const group = new THREE.Group();
+            
+            for (let side = -1; side <= 1; side += 2) {
+                // Palm
+                const palmGeometry = new THREE.BoxGeometry(0.08 * height, 0.1 * height, 0.02 * height);
+                const palm = new THREE.Mesh(palmGeometry, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 }));
+                palm.position.set(side * 0.22 * height, 0.5 * height, 0);
+                palm.castShadow = true;
+                group.add(palm);
+                
+                // Fingers
+                for (let finger = 0; finger < 5; finger++) {
+                    const fingerGeometry = new THREE.CapsuleGeometry(0.008 * height, 0.06 * height, 4, 6);
+                    const fingerMesh = new THREE.Mesh(fingerGeometry, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 }));
+                    fingerMesh.position.set(
+                        side * 0.22 * height + (finger - 2) * 0.015 * height,
+                        0.42 * height,
+                        0
+                    );
+                    fingerMesh.castShadow = true;
+                    group.add(fingerMesh);
+                }
+            }
+            
+            group.name = 'Hands';
+            return group;
+        }
+        
+        function createLegs(height, build, skinColor, detailLevel) {
+            const group = new THREE.Group();
+            const buildMultiplier = build === 'slim' ? 0.85 : build === 'muscular' ? 1.4 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                // Thigh
+                const thighGeometry = new THREE.CapsuleGeometry(0.08 * height * buildMultiplier, 0.4 * height, 8, 12);
+                const thigh = new THREE.Mesh(thighGeometry, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 }));
+                thigh.position.set(side * 0.1 * height, 0.5 * height, 0);
+                thigh.castShadow = true;
+                group.add(thigh);
+                
+                // Calf
+                const calfGeometry = new THREE.CapsuleGeometry(0.06 * height * buildMultiplier, 0.35 * height, 8, 12);
+                const calf = new THREE.Mesh(calfGeometry, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 }));
+                calf.position.set(side * 0.1 * height, 0.18 * height, 0);
+                calf.castShadow = true;
+                group.add(calf);
+            }
+            
+            group.name = 'Legs';
+            return group;
+        }
+        
+        function createFeet(height, skinColor) {
+            const group = new THREE.Group();
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const footGeometry = new THREE.BoxGeometry(0.08 * height, 0.04 * height, 0.15 * height);
+                const foot = new THREE.Mesh(footGeometry, new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 }));
+                foot.position.set(side * 0.1 * height, 0.02 * height, 0.03 * height);
+                foot.castShadow = true;
+                group.add(foot);
+            }
+            
+            group.name = 'Feet';
+            return group;
+        }
+        
+        // ═══ SKELETAL SYSTEM ═══
+        
+        function createSkull(height, detailLevel) {
+            const segments = detailLevel === 'ultra' ? 32 : 16;
+            const geometry = new THREE.SphereGeometry(0.11 * height, segments, segments);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0xf0e6d2,
+                roughness: 0.8,
+                transparent: xrayMode,
+                opacity: xrayMode ? 0.3 : 1
+            });
+            const skull = new THREE.Mesh(geometry, material);
+            skull.position.y = 1.55 * height;
+            skull.visible = xrayMode;
+            skull.name = 'Skull';
+            return skull;
+        }
+        
+        function createSpine(height) {
+            const group = new THREE.Group();
+            const vertebrae = 24;
+            
+            for (let i = 0; i < vertebrae; i++) {
+                const vertebraGeometry = new THREE.CylinderGeometry(0.02 * height, 0.02 * height, 0.03 * height, 8);
+                const vertebra = new THREE.Mesh(vertebraGeometry, new THREE.MeshStandardMaterial({
+                    color: 0xf0e6d2,
+                    roughness: 0.8
+                }));
+                vertebra.position.y = 0.7 * height + (i * 0.03 * height);
+                vertebra.visible = xrayMode;
+                group.add(vertebra);
+            }
+            
+            group.name = 'Spine';
+            return group;
+        }
+        
+        function createRibcage(height) {
+            const group = new THREE.Group();
+            const ribs = 12;
+            
+            for (let i = 0; i < ribs; i++) {
+                for (let side = -1; side <= 1; side += 2) {
+                    const ribGeometry = new THREE.TorusGeometry(0.12 * height, 0.006 * height, 8, 16, Math.PI);
+                    const rib = new THREE.Mesh(ribGeometry, new THREE.MeshStandardMaterial({
+                        color: 0xf0e6d2,
+                        roughness: 0.8
+                    }));
+                    rib.position.y = 1.0 * height + (i * 0.02 * height);
+                    rib.rotation.y = side === -1 ? 0 : Math.PI;
+                    rib.rotation.z = Math.PI / 2;
+                    rib.visible = xrayMode;
+                    group.add(rib);
+                }
+            }
+            
+            group.name = 'Ribcage';
+            return group;
+        }
+        
+        function createPelvis(height) {
+            const geometry = new THREE.TorusGeometry(0.13 * height, 0.02 * height, 8, 16, Math.PI);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0xf0e6d2,
+                roughness: 0.8
+            });
+            const pelvis = new THREE.Mesh(geometry, material);
+            pelvis.position.y = 0.7 * height;
+            pelvis.rotation.x = Math.PI / 2;
+            pelvis.visible = xrayMode;
+            pelvis.name = 'Pelvis';
+            return pelvis;
+        }
+        
+        // ═══ MUSCULAR SYSTEM ═══
+        
+        function createChestMuscles(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.3 : build === 'slim' ? 0.8 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.SphereGeometry(0.08 * height * size, 16, 16);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9,
+                    transparent: !xrayMode,
+                    opacity: xrayMode ? 1 : 0.3
+                });
+                const pec = new THREE.Mesh(geometry, material);
+                pec.position.set(side * 0.1 * height, 1.15 * height, 0.05 * height);
+                pec.scale.set(1, 0.7, 0.6);
+                pec.visible = xrayMode;
+                group.add(pec);
+            }
+            
+            group.name = 'ChestMuscles';
+            return group;
+        }
+        
+        function createAbsMuscles(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.2 : build === 'slim' ? 0.9 : 1;
+            
+            for (let i = 0; i < 3; i++) {
+                for (let side = -1; side <= 1; side += 2) {
+                    const geometry = new THREE.BoxGeometry(0.06 * height * size, 0.08 * height, 0.04 * height);
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0xcc5555,
+                        roughness: 0.9
+                    });
+                    const ab = new THREE.Mesh(geometry, material);
+                    ab.position.set(side * 0.04 * height, 1.0 * height - (i * 0.1 * height), 0.08 * height);
+                    ab.visible = xrayMode;
+                    group.add(ab);
+                }
+            }
+            
+            group.name = 'AbsMuscles';
+            return group;
+        }
+        
+        function createShoulderMuscles(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.4 : build === 'slim' ? 0.8 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.SphereGeometry(0.07 * height * size, 12, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9
+                });
+                const deltoid = new THREE.Mesh(geometry, material);
+                deltoid.position.set(side * 0.2 * height, 1.2 * height, 0);
+                deltoid.visible = xrayMode;
+                group.add(deltoid);
+            }
+            
+            group.name = 'ShoulderMuscles';
+            return group;
+        }
+        
+        function createBiceps(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.5 : build === 'slim' ? 0.8 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.SphereGeometry(0.045 * height * size, 12, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9
+                });
+                const bicep = new THREE.Mesh(geometry, material);
+                bicep.position.set(side * 0.22 * height, 1.0 * height, 0.02 * height);
+                bicep.scale.set(1, 1.5, 1);
+                bicep.visible = xrayMode;
+                group.add(bicep);
+            }
+            
+            group.name = 'Biceps';
+            return group;
+        }
+        
+        function createTriceps(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.4 : build === 'slim' ? 0.8 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.SphereGeometry(0.04 * height * size, 12, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9
+                });
+                const tricep = new THREE.Mesh(geometry, material);
+                tricep.position.set(side * 0.22 * height, 1.0 * height, -0.02 * height);
+                tricep.scale.set(1, 1.5, 1);
+                tricep.visible = xrayMode;
+                group.add(tricep);
+            }
+            
+            group.name = 'Triceps';
+            return group;
+        }
+        
+        function createForearms(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.2 : build === 'slim' ? 0.9 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.CapsuleGeometry(0.035 * height * size, 0.2 * height, 8, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9
+                });
+                const forearm = new THREE.Mesh(geometry, material);
+                forearm.position.set(side * 0.22 * height, 0.75 * height, 0);
+                forearm.visible = xrayMode;
+                group.add(forearm);
+            }
+            
+            group.name = 'Forearms';
+            return group;
+        }
+        
+        function createQuads(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.5 : build === 'slim' ? 0.85 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.CapsuleGeometry(0.08 * height * size, 0.35 * height, 8, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9
+                });
+                const quad = new THREE.Mesh(geometry, material);
+                quad.position.set(side * 0.1 * height, 0.5 * height, 0.03 * height);
+                quad.visible = xrayMode;
+                group.add(quad);
+            }
+            
+            group.name = 'Quads';
+            return group;
+        }
+        
+        function createHamstrings(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.4 : build === 'slim' ? 0.9 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.CapsuleGeometry(0.07 * height * size, 0.3 * height, 8, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9
+                });
+                const hamstring = new THREE.Mesh(geometry, material);
+                hamstring.position.set(side * 0.1 * height, 0.5 * height, -0.03 * height);
+                hamstring.visible = xrayMode;
+                group.add(hamstring);
+            }
+            
+            group.name = 'Hamstrings';
+            return group;
+        }
+        
+        function createCalves(height, build) {
+            const group = new THREE.Group();
+            const size = build === 'muscular' ? 1.3 : build === 'slim' ? 0.9 : 1;
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.SphereGeometry(0.06 * height * size, 12, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xcc5555,
+                    roughness: 0.9
+                });
+                const calf = new THREE.Mesh(geometry, material);
+                calf.position.set(side * 0.1 * height, 0.25 * height, -0.02 * height);
+                calf.scale.set(1, 1.3, 1);
+                calf.visible = xrayMode;
+                group.add(calf);
+            }
+            
+            group.name = 'Calves';
+            return group;
+        }
+        
+        // ═══ FACIAL FEATURES ═══
+        
+        function createEyes(height) {
+            const group = new THREE.Group();
+            
+            for (let side = -1; side <= 1; side += 2) {
+                // Eyeball
+                const eyeballGeometry = new THREE.SphereGeometry(0.015 * height, 16, 16);
+                const eyeballMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, metalness: 0.1 });
+                const eyeball = new THREE.Mesh(eyeballGeometry, eyeballMaterial);
+                eyeball.position.set(side * 0.04 * height, 1.58 * height, 0.11 * height);
+                group.add(eyeball);
+                
+                // Iris
+                const irisGeometry = new THREE.CircleGeometry(0.008 * height, 16);
+                const irisMaterial = new THREE.MeshStandardMaterial({ color: 0x4a90e2, roughness: 0.3 });
+                const iris = new THREE.Mesh(irisGeometry, irisMaterial);
+                iris.position.set(side * 0.04 * height, 1.58 * height, 0.125 * height);
+                group.add(iris);
+                
+                // Pupil
+                const pupilGeometry = new THREE.CircleGeometry(0.004 * height, 16);
+                const pupilMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+                const pupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+                pupil.position.set(side * 0.04 * height, 1.58 * height, 0.126 * height);
+                group.add(pupil);
+            }
+            
+            group.name = 'Eyes';
+            return group;
+        }
+        
+        function createNose(height, skinColor) {
+            const geometry = new THREE.ConeGeometry(0.02 * height, 0.05 * height, 8);
+            const material = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.6 });
+            const nose = new THREE.Mesh(geometry, material);
+            nose.position.set(0, 1.55 * height, 0.13 * height);
+            nose.rotation.x = Math.PI / 2;
+            nose.name = 'Nose';
+            return nose;
+        }
+        
+        function createMouth(height, skinColor) {
+            const geometry = new THREE.CapsuleGeometry(0.04 * height, 0.002 * height, 4, 8);
+            const material = new THREE.MeshStandardMaterial({ color: 0xff6b9d, roughness: 0.5 });
+            const mouth = new THREE.Mesh(geometry, material);
+            mouth.position.set(0, 1.5 * height, 0.12 * height);
+            mouth.rotation.z = Math.PI / 2;
+            mouth.name = 'Mouth';
+            return mouth;
+        }
+        
+        function createEars(height, skinColor) {
+            const group = new THREE.Group();
+            
+            for (let side = -1; side <= 1; side += 2) {
+                const geometry = new THREE.SphereGeometry(0.025 * height, 12, 12);
+                const material = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7 });
+                const ear = new THREE.Mesh(geometry, material);
+                ear.position.set(side * 0.12 * height, 1.55 * height, 0);
+                ear.scale.set(0.5, 1, 0.5);
+                group.add(ear);
+            }
+            
+            group.name = 'Ears';
+            return group;
+        }
+        
+        function createHair(height, gender) {
+            const geometry = new THREE.SphereGeometry(0.13 * height, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+            const hairColor = gender === 'female' ? 0x4a2c2a : 0x2a1a1a;
+            const material = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.8 });
+            const hair = new THREE.Mesh(geometry, material);
+            hair.position.y = 1.62 * height;
+            hair.name = 'Hair';
+            return hair;
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // CONTROLS & UTILITIES
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        async function generateSkeleton() {
+            showProgress(true);
+            if (humanGroup) scene.remove(humanGroup);
+            humanGroup = new THREE.Group();
+            
+            const height = parseInt(document.getElementById('height').value) / 100;
+            
+            updateProgress(25, 'Generating skull...');
+            humanGroup.add(createSkull(height, 'medium'));
+            await sleep(100);
+            
+            updateProgress(50, 'Generating spine...');
+            humanGroup.add(createSpine(height));
+            await sleep(100);
+            
+            updateProgress(75, 'Generating ribcage...');
+            humanGroup.add(createRibcage(height));
+            await sleep(100);
+            
+            updateProgress(100, 'Generating pelvis...');
+            humanGroup.add(createPelvis(height));
+            
+            scene.add(humanGroup);
+            updateStats();
+            showProgress(false);
+        }
+        
+        async function generateMuscles() {
+            showProgress(true);
+            if (humanGroup) scene.remove(humanGroup);
+            humanGroup = new THREE.Group();
+            
+            const height = parseInt(document.getElementById('height').value) / 100;
+            const build = document.getElementById('build').value;
+            
+            const muscles = [
+                { name: 'chest', fn: createChestMuscles },
+                { name: 'abs', fn: createAbsMuscles },
+                { name: 'shoulders', fn: createShoulderMuscles },
+                { name: 'biceps', fn: createBiceps },
+                { name: 'triceps', fn: createTriceps },
+                { name: 'forearms', fn: createForearms },
+                { name: 'quads', fn: createQuads },
+                { name: 'hamstrings', fn: createHamstrings },
+                { name: 'calves', fn: createCalves }
+            ];
+            
+            for (let i = 0; i < muscles.length; i++) {
+                updateProgress((i / muscles.length) * 100, `Generating ${muscles[i].name}...`);
+                humanGroup.add(muscles[i].fn(height, build));
+                await sleep(80);
+            }
+            
+            scene.add(humanGroup);
+            updateStats();
+            showProgress(false);
+        }
+        
+        function toggleWireframe() {
+            wireframeMode = !wireframeMode;
+            if (humanGroup) {
+                humanGroup.traverse((child) => {
+                    if (child.material) {
+                        child.material.wireframe = wireframeMode;
+                    }
+                });
+            }
+        }
+        
+        function toggleXRay() {
+            xrayMode = !xrayMode;
+            if (humanGroup) {
+                humanGroup.traverse((child) => {
+                    if (child.name === 'Skull' || child.name === 'Spine' || child.name === 'Ribcage' || child.name === 'Pelvis' ||
+                        child.name === 'ChestMuscles' || child.name === 'AbsMuscles' || child.name === 'ShoulderMuscles' ||
+                        child.name === 'Biceps' || child.name === 'Triceps' || child.name === 'Forearms' ||
+                        child.name === 'Quads' || child.name === 'Hamstrings' || child.name === 'Calves') {
+                        child.visible = xrayMode;
+                    } else if (child.material) {
+                        child.material.transparent = xrayMode;
+                        child.material.opacity = xrayMode ? 0.3 : 1;
+                        child.material.needsUpdate = true;
+                    }
+                });
+            }
+        }
+        
+        function randomizeHuman() {
+            document.getElementById('height').value = 150 + Math.random() * 50;
+            document.getElementById('build').value = ['slim', 'average', 'athletic', 'muscular'][Math.floor(Math.random() * 4)];
+            document.getElementById('gender').value = ['male', 'female'][Math.floor(Math.random() * 2)];
+            
+            const skinTones = ['#ffdbac', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#654321'];
+            document.getElementById('skin-color').value = skinTones[Math.floor(Math.random() * skinTones.length)];
+            
+            document.getElementById('height-val').textContent = document.getElementById('height').value;
+            
+            generateCompleteHuman();
+        }
+        
+        function exportHuman() {
+            if (!humanGroup) return;
+            
+            let objContent = '# PixelProdigy Complete Anatomical Human Export\n\n';
+            let vertexOffset = 1;
+            
+            humanGroup.traverse((child) => {
+                if (child.geometry) {
+                    objContent += `o ${child.name || 'Part'}\n`;
+                    
+                    const positions = child.geometry.attributes.position.array;
+                    const indices = child.geometry.index ? child.geometry.index.array : null;
+                    
+                    for (let i = 0; i < positions.length; i += 3) {
+                        const v = new THREE.Vector3(positions[i], positions[i+1], positions[i+2]);
+                        child.localToWorld(v);
+                        objContent += `v ${v.x.toFixed(4)} ${v.y.toFixed(4)} ${v.z.toFixed(4)}\n`;
+                    }
+                    
+                    if (indices) {
+                        for (let i = 0; i < indices.length; i += 3) {
+                            objContent += `f ${indices[i] + vertexOffset} ${indices[i+1] + vertexOffset} ${indices[i+2] + vertexOffset}\n`;
+                        }
+                    }
+                    
+                    vertexOffset += positions.length / 3;
+                    objContent += '\n';
+                }
+            });
+            
+            const blob = new Blob([objContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'complete_human.obj';
+            a.click();
+            
+            console.log('💾 Complete human exported');
+        }
+        
+        function updateStats() {
+            if (!humanGroup) return;
+            
+            let totalVerts = 0;
+            let totalFaces = 0;
+            
+            humanGroup.traverse((child) => {
+                if (child.geometry) {
+                    totalVerts += child.geometry.attributes.position.count;
+                    if (child.geometry.index) {
+                        totalFaces += child.geometry.index.count / 3;
+                    } else {
+                        totalFaces += child.geometry.attributes.position.count / 3;
+                    }
+                }
+            });
+            
+            document.getElementById('total-verts').textContent = totalVerts.toLocaleString();
+            document.getElementById('total-faces').textContent = Math.floor(totalFaces).toLocaleString();
+            document.getElementById('body-parts').textContent = `${generatedParts.size} / 28`;
+        }
+        
+        function showProgress(show) {
+            document.getElementById('progress').classList.toggle('active', show);
+        }
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progress-fill').style.width = percent + '%';
+            document.getElementById('progress-text').textContent = text;
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('canvas');
+            camera.aspect = canvas.parentElement.clientWidth / canvas.parentElement.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+        });
+        
+        window.addEventListener('load', init);
+        
+        console.log('✅ Complete Anatomical Human Generator loaded');
+    </script>
+</body>
+</html>

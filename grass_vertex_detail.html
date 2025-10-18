@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grass Blade Vertex Detail - PixelProdigy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a4d2e 0%, #2a5c3e 100%);
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        #container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            height: 100vh;
+        }
+        
+        /* Left Panel */
+        #info-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 3px solid #4a9a3d;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            color: #4a9a3d;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .section {
+            background: rgba(74, 154, 61, 0.1);
+            border: 2px solid #4a9a3d;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .section h3 {
+            color: #4a9a3d;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .control-row {
+            margin: 12px 0;
+        }
+        
+        .control-label {
+            color: #aaa;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        
+        .value-display {
+            background: rgba(74, 154, 61, 0.3);
+            color: #4a9a3d;
+            padding: 3px 8px;
+            border-radius: 3px;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        button {
+            width: 100%;
+            background: #4a9a3d;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 8px 0;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #5cb850;
+            transform: translateY(-2px);
+        }
+        
+        .vertex-info {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        
+        .vertex-point {
+            color: #00ffaa;
+            font-weight: bold;
+        }
+        
+        /* Right - 3D Canvas */
+        #viewport {
+            position: relative;
+            background: linear-gradient(180deg, #87CEEB 0%, #c5e8b7 100%);
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #stats {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #4a9a3d;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 11px;
+            min-width: 200px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            color: #aaa;
+        }
+        
+        .stat-value {
+            color: #4a9a3d;
+            font-weight: bold;
+        }
+        
+        #wireframe-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #4a9a3d;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+        
+        #wireframe-toggle:hover {
+            background: rgba(74, 154, 61, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Info Panel -->
+        <div id="info-panel">
+            <h1>🌱 GRASS BLADE VERTEX STRUCTURE</h1>
+            
+            <div class="section">
+                <h3>📐 Blade Parameters</h3>
+                <div class="control-row">
+                    <span class="control-label">Height</span>
+                    <input type="range" id="height" min="0.5" max="2" value="1" step="0.1" oninput="updateGrass()">
+                    <span class="value-display" id="height-val">1.0</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Width</span>
+                    <input type="range" id="width" min="0.02" max="0.2" value="0.08" step="0.01" oninput="updateGrass()">
+                    <span class="value-display" id="width-val">0.08</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Segments</span>
+                    <input type="range" id="segments" min="3" max="20" value="8" step="1" oninput="updateGrass()">
+                    <span class="value-display" id="segments-val">8</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Curve</span>
+                    <input type="range" id="curve" min="0" max="0.5" value="0.15" step="0.05" oninput="updateGrass()">
+                    <span class="value-display" id="curve-val">0.15</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>🎨 Appearance</h3>
+                <div class="control-row">
+                    <span class="control-label">Color</span>
+                    <input type="color" id="color" value="#4a9a3d" onchange="updateGrass()">
+                </div>
+                <button onclick="toggleWireframe()">🔲 Toggle Wireframe</button>
+                <button onclick="showVertexPoints()">📍 Show Vertex Points</button>
+            </div>
+            
+            <div class="section">
+                <h3>🌾 Grass Types</h3>
+                <button onclick="generatePatch()">🌿 Generate Patch (20 blades)</button>
+                <button onclick="generateField()">🌾 Generate Field (100 blades)</button>
+                <button onclick="resetSingle()">🌱 Single Blade</button>
+            </div>
+            
+            <div class="section">
+                <h3>📊 Vertex Structure</h3>
+                <div class="vertex-info">
+                    <strong>Each segment has 3 vertices:</strong><br>
+                    • <span class="vertex-point">Left Edge</span> - Outer boundary<br>
+                    • <span class="vertex-point">Center</span> - Midline (thickness)<br>
+                    • <span class="vertex-point">Right Edge</span> - Outer boundary<br>
+                    <br>
+                    <strong>Faces (triangles):</strong><br>
+                    • Left quad = 2 triangles<br>
+                    • Right quad = 2 triangles<br>
+                    • Total: 4 triangles per segment<br>
+                    <br>
+                    <strong>Why center vertices?</strong><br>
+                    Shows internal structure, enables proper shading, allows for texture mapping detail.
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>💾 Export</h3>
+                <button onclick="exportOBJ()">📤 Export as OBJ</button>
+                <button onclick="exportVertexData()">📋 Export Vertex Data</button>
+            </div>
+        </div>
+        
+        <!-- 3D Viewport -->
+        <div id="viewport">
+            <canvas id="canvas"></canvas>
+            
+            <div id="stats">
+                <div class="stat-row">
+                    <span class="stat-label">Total Vertices:</span>
+                    <span class="stat-value" id="vertex-count">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Faces:</span>
+                    <span class="stat-value" id="face-count">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Blades:</span>
+                    <span class="stat-value" id="blade-count">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Segments/Blade:</span>
+                    <span class="stat-value" id="segment-count">8</span>
+                </div>
+            </div>
+            
+            <button id="wireframe-toggle" onclick="toggleWireframe()">
+                🔲 Toggle Wireframe
+            </button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <script>
+        // ===== THREE.JS SETUP =====
+        let scene, camera, renderer, controls;
+        let grassMesh = null;
+        let wireframeMode = false;
+        let vertexPoints = null;
+        
+        function init() {
+            const canvas = document.getElementById('canvas');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.Fog(0x87CEEB, 10, 50);
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                60,
+                canvas.parentElement.clientWidth / canvas.parentElement.clientHeight,
+                0.1,
+                100
+            );
+            camera.position.set(2, 1.5, 2);
+            camera.lookAt(0, 0.5, 0);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const sunLight = new THREE.DirectionalLight(0xffffee, 0.8);
+            sunLight.position.set(5, 10, 5);
+            sunLight.castShadow = true;
+            scene.add(sunLight);
+            
+            const fillLight = new THREE.DirectionalLight(0x8899ff, 0.3);
+            fillLight.position.set(-5, 5, -5);
+            scene.add(fillLight);
+            
+            // Ground
+            const groundGeometry = new THREE.PlaneGeometry(20, 20);
+            const groundMaterial = new THREE.MeshStandardMaterial({
+                color: 0x3a7d44,
+                roughness: 0.9
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(10, 20, 0x4a9a3d, 0x2a5c3e);
+            gridHelper.position.y = 0.01;
+            scene.add(gridHelper);
+            
+            // Controls
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(0, 0.5, 0);
+            
+            // Initial grass blade
+            createGrassBlade();
+            
+            animate();
+            updateValues();
+            
+            console.log('✅ Grass Vertex Detail System initialized');
+        }
+        
+        function createGrassBlade() {
+            const height = parseFloat(document.getElementById('height').value);
+            const baseWidth = parseFloat(document.getElementById('width').value);
+            const segments = parseInt(document.getElementById('segments').value);
+            const curveAmount = parseFloat(document.getElementById('curve').value);
+            const color = document.getElementById('color').value;
+            
+            const vertices = [];
+            const indices = [];
+            const colors = [];
+            
+            // Build vertices (3 per segment: left, center, right)
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const y = t * height;
+                const width = baseWidth * (1 - t * 0.9);
+                const curve = Math.sin(t * Math.PI * 0.5) * curveAmount;
+                
+                // Color gradient (darker at base, lighter at tip)
+                const colorValue = 0.6 + t * 0.4;
+                
+                // Left edge
+                vertices.push(-width / 2 + curve, y, 0);
+                colors.push(colorValue * 0.29, colorValue * 0.6, colorValue * 0.24);
+                
+                // Center
+                vertices.push(0 + curve, y, 0);
+                colors.push(colorValue * 0.29, colorValue * 0.6, colorValue * 0.24);
+                
+                // Right edge
+                vertices.push(width / 2 + curve, y, 0);
+                colors.push(colorValue * 0.29, colorValue * 0.6, colorValue * 0.24);
+            }
+            
+            // Build faces
+            for (let i = 0; i < segments; i++) {
+                const base = i * 3;
+                const next = (i + 1) * 3;
+                
+                // Left quad
+                indices.push(base, next, base + 1);
+                indices.push(base + 1, next, next + 1);
+                
+                // Right quad
+                indices.push(base + 1, next + 1, base + 2);
+                indices.push(base + 2, next + 1, next + 2);
+            }
+            
+            // Create geometry
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+            
+            // Create material
+            const material = new THREE.MeshStandardMaterial({
+                vertexColors: true,
+                roughness: 0.8,
+                metalness: 0,
+                side: THREE.DoubleSide,
+                wireframe: wireframeMode
+            });
+            
+            // Remove old mesh
+            if (grassMesh) {
+                scene.remove(grassMesh);
+            }
+            if (vertexPoints) {
+                scene.remove(vertexPoints);
+                vertexPoints = null;
+            }
+            
+            // Add new mesh
+            grassMesh = new THREE.Mesh(geometry, material);
+            grassMesh.castShadow = true;
+            scene.add(grassMesh);
+            
+            updateStats(vertices.length / 3, indices.length / 3, 1, segments);
+        }
+        
+        function generatePatch() {
+            if (grassMesh) scene.remove(grassMesh);
+            if (vertexPoints) scene.remove(vertexPoints);
+            
+            grassMesh = new THREE.Group();
+            
+            const patchSize = 2;
+            const bladeCount = 20;
+            
+            for (let i = 0; i < bladeCount; i++) {
+                const blade = createSingleBlade();
+                
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * patchSize;
+                blade.position.x = Math.cos(angle) * radius;
+                blade.position.z = Math.sin(angle) * radius;
+                blade.rotation.y = Math.random() * Math.PI * 2;
+                blade.rotation.z = (Math.random() - 0.5) * 0.3;
+                
+                const scale = 0.7 + Math.random() * 0.6;
+                blade.scale.set(scale, scale, scale);
+                
+                grassMesh.add(blade);
+            }
+            
+            scene.add(grassMesh);
+            updateStatsFromGroup(grassMesh, bladeCount);
+        }
+        
+        function generateField() {
+            if (grassMesh) scene.remove(grassMesh);
+            if (vertexPoints) scene.remove(vertexPoints);
+            
+            grassMesh = new THREE.Group();
+            
+            const rows = 10;
+            const cols = 10;
+            const spacing = 0.4;
+            let totalBlades = 0;
+            
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const blade = createSingleBlade();
+                    
+                    blade.position.x = (col - cols / 2) * spacing + (Math.random() - 0.5) * 0.2;
+                    blade.position.z = (row - rows / 2) * spacing + (Math.random() - 0.5) * 0.2;
+                    blade.rotation.y = Math.random() * Math.PI * 2;
+                    blade.rotation.z = (Math.random() - 0.5) * 0.2;
+                    
+                    const scale = 0.8 + Math.random() * 0.4;
+                    blade.scale.set(scale, scale, scale);
+                    
+                    grassMesh.add(blade);
+                    totalBlades++;
+                }
+            }
+            
+            scene.add(grassMesh);
+            updateStatsFromGroup(grassMesh, totalBlades);
+        }
+        
+        function createSingleBlade() {
+            const height = parseFloat(document.getElementById('height').value);
+            const baseWidth = parseFloat(document.getElementById('width').value);
+            const segments = parseInt(document.getElementById('segments').value);
+            const curveAmount = parseFloat(document.getElementById('curve').value);
+            
+            const vertices = [];
+            const indices = [];
+            const colors = [];
+            
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const y = t * height;
+                const width = baseWidth * (1 - t * 0.9);
+                const curve = Math.sin(t * Math.PI * 0.5) * curveAmount;
+                const colorValue = 0.6 + t * 0.4;
+                
+                vertices.push(-width / 2 + curve, y, 0);
+                colors.push(colorValue * 0.29, colorValue * 0.6, colorValue * 0.24);
+                
+                vertices.push(0 + curve, y, 0);
+                colors.push(colorValue * 0.29, colorValue * 0.6, colorValue * 0.24);
+                
+                vertices.push(width / 2 + curve, y, 0);
+                colors.push(colorValue * 0.29, colorValue * 0.6, colorValue * 0.24);
+            }
+            
+            for (let i = 0; i < segments; i++) {
+                const base = i * 3;
+                const next = (i + 1) * 3;
+                indices.push(base, next, base + 1);
+                indices.push(base + 1, next, next + 1);
+                indices.push(base + 1, next + 1, base + 2);
+                indices.push(base + 2, next + 1, next + 2);
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+            
+            const material = new THREE.MeshStandardMaterial({
+                vertexColors: true,
+                roughness: 0.8,
+                metalness: 0,
+                side: THREE.DoubleSide,
+                wireframe: wireframeMode
+            });
+            
+            return new THREE.Mesh(geometry, material);
+        }
+        
+        function resetSingle() {
+            if (vertexPoints) {
+                scene.remove(vertexPoints);
+                vertexPoints = null;
+            }
+            createGrassBlade();
+        }
+        
+        function toggleWireframe() {
+            wireframeMode = !wireframeMode;
+            
+            if (grassMesh) {
+                grassMesh.traverse((child) => {
+                    if (child.material) {
+                        child.material.wireframe = wireframeMode;
+                    }
+                });
+            }
+        }
+        
+        function showVertexPoints() {
+            if (vertexPoints) {
+                scene.remove(vertexPoints);
+                vertexPoints = null;
+                return;
+            }
+            
+            if (!grassMesh || !grassMesh.geometry) return;
+            
+            const positions = grassMesh.geometry.attributes.position.array;
+            const pointsGeometry = new THREE.BufferGeometry();
+            pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            
+            const pointsMaterial = new THREE.PointsMaterial({
+                color: 0xff0000,
+                size: 0.05,
+                sizeAttenuation: true
+            });
+            
+            vertexPoints = new THREE.Points(pointsGeometry, pointsMaterial);
+            scene.add(vertexPoints);
+        }
+        
+        function updateGrass() {
+            updateValues();
+            if (grassMesh && grassMesh.geometry) {
+                createGrassBlade();
+            }
+        }
+        
+        function updateValues() {
+            document.getElementById('height-val').textContent = document.getElementById('height').value;
+            document.getElementById('width-val').textContent = document.getElementById('width').value;
+            document.getElementById('segments-val').textContent = document.getElementById('segments').value;
+            document.getElementById('curve-val').textContent = document.getElementById('curve').value;
+        }
+        
+        function updateStats(vertices, faces, blades, segments) {
+            document.getElementById('vertex-count').textContent = vertices;
+            document.getElementById('face-count').textContent = Math.floor(faces);
+            document.getElementById('blade-count').textContent = blades;
+            document.getElementById('segment-count').textContent = segments;
+        }
+        
+        function updateStatsFromGroup(group, blades) {
+            let totalVerts = 0;
+            let totalFaces = 0;
+            const segments = parseInt(document.getElementById('segments').value);
+            
+            group.traverse((child) => {
+                if (child.geometry) {
+                    totalVerts += child.geometry.attributes.position.count;
+                    if (child.geometry.index) {
+                        totalFaces += child.geometry.index.count / 3;
+                    }
+                }
+            });
+            
+            updateStats(totalVerts, totalFaces, blades, segments);
+        }
+        
+        function exportOBJ() {
+            if (!grassMesh) return;
+            
+            let objContent = '# Grass Blade Vertex Detail Export\n\n';
+            let vertexOffset = 1;
+            
+            if (grassMesh.geometry) {
+                const positions = grassMesh.geometry.attributes.position.array;
+                const indices = grassMesh.geometry.index.array;
+                
+                for (let i = 0; i < positions.length; i += 3) {
+                    objContent += `v ${positions[i].toFixed(4)} ${positions[i+1].toFixed(4)} ${positions[i+2].toFixed(4)}\n`;
+                }
+                
+                for (let i = 0; i < indices.length; i += 3) {
+                    objContent += `f ${indices[i] + 1} ${indices[i+1] + 1} ${indices[i+2] + 1}\n`;
+                }
+            } else {
+                grassMesh.traverse((child) => {
+                    if (child.geometry) {
+                        const positions = child.geometry.attributes.position.array;
+                        const indices = child.geometry.index.array;
+                        
+                        for (let i = 0; i < positions.length; i += 3) {
+                            const v = new THREE.Vector3(positions[i], positions[i+1], positions[i+2]);
+                            child.localToWorld(v);
+                            objContent += `v ${v.x.toFixed(4)} ${v.y.toFixed(4)} ${v.z.toFixed(4)}\n`;
+                        }
+                        
+                        for (let i = 0; i < indices.length; i += 3) {
+                            objContent += `f ${indices[i] + vertexOffset} ${indices[i+1] + vertexOffset} ${indices[i+2] + vertexOffset}\n`;
+                        }
+                        
+                        vertexOffset += positions.length / 3;
+                    }
+                });
+            }
+            
+            const blob = new Blob([objContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'grass_vertex_detail.obj';
+            a.click();
+            
+            console.log('💾 OBJ exported');
+        }
+        
+        function exportVertexData() {
+            if (!grassMesh || !grassMesh.geometry) return;
+            
+            const positions = grassMesh.geometry.attributes.position.array;
+            const indices = grassMesh.geometry.index.array;
+            
+            let data = 'GRASS BLADE VERTEX DATA\n';
+            data += '======================\n\n';
+            data += `Total Vertices: ${positions.length / 3}\n`;
+            data += `Total Faces: ${indices.length / 3}\n\n`;
+            data += 'VERTICES (X, Y, Z):\n';
+            
+            for (let i = 0; i < positions.length; i += 3) {
+                const vertNum = Math.floor(i / 3);
+                const type = vertNum % 3 === 0 ? 'LEFT' : (vertNum % 3 === 1 ? 'CENTER' : 'RIGHT');
+                data += `${vertNum}: [${type}] (${positions[i].toFixed(4)}, ${positions[i+1].toFixed(4)}, ${positions[i+2].toFixed(4)})\n`;
+            }
+            
+            data += '\n\nFACES (Triangle Indices):\n';
+            for (let i = 0; i < indices.length; i += 3) {
+                data += `${Math.floor(i/3)}: [${indices[i]}, ${indices[i+1]}, ${indices[i+2]}]\n`;
+            }
+            
+            const blob = new Blob([data], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'grass_vertex_data.txt';
+            a.click();
+            
+            console.log('📋 Vertex data exported');
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('canvas');
+            camera.aspect = canvas.parentElement.clientWidth / canvas.parentElement.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+        });
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

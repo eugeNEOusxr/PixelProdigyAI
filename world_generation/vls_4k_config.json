@@ -1,0 +1,11 @@
+{
+  "maxVertices": 262144,
+  "maxTriangles": 174762,
+  "chunkSize": 16384,
+  "compressionFormat": "delta-encoded-quantized",
+  "bitDepth": {
+    "position": 16,
+    "normal": 10,
+    "color": 8
+  }
+}

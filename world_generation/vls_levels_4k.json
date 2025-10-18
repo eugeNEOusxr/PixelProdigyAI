@@ -1,0 +1,22 @@
+{
+  "level": 5,
+  "name": "Ultra Detail (4K)",
+  "resolution": "4K",
+  "minVertices": 131072,
+  "maxVertices": 262144,
+  "targetQuality": 0.98,
+  "buildTimeMinutes": 45,
+  "useCases": [
+    "Marketing screenshots",
+    "Cinematic cutscenes",
+    "Print media (posters, box art)",
+    "Hero character close-ups",
+    "Signature weapons/items"
+  ],
+  "optimizations": {
+    "enableNormalMapping": true,
+    "enableDisplacementMapping": true,
+    "enableSubsurfaceScattering": true,
+    "enableAnisotropicFiltering": 16
+  }
+}

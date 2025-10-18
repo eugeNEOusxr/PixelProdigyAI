@@ -1,0 +1,12 @@
+{
+  "totalBudget": 4294967296,
+  "allocations": {
+    "geometry": 2147483648,
+    "textures": 1610612736,
+    "framebuffers": 402653184,
+    "uniforms": 134217728
+  },
+  "strategy": "pool-allocator",
+  "defragmentation": "background",
+  "oversubscription": false
+}

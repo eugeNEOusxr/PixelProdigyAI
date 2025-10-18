@@ -1,0 +1,58 @@
+{
+  "enabled": true,
+  "monitorInterval": 5000,
+  "thresholds": {
+    "normal": {
+      "max": 70,
+      "action": "none"
+    },
+    "warm": {
+      "max": 80,
+      "action": "reduce_quality"
+    },
+    "hot": {
+      "max": 90,
+      "action": "aggressive_reduce"
+    },
+    "critical": {
+      "max": 95,
+      "action": "emergency"
+    }
+  },
+  "actions": {
+    "reduce_quality": [
+      "disable_4k",
+      "reduce_effects",
+      "lower_resolution"
+    ],
+    "aggressive_reduce": [
+      "force_720p",
+      "disable_shadows",
+      "reduce_draw_distance"
+    ],
+    "emergency": [
+      "force_360p",
+      "minimal_effects",
+      "pause_rendering"
+    ]
+  },
+  "recovery": {
+    "enabled": true,
+    "cooldownTemp": 65,
+    "recoveryDelay": 10000
+  },
+  "sources": {
+    "gpu": {
+      "weight": 0.7,
+      "priority": "high"
+    },
+    "cpu": {
+      "weight": 0.2,
+      "priority": "medium"
+    },
+    "battery": {
+      "weight": 0.1,
+      "priority": "low"
+    }
+  }
+}

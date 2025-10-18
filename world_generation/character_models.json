@@ -1,0 +1,376 @@
+{
+  "version": "1.0",
+  "races": {
+    "human": {
+      "name": "Human",
+      "icon": "👨",
+      "description": "Versatile and adaptable. +2 to all attributes.",
+      "bonuses": {
+        "strength": 2,
+        "agility": 2,
+        "vitality": 2,
+        "intelligence": 2,
+        "wisdom": 2
+      },
+      "baseModel": "humanoid_male.vls",
+      "heightRange": [1.65, 1.85],
+      "animations": {
+        "idle": "human_idle.anim",
+        "walk": "human_walk.anim",
+        "run": "human_run.anim",
+        "attack": "human_attack.anim",
+        "cast": "human_cast.anim",
+        "death": "human_death.anim"
+      },
+      "skinTones": {
+        "light": "#ffdfc4",
+        "medium": "#f0c48c",
+        "tan": "#c68642",
+        "dark": "#8d5524",
+        "pale": "#ffe4e1"
+      }
+    },
+    "elf": {
+      "name": "Elf",
+      "icon": "🧝",
+      "description": "Graceful and wise. +4 Agility, +4 Intelligence.",
+      "bonuses": {
+        "strength": 0,
+        "agility": 4,
+        "vitality": 0,
+        "intelligence": 4,
+        "wisdom": 0
+      },
+      "baseModel": "elf_male.vls",
+      "heightRange": [1.75, 1.95],
+      "animations": {
+        "idle": "elf_idle.anim",
+        "walk": "elf_walk.anim",
+        "run": "elf_run.anim",
+        "attack": "elf_attack.anim",
+        "cast": "elf_cast.anim",
+        "death": "elf_death.anim"
+      },
+      "skinTones": {
+        "light": "#ffdfc4",
+        "pale": "#ffe4e1",
+        "moonlight": "#f0f0ff"
+      }
+    },
+    "dwarf": {
+      "name": "Dwarf",
+      "icon": "🧔",
+      "description": "Sturdy and resilient. +4 Strength, +4 Vitality.",
+      "bonuses": {
+        "strength": 4,
+        "agility": 0,
+        "vitality": 4,
+        "intelligence": 0,
+        "wisdom": 0
+      },
+      "baseModel": "dwarf_male.vls",
+      "heightRange": [1.35, 1.55],
+      "animations": {
+        "idle": "dwarf_idle.anim",
+        "walk": "dwarf_walk.anim",
+        "run": "dwarf_run.anim",
+        "attack": "dwarf_attack.anim",
+        "cast": "dwarf_cast.anim",
+        "death": "dwarf_death.anim"
+      },
+      "skinTones": {
+        "light": "#ffdfc4",
+        "medium": "#f0c48c",
+        "tan": "#c68642",
+        "ruddy": "#d08080"
+      }
+    },
+    "orc": {
+      "name": "Orc",
+      "icon": "👹",
+      "description": "Fierce and powerful. +6 Strength, +2 Vitality.",
+      "bonuses": {
+        "strength": 6,
+        "agility": 0,
+        "vitality": 2,
+        "intelligence": 0,
+        "wisdom": 0
+      },
+      "baseModel": "orc_male.vls",
+      "heightRange": [1.85, 2.15],
+      "animations": {
+        "idle": "orc_idle.anim",
+        "walk": "orc_walk.anim",
+        "run": "orc_run.anim",
+        "attack": "orc_attack.anim",
+        "cast": "orc_cast.anim",
+        "death": "orc_death.anim"
+      },
+      "skinTones": {
+        "green": "#90ee90",
+        "dark_green": "#6b8e6b",
+        "gray": "#808080",
+        "brown": "#8b7355"
+      }
+    }
+  },
+  "classes": {
+    "warrior": {
+      "name": "Warrior",
+      "icon": "🛡️",
+      "description": "Master of melee combat. High HP and physical damage.",
+      "primaryStat": "strength",
+      "secondaryStat": "vitality",
+      "startingHP": 150,
+      "startingMana": 50,
+      "hpPerLevel": 15,
+      "manaPerLevel": 3,
+      "startingEquipment": [
+        "iron_sword",
+        "wooden_shield",
+        "leather_armor",
+        "leather_boots",
+        "iron_helmet"
+      ],
+      "abilities": [
+        {
+          "id": "power_strike",
+          "name": "Power Strike",
+          "description": "A powerful melee attack dealing 150% weapon damage.",
+          "cooldown": 6,
+          "manaCost": 15,
+          "icon": "⚔️"
+        },
+        {
+          "id": "shield_bash",
+          "name": "Shield Bash",
+          "description": "Bash enemy with shield, stunning for 2 seconds.",
+          "cooldown": 10,
+          "manaCost": 20,
+          "icon": "🛡️"
+        },
+        {
+          "id": "battle_cry",
+          "name": "Battle Cry",
+          "description": "Increase attack damage by 30% for 10 seconds.",
+          "cooldown": 60,
+          "manaCost": 25,
+          "icon": "📢"
+        }
+      ]
+    },
+    "mage": {
+      "name": "Mage",
+      "icon": "🔮",
+      "description": "Wields powerful magic. High spell damage and mana.",
+      "primaryStat": "intelligence",
+      "secondaryStat": "wisdom",
+      "startingHP": 80,
+      "startingMana": 200,
+      "hpPerLevel": 8,
+      "manaPerLevel": 15,
+      "startingEquipment": [
+        "wooden_staff",
+        "cloth_robe",
+        "cloth_hood",
+        "cloth_boots"
+      ],
+      "abilities": [
+        {
+          "id": "fireball",
+          "name": "Fireball",
+          "description": "Hurl a ball of fire dealing 80 fire damage.",
+          "cooldown": 4,
+          "manaCost": 30,
+          "icon": "🔥"
+        },
+        {
+          "id": "ice_blast",
+          "name": "Ice Blast",
+          "description": "Blast of ice dealing 60 damage and slowing by 50%.",
+          "cooldown": 8,
+          "manaCost": 40,
+          "icon": "❄️"
+        },
+        {
+          "id": "arcane_shield",
+          "name": "Arcane Shield",
+          "description": "Create a shield absorbing 100 damage for 8 seconds.",
+          "cooldown": 30,
+          "manaCost": 50,
+          "icon": "✨"
+        }
+      ]
+    },
+    "rogue": {
+      "name": "Rogue",
+      "icon": "🗡️",
+      "description": "Swift and deadly. High critical chance and evasion.",
+      "primaryStat": "agility",
+      "secondaryStat": "strength",
+      "startingHP": 100,
+      "startingMana": 100,
+      "hpPerLevel": 10,
+      "manaPerLevel": 8,
+      "startingEquipment": [
+        "iron_dagger",
+        "iron_dagger",
+        "leather_vest",
+        "leather_boots",
+        "leather_gloves"
+      ],
+      "abilities": [
+        {
+          "id": "backstab",
+          "name": "Backstab",
+          "description": "Attack from behind for 250% damage.",
+          "cooldown": 10,
+          "manaCost": 25,
+          "icon": "🗡️"
+        },
+        {
+          "id": "shadow_step",
+          "name": "Shadow Step",
+          "description": "Teleport behind target, 6 meter range.",
+          "cooldown": 15,
+          "manaCost": 30,
+          "icon": "👥"
+        },
+        {
+          "id": "poison_blade",
+          "name": "Poison Blade",
+          "description": "Coat weapon in poison, dealing 20 damage/sec for 8 sec.",
+          "cooldown": 20,
+          "manaCost": 35,
+          "icon": "🧪"
+        }
+      ]
+    },
+    "cleric": {
+      "name": "Cleric",
+      "icon": "✨",
+      "description": "Divine healer. Can heal and buff allies.",
+      "primaryStat": "wisdom",
+      "secondaryStat": "intelligence",
+      "startingHP": 120,
+      "startingMana": 150,
+      "hpPerLevel": 12,
+      "manaPerLevel": 12,
+      "startingEquipment": [
+        "wooden_mace",
+        "holy_symbol",
+        "cloth_robe",
+        "cloth_boots"
+      ],
+      "abilities": [
+        {
+          "id": "heal",
+          "name": "Heal",
+          "description": "Restore 100 HP to target ally or self.",
+          "cooldown": 5,
+          "manaCost": 40,
+          "icon": "💚"
+        },
+        {
+          "id": "smite",
+          "name": "Smite",
+          "description": "Holy attack dealing 70 damage to undead/demons.",
+          "cooldown": 8,
+          "manaCost": 30,
+          "icon": "⚡"
+        },
+        {
+          "id": "divine_shield",
+          "name": "Divine Shield",
+          "description": "Grant immunity to damage for 3 seconds.",
+          "cooldown": 120,
+          "manaCost": 80,
+          "icon": "🛡️"
+        }
+      ]
+    }
+  },
+  "appearance": {
+    "hairStyles": [
+      {
+        "id": 1,
+        "name": "Short",
+        "icon": "💇",
+        "model": "hair_short.vls"
+      },
+      {
+        "id": 2,
+        "name": "Medium",
+        "icon": "💇‍♂️",
+        "model": "hair_medium.vls"
+      },
+      {
+        "id": 3,
+        "name": "Long",
+        "icon": "💇‍♀️",
+        "model": "hair_long.vls"
+      },
+      {
+        "id": 4,
+        "name": "Curly",
+        "icon": "🦱",
+        "model": "hair_curly.vls"
+      },
+      {
+        "id": 5,
+        "name": "Bald",
+        "icon": "🦲",
+        "model": null
+      }
+    ],
+    "hairColors": [
+      { "name": "black", "hex": "#1a1a1a" },
+      { "name": "brown", "hex": "#654321" },
+      { "name": "blonde", "hex": "#f0e68c" },
+      { "name": "red", "hex": "#cd5c5c" },
+      { "name": "white", "hex": "#f5f5f5" },
+      { "name": "blue", "hex": "#4169e1" }
+    ],
+    "faceTypes": [
+      {
+        "id": 1,
+        "name": "Friendly",
+        "icon": "😊",
+        "model": "face_1.vls"
+      },
+      {
+        "id": 2,
+        "name": "Serious",
+        "icon": "😎",
+        "model": "face_2.vls"
+      },
+      {
+        "id": 3,
+        "name": "Stern",
+        "icon": "🤨",
+        "model": "face_3.vls"
+      },
+      {
+        "id": 4,
+        "name": "Fierce",
+        "icon": "😈",
+        "model": "face_4.vls"
+      },
+      {
+        "id": 5,
+        "name": "Kind",
+        "icon": "🥰",
+        "model": "face_5.vls"
+      }
+    ]
+  },
+  "startingAttributes": {
+    "base": 10,
+    "min": 10,
+    "max": 30,
+    "pointsToDistribute": 20
+  },
+  "startingGold": 100,
+  "startingLevel": 1,
+  "startingExperience": 0
+}

@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy - Blender-Style 3D Modeler</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        
+        /* TOP MENU BAR */
+        #menu-bar {
+            background: #2b2b2b;
+            border-bottom: 1px solid #3f3f3f;
+            display: flex;
+            padding: 8px 15px;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .menu-item {
+            color: #e0e0e0;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background 0.2s;
+            font-size: 13px;
+        }
+        
+        .menu-item:hover {
+            background: #3f3f3f;
+        }
+        
+        /* MAIN LAYOUT */
+        #app-container {
+            display: grid;
+            grid-template-columns: 60px 250px 1fr 300px;
+            height: calc(100vh - 40px);
+        }
+        
+        /* LEFT TOOLBAR */
+        #toolbar {
+            background: #2b2b2b;
+            border-right: 1px solid #3f3f3f;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .tool-button {
+            width: 50px;
+            height: 50px;
+            background: #3f3f3f;
+            border: 1px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.2s;
+        }
+        
+        .tool-button:hover {
+            background: #4f4f4f;
+            border-color: #00aaff;
+        }
+        
+        .tool-button.active {
+            background: #00aaff;
+            border-color: #00ccff;
+        }
+        
+        /* LEFT PANEL - OBJECT LIST */
+        #objects-panel {
+            background: #252525;
+            border-right: 1px solid #3f3f3f;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            background: #2b2b2b;
+            padding: 12px;
+            border-bottom: 1px solid #3f3f3f;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .object-item {
+            background: #2b2b2b;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            font-size: 12px;
+        }
+        
+        .object-item:hover {
+            background: #3f3f3f;
+        }
+        
+        .object-item.selected {
+            background: #00aaff;
+        }
+        
+        /* CENTER - 3D VIEWPORT */
+        #viewport {
+            position: relative;
+            background: #1a1a1a;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* VIEWPORT OVERLAY */
+        #viewport-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .overlay-row {
+            margin: 3px 0;
+        }
+        
+        .overlay-label {
+            color: #888;
+        }
+        
+        .overlay-value {
+            color: #00ffaa;
+            font-weight: bold;
+        }
+        
+        /* GRID SNAP INDICATOR */
+        #grid-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+        
+        /* RIGHT PANEL - PROPERTIES */
+        #properties-panel {
+            background: #252525;
+            border-left: 1px solid #3f3f3f;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .property-section {
+            border-bottom: 1px solid #3f3f3f;
+            padding: 15px;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+        
+        .property-row {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            gap: 10px;
+        }
+        
+        .property-label {
+            flex: 0 0 60px;
+            font-size: 11px;
+            color: #aaa;
+        }
+        
+        input[type="number"],
+        input[type="text"],
+        select {
+            flex: 1;
+            background: #1e1e1e;
+            border: 1px solid #3f3f3f;
+            color: #e0e0e0;
+            padding: 6px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        input[type="color"] {
+            width: 40px;
+            height: 30px;
+            border: 1px solid #3f3f3f;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        button {
+            background: #3f3f3f;
+            border: 1px solid #555;
+            color: #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #4f4f4f;
+            border-color: #00aaff;
+        }
+        
+        button.primary {
+            background: #00aaff;
+            border-color: #00ccff;
+        }
+        
+        button.danger {
+            background: #ff4444;
+            border-color: #ff6666;
+        }
+        
+        /* MODIFIERS LIST */
+        .modifier-item {
+            background: #2b2b2b;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border-left: 3px solid #00aaff;
+        }
+        
+        .modifier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .modifier-controls {
+            margin-top: 8px;
+            font-size: 10px;
+        }
+        
+        /* SHORTCUTS HELP */
+        #shortcuts {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 10px;
+            max-width: 250px;
+        }
+        
+        .shortcut-row {
+            margin: 4px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .key {
+            background: #3f3f3f;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        /* TRANSFORM GIZMO OVERLAY */
+        #transform-mode {
+            position: absolute;
+            top: 10px;
+            right: 320px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            border-radius: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .mode-btn {
+            width: 40px;
+            height: 40px;
+            background: #3f3f3f;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn:hover {
+            background: #4f4f4f;
+        }
+        
+        .mode-btn.active {
+            background: #00aaff;
+            border-color: #00ccff;
+        }
+    </style>
+</head>
+<body>
+    <!-- TOP MENU BAR -->
+    <div id="menu-bar">
+        <div class="menu-item" onclick="fileMenu()">File</div>
+        <div class="menu-item" onclick="editMenu()">Edit</div>
+        <div class="menu-item" onclick="addMenu()">Add</div>
+        <div class="menu-item" onclick="modifierMenu()">Modifier</div>
+        <div class="menu-item" onclick="renderMenu()">Render</div>
+        <div class="menu-item" onclick="helpMenu()">Help</div>
+        <div style="flex: 1"></div>
+        <div class="menu-item" onclick="saveProject()">💾 Save</div>
+        <div class="menu-item" onclick="exportModel()">📤 Export</div>
+    </div>
+    
+    <!-- MAIN LAYOUT -->
+    <div id="app-container">
+        <!-- LEFT TOOLBAR -->
+        <div id="toolbar">
+            <div class="tool-button active" onclick="setTool('select')" title="Select (Q)">☝️</div>
+            <div class="tool-button" onclick="setTool('move')" title="Move (G)">✋</div>
+            <div class="tool-button" onclick="setTool('rotate')" title="Rotate (R)">🔄</div>
+            <div class="tool-button" onclick="setTool('scale')" title="Scale (S)">📏</div>
+            <div style="height: 20px"></div>
+            <div class="tool-button" onclick="setTool('extrude')" title="Extrude (E)">⬆️</div>
+            <div class="tool-button" onclick="setTool('inset')" title="Inset (I)">📐</div>
+            <div class="tool-button" onclick="setTool('bevel')" title="Bevel (B)">💎</div>
+            <div class="tool-button" onclick="setTool('knife')" title="Knife (K)">🔪</div>
+            <div style="height: 20px"></div>
+            <div class="tool-button" onclick="setTool('sculpt')" title="Sculpt">🎨</div>
+        </div>
+        
+        <!-- OBJECTS PANEL -->
+        <div id="objects-panel">
+            <div class="panel-header">📦 Scene Collection</div>
+            <div class="panel-content" id="objects-list">
+                <div class="object-item selected" data-id="default-cube">
+                    <span>📦</span>
+                    <span>Cube</span>
+                </div>
+            </div>
+            <div style="padding: 10px;">
+                <button onclick="addObject()" style="width: 100%;">➕ Add Object</button>
+            </div>
+        </div>
+        
+        <!-- 3D VIEWPORT -->
+        <div id="viewport">
+            <canvas id="render-canvas"></canvas>
+            
+            <!-- VIEWPORT INFO -->
+            <div id="viewport-overlay">
+                <div class="overlay-row">
+                    <span class="overlay-label">Verts:</span>
+                    <span class="overlay-value" id="vert-count">8</span>
+                </div>
+                <div class="overlay-row">
+                    <span class="overlay-label">Faces:</span>
+                    <span class="overlay-value" id="face-count">6</span>
+                </div>
+                <div class="overlay-row">
+                    <span class="overlay-label">Tool:</span>
+                    <span class="overlay-value" id="current-tool">SELECT</span>
+                </div>
+            </div>
+            
+            <!-- TRANSFORM MODE -->
+            <div id="transform-mode">
+                <div class="mode-btn active" onclick="setTransformMode('translate')" title="Move (G)">↔️</div>
+                <div class="mode-btn" onclick="setTransformMode('rotate')" title="Rotate (R)">🔄</div>
+                <div class="mode-btn" onclick="setTransformMode('scale')" title="Scale (S)">📏</div>
+            </div>
+            
+            <!-- GRID SNAP -->
+            <div id="grid-indicator">
+                Grid: <span style="color: #00ffaa">ON</span> | Snap: 0.5
+            </div>
+            
+            <!-- SHORTCUTS HELP -->
+            <div id="shortcuts">
+                <div style="font-weight: 600; margin-bottom: 8px;">Keyboard Shortcuts</div>
+                <div class="shortcut-row">
+                    <span class="key">G</span>
+                    <span>Move</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">R</span>
+                    <span>Rotate</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">S</span>
+                    <span>Scale</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">E</span>
+                    <span>Extrude</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">I</span>
+                    <span>Inset</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">X/Y/Z</span>
+                    <span>Lock Axis</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">Tab</span>
+                    <span>Edit Mode</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">Ctrl+Z</span>
+                    <span>Undo</span>
+                </div>
+                <div class="shortcut-row">
+                    <span class="key">Del</span>
+                    <span>Delete</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PROPERTIES PANEL -->
+        <div id="properties-panel">
+            <div class="panel-header">⚙️ Properties</div>
+            
+            <!-- TRANSFORM -->
+            <div class="property-section">
+                <div class="section-title">Transform</div>
+                <div class="property-row">
+                    <span class="property-label">Location</span>
+                </div>
+                <div class="property-row">
+                    <input type="number" id="loc-x" value="0" step="0.1" onchange="updateTransform()">
+                    <input type="number" id="loc-y" value="0" step="0.1" onchange="updateTransform()">
+                    <input type="number" id="loc-z" value="0" step="0.1" onchange="updateTransform()">
+                </div>
+                <div class="property-row">
+                    <span class="property-label">Rotation</span>
+                </div>
+                <div class="property-row">
+                    <input type="number" id="rot-x" value="0" step="5" onchange="updateTransform()">
+                    <input type="number" id="rot-y" value="0" step="5" onchange="updateTransform()">
+                    <input type="number" id="rot-z" value="0" step="5" onchange="updateTransform()">
+                </div>
+                <div class="property-row">
+                    <span class="property-label">Scale</span>
+                </div>
+                <div class="property-row">
+                    <input type="number" id="scale-x" value="1" step="0.1" onchange="updateTransform()">
+                    <input type="number" id="scale-y" value="1" step="0.1" onchange="updateTransform()">
+                    <input type="number" id="scale-z" value="1" step="0.1" onchange="updateTransform()">
+                </div>
+            </div>
+            
+            <!-- MATERIAL -->
+            <div class="property-section">
+                <div class="section-title">Material</div>
+                <div class="property-row">
+                    <span class="property-label">Color</span>
+                    <input type="color" id="material-color" value="#888888" onchange="updateMaterial()">
+                </div>
+                <div class="property-row">
+                    <span class="property-label">Roughness</span>
+                    <input type="number" id="roughness" value="0.7" min="0" max="1" step="0.1" onchange="updateMaterial()">
+                </div>
+                <div class="property-row">
+                    <span class="property-label">Metallic</span>
+                    <input type="number" id="metallic" value="0.0" min="0" max="1" step="0.1" onchange="updateMaterial()">
+                </div>
+                <button onclick="loadTexture()" style="width: 100%; margin-top: 10px;">📷 Load 4K Texture</button>
+            </div>
+            
+            <!-- MODIFIERS -->
+            <div class="property-section">
+                <div class="section-title">Modifiers</div>
+                <div id="modifiers-list">
+                    <!-- Dynamic modifiers -->
+                </div>
+                <div class="button-group">
+                    <button onclick="addModifier('subdivide')">➕ Subdivide</button>
+                    <button onclick="addModifier('mirror')">🪞 Mirror</button>
+                    <button onclick="addModifier('bevel')">💎 Bevel</button>
+                    <button onclick="addModifier('array')">📋 Array</button>
+                </div>
+            </div>
+            
+            <!-- QUICK ACTIONS -->
+            <div class="property-section">
+                <div class="section-title">Quick Actions</div>
+                <button onclick="duplicateObject()" style="width: 100%; margin: 5px 0;">📋 Duplicate</button>
+                <button onclick="smoothShading()" style="width: 100%; margin: 5px 0;">〰️ Smooth Shade</button>
+                <button onclick="flatShading()" style="width: 100%; margin: 5px 0;">▭ Flat Shade</button>
+                <button onclick="deleteObject()" class="danger" style="width: 100%; margin: 5px 0;">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.152.0/examples/js/controls/TransformControls.js"></script>
+    
+    <script>
+        // ===== GLOBAL STATE =====
+        let scene, camera, renderer, controls, transformControls;
+        let selectedObject = null;
+        let currentTool = 'select';
+        let transformMode = 'translate';
+        let history = [];
+        let historyIndex = -1;
+        
+        // ===== INITIALIZE THREE.JS =====
+        function init() {
+            const canvas = document.getElementById('render-canvas');
+            const container = canvas.parentElement;
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a1a);
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                60,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(5, 5, 5);
+            camera.lookAt(0, 0, 0);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            
+            // Lighting (Blender-style 3-point)
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+            
+            const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            keyLight.position.set(5, 10, 7);
+            keyLight.castShadow = true;
+            scene.add(keyLight);
+            
+            const fillLight = new THREE.DirectionalLight(0x8899ff, 0.3);
+            fillLight.position.set(-5, 5, -5);
+            scene.add(fillLight);
+            
+            const rimLight = new THREE.DirectionalLight(0xffaa77, 0.4);
+            rimLight.position.set(0, 5, -10);
+            scene.add(rimLight);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+            scene.add(gridHelper);
+            
+            // Orbit Controls
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            
+            // Transform Controls
+            transformControls = new THREE.TransformControls(camera, canvas);
+            transformControls.addEventListener('change', render);
+            transformControls.addEventListener('dragging-changed', (event) => {
+                controls.enabled = !event.value;
+            });
+            scene.add(transformControls);
+            
+            // Create default cube
+            createDefaultCube();
+            
+            // Keyboard shortcuts
+            setupKeyboardShortcuts();
+            
+            animate();
+            
+            console.log('✅ Blender-Style Modeler initialized');
+        }
+        
+        function createDefaultCube() {
+            const geometry = new THREE.BoxGeometry(2, 2, 2);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x888888,
+                roughness: 0.7,
+                metalness: 0.0
+            });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.name = 'Cube';
+            cube.castShadow = true;
+            cube.receiveShadow = true;
+            scene.add(cube);
+            
+            selectObject(cube);
+        }
+        
+        function selectObject(object) {
+            selectedObject = object;
+            transformControls.attach(object);
+            updatePropertiesPanel();
+            updateStats();
+        }
+        
+        function updatePropertiesPanel() {
+            if (!selectedObject) return;
+            
+            document.getElementById('loc-x').value = selectedObject.position.x.toFixed(2);
+            document.getElementById('loc-y').value = selectedObject.position.y.toFixed(2);
+            document.getElementById('loc-z').value = selectedObject.position.z.toFixed(2);
+            
+            document.getElementById('rot-x').value = THREE.MathUtils.radToDeg(selectedObject.rotation.x).toFixed(0);
+            document.getElementById('rot-y').value = THREE.MathUtils.radToDeg(selectedObject.rotation.y).toFixed(0);
+            document.getElementById('rot-z').value = THREE.MathUtils.radToDeg(selectedObject.rotation.z).toFixed(0);
+            
+            document.getElementById('scale-x').value = selectedObject.scale.x.toFixed(2);
+            document.getElementById('scale-y').value = selectedObject.scale.y.toFixed(2);
+            document.getElementById('scale-z').value = selectedObject.scale.z.toFixed(2);
+        }
+        
+        function updateTransform() {
+            if (!selectedObject) return;
+            
+            selectedObject.position.x = parseFloat(document.getElementById('loc-x').value);
+            selectedObject.position.y = parseFloat(document.getElementById('loc-y').value);
+            selectedObject.position.z = parseFloat(document.getElementById('loc-z').value);
+            
+            selectedObject.rotation.x = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-x').value));
+            selectedObject.rotation.y = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-y').value));
+            selectedObject.rotation.z = THREE.MathUtils.degToRad(parseFloat(document.getElementById('rot-z').value));
+            
+            selectedObject.scale.x = parseFloat(document.getElementById('scale-x').value);
+            selectedObject.scale.y = parseFloat(document.getElementById('scale-y').value);
+            selectedObject.scale.z = parseFloat(document.getElementById('scale-z').value);
+        }
+        
+        function updateMaterial() {
+            if (!selectedObject) return;
+            
+            const color = document.getElementById('material-color').value;
+            const roughness = parseFloat(document.getElementById('roughness').value);
+            const metallic = parseFloat(document.getElementById('metallic').value);
+            
+            selectedObject.material.color.set(color);
+            selectedObject.material.roughness = roughness;
+            selectedObject.material.metalness = metallic;
+        }
+        
+        function updateStats() {
+            if (!selectedObject || !selectedObject.geometry) return;
+            
+            const vertCount = selectedObject.geometry.attributes.position.count;
+            const faceCount = selectedObject.geometry.index ? 
+                selectedObject.geometry.index.count / 3 : vertCount / 3;
+            
+            document.getElementById('vert-count').textContent = vertCount;
+            document.getElementById('face-count').textContent = Math.floor(faceCount);
+        }
+        
+        function setTool(tool) {
+            currentTool = tool;
+            document.getElementById('current-tool').textContent = tool.toUpperCase();
+            
+            // Update button states
+            document.querySelectorAll('.tool-button').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Apply tool-specific actions
+            if (selectedObject) {
+                switch(tool) {
+                    case 'extrude':
+                        extrudeGeometry();
+                        break;
+                    case 'inset':
+                        insetFaces();
+                        break;
+                    case 'bevel':
+                        bevelEdges();
+                        break;
+                    case 'knife':
+                        activateKnifeTool();
+                        break;
+                    case 'sculpt':
+                        activateSculptMode();
+                        break;
+                }
+            }
+            
+            console.log('🔧 Tool:', tool);
+        }
+        
+        // ===== MODELING TOOLS IMPLEMENTATION =====
+        
+        function extrudeGeometry() {
+            if (!selectedObject) return;
+            console.log('⬆️ Extruding faces...');
+            
+            const geometry = selectedObject.geometry;
+            const positions = geometry.attributes.position.array;
+            const extrudeAmount = 0.5;
+            
+            // Get face normals and extrude along them
+            const newPositions = Array.from(positions);
+            const normals = geometry.attributes.normal.array;
+            
+            for (let i = 0; i < positions.length; i += 3) {
+                newPositions[i] += normals[i] * extrudeAmount;
+                newPositions[i + 1] += normals[i + 1] * extrudeAmount;
+                newPositions[i + 2] += normals[i + 2] * extrudeAmount;
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(newPositions, 3));
+            geometry.computeVertexNormals();
+            geometry.attributes.position.needsUpdate = true;
+            updateStats();
+            saveState();
+        }
+        
+        function insetFaces() {
+            if (!selectedObject) return;
+            console.log('📐 Insetting faces...');
+            
+            const geometry = selectedObject.geometry;
+            const positions = geometry.attributes.position.array;
+            const insetAmount = 0.8; // Scale factor
+            
+            // Calculate centroid
+            let cx = 0, cy = 0, cz = 0;
+            for (let i = 0; i < positions.length; i += 3) {
+                cx += positions[i];
+                cy += positions[i + 1];
+                cz += positions[i + 2];
+            }
+            const count = positions.length / 3;
+            cx /= count; cy /= count; cz /= count;
+            
+            // Move vertices toward centroid
+            const newPositions = Array.from(positions);
+            for (let i = 0; i < positions.length; i += 3) {
+                const dx = positions[i] - cx;
+                const dy = positions[i + 1] - cy;
+                const dz = positions[i + 2] - cz;
+                
+                newPositions[i] = cx + dx * insetAmount;
+                newPositions[i + 1] = cy + dy * insetAmount;
+                newPositions[i + 2] = cz + dz * insetAmount;
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(newPositions, 3));
+            geometry.computeVertexNormals();
+            geometry.attributes.position.needsUpdate = true;
+            updateStats();
+            saveState();
+        }
+        
+        function bevelEdges() {
+            if (!selectedObject) return;
+            console.log('💎 Beveling edges...');
+            
+            // Simple bevel: slightly subdivide and smooth
+            subdivideGeometry();
+            
+            const geometry = selectedObject.geometry;
+            const positions = geometry.attributes.position.array;
+            
+            // Smooth vertices slightly
+            for (let pass = 0; pass < 2; pass++) {
+                const newPositions = Array.from(positions);
+                for (let i = 0; i < positions.length; i += 9) {
+                    // Average triangle vertices with neighbors
+                    const avgX = (positions[i] + positions[i + 3] + positions[i + 6]) / 3;
+                    const avgY = (positions[i + 1] + positions[i + 4] + positions[i + 7]) / 3;
+                    const avgZ = (positions[i + 2] + positions[i + 5] + positions[i + 8]) / 3;
+                    
+                    for (let j = 0; j < 3; j++) {
+                        const idx = i + j * 3;
+                        newPositions[idx] = positions[idx] * 0.7 + avgX * 0.3;
+                        newPositions[idx + 1] = positions[idx + 1] * 0.7 + avgY * 0.3;
+                        newPositions[idx + 2] = positions[idx + 2] * 0.7 + avgZ * 0.3;
+                    }
+                }
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(newPositions, 3));
+            }
+            
+            geometry.computeVertexNormals();
+            geometry.attributes.position.needsUpdate = true;
+            updateStats();
+            saveState();
+        }
+        
+        function activateKnifeTool() {
+            console.log('🔪 Knife tool activated - Click to cut');
+            alert('Knife Tool:\nClick on the mesh to add cut lines.\nPress Enter to complete the cut.');
+            // Full knife tool would require raycasting and geometry splitting
+        }
+        
+        function activateSculptMode() {
+            console.log('🎨 Sculpt mode activated');
+            alert('Sculpt Mode:\nUse mouse drag to sculpt.\nHold Shift to smooth.\nHold Ctrl to subtract.');
+            // Full sculpt mode would require brush system and vertex painting
+        }
+        
+        function setTransformMode(mode) {
+            transformMode = mode;
+            transformControls.setMode(mode);
+            
+            // Update button states
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+        
+        function addObject() {
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.name = 'Object.' + (scene.children.length - 4);
+            mesh.position.set(Math.random() * 4 - 2, 1, Math.random() * 4 - 2);
+            mesh.castShadow = true;
+            scene.add(mesh);
+            
+            selectObject(mesh);
+            refreshObjectsList();
+        }
+        
+        function refreshObjectsList() {
+            const list = document.getElementById('objects-list');
+            list.innerHTML = '';
+            
+            scene.children.forEach(child => {
+                if (child.isMesh) {
+                    const item = document.createElement('div');
+                    item.className = 'object-item';
+                    if (child === selectedObject) item.classList.add('selected');
+                    item.innerHTML = `<span>📦</span><span>${child.name}</span>`;
+                    item.onclick = () => selectObject(child);
+                    list.appendChild(item);
+                }
+            });
+        }
+        
+        function addModifier(type) {
+            if (!selectedObject) return;
+            
+            const modifiersList = document.getElementById('modifiers-list');
+            const modifierId = 'modifier-' + Date.now();
+            const modifier = document.createElement('div');
+            modifier.className = 'modifier-item';
+            modifier.id = modifierId;
+            
+            let controlsHTML = '';
+            
+            if (type === 'subdivide') {
+                controlsHTML = `
+                    <div class="modifier-controls">
+                        Level: <input type="number" value="2" min="1" max="5" 
+                               onchange="applyModifier('${modifierId}', '${type}')" style="width: 60px">
+                    </div>
+                `;
+            } else if (type === 'array') {
+                controlsHTML = `
+                    <div class="modifier-controls">
+                        Count: <input type="number" value="3" min="1" max="10" 
+                               onchange="applyModifier('${modifierId}', '${type}')" style="width: 60px">
+                        <br>Offset X: <input type="number" value="2" step="0.5" 
+                                      onchange="applyModifier('${modifierId}', '${type}')" style="width: 60px">
+                    </div>
+                `;
+            } else {
+                controlsHTML = `
+                    <div class="modifier-controls">
+                        Strength: <input type="number" value="1" min="0" max="2" step="0.1" 
+                                  onchange="applyModifier('${modifierId}', '${type}')" style="width: 60px">
+                    </div>
+                `;
+            }
+            
+            modifier.innerHTML = `
+                <div class="modifier-header">
+                    <span>${type.toUpperCase()}</span>
+                    <button onclick="removeModifier('${modifierId}')">❌</button>
+                </div>
+                ${controlsHTML}
+            `;
+            modifiersList.appendChild(modifier);
+            
+            // Apply modifier immediately
+            applyModifier(modifierId, type);
+        }
+        
+        function applyModifier(modifierId, type) {
+            if (!selectedObject) return;
+            
+            const modifierEl = document.getElementById(modifierId);
+            if (!modifierEl) return;
+            
+            const inputs = modifierEl.querySelectorAll('input');
+            
+            switch(type) {
+                case 'subdivide':
+                    const level = parseInt(inputs[0].value) || 1;
+                    for (let i = 0; i < level; i++) {
+                        subdivideGeometry();
+                    }
+                    break;
+                    
+                case 'mirror':
+                    mirrorObject();
+                    break;
+                    
+                case 'bevel':
+                    bevelEdges();
+                    break;
+                    
+                case 'array':
+                    const count = parseInt(inputs[0].value) || 3;
+                    const offsetX = parseFloat(inputs[1].value) || 2;
+                    arrayModifier(count, offsetX);
+                    break;
+            }
+        }
+        
+        function removeModifier(modifierId) {
+            const modifier = document.getElementById(modifierId);
+            if (modifier) {
+                modifier.remove();
+                console.log('Modifier removed');
+            }
+        }
+        
+        function arrayModifier(count, offsetX) {
+            if (!selectedObject) return;
+            
+            // Remove existing array instances
+            const arrayName = selectedObject.name + '.array';
+            scene.children.filter(c => c.name && c.name.startsWith(arrayName)).forEach(c => {
+                scene.remove(c);
+            });
+            
+            // Create array instances
+            for (let i = 1; i < count; i++) {
+                const clone = selectedObject.clone();
+                clone.material = selectedObject.material.clone();
+                clone.position.x = selectedObject.position.x + (offsetX * i);
+                clone.position.y = selectedObject.position.y;
+                clone.position.z = selectedObject.position.z;
+                clone.name = `${selectedObject.name}.array.${i}`;
+                scene.add(clone);
+            }
+            
+            refreshObjectsList();
+            console.log(`📋 Array: ${count} instances with ${offsetX} offset`);
+        }
+        
+        function subdivideGeometry() {
+            if (!selectedObject) return;
+            console.log('➕ Subdividing geometry...');
+            
+            const geometry = selectedObject.geometry;
+            const positions = geometry.attributes.position.array;
+            const indices = geometry.index ? geometry.index.array : null;
+            
+            // Simple subdivision: split each triangle into 4 smaller triangles
+            const newPositions = [];
+            const newIndices = [];
+            
+            if (indices) {
+                for (let i = 0; i < indices.length; i += 3) {
+                    const i0 = indices[i] * 3;
+                    const i1 = indices[i + 1] * 3;
+                    const i2 = indices[i + 2] * 3;
+                    
+                    // Original vertices
+                    const v0 = [positions[i0], positions[i0 + 1], positions[i0 + 2]];
+                    const v1 = [positions[i1], positions[i1 + 1], positions[i1 + 2]];
+                    const v2 = [positions[i2], positions[i2 + 1], positions[i2 + 2]];
+                    
+                    // Midpoints
+                    const m01 = [(v0[0] + v1[0]) / 2, (v0[1] + v1[1]) / 2, (v0[2] + v1[2]) / 2];
+                    const m12 = [(v1[0] + v2[0]) / 2, (v1[1] + v2[1]) / 2, (v1[2] + v2[2]) / 2];
+                    const m20 = [(v2[0] + v0[0]) / 2, (v2[1] + v0[1]) / 2, (v2[2] + v0[2]) / 2];
+                    
+                    // Add all vertices
+                    const startIdx = newPositions.length / 3;
+                    newPositions.push(...v0, ...v1, ...v2, ...m01, ...m12, ...m20);
+                    
+                    // Create 4 new triangles
+                    newIndices.push(
+                        startIdx, startIdx + 3, startIdx + 5,  // v0, m01, m20
+                        startIdx + 3, startIdx + 1, startIdx + 4,  // m01, v1, m12
+                        startIdx + 5, startIdx + 4, startIdx + 2,  // m20, m12, v2
+                        startIdx + 3, startIdx + 4, startIdx + 5   // m01, m12, m20
+                    );
+                }
+            }
+            
+            // Create new geometry
+            const newGeometry = new THREE.BufferGeometry();
+            newGeometry.setAttribute('position', new THREE.Float32BufferAttribute(newPositions, 3));
+            newGeometry.setIndex(newIndices);
+            newGeometry.computeVertexNormals();
+            
+            selectedObject.geometry.dispose();
+            selectedObject.geometry = newGeometry;
+            updateStats();
+        }
+        
+        function mirrorObject() {
+            if (!selectedObject) return;
+            const clone = selectedObject.clone();
+            clone.material = selectedObject.material.clone();
+            clone.position.x = -selectedObject.position.x;
+            clone.scale.x *= -1;
+            clone.name = selectedObject.name + '.mirror';
+            scene.add(clone);
+            refreshObjectsList();
+        }
+        
+        function duplicateObject() {
+            if (!selectedObject) return;
+            const clone = selectedObject.clone();
+            clone.position.x += 2;
+            scene.add(clone);
+            selectObject(clone);
+            refreshObjectsList();
+        }
+        
+        function deleteObject() {
+            if (!selectedObject) return;
+            scene.remove(selectedObject);
+            transformControls.detach();
+            selectedObject = null;
+            refreshObjectsList();
+        }
+        
+        function smoothShading() {
+            if (!selectedObject) return;
+            selectedObject.material.flatShading = false;
+            selectedObject.material.needsUpdate = true;
+            selectedObject.geometry.computeVertexNormals();
+        }
+        
+        function flatShading() {
+            if (!selectedObject) return;
+            selectedObject.material.flatShading = true;
+            selectedObject.material.needsUpdate = true;
+        }
+        
+        function loadTexture() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const texture = new THREE.TextureLoader().load(event.target.result);
+                    if (selectedObject) {
+                        selectedObject.material.map = texture;
+                        selectedObject.material.needsUpdate = true;
+                    }
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+        
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Prevent default for our shortcuts
+                const shortcuts = ['g', 'r', 's', 'e', 'i', 'b', 'k', 'x', 'y', 'z', 'd'];
+                if (shortcuts.includes(e.key.toLowerCase()) && !e.ctrlKey) {
+                    e.preventDefault();
+                }
+                
+                // Undo/Redo
+                if (e.ctrlKey && e.shiftKey && e.key === 'Z') {
+                    e.preventDefault();
+                    redo();
+                } else if (e.ctrlKey && e.key === 'z') {
+                    e.preventDefault();
+                    undo();
+                }
+                
+                // Transform modes
+                if (e.key.toLowerCase() === 'g' && !e.ctrlKey) {
+                    setTransformMode('translate');
+                    document.getElementById('current-tool').textContent = 'MOVE';
+                }
+                if (e.key.toLowerCase() === 'r' && !e.ctrlKey) {
+                    setTransformMode('rotate');
+                    document.getElementById('current-tool').textContent = 'ROTATE';
+                }
+                if (e.key.toLowerCase() === 's' && !e.ctrlKey && !e.shiftKey) {
+                    setTransformMode('scale');
+                    document.getElementById('current-tool').textContent = 'SCALE';
+                }
+                
+                // Modeling tools
+                if (e.key.toLowerCase() === 'e' && !e.ctrlKey) {
+                    setTool('extrude');
+                }
+                if (e.key.toLowerCase() === 'i' && !e.ctrlKey) {
+                    setTool('inset');
+                }
+                if (e.key.toLowerCase() === 'b' && !e.ctrlKey) {
+                    setTool('bevel');
+                }
+                if (e.key.toLowerCase() === 'k' && !e.ctrlKey) {
+                    setTool('knife');
+                }
+                
+                // Duplicate
+                if (e.shiftKey && e.key.toLowerCase() === 'd') {
+                    e.preventDefault();
+                    duplicateObject();
+                }
+                
+                // Delete
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    e.preventDefault();
+                    if (selectedObject) {
+                        const confirm = window.confirm(`Delete ${selectedObject.name}?`);
+                        if (confirm) deleteObject();
+                    }
+                }
+                
+                // Axis constraints (lowercase to handle both cases)
+                if (e.key.toLowerCase() === 'x' && !e.ctrlKey) {
+                    transformControls.showX = true;
+                    transformControls.showY = false;
+                    transformControls.showZ = false;
+                }
+                if (e.key.toLowerCase() === 'y' && !e.ctrlKey) {
+                    transformControls.showX = false;
+                    transformControls.showY = true;
+                    transformControls.showZ = false;
+                }
+                if (e.key.toLowerCase() === 'z' && !e.ctrlKey && !e.shiftKey) {
+                    transformControls.showX = false;
+                    transformControls.showY = false;
+                    transformControls.showZ = true;
+                }
+                
+                // Reset axis constraints
+                if (e.key === 'Escape') {
+                    transformControls.showX = true;
+                    transformControls.showY = true;
+                    transformControls.showZ = true;
+                }
+            });
+        }
+        
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                restoreState(history[historyIndex]);
+                console.log('↩️ Undo:', historyIndex + '/' + history.length);
+            }
+        }
+        
+        function redo() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                restoreState(history[historyIndex]);
+                console.log('↪️ Redo:', historyIndex + '/' + history.length);
+            }
+        }
+        
+        function saveState() {
+            const state = {
+                objects: scene.children.filter(c => c.isMesh).map(obj => ({
+                    name: obj.name,
+                    position: obj.position.clone(),
+                    rotation: obj.rotation.clone(),
+                    scale: obj.scale.clone(),
+                    geometry: obj.geometry.clone(),
+                    material: obj.material.clone()
+                }))
+            };
+            history = history.slice(0, historyIndex + 1);
+            history.push(state);
+            historyIndex++;
+        }
+        
+        function restoreState(state) {
+            // Clear current objects
+            const meshes = scene.children.filter(c => c.isMesh);
+            meshes.forEach(m => scene.remove(m));
+            
+            // Restore objects
+            state.objects.forEach(obj => {
+                const geometry = obj.geometry.clone();
+                const material = obj.material.clone();
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.name = obj.name;
+                mesh.position.copy(obj.position);
+                mesh.rotation.copy(obj.rotation);
+                mesh.scale.copy(obj.scale);
+                scene.add(mesh);
+            });
+            
+            refreshObjectsList();
+        }
+        
+        function saveProject() {
+            const projectData = {
+                version: '1.0',
+                objects: scene.children.filter(c => c.isMesh).map(obj => ({
+                    name: obj.name,
+                    type: obj.geometry.type,
+                    position: [obj.position.x, obj.position.y, obj.position.z],
+                    rotation: [obj.rotation.x, obj.rotation.y, obj.rotation.z],
+                    scale: [obj.scale.x, obj.scale.y, obj.scale.z],
+                    color: '#' + obj.material.color.getHexString(),
+                    roughness: obj.material.roughness,
+                    metalness: obj.material.metalness
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pixelprodigy_project.json';
+            a.click();
+            
+            console.log('💾 Project saved!');
+        }
+        
+        function exportModel() {
+            if (!selectedObject) {
+                alert('Please select an object to export');
+                return;
+            }
+            
+            // Export as OBJ format
+            const geometry = selectedObject.geometry;
+            const positions = geometry.attributes.position.array;
+            const indices = geometry.index ? geometry.index.array : null;
+            
+            let objContent = '# PixelProdigy 3D Model Export\n';
+            objContent += `# Object: ${selectedObject.name}\n\n`;
+            
+            // Vertices
+            for (let i = 0; i < positions.length; i += 3) {
+                objContent += `v ${positions[i]} ${positions[i + 1]} ${positions[i + 2]}\n`;
+            }
+            
+            // Faces
+            if (indices) {
+                for (let i = 0; i < indices.length; i += 3) {
+                    objContent += `f ${indices[i] + 1} ${indices[i + 1] + 1} ${indices[i + 2] + 1}\n`;
+                }
+            } else {
+                for (let i = 0; i < positions.length / 3; i += 3) {
+                    objContent += `f ${i + 1} ${i + 2} ${i + 3}\n`;
+                }
+            }
+            
+            const blob = new Blob([objContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${selectedObject.name}.obj`;
+            a.click();
+            
+            console.log('📤 Model exported as OBJ!');
+        }
+        
+        function fileMenu() {
+            const action = prompt('File Menu:\n1. New Project\n2. Save Project\n3. Load Project\n4. Export Model\n\nEnter number:');
+            if (action === '2') saveProject();
+            if (action === '4') exportModel();
+        }
+        
+        function editMenu() {
+            const action = prompt('Edit Menu:\n1. Undo\n2. Redo\n3. Duplicate\n4. Delete\n\nEnter number:');
+            if (action === '1') undo();
+            if (action === '2') redo();
+            if (action === '3') duplicateObject();
+            if (action === '4') deleteObject();
+        }
+        
+        function addMenu() {
+            const shapes = prompt(
+                'Add Object:\n' +
+                '1. Cube\n' +
+                '2. Sphere\n' +
+                '3. Cylinder\n' +
+                '4. Cone\n' +
+                '5. Torus\n' +
+                '6. Plane\n' +
+                '\nEnter number:'
+            );
+            
+            let geometry;
+            let name;
+            
+            switch(shapes) {
+                case '1':
+                    geometry = new THREE.BoxGeometry(1, 1, 1);
+                    name = 'Cube';
+                    break;
+                case '2':
+                    geometry = new THREE.SphereGeometry(0.75, 32, 32);
+                    name = 'Sphere';
+                    break;
+                case '3':
+                    geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32);
+                    name = 'Cylinder';
+                    break;
+                case '4':
+                    geometry = new THREE.ConeGeometry(0.5, 1, 32);
+                    name = 'Cone';
+                    break;
+                case '5':
+                    geometry = new THREE.TorusGeometry(0.5, 0.2, 16, 32);
+                    name = 'Torus';
+                    break;
+                case '6':
+                    geometry = new THREE.PlaneGeometry(2, 2);
+                    name = 'Plane';
+                    break;
+                default:
+                    return;
+            }
+            
+            const material = new THREE.MeshStandardMaterial({
+                color: Math.random() * 0xffffff,
+                roughness: 0.7,
+                metalness: 0.0
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.name = name + '.' + scene.children.filter(c => c.isMesh).length;
+            mesh.position.set(Math.random() * 4 - 2, 1, Math.random() * 4 - 2);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+            
+            selectObject(mesh);
+            refreshObjectsList();
+            saveState();
+        }
+        
+        function modifierMenu() {
+            const mod = prompt('Modifier Menu:\n1. Subdivide\n2. Mirror\n3. Bevel\n4. Array\n\nEnter number:');
+            if (mod === '1') addModifier('subdivide');
+            if (mod === '2') addModifier('mirror');
+            if (mod === '3') addModifier('bevel');
+            if (mod === '4') addModifier('array');
+        }
+        
+        function renderMenu() {
+            alert('Render Menu:\nUse File > Export to save your model.\nThen import into your main game engine or rendering system!');
+        }
+        
+        function helpMenu() {
+            alert(
+                'PixelProdigy Blender-Style 3D Modeler\n\n' +
+                '=== KEYBOARD SHORTCUTS ===\n' +
+                'G - Move (Grab)\n' +
+                'R - Rotate\n' +
+                'S - Scale\n' +
+                'E - Extrude\n' +
+                'I - Inset\n' +
+                'B - Bevel\n' +
+                'K - Knife Tool\n' +
+                'X/Y/Z - Lock to Axis\n' +
+                'Tab - Edit Mode\n' +
+                'Ctrl+Z - Undo\n' +
+                'Ctrl+Shift+Z - Redo\n' +
+                'Delete - Delete Object\n' +
+                'Shift+D - Duplicate\n\n' +
+                '=== TOOLS ===\n' +
+                '☝️ Select - Pick objects\n' +
+                '✋ Move - Translate position\n' +
+                '🔄 Rotate - Rotate object\n' +
+                '📏 Scale - Resize object\n' +
+                '⬆️ Extrude - Push out faces\n' +
+                '📐 Inset - Shrink faces inward\n' +
+                '💎 Bevel - Round edges\n' +
+                '🔪 Knife - Cut geometry\n' +
+                '🎨 Sculpt - Organic modeling\n\n' +
+                '=== TIPS ===\n' +
+                '• Load 4K textures from Material panel\n' +
+                '• Use modifiers for complex effects\n' +
+                '• Export as OBJ for other programs\n' +
+                '• Save project as JSON to continue later'
+            );
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            render();
+        }
+        
+        function render() {
+            renderer.render(scene, camera);
+        }
+        
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('render-canvas');
+            const container = canvas.parentElement;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+        
+        window.addEventListener('load', () => {
+            init();
+            console.log('🎨 Blender-Style Modeler Ready!');
+        });
+    </script>
+</body>
+</html>

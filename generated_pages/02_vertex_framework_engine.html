@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertex Framework Engine - PixelProdigy AI (Personality #2)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        #container {
+            display: grid;
+            grid-template-columns: 320px 1fr 280px;
+            height: 100vh;
+        }
+        
+        /* Left Controls */
+        #controls-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 3px solid #00d4ff;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            color: #00d4ff;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .personality-badge {
+            background: #00d4ff22;
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+        
+        .personality-badge .id {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .section {
+            background: #00d4ff0D;
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .section h3 {
+            color: #00d4ff;
+            font-size: 13px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        
+        button {
+            width: 100%;
+            background: #00d4ff;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 8px 0;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px #00d4ff88;
+        }
+        
+        /* Center Viewport */
+        #viewport {
+            position: relative;
+            background: linear-gradient(180deg, #0a0a1e 0%, #1a1a2e 100%);
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #stats {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            min-width: 200px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+        }
+        
+        .stat-value {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        
+        /* Right Panel */
+        #info-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 3px solid #00d4ff;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            background: #00d4ff11;
+            border-left: 3px solid #00d4ff;
+            padding: 10px;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Left Controls -->
+        <div id="controls-panel">
+            <h1>🔷 Vertex Framework Engine</h1>
+            
+            <div class="personality-badge">
+                <div class="id">Personality #2</div>
+                <div>Architects, Engineers, System Designers</div>
+                <div style="margin-top: 8px; color: #aaa;">Specialty: Core Geometry System</div>
+            </div>
+            
+            <div class="section">
+                <h3>🎯 Quick Actions</h3>
+                <button onclick="initialize()">🚀 Initialize Vertex Framework Engine</button>
+                <button onclick="generate()">⚡ Generate Content</button>
+                <button onclick="exportScene()">💾 Export Scene</button>
+            </div>
+            
+            <div class="section">
+                <h3>⚙️ Settings</h3>
+                <button>Add Vertex</button><button>Connect Edges</button>
+            </div>
+            
+            <div class="section">
+                <h3>🌍 Terrain Integration</h3>
+                <button onclick="loadTerrain()">📡 Load Terrain Data</button>
+                <button onclick="generateMesh()">🗺️ Generate Mesh</button>
+                <button onclick="applyTextures()">🎨 Apply Textures</button>
+            </div>
+        </div>
+        
+        <!-- Center Viewport -->
+        <div id="viewport">
+            <canvas id="canvas"></canvas>
+            
+            <div id="stats">
+                <div class="stat-row">
+                    <span>Vertices:</span>
+                    <span class="stat-value" id="vertex-count">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Faces:</span>
+                    <span class="stat-value" id="face-count">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>FPS:</span>
+                    <span class="stat-value" id="fps">60</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Info -->
+        <div id="info-panel">
+            <h1>📋 Features</h1>
+            <ul class="feature-list">
+                <li>✓ Single vertex start point</li><li>✓ Edge connection system</li><li>✓ Face generation</li><li>✓ Vertex normal calculation</li><li>✓ BufferGeometry optimization</li>
+            </ul>
+            
+            <div class="section">
+                <h3>🔗 Related Systems</h3>
+                <button onclick="window.open('Mesh Generator Platform.html')">Mesh Generator Platform</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        
+        // ═══════════════════════════════════════════════════════════════════
+        // VERTEX FRAMEWORK ENGINE - PERSONALITY #2
+        // Architects, Engineers, System Designers
+        // ═══════════════════════════════════════════════════════════════════
+        
+        let scene, camera, renderer, controls;
+        let terrainMesh = null;
+        
+        function init() {
+            const canvas = document.getElementById('canvas');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1e);
+            scene.fog = new THREE.Fog(0x0a0a1e, 20, 100);
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                60,
+                canvas.parentElement.clientWidth / canvas.parentElement.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(10, 10, 10);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            
+            // Advanced Lighting System
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+            
+            const sunLight = new THREE.DirectionalLight(0xffffee, 1.0);
+            sunLight.position.set(50, 50, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.camera.left = -50;
+            sunLight.shadow.camera.right = 50;
+            sunLight.shadow.camera.top = 50;
+            sunLight.shadow.camera.bottom = -50;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            scene.add(sunLight);
+            
+            const fillLight = new THREE.DirectionalLight(0x8899ff, 0.5);
+            fillLight.position.set(-30, 20, -30);
+            scene.add(fillLight);
+            
+            const rimLight = new THREE.DirectionalLight(0xffaa77, 0.6);
+            rimLight.position.set(0, 30, -50);
+            scene.add(rimLight);
+            
+            // Controls
+            controls = new OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 5;
+            controls.maxDistance = 100;
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(100, 100, #00d4ff, 0x222222);
+            scene.add(gridHelper);
+            
+            // Initialize specific system
+            initializeVertexSystem();
+            
+            animate();
+            console.log('✅ Vertex Framework Engine initialized');
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            
+            // Update FPS
+            const fps = Math.round(1000 / (performance.now() % 1000));
+            document.getElementById('fps').textContent = fps;
+            
+            renderer.render(scene, camera);
+        }
+        
+        // ═══ TERRAIN SYSTEM ═══
+        async function loadTerrain() {
+            console.log('📡 Loading terrain data...');
+            // Mapbox terrain-rgb or similar
+            const terrainData = await fetch('https://api.mapbox.com/v4/mapbox.terrain-rgb/...');
+            generateTerrainMesh(terrainData);
+        }
+        
+        function generateTerrainMesh(data) {
+            const size = 100;
+            const segments = 256;
+            
+            const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
+            const vertices = geometry.attributes.position.array;
+            
+            // Apply elevation data
+            for (let i = 0; i < vertices.length; i += 3) {
+                const x = vertices[i];
+                const z = vertices[i + 1];
+                vertices[i + 2] = Math.random() * 10; // Replace with real elevation
+            }
+            
+            geometry.computeVertexNormals();
+            
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x3a7d44,
+                roughness: 0.9,
+                wireframe: false
+            });
+            
+            if (terrainMesh) scene.remove(terrainMesh);
+            terrainMesh = new THREE.Mesh(geometry, material);
+            terrainMesh.rotation.x = -Math.PI / 2;
+            terrainMesh.receiveShadow = true;
+            scene.add(terrainMesh);
+            
+            updateStats();
+        }
+        
+        function generateMesh() {
+            buildMeshFromVertices();
+        }
+        
+        function applyTextures() {
+            if (!terrainMesh) return;
+            const loader = new THREE.TextureLoader();
+            loader.load('assets/terrain/grass.jpg', (texture) => {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(20, 20);
+                terrainMesh.material.map = texture;
+                terrainMesh.material.needsUpdate = true;
+            });
+        }
+        
+        function updateStats() {
+            if (terrainMesh) {
+                const verts = terrainMesh.geometry.attributes.position.count;
+                const faces = terrainMesh.geometry.index ? 
+                    terrainMesh.geometry.index.count / 3 : 
+                    verts / 3;
+                
+                document.getElementById('vertex-count').textContent = verts.toLocaleString();
+                document.getElementById('face-count').textContent = Math.floor(faces).toLocaleString();
+            }
+        }
+        
+        // ═══ EXPORT SYSTEM ═══
+        function exportScene() {
+            // Export to OBJ/GLTF
+            console.log('💾 Exporting scene...');
+        }
+        
+        // Global functions
+        window.initialize = init;
+        window.generate = generateMesh;
+        window.loadTerrain = loadTerrain;
+        window.generateMesh = generateMesh;
+        window.applyTextures = applyTextures;
+        window.exportScene = exportScene;
+        
+        window.addEventListener('load', init);
+        window.addEventListener('resize', () => {
+            camera.aspect = canvas.parentElement.clientWidth / canvas.parentElement.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+        });
+    </script>
+</body>
+</html>

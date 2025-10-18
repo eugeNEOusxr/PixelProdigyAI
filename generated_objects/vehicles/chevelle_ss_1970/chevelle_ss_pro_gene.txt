@@ -1,0 +1,84 @@
+# ========================================
+# 1970 CHEVELLE SS 454 - PRO TIER (GENE)
+# Natural Language Complete Detail
+# ========================================
+
+# BODY & STRUCTURE
+CAR > body > blob forward 495cm aerodynamic muscular coefficient 0.45
+CAR > hood > surface forward 180cm scoops repeat 2 powerdome chrome hinged
+CAR > roof > surface vinyl black smooth curved elegant
+CAR > doors > wall repeat 2 frameless-glass handles chrome hinged
+CAR > fenders > blob curved flared muscular compound-curves steel
+CAR > quarter-panels > surface sculpted coke-bottle-shape flowing iconic
+CAR > bumpers > chrome repeat 2 front rear 5mph-rated polished
+
+# ENGINE COMPARTMENT
+CAR > engine > block v8 454cubic-inch cast-iron big-block powerful
+CAR > engine > heads aluminum rectangular-port polished performance
+CAR > engine > intake dual-plane aluminum holley-mount 850cfm
+CAR > engine > carburetor holley 4barrel chrome 850cfm tuned
+CAR > engine > headers tube stainless repeat 8 ceramic-coated 2.25inch
+CAR > engine > exhaust dual chambered-mufflers chrome-tips loud
+CAR > engine > valve-covers aluminum finned polished chevrolet-script
+CAR > engine > pistons forged dome-top repeat 8 10.25compression
+CAR > engine > crankshaft forged-steel 4bolt-main balanced precision
+CAR > engine > camshaft hydraulic-roller performance lift-0.525
+
+# DRIVETRAIN
+CAR > transmission > turbo-400 3speed-auto shift-kit heavy-duty
+CAR > driveshaft > steel 2piece u-joints repeat 3 balanced
+CAR > differential > 12bolt posi 3.73gears heavy-duty limited-slip
+
+# SUSPENSION
+CAR > suspension > control-arms tubular chromoly front rear adjustable
+CAR > suspension > springs progressive-rate lowered coil leaf performance
+CAR > suspension > shocks gas-charged adjustable bilstein repeat 4
+CAR > suspension > sway-bars solid-steel front 1.25inch rear 1inch
+
+# WHEELS & TIRES
+CAR > wheels > rally chrome 15inch diameter front 15x7 rear 15x8 repeat 4
+CAR > tires > performance radial front 225width rear 275width grip
+
+# BRAKES
+CAR > brakes > rotors vented cross-drilled front 30cm rear 28cm repeat 4
+CAR > brakes > calipers dual-piston aluminum red powder-coat repeat 4
+
+# INTERIOR
+CAR > interior > seats bucket vinyl black bolstered headrests repeat 2
+CAR > interior > dashboard molded woodgrain padded gauges repeat 5
+CAR > interior > steering-wheel 3spoke chrome horn-button ss-emblem
+CAR > interior > shifter floor-mounted chrome t-handle horseshoe
+CAR > interior > console center woodgrain storage armrest
+CAR > interior > carpet loop-pile black molded sound-deadening
+
+# EXTERIOR DETAILS
+CAR > exterior > grille blacked-out egg-crate ss-emblem chrome
+CAR > exterior > headlights sealed-beam chrome-bezels repeat 4
+CAR > exterior > taillights rectangular red-lens chrome-trim repeat 2
+CAR > exterior > mirrors remote chrome convex repeat 2
+CAR > exterior > emblems ss-454 chevrolet bowtie chrome repeat 8
+
+# GLASS
+CAR > glass > windshield curved laminated tinted dot-safety
+CAR > glass > windows frameless tempered tinted power repeat 4
+
+# LIGHTING
+CAR > lights > headlamps halogen sealed-beam high-low repeat 4
+CAR > lights > turn-signals amber-front red-rear sequential repeat 4
+
+# ELECTRICAL
+CAR > electrical > battery 12volt 850cca optima top-post
+CAR > electrical > wiring copper 16gauge fused relay-box
+
+# COOLING
+CAR > cooling > radiator aluminum 3row core-support
+CAR > cooling > fan electric thermostat-controlled 3000cfm
+
+# FUEL
+CAR > fuel > tank steel 20gallon baffled vented
+CAR > fuel > pump electric high-pressure 110gph in-tank
+
+# PAINT
+CAR > paint > base cranberry-red metallic base-coat
+CAR > paint > clear urethane 2stage uv-protection wet-sand buffed
+CAR > paint > stripes cowl-induction white vinyl rallye-style repeat 2

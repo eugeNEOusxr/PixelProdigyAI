@@ -1,0 +1,9 @@
+{
+  "totalChunks": 100,
+  "totalVertices": 6300100,
+  "totalCities": 5,
+  "generationTime": "2.58s",
+  "avgVerticesPerChunk": 63001,
+  "estimatedWorldSize": "192.26 MB (uncompressed)",
+  "estimatedVLSSize": "2.40 MB (VLS compressed)"
+}

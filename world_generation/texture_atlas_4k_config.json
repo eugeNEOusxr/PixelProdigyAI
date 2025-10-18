@@ -1,0 +1,9 @@
+{
+  "atlasSize": 4096,
+  "format": "BC7_UNORM",
+  "mipLevels": 12,
+  "maxTextures": 256,
+  "packingAlgorithm": "guillotine",
+  "padding": 2,
+  "dynamicAllocation": true
+}

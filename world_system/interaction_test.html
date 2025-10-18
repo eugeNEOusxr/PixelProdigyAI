@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Interaction Test - PixelVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+            background: #1a1a1a;
+            cursor: crosshair;
+        }
+
+        .hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 250px;
+        }
+
+        .hud h3 {
+            color: #ffc832;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .hud-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .hud-label {
+            color: #aaa;
+        }
+
+        .hud-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .controls h3 {
+            color: #ffc832;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .key-binding {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .key {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #ffc832;
+            color: #000;
+            font-weight: bold;
+            border-radius: 4px;
+            min-width: 30px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .action {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .log {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            width: 400px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            font-size: 12px;
+            margin: 3px 0;
+            padding: 3px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .log-entry.success {
+            color: #4ade80;
+        }
+
+        .log-entry.info {
+            color: #60a5fa;
+        }
+
+        .log-entry.warning {
+            color: #fbbf24;
+        }
+
+        .crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .crosshair::before {
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .crosshair::after {
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+
+        .crosshair.targeting {
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .scene-objects {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 200px;
+        }
+
+        .scene-objects h4 {
+            color: #ffc832;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .object-item {
+            font-size: 12px;
+            padding: 5px;
+            margin: 3px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .object-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .object-item.targeted {
+            background: rgba(255, 200, 50, 0.3);
+            border-left: 3px solid #ffc832;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="crosshair" id="crosshair"></div>
+
+    <div class="hud">
+        <h3>Player Stats</h3>
+        <div class="hud-item">
+            <span class="hud-label">Position:</span>
+            <span class="hud-value" id="playerPos">0, 0, 0</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">Looking At:</span>
+            <span class="hud-value" id="lookingAt">Nothing</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">Distance:</span>
+            <span class="hud-value" id="distance">-</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">Interactions:</span>
+            <span class="hud-value" id="interactionCount">0</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <h3>Controls</h3>
+        <div class="key-binding">
+            <span class="key">W/A/S/D</span>
+            <span class="action">Move</span>
+        </div>
+        <div class="key-binding">
+            <span class="key">Mouse</span>
+            <span class="action">Look Around</span>
+        </div>
+        <div class="key-binding">
+            <span class="key">E</span>
+            <span class="action">Gather Resource</span>
+        </div>
+        <div class="key-binding">
+            <span class="key">F</span>
+            <span class="action">Loot Container</span>
+        </div>
+        <div class="key-binding">
+            <span class="key">G</span>
+            <span class="action">Use Object</span>
+        </div>
+        <div class="key-binding">
+            <span class="key">T</span>
+            <span class="action">Talk to NPC</span>
+        </div>
+        <div class="key-binding">
+            <span class="key">X</span>
+            <span class="action">Examine</span>
+        </div>
+        <div class="key-binding">
+            <span class="key">Right-Click</span>
+            <span class="action">Context Menu</span>
+        </div>
+    </div>
+
+    <div class="scene-objects">
+        <h4>Nearby Objects</h4>
+        <div id="objectList"></div>
+    </div>
+
+    <div class="log" id="log">
+        <div class="log-entry info">System ready. Look at objects and press interaction keys.</div>
+    </div>
+
+    <script src="interaction_ui.js"></script>
+    <script src="outline_shader.js"></script>
+    
+    <script>
+        // Simple 3D scene simulation
+        class InteractionTestScene {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.interactionUI = new InteractionUI();
+                
+                // Player state
+                this.player = {
+                    position: { x: 0, y: 1.6, z: 0 },
+                    rotation: { x: 0, y: 0 },
+                    direction: { x: 0, y: 0, z: 1 }
+                };
+                
+                // Objects in scene
+                this.objects = [
+                    {
+                        id: 'tree_001',
+                        displayName: 'Oak Tree',
+                        description: 'A sturdy oak tree',
+                        type: 'resource',
+                        position: { x: 5, y: 0, z: 0 },
+                        primaryInteraction: 'gather',
+                        color: '#2d5016',
+                        size: { w: 1, h: 3 }
+                    },
+                    {
+                        id: 'chest_001',
+                        displayName: 'Treasure Chest',
+                        description: 'A locked chest full of loot',
+                        type: 'container',
+                        position: { x: 10, y: 0, z: 5 },
+                        primaryInteraction: 'loot',
+                        secondaryInteractions: ['examine'],
+                        color: '#8b4513',
+                        size: { w: 1, h: 1 }
+                    },
+                    {
+                        id: 'chair_001',
+                        displayName: 'Wooden Chair',
+                        description: 'A comfortable chair',
+                        type: 'furniture',
+                        position: { x: 3, y: 0, z: 8 },
+                        primaryInteraction: 'use',
+                        color: '#cd853f',
+                        size: { w: 0.8, h: 1.2 }
+                    },
+                    {
+                        id: 'rock_001',
+                        displayName: 'Iron Ore',
+                        description: 'A rocky outcrop with iron ore',
+                        type: 'resource',
+                        position: { x: -5, y: 0, z: 3 },
+                        primaryInteraction: 'gather',
+                        color: '#708090',
+                        size: { w: 1.5, h: 1.5 }
+                    },
+                    {
+                        id: 'door_001',
+                        displayName: 'Wooden Door',
+                        description: 'A sturdy door',
+                        type: 'door',
+                        position: { x: 0, y: 0, z: 15 },
+                        primaryInteraction: 'use',
+                        secondaryInteractions: ['examine'],
+                        color: '#654321',
+                        size: { w: 2, h: 2.5 }
+                    }
+                ];
+                
+                // Input state
+                this.keys = {};
+                this.mouse = { x: 0, y: 0, down: false };
+                this.interactionCount = 0;
+                
+                // Setup
+                this.resize();
+                this.setupInput();
+                this.start();
+            }
+            
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            setupInput() {
+                // Keyboard
+                window.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                });
+                
+                window.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                });
+                
+                // Mouse movement
+                this.canvas.addEventListener('mousemove', (e) => {
+                    const deltaX = e.movementX * 0.002;
+                    const deltaY = e.movementY * 0.002;
+                    
+                    this.player.rotation.y -= deltaX;
+                    this.player.rotation.x -= deltaY;
+                    this.player.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.player.rotation.x));
+                    
+                    this.updatePlayerDirection();
+                });
+                
+                // Pointer lock
+                this.canvas.addEventListener('click', () => {
+                    this.canvas.requestPointerLock();
+                });
+                
+                // Resize
+                window.addEventListener('resize', () => this.resize());
+            }
+            
+            updatePlayerDirection() {
+                const yaw = this.player.rotation.y;
+                this.player.direction = {
+                    x: Math.sin(yaw),
+                    y: 0,
+                    z: Math.cos(yaw)
+                };
+            }
+            
+            update(deltaTime) {
+                // Movement
+                const speed = 5.0 * deltaTime;
+                
+                if (this.keys['KeyW']) {
+                    this.player.position.x += this.player.direction.x * speed;
+                    this.player.position.z += this.player.direction.z * speed;
+                }
+                if (this.keys['KeyS']) {
+                    this.player.position.x -= this.player.direction.x * speed;
+                    this.player.position.z -= this.player.direction.z * speed;
+                }
+                if (this.keys['KeyA']) {
+                    this.player.position.x -= this.player.direction.z * speed;
+                    this.player.position.z += this.player.direction.x * speed;
+                }
+                if (this.keys['KeyD']) {
+                    this.player.position.x += this.player.direction.z * speed;
+                    this.player.position.z -= this.player.direction.x * speed;
+                }
+                
+                // Update interaction system
+                this.interactionUI.update(
+                    this.player.position,
+                    this.player.direction,
+                    this.objects
+                );
+                
+                // Update HUD
+                this.updateHUD();
+            }
+            
+            render() {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                
+                // Clear
+                ctx.fillStyle = '#2c5364';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw grid floor
+                this.drawGrid(ctx);
+                
+                // Draw objects
+                this.objects.forEach(obj => {
+                    this.drawObject(ctx, obj);
+                });
+                
+                // Draw player indicator
+                this.drawPlayer(ctx);
+            }
+            
+            drawGrid(ctx) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const gridSize = 50;
+                
+                for (let x = 0; x < this.canvas.width; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, this.canvas.height);
+                    ctx.stroke();
+                }
+                
+                for (let y = 0; y < this.canvas.height; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(this.canvas.width, y);
+                    ctx.stroke();
+                }
+            }
+            
+            drawObject(ctx, obj) {
+                const screenPos = this.worldToScreen(obj.position);
+                if (!screenPos) return;
+                
+                const isHovered = this.interactionUI.hoveredObject === obj;
+                const scale = 50 / Math.max(1, screenPos.distance);
+                const width = obj.size.w * scale * 30;
+                const height = obj.size.h * scale * 30;
+                
+                // Draw object
+                ctx.fillStyle = obj.color;
+                if (isHovered) {
+                    ctx.fillStyle = '#ffc832';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ffc832';
+                }
+                
+                ctx.fillRect(
+                    screenPos.x - width / 2,
+                    screenPos.y - height,
+                    width,
+                    height
+                );
+                
+                ctx.shadowBlur = 0;
+                
+                // Draw label
+                if (screenPos.distance < 10) {
+                    ctx.fillStyle = isHovered ? '#ffc832' : '#fff';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(obj.displayName, screenPos.x, screenPos.y - height - 10);
+                    
+                    // Distance
+                    ctx.font = '11px Arial';
+                    ctx.fillStyle = '#aaa';
+                    ctx.fillText(`${screenPos.distance.toFixed(1)}m`, screenPos.x, screenPos.y - height - 25);
+                }
+            }
+            
+            drawPlayer(ctx) {
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2 + 100;
+                
+                ctx.fillStyle = '#4ade80';
+                ctx.fillRect(centerX - 10, centerY - 30, 20, 30);
+                ctx.beginPath();
+                ctx.arc(centerX, centerY - 40, 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            worldToScreen(worldPos) {
+                // Simple pseudo-3D projection
+                const dx = worldPos.x - this.player.position.x;
+                const dy = worldPos.y - this.player.position.y;
+                const dz = worldPos.z - this.player.position.z;
+                
+                const distance = Math.sqrt(dx * dx + dz * dz);
+                
+                // Rotate by player rotation
+                const angle = Math.atan2(dx, dz) - this.player.rotation.y;
+                
+                // Check if behind player
+                if (Math.abs(angle) > Math.PI / 2) return null;
+                
+                const screenX = this.canvas.width / 2 + (angle * 800);
+                const screenY = this.canvas.height / 2 - (dy * 50 / Math.max(1, distance)) - (50 / Math.max(1, distance));
+                
+                return { x: screenX, y: screenY, distance };
+            }
+            
+            updateHUD() {
+                const pos = this.player.position;
+                document.getElementById('playerPos').textContent = 
+                    `${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}`;
+                
+                const hovered = this.interactionUI.hoveredObject;
+                if (hovered) {
+                    document.getElementById('lookingAt').textContent = hovered.displayName;
+                    const dx = hovered.position.x - pos.x;
+                    const dz = hovered.position.z - pos.z;
+                    const dist = Math.sqrt(dx * dx + dz * dz);
+                    document.getElementById('distance').textContent = `${dist.toFixed(2)}m`;
+                    document.getElementById('crosshair').classList.add('targeting');
+                } else {
+                    document.getElementById('lookingAt').textContent = 'Nothing';
+                    document.getElementById('distance').textContent = '-';
+                    document.getElementById('crosshair').classList.remove('targeting');
+                }
+                
+                document.getElementById('interactionCount').textContent = this.interactionCount;
+                
+                // Update object list
+                this.updateObjectList();
+            }
+            
+            updateObjectList() {
+                const list = document.getElementById('objectList');
+                list.innerHTML = '';
+                
+                const nearby = this.objects
+                    .map(obj => {
+                        const dx = obj.position.x - this.player.position.x;
+                        const dz = obj.position.z - this.player.position.z;
+                        const distance = Math.sqrt(dx * dx + dz * dz);
+                        return { obj, distance };
+                    })
+                    .filter(item => item.distance < 15)
+                    .sort((a, b) => a.distance - b.distance);
+                
+                nearby.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'object-item';
+                    if (this.interactionUI.hoveredObject === item.obj) {
+                        div.classList.add('targeted');
+                    }
+                    div.textContent = `${item.obj.displayName} (${item.distance.toFixed(1)}m)`;
+                    list.appendChild(div);
+                });
+            }
+            
+            log(message, type = 'info') {
+                const log = document.getElementById('log');
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                log.insertBefore(entry, log.firstChild);
+                
+                while (log.children.length > 20) {
+                    log.removeChild(log.lastChild);
+                }
+            }
+            
+            start() {
+                let lastTime = performance.now();
+                
+                const gameLoop = (currentTime) => {
+                    const deltaTime = (currentTime - lastTime) / 1000;
+                    lastTime = currentTime;
+                    
+                    this.update(deltaTime);
+                    this.render();
+                    
+                    requestAnimationFrame(gameLoop);
+                };
+                
+                requestAnimationFrame(gameLoop);
+                
+                this.log('Interaction system started', 'success');
+            }
+        }
+        
+        // Start the scene
+        window.addEventListener('load', () => {
+            new InteractionTestScene();
+        });
+    </script>
+</body>
+</html>

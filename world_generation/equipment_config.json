@@ -1,0 +1,344 @@
+{
+  "version": "1.0",
+  "equipmentSlots": {
+    "head": {
+      "name": "Head",
+      "boneName": "head",
+      "categories": ["helmet", "hat", "crown", "circlet", "mask"],
+      "offset": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["light", "medium", "heavy", "cloth"],
+      "hiddenBodyParts": ["hair"]
+    },
+    "chest": {
+      "name": "Chest",
+      "boneName": "chest",
+      "categories": ["armor", "robe", "tunic", "vest"],
+      "offset": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["light", "medium", "heavy", "cloth"]
+    },
+    "legs": {
+      "name": "Legs",
+      "boneName": "spine",
+      "categories": ["pants", "leggings", "greaves", "skirt"],
+      "offset": {
+        "position": [0, -0.5, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["light", "medium", "heavy", "cloth"]
+    },
+    "feet": {
+      "name": "Feet",
+      "boneName": "foot_left",
+      "mirrorBone": "foot_right",
+      "categories": ["boots", "shoes", "sandals"],
+      "offset": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["light", "medium", "heavy", "cloth"]
+    },
+    "weapon_main": {
+      "name": "Main Hand",
+      "boneName": "hand_right",
+      "categories": ["sword", "axe", "mace", "dagger", "staff", "wand", "bow", "crossbow", "shield"],
+      "offset": {
+        "position": [0, 0, 0.1],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["weapon", "tool"],
+      "animationModifiers": {
+        "sword": "attack_melee",
+        "axe": "attack_melee",
+        "mace": "attack_melee",
+        "dagger": "attack_melee",
+        "staff": "cast",
+        "wand": "cast",
+        "bow": "attack_ranged",
+        "crossbow": "attack_ranged"
+      }
+    },
+    "weapon_off": {
+      "name": "Off Hand",
+      "boneName": "hand_left",
+      "categories": ["shield", "dagger", "wand", "torch", "orb"],
+      "offset": {
+        "position": [0, 0, -0.1],
+        "rotation": [0, 3.14, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["weapon", "tool"],
+      "restrictions": {
+        "twoHanded": ["staff", "bow", "crossbow", "greatsword"]
+      }
+    },
+    "back": {
+      "name": "Back",
+      "boneName": "spine",
+      "categories": ["cape", "quiver", "backpack", "wings"],
+      "offset": {
+        "position": [0, 0.3, -0.2],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["cosmetic", "storage"]
+    },
+    "shoulders": {
+      "name": "Shoulders",
+      "boneName": "shoulder_left",
+      "mirrorBone": "shoulder_right",
+      "categories": ["pauldrons", "shoulderguard"],
+      "offset": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["light", "medium", "heavy"]
+    },
+    "hands": {
+      "name": "Hands",
+      "boneName": "hand_left",
+      "mirrorBone": "hand_right",
+      "categories": ["gloves", "gauntlets", "bracers"],
+      "offset": {
+        "position": [0, -0.1, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["light", "medium", "heavy", "cloth"]
+    },
+    "waist": {
+      "name": "Waist",
+      "boneName": "spine",
+      "categories": ["belt", "sash"],
+      "offset": {
+        "position": [0, -0.3, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["light", "medium", "heavy", "cloth"]
+    },
+    "neck": {
+      "name": "Neck",
+      "boneName": "neck",
+      "categories": ["necklace", "amulet", "collar"],
+      "offset": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "allowedTypes": ["accessory"]
+    },
+    "finger_left": {
+      "name": "Left Ring",
+      "boneName": "hand_left",
+      "categories": ["ring"],
+      "offset": {
+        "position": [0, -0.05, 0.02],
+        "rotation": [0, 0, 0, 1],
+        "scale": [0.3, 0.3, 0.3]
+      },
+      "allowedTypes": ["accessory"]
+    },
+    "finger_right": {
+      "name": "Right Ring",
+      "boneName": "hand_right",
+      "categories": ["ring"],
+      "offset": {
+        "position": [0, -0.05, 0.02],
+        "rotation": [0, 0, 0, 1],
+        "scale": [0.3, 0.3, 0.3]
+      },
+      "allowedTypes": ["accessory"]
+    }
+  },
+  "equipmentSets": {
+    "warrior_starter": {
+      "name": "Warrior Starter Set",
+      "items": {
+        "chest": "iron_chestplate",
+        "legs": "iron_leggings",
+        "feet": "iron_boots",
+        "weapon_main": "iron_sword",
+        "weapon_off": "wooden_shield"
+      },
+      "setBonuses": {
+        "2": { "defense": 5 },
+        "4": { "defense": 10, "strength": 2 },
+        "5": { "defense": 15, "strength": 5, "ability": "shield_bash" }
+      }
+    },
+    "mage_starter": {
+      "name": "Mage Starter Set",
+      "items": {
+        "chest": "apprentice_robe",
+        "legs": "apprentice_pants",
+        "feet": "cloth_shoes",
+        "weapon_main": "oak_staff",
+        "neck": "mana_amulet"
+      },
+      "setBonuses": {
+        "2": { "mana": 50 },
+        "4": { "mana": 100, "intelligence": 3 },
+        "5": { "mana": 150, "intelligence": 5, "spellPower": 10 }
+      }
+    },
+    "rogue_starter": {
+      "name": "Rogue Starter Set",
+      "items": {
+        "chest": "leather_vest",
+        "legs": "leather_pants",
+        "feet": "soft_boots",
+        "weapon_main": "steel_dagger",
+        "weapon_off": "parrying_dagger"
+      },
+      "setBonuses": {
+        "2": { "agility": 3 },
+        "4": { "agility": 6, "critChance": 5 },
+        "5": { "agility": 10, "critChance": 10, "ability": "shadow_step" }
+      }
+    }
+  },
+  "armorTypes": {
+    "cloth": {
+      "name": "Cloth Armor",
+      "defense": 1.0,
+      "weight": 0.5,
+      "durability": 50,
+      "classes": ["mage", "priest", "warlock"]
+    },
+    "light": {
+      "name": "Light Armor",
+      "defense": 1.5,
+      "weight": 1.0,
+      "durability": 75,
+      "classes": ["rogue", "ranger", "monk"]
+    },
+    "medium": {
+      "name": "Medium Armor",
+      "defense": 2.0,
+      "weight": 2.0,
+      "durability": 100,
+      "classes": ["druid", "shaman", "bard"]
+    },
+    "heavy": {
+      "name": "Heavy Armor",
+      "defense": 3.0,
+      "weight": 4.0,
+      "durability": 150,
+      "classes": ["warrior", "paladin", "knight"]
+    }
+  },
+  "weaponTypes": {
+    "sword": {
+      "name": "Sword",
+      "damage": "1d8",
+      "speed": 1.4,
+      "range": 1.5,
+      "twoHanded": false,
+      "attackAnimation": "attack_melee"
+    },
+    "greatsword": {
+      "name": "Greatsword",
+      "damage": "2d6",
+      "speed": 2.0,
+      "range": 2.0,
+      "twoHanded": true,
+      "attackAnimation": "attack_melee"
+    },
+    "axe": {
+      "name": "Axe",
+      "damage": "1d10",
+      "speed": 1.6,
+      "range": 1.5,
+      "twoHanded": false,
+      "attackAnimation": "attack_melee"
+    },
+    "mace": {
+      "name": "Mace",
+      "damage": "1d8",
+      "speed": 1.5,
+      "range": 1.5,
+      "twoHanded": false,
+      "attackAnimation": "attack_melee"
+    },
+    "dagger": {
+      "name": "Dagger",
+      "damage": "1d4",
+      "speed": 1.0,
+      "range": 1.0,
+      "twoHanded": false,
+      "attackAnimation": "attack_melee"
+    },
+    "staff": {
+      "name": "Staff",
+      "damage": "1d6",
+      "spellPower": 20,
+      "speed": 1.8,
+      "range": 2.0,
+      "twoHanded": true,
+      "attackAnimation": "cast"
+    },
+    "wand": {
+      "name": "Wand",
+      "damage": "1d4",
+      "spellPower": 15,
+      "speed": 1.2,
+      "range": 25,
+      "twoHanded": false,
+      "attackAnimation": "cast"
+    },
+    "bow": {
+      "name": "Bow",
+      "damage": "1d8",
+      "speed": 1.6,
+      "range": 30,
+      "twoHanded": true,
+      "attackAnimation": "attack_ranged",
+      "ammo": "arrow"
+    },
+    "crossbow": {
+      "name": "Crossbow",
+      "damage": "1d10",
+      "speed": 2.0,
+      "range": 40,
+      "twoHanded": true,
+      "attackAnimation": "attack_ranged",
+      "ammo": "bolt"
+    }
+  },
+  "visualLayers": {
+    "baseBody": {
+      "priority": 0,
+      "alwaysVisible": true
+    },
+    "undergarments": {
+      "priority": 1
+    },
+    "innerArmor": {
+      "priority": 2
+    },
+    "outerArmor": {
+      "priority": 3
+    },
+    "accessories": {
+      "priority": 4
+    },
+    "weapons": {
+      "priority": 5
+    },
+    "effects": {
+      "priority": 6
+    }
+  }
+}

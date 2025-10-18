@@ -1,0 +1,35 @@
+{
+  "title": "PixelVerse Beta Monitoring",
+  "panels": [
+    {
+      "title": "Active Players",
+      "type": "graph",
+      "query": "player_count"
+    },
+    {
+      "title": "Server CPU Usage",
+      "type": "gauge",
+      "query": "cpu_usage_percent"
+    },
+    {
+      "title": "Average FPS",
+      "type": "stat",
+      "query": "avg(fps_average)"
+    },
+    {
+      "title": "WebSocket Connections",
+      "type": "graph",
+      "query": "websocket_connections"
+    },
+    {
+      "title": "Memory Usage",
+      "type": "gauge",
+      "query": "memory_usage_percent"
+    },
+    {
+      "title": "HTTP Requests",
+      "type": "graph",
+      "query": "rate(http_requests_total[5m])"
+    }
+  ]
+}

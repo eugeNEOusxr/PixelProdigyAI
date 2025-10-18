@@ -1,0 +1,384 @@
+{
+  "version": "1.0.0",
+  "total_personalities": 144,
+  "methods_distributed": 10,
+  "assignments": {
+    "30": {
+      "name": "Interior Designer",
+      "methods": [
+        {
+          "name": "download_furniture_images",
+          "description": "Downloads luxury furniture images from web",
+          "python_file": "image_scraper.py",
+          "function": "ImageScraper.scrape_category",
+          "parameters": {
+            "category": "furniture",
+            "styles": [
+              "luxury",
+              "modern",
+              "elegant",
+              "comfortable"
+            ]
+          },
+          "gene_output": "CHAIR, TABLE, SOFA objects with \"luxurious\" modifiers"
+        },
+        {
+          "name": "generate_furniture_gene",
+          "description": "Creates GENE code for comfortable, elegant furniture",
+          "gene_template": "CHAIR > seat > cushion soft ergonomic comfortable",
+          "materials": [
+            "fabric",
+            "leather",
+            "wood"
+          ],
+          "modifiers": [
+            "luxurious",
+            "comfortable",
+            "elegant"
+          ]
+        }
+      ]
+    },
+    "14": {
+      "name": "Organic Naturalist",
+      "methods": [
+        {
+          "name": "download_nature_images",
+          "description": "Downloads plants, trees, natural landscapes",
+          "python_file": "image_scraper.py",
+          "function": "ImageScraper.search_google_images_free",
+          "parameters": {
+            "queries": [
+              "rainforest plants",
+              "desert flora",
+              "mountain vegetation"
+            ],
+            "num_images": 100
+          },
+          "gene_output": "TREE, PLANT, FLOWER with \"organic natural\" modifiers"
+        },
+        {
+          "name": "generate_nature_gene",
+          "description": "Creates asymmetric, organic GENE code for plants",
+          "gene_template": "TREE > trunk > cylinder upward 800cm diameter 50cm wood organic",
+          "materials": [
+            "wood",
+            "leaf",
+            "bark"
+          ],
+          "modifiers": [
+            "organic",
+            "natural",
+            "irregular",
+            "flowing"
+          ]
+        }
+      ]
+    },
+    "20": {
+      "name": "Vehicle Designer",
+      "methods": [
+        {
+          "name": "download_vehicle_images",
+          "description": "Downloads cars, aircraft, boats, motorcycles",
+          "python_file": "image_scraper.py",
+          "function": "ImageScraper.scrape_category",
+          "parameters": {
+            "category": "vehicles",
+            "queries": [
+              "sports car",
+              "luxury sedan",
+              "concept aircraft"
+            ]
+          },
+          "gene_output": "CAR, AIRCRAFT, BOAT with \"aerodynamic sleek\" modifiers"
+        },
+        {
+          "name": "generate_vehicle_gene",
+          "description": "Creates streamlined GENE code for vehicles",
+          "gene_template": "CAR > body > blob forward 400cm aerodynamic smooth sleek",
+          "materials": [
+            "metal",
+            "glass",
+            "carbon_fiber"
+          ],
+          "modifiers": [
+            "sleek",
+            "aerodynamic",
+            "efficient",
+            "performance"
+          ]
+        }
+      ]
+    },
+    "33": {
+      "name": "Industrial Designer",
+      "methods": [
+        {
+          "name": "convert_to_precision_3d",
+          "description": "Converts images to high-poly precision 3D models",
+          "python_file": "image_to_3d_converter.py",
+          "function": "Image3DConverter.meshy_image_to_3d",
+          "parameters": {
+            "topology": "quad",
+            "target_polycount": 50000,
+            "enable_pbr": true
+          },
+          "gene_output": "TOOL, DEVICE, MACHINE with \"precise sharp\" modifiers"
+        },
+        {
+          "name": "generate_industrial_gene",
+          "description": "Creates precise GENE code for tools and electronics",
+          "gene_template": "TOOL > handle > cylinder precise measured metal sharp",
+          "materials": [
+            "metal",
+            "plastic",
+            "rubber"
+          ],
+          "modifiers": [
+            "precise",
+            "sharp",
+            "functional",
+            "industrial"
+          ]
+        }
+      ]
+    },
+    "1": {
+      "name": "Visionary Artist",
+      "methods": [
+        {
+          "name": "convert_to_artistic_3d",
+          "description": "Converts images to stylized artistic 3D models",
+          "python_file": "image_to_3d_converter.py",
+          "function": "Image3DConverter.luma_image_to_3d",
+          "parameters": {
+            "style": "artistic",
+            "interpretation": "creative"
+          },
+          "gene_output": "SCULPTURE, ART with \"artistic creative\" modifiers"
+        },
+        {
+          "name": "generate_artistic_gene",
+          "description": "Creates expressive GENE code for art pieces",
+          "gene_template": "SCULPTURE > form > blob organic artistic expressive unique",
+          "materials": [
+            "bronze",
+            "marble",
+            "clay"
+          ],
+          "modifiers": [
+            "artistic",
+            "creative",
+            "expressive",
+            "unique"
+          ]
+        }
+      ]
+    },
+    "53": {
+      "name": "Medical Professional",
+      "methods": [
+        {
+          "name": "create_skeletal_layer",
+          "description": "Generates medical-grade skeletal structures",
+          "python_file": "gene_parser.py",
+          "function": "GENEParser.parse_anatomical_model",
+          "parameters": {
+            "layer": "skeletal",
+            "precision": "medical",
+            "include_ligaments": true
+          },
+          "gene_output": "HUMAN_BODY > skeletal > bone structures"
+        },
+        {
+          "name": "create_muscular_layer",
+          "description": "Generates muscle groups with attachment points",
+          "gene_template": "HUMAN_BODY > muscular > biceps blob attach humerus flesh soft",
+          "materials": [
+            "flesh",
+            "tendon",
+            "fascia"
+          ],
+          "modifiers": [
+            "anatomical",
+            "medical",
+            "precise"
+          ]
+        },
+        {
+          "name": "create_vascular_layer",
+          "description": "Generates blood vessel networks",
+          "gene_template": "HUMAN_BODY > vascular > aorta cylinder diameter 2.5cm blood flowing",
+          "materials": [
+            "blood",
+            "vessel_wall"
+          ],
+          "modifiers": [
+            "branching",
+            "network",
+            "distributed"
+          ]
+        },
+        {
+          "name": "create_organ_layer",
+          "description": "Generates internal organs with realistic shapes",
+          "gene_template": "HUMAN_BODY > organ > heart blob 12cm attach ribs position center",
+          "materials": [
+            "organ_tissue",
+            "membrane"
+          ],
+          "modifiers": [
+            "biological",
+            "functional",
+            "precise"
+          ]
+        },
+        {
+          "name": "create_skin_layers",
+          "description": "Generates dermis and epidermis with pores",
+          "gene_template": "HUMAN_BODY > epidermis > covering thickness 0.5mm skin tone medium",
+          "materials": [
+            "skin",
+            "dermis",
+            "epidermis"
+          ],
+          "modifiers": [
+            "smooth",
+            "natural",
+            "flexible"
+          ]
+        }
+      ]
+    },
+    "82": {
+      "name": "Career Coach",
+      "methods": [
+        {
+          "name": "build_gene_editor_page",
+          "description": "Creates web interface for GENE code editing",
+          "output": "gene_editor.html",
+          "features": [
+            "syntax_highlighting",
+            "autocomplete",
+            "live_preview"
+          ],
+          "frameworks": [
+            "Three.js",
+            "Monaco Editor"
+          ]
+        },
+        {
+          "name": "optimize_batch_processing",
+          "description": "Automates conversion of 47K objects to GENE",
+          "python_file": "convert_objects_to_vls.js",
+          "optimization": "parallel_processing",
+          "target_speed": "100 objects/sec"
+        }
+      ]
+    },
+    "67": {
+      "name": "Financial Advisor",
+      "methods": [
+        {
+          "name": "build_cost_dashboard",
+          "description": "Creates cost comparison dashboard",
+          "output": "cost_analysis.html",
+          "metrics": [
+            "conversion_costs",
+            "storage_savings",
+            "bandwidth_reduction"
+          ],
+          "charts": [
+            "compression_ratio",
+            "roi_timeline"
+          ]
+        },
+        {
+          "name": "calculate_meshy_budget",
+          "description": "Optimizes Meshy AI usage for budget",
+          "parameters": {
+            "total_budget": 1000,
+            "cost_per_model": 0.2,
+            "priority": [
+              "legendary",
+              "epic",
+              "rare"
+            ]
+          },
+          "output": "optimal_conversion_plan"
+        }
+      ]
+    },
+    "21": {
+      "name": "Costume Designer",
+      "methods": [
+        {
+          "name": "apply_visual_styling",
+          "description": "Applies beautiful CSS to web pages",
+          "output": "styled_pages",
+          "themes": [
+            "modern",
+            "elegant",
+            "professional"
+          ],
+          "features": [
+            "animations",
+            "gradients",
+            "responsive_design"
+          ]
+        },
+        {
+          "name": "generate_garment_gene",
+          "description": "Creates GENE code for clothing items",
+          "gene_template": "SHIRT > fabric > surface flowing draped elegant tailored",
+          "materials": [
+            "fabric",
+            "cotton",
+            "silk",
+            "leather"
+          ],
+          "modifiers": [
+            "flowing",
+            "draped",
+            "elegant",
+            "tailored"
+          ]
+        }
+      ]
+    },
+    "25": {
+      "name": "Residential Architect",
+      "methods": [
+        {
+          "name": "generate_building_gene",
+          "description": "Creates GENE code for buildings and structures",
+          "gene_template": "BUILDING > walls > wall upward 300cm concrete insulated structural",
+          "materials": [
+            "concrete",
+            "brick",
+            "steel",
+            "glass"
+          ],
+          "modifiers": [
+            "structural",
+            "spacious",
+            "functional",
+            "secure"
+          ]
+        },
+        {
+          "name": "design_floor_plan",
+          "description": "Generates room layouts with GENE",
+          "gene_template": "ROOM > floor > surface forward 500cm leftward 400cm",
+          "includes": [
+            "walls",
+            "doors",
+            "windows",
+            "ceiling"
+          ]
+        }
+      ]
+    }
+  }
+}

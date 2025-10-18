@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelVerse 3D - Interactive World Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #stats {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-width: 250px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #stats h3 {
+            margin-bottom: 10px;
+            color: #00ff88;
+            font-size: 16px;
+        }
+
+        #stats .stat-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #stats .stat-label {
+            color: #aaa;
+        }
+
+        #stats .stat-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        #stats .stat-value.good {
+            color: #00ff88;
+        }
+
+        #stats .stat-value.warning {
+            color: #ffaa00;
+        }
+
+        #stats .stat-value.bad {
+            color: #ff4444;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #controls p {
+            text-align: center;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px 60px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #loading h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+
+        #loading .progress-bar {
+            width: 300px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+
+        #loading .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #info h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        #info p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ccc;
+            margin: 8px 0;
+        }
+
+        .hide {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div id="loading">
+        <h2>🌍 Loading PixelVerse...</h2>
+        <p id="loadingText">Initializing 3D engine...</p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="loadingDetails" style="font-size: 12px; opacity: 0.7; margin-top: 10px;"></p>
+    </div>
+
+    <div id="stats" class="hide">
+        <h3>⚡ Performance</h3>
+        <div class="stat-line">
+            <span class="stat-label">FPS:</span>
+            <span class="stat-value" id="fps">0</span>
+        </div>
+        <div class="stat-line">
+            <span class="stat-label">Frame Time:</span>
+            <span class="stat-value" id="frameTime">0</span>
+        </div>
+        <div class="stat-line">
+            <span class="stat-label">Draw Calls:</span>
+            <span class="stat-value" id="drawCalls">0</span>
+        </div>
+        <div class="stat-line">
+            <span class="stat-label">Vertices:</span>
+            <span class="stat-value" id="vertices">0</span>
+        </div>
+        <div class="stat-line">
+            <span class="stat-label">Chunks Loaded:</span>
+            <span class="stat-value" id="chunksLoaded">0</span>
+        </div>
+        <div class="stat-line">
+            <span class="stat-label">Chunks Visible:</span>
+            <span class="stat-value" id="chunksVisible">0</span>
+        </div>
+    </div>
+
+    <div id="info" class="hide">
+        <h3>🗺️ World Info</h3>
+        <p><strong>Position:</strong> <span id="position">50000, 200, 50000</span></p>
+        <p><strong>Current Biome:</strong> <span id="biome">Genesis City</span></p>
+        <p><strong>Nearby City:</strong> <span id="nearbyCity">Genesis City (0m)</span></p>
+        <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+            <strong>World Size:</strong> 100km²<br>
+            <strong>Total Objects:</strong> 99,640<br>
+            <strong>Total Cities:</strong> 5
+        </p>
+    </div>
+
+    <div id="controls" class="hide">
+        <p>🖱️ Click and drag to rotate • Scroll to zoom • WASD to move</p>
+    </div>
+
+    <script src="rendering_engine.js"></script>
+    <script>
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+
+        let renderer = null;
+        let worldData = {
+            chunks: [],
+            cities: []
+        };
+        let animationId = null;
+        let lastTime = 0;
+
+        // Camera controls
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let cameraAngle = 0;
+        let cameraDistance = 500;
+        let cameraHeight = 200;
+
+        async function init() {
+            try {
+                // Setup canvas
+                const canvas = document.getElementById('canvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                // Update loading
+                updateLoading('Initializing renderer...', 10);
+
+                // Initialize renderer
+                renderer = new PixelVerseRenderer(canvas);
+                
+                updateLoading('Loading world data...', 30);
+
+                // Load world data
+                await loadWorldData();
+
+                updateLoading('Loading terrain chunks...', 50);
+
+                // Load initial chunks (center area)
+                await loadInitialChunks();
+
+                updateLoading('Setting up controls...', 80);
+
+                // Setup controls
+                setupControls();
+
+                updateLoading('Ready!', 100);
+
+                // Hide loading, show UI
+                setTimeout(() => {
+                    document.getElementById('loading').classList.add('hide');
+                    document.getElementById('stats').classList.remove('hide');
+                    document.getElementById('info').classList.remove('hide');
+                    document.getElementById('controls').classList.remove('hide');
+
+                    // Start render loop
+                    startRenderLoop();
+                }, 500);
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                document.getElementById('loadingText').textContent = '❌ Error: ' + error.message;
+            }
+        }
+
+        function updateLoading(text, progress) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // ==========================================
+        // DATA LOADING
+        // ==========================================
+
+        async function loadWorldData() {
+            try {
+                // Load chunk summary
+                const chunksResponse = await fetch('pixelverse_chunks_summary.json');
+                worldData.chunks = await chunksResponse.json();
+                
+                document.getElementById('loadingDetails').textContent = 
+                    `Loaded ${worldData.chunks.length} chunk summaries`;
+
+                // Load cities
+                const citiesResponse = await fetch('pixelverse_cities.json');
+                worldData.cities = await citiesResponse.json();
+
+                console.log('✅ World data loaded:', {
+                    chunks: worldData.chunks.length,
+                    cities: worldData.cities.length
+                });
+
+            } catch (error) {
+                console.error('Failed to load world data:', error);
+                throw new Error('Could not load world data files');
+            }
+        }
+
+        async function loadInitialChunks() {
+            // For demo, we'll generate simplified chunk data
+            // In production, this would load actual vertex data from server/database
+            
+            const centerChunk = 50; // World is 100x100 chunks, center is at 50,50
+            const loadRadius = 5; // Load 5x5 chunks initially
+
+            let loaded = 0;
+            const total = (loadRadius * 2 + 1) ** 2;
+
+            for (let z = -loadRadius; z <= loadRadius; z++) {
+                for (let x = -loadRadius; x <= loadRadius; x++) {
+                    const chunkX = centerChunk + x;
+                    const chunkZ = centerChunk + z;
+
+                    // Generate demo terrain for this chunk
+                    const chunkData = generateDemoChunk(chunkX, chunkZ);
+                    renderer.loadChunk(chunkX, chunkZ, chunkData);
+
+                    loaded++;
+                    const progress = 50 + (loaded / total) * 30;
+                    document.getElementById('loadingDetails').textContent = 
+                        `Loading chunk ${loaded}/${total}`;
+                    updateLoading('Loading terrain chunks...', progress);
+                }
+            }
+
+            console.log(`✅ Loaded ${loaded} chunks`);
+        }
+
+        function generateDemoChunk(chunkX, chunkZ) {
+            // Generate simple terrain for demo
+            const vertices = [];
+            const resolution = 50; // 50x50 vertices per chunk
+            const chunkSize = 1000; // 1km
+
+            for (let z = 0; z <= resolution; z++) {
+                for (let x = 0; x <= resolution; x++) {
+                    const worldX = chunkX * chunkSize + (x / resolution) * chunkSize;
+                    const worldZ = chunkZ * chunkSize + (z / resolution) * chunkSize;
+
+                    // Simple height calculation
+                    const height = Math.sin(worldX * 0.01) * 50 + 
+                                 Math.cos(worldZ * 0.01) * 30;
+
+                    // Determine biome color based on height
+                    let color = '#7d9b3f'; // Default grass
+                    if (height > 100) color = '#5a5a5a'; // Mountain
+                    else if (height < 10) color = '#4da6ff'; // Water
+                    else if (Math.random() > 0.7) color = '#4a7c2d'; // Forest
+
+                    vertices.push({
+                        x: worldX,
+                        y: height,
+                        z: worldZ,
+                        biome: height > 100 ? 'mountain' : (height < 10 ? 'water' : 'plains'),
+                        color: color
+                    });
+                }
+            }
+
+            return {
+                chunkX,
+                chunkZ,
+                vertices,
+                biome: 'plains'
+            };
+        }
+
+        // ==========================================
+        // CONTROLS
+        // ==========================================
+
+        function setupControls() {
+            const canvas = document.getElementById('canvas');
+
+            // Mouse controls
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+
+                const deltaX = e.clientX - lastMouseX;
+                const deltaY = e.clientY - lastMouseY;
+
+                cameraAngle += deltaX * 0.01;
+                cameraHeight = Math.max(50, Math.min(500, cameraHeight - deltaY));
+
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+
+                updateCamera();
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            // Scroll zoom
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                cameraDistance = Math.max(100, Math.min(2000, cameraDistance + e.deltaY));
+                updateCamera();
+            });
+
+            // Keyboard controls
+            const keys = {};
+            window.addEventListener('keydown', (e) => keys[e.key] = true);
+            window.addEventListener('keyup', (e) => keys[e.key] = false);
+
+            // Movement loop
+            setInterval(() => {
+                let moved = false;
+                const speed = 10;
+
+                if (keys['w'] || keys['W']) {
+                    renderer.camera.position[2] -= speed;
+                    renderer.camera.target[2] -= speed;
+                    moved = true;
+                }
+                if (keys['s'] || keys['S']) {
+                    renderer.camera.position[2] += speed;
+                    renderer.camera.target[2] += speed;
+                    moved = true;
+                }
+                if (keys['a'] || keys['A']) {
+                    renderer.camera.position[0] -= speed;
+                    renderer.camera.target[0] -= speed;
+                    moved = true;
+                }
+                if (keys['d'] || keys['D']) {
+                    renderer.camera.position[0] += speed;
+                    renderer.camera.target[0] += speed;
+                    moved = true;
+                }
+
+                if (moved) {
+                    updatePositionDisplay();
+                }
+            }, 16);
+
+            console.log('✅ Controls setup');
+        }
+
+        function updateCamera() {
+            const centerX = 50000;
+            const centerZ = 50000;
+
+            renderer.camera.position = [
+                centerX + Math.cos(cameraAngle) * cameraDistance,
+                cameraHeight,
+                centerZ + Math.sin(cameraAngle) * cameraDistance
+            ];
+
+            renderer.camera.target = [centerX, 0, centerZ];
+        }
+
+        function updatePositionDisplay() {
+            const pos = renderer.camera.position;
+            document.getElementById('position').textContent = 
+                `${Math.round(pos[0])}, ${Math.round(pos[1])}, ${Math.round(pos[2])}`;
+
+            // Find nearest city
+            let nearestCity = null;
+            let nearestDist = Infinity;
+
+            worldData.cities.forEach(city => {
+                const dx = city.position.x - pos[0];
+                const dz = city.position.z - pos[2];
+                const dist = Math.sqrt(dx * dx + dz * dz);
+
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestCity = city;
+                }
+            });
+
+            if (nearestCity) {
+                document.getElementById('nearbyCity').textContent = 
+                    `${nearestCity.name} (${Math.round(nearestDist)}m)`;
+            }
+        }
+
+        // ==========================================
+        // RENDER LOOP
+        // ==========================================
+
+        function startRenderLoop() {
+            function loop(currentTime) {
+                const deltaTime = currentTime - lastTime;
+                lastTime = currentTime;
+
+                // Render
+                renderer.render(deltaTime);
+
+                // Update stats
+                updateStats();
+
+                // Continue loop
+                animationId = requestAnimationFrame(loop);
+            }
+
+            animationId = requestAnimationFrame(loop);
+            console.log('✅ Render loop started');
+        }
+
+        function updateStats() {
+            const stats = renderer.getStats();
+
+            // FPS
+            const fpsElement = document.getElementById('fps');
+            fpsElement.textContent = Math.round(stats.fps);
+            fpsElement.className = 'stat-value ' + 
+                (stats.fps >= 55 ? 'good' : stats.fps >= 30 ? 'warning' : 'bad');
+
+            // Frame time
+            document.getElementById('frameTime').textContent = stats.frameTime.toFixed(2) + 'ms';
+
+            // Draw calls
+            document.getElementById('drawCalls').textContent = stats.drawCalls;
+
+            // Vertices
+            document.getElementById('vertices').textContent = stats.verticesRendered.toLocaleString();
+
+            // Chunks
+            document.getElementById('chunksLoaded').textContent = stats.chunksLoaded;
+            document.getElementById('chunksVisible').textContent = stats.chunksVisible;
+        }
+
+        // ==========================================
+        // WINDOW RESIZE
+        // ==========================================
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            if (renderer && renderer.gl) {
+                renderer.gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+        });
+
+        // ==========================================
+        // START
+        // ==========================================
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

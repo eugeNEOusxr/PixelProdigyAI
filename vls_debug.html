@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VLS Debug - Simple Tree Test</title>
+  <style>
+    body { margin: 0; background: #87CEEB; font-family: monospace; }
+    canvas { display: block; }
+    #debug {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.9);
+      color: #0f0;
+      padding: 15px;
+      border: 2px solid #0f0;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .success { color: #0f0; }
+    .error { color: #f00; }
+    .warn { color: #ff0; }
+    .info { color: #0ff; }
+  </style>
+</head>
+<body>
+  <div id="debug">
+    <h3>🌲 VLS Debug Console</h3>
+    <div id="log"></div>
+  </div>
+
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+  <script src="object_generator/vls_parser.js"></script>
+  <script src="world_generation/vls_tree_generator.js"></script>
+
+  <script>
+    const logDiv = document.getElementById('log');
+    
+    function log(msg, type = 'info') {
+      console.log(msg);
+      const p = document.createElement('p');
+      p.className = type;
+      p.innerHTML = msg;
+      logDiv.appendChild(p);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    
+    log('=== VLS SYSTEM TEST ===', 'info');
+    log('');
+    
+    // Test 1: Check THREE.js
+    log('Test 1: THREE.js', 'info');
+    if (typeof THREE !== 'undefined') {
+      log('✓ THREE.js loaded (r' + THREE.REVISION + ')', 'success');
+    } else {
+      log('✗ THREE.js NOT loaded', 'error');
+    }
+    log('');
+    
+    // Test 2: Check VLSParser
+    log('Test 2: VLSParser', 'info');
+    if (typeof VLSParser !== 'undefined') {
+      log('✓ VLSParser class available', 'success');
+      try {
+        const parser = new VLSParser();
+        log('✓ VLSParser instantiated', 'success');
+        
+        // Test parsing simple VLS
+        log('  Testing simple VLS: +E^4', 'info');
+        const result = parser.parse('+E^4');
+        log(`  → vertices: ${result.vertices.length} (${result.vertices.length/3} points)`, 'info');
+        log(`  → indices: ${result.indices.length} (${result.indices.length/3} triangles)`, 'info');
+        log(`  → sample vertices: [${result.vertices.slice(0, 9).join(', ')}]`, 'info');
+        
+        if (result.vertices.length > 0) {
+          log('✓ Parser creating vertices!', 'success');
+        } else {
+          log('✗ Parser NOT creating vertices', 'error');
+        }
+        
+      } catch (e) {
+        log('✗ Error with VLSParser: ' + e.message, 'error');
+      }
+    } else {
+      log('✗ VLSParser NOT available', 'error');
+    }
+    log('');
+    
+    // Test 3: Check VLSTreeGenerator
+    log('Test 3: VLSTreeGenerator', 'info');
+    if (typeof VLSTreeGenerator !== 'undefined') {
+      log('✓ VLSTreeGenerator class available', 'success');
+      try {
+        const parser = new VLSParser();
+        const generator = new VLSTreeGenerator(parser);
+        log('✓ VLSTreeGenerator instantiated', 'success');
+        
+        // Test generating oak tree
+        log('  Generating oak tree...', 'info');
+        const oakTree = generator.generateTree('oak', {
+          position: { x: 0, y: 0, z: 0 },
+          scale: 1.0
+        });
+        
+        if (oakTree) {
+          log('✓ Oak tree generated!', 'success');
+          log(`  → type: ${oakTree.type}`, 'info');
+          log(`  → geometry: ${oakTree.geometry ? 'yes' : 'no'}`, 'info');
+          if (oakTree.geometry && oakTree.geometry.attributes) {
+            log(`  → vertices: ${oakTree.geometry.attributes.position.count}`, 'info');
+          }
+        } else {
+          log('✗ Oak tree is NULL', 'error');
+        }
+        
+      } catch (e) {
+        log('✗ Error with VLSTreeGenerator: ' + e.message, 'error');
+        log('  Stack: ' + e.stack, 'error');
+      }
+    } else {
+      log('✗ VLSTreeGenerator NOT available', 'error');
+    }
+    log('');
+    
+    // Test 4: Render a tree
+    log('Test 4: Render Tree', 'info');
+    try {
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87CEEB);
+      
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(5, 3, 5);
+      camera.lookAt(0, 2, 0);
+      
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      
+      // Lights
+      const sun = new THREE.DirectionalLight(0xffffff, 1);
+      sun.position.set(10, 10, 10);
+      scene.add(sun);
+      const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambient);
+      
+      // Ground
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(20, 20),
+        new THREE.MeshStandardMaterial({ color: 0x4a7c59 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      scene.add(ground);
+      
+      log('✓ Scene created', 'success');
+      
+      // Generate trees
+      const parser = new VLSParser();
+      const generator = new VLSTreeGenerator(parser);
+      
+      const treeTypes = ['oak', 'pine', 'willow', 'dead'];
+      let treeCount = 0;
+      
+      for (let i = 0; i < treeTypes.length; i++) {
+        const type = treeTypes[i];
+        const tree = generator.generateTree(type, {
+          position: { x: (i - 1.5) * 3, y: 0, z: 0 },
+          scale: 0.8,
+          color: 0x8B4513,
+          leafColor: type === 'dead' ? 0x666666 : 0x228B22
+        });
+        
+        if (tree) {
+          scene.add(tree);
+          treeCount++;
+          log(`✓ Added ${type} tree (${tree.geometry.attributes.position.count} vertices)`, 'success');
+        } else {
+          log(`✗ Failed to create ${type} tree`, 'error');
+        }
+      }
+      
+      log('');
+      log(`✓ Scene has ${treeCount} VLS trees!`, 'success');
+      log('✓ Rendering...', 'success');
+      
+      // Animate
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+      
+    } catch (e) {
+      log('✗ Render error: ' + e.message, 'error');
+      log('  Stack: ' + e.stack, 'error');
+    }
+    
+  </script>
+</body>
+</html>

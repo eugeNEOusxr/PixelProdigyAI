@@ -1,0 +1,4104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigyOS AI – Creative Operating System</title>
+  
+  <!-- 
+    ═══════════════════════════════════════════════════════════════════════════
+    PIXELPRODIGY HUMAN SCULPT WINDOW - MANUAL 3D CREATION PLATFORM
+    ═══════════════════════════════════════════════════════════════════════════
+    
+    Copyright © 2025 Jeremy (EugeNEOusXR / PixelProdigy)
+    All Rights Reserved.
+    
+    PROPRIETARY AND CONFIDENTIAL
+    
+    This software and associated documentation files (the "Software") contain
+    proprietary and confidential information belonging to Jeremy/PixelProdigy.
+    
+    RESTRICTIONS:
+    - No unauthorized copying, modification, or distribution
+    - No reverse engineering or decompilation
+    - Commercial use requires explicit written permission
+    - AI training/scraping prohibited without written consent
+    
+    LEGAL NOTICES:
+    - Patent Pending (Provisional filing in progress)
+    - Trademark: PixelProdigy™ (Registration pending)
+    - Git Repository: Timestamped commits serve as proof of authorship
+    - Build Version: 1.0.0-alpha
+    - Build Date: October 17, 2025
+    
+    UNIQUE INNOVATIONS:
+    1. Box/Circle/Lasso selection with real-time modification
+    2. Selection utilities (Invert/Grow/Shrink/Clear/SelectAll)
+    3. Lasso-guided laser cutting system (Patent Pending)
+    4. Physics-based destruction with object binding
+    5. Dual-window Human/AI collaboration architecture
+    6. Real-time vertex manipulation with layer modification
+    
+    For licensing inquiries: contact@pixelprodigy.ai
+    
+    BUILD FINGERPRINT: PPG-HUMAN-SCULPT-${Date.now()}
+    ═══════════════════════════════════════════════════════════════════════════
+  -->
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0a0e14;
+      color: #d4dce6;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Toolbar */
+    #toolbar {
+      background: linear-gradient(135deg, #141b24 0%, #1a2332 100%);
+      border-bottom: 1px solid #2a3848;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      border-right: 1px solid #2a3848;
+    }
+
+    .toolbar-section:last-child {
+      border-right: none;
+    }
+
+    .toolbar-section label {
+      font-size: 12px;
+      color: #8a9aad;
+      font-weight: 500;
+    }
+
+    .toolbar-section input[type="range"],
+    .toolbar-section input[type="number"],
+    .toolbar-section select {
+      background: #1e2836;
+      border: 1px solid #2e3b4e;
+      border-radius: 4px;
+      color: #d4dce6;
+      padding: 4px 8px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .toolbar-section input[type="range"] {
+      width: 90px;
+    }
+
+    .toolbar-section input[type="number"] {
+      width: 60px;
+    }
+
+    .toolbar-section select {
+      padding: 4px 6px;
+    }
+
+    .toolbar-section button {
+      background: #2563eb;
+      border: none;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .toolbar-section button:hover {
+      background: #1d4ed8;
+    }
+
+    /* Main Layout */
+    #main {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Left Panel: Brush & Layer Controls */
+    #leftPanel {
+      width: 280px;
+      background: #0f1419;
+      border-right: 1px solid #2a3848;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .panel-section {
+      margin-bottom: 24px;
+    }
+
+    .panel-section h3 {
+      font-size: 13px;
+      color: #7dd3fc;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .control-row label {
+      font-size: 12px;
+      color: #8a9aad;
+    }
+
+    .control-row input[type="range"] {
+      flex: 1;
+      margin-left: 12px;
+    }
+
+    .control-row input[type="number"] {
+      width: 55px;
+      margin-left: 8px;
+    }
+
+    .brush-shape-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .brush-shape-btn {
+      background: #1e2836;
+      border: 2px solid #2e3b4e;
+      color: #d4dce6;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .brush-shape-btn.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
+    .brush-shape-btn:hover {
+      border-color: #3b82f6;
+    }
+
+    .layer-list {
+      background: #1e2836;
+      border: 1px solid #2e3b4e;
+      border-radius: 6px;
+      padding: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .layer-item {
+      background: #141b24;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s;
+    }
+
+    .layer-item.active {
+      background: #1e3a8a;
+      border-left: 3px solid #3b82f6;
+    }
+
+    .layer-item:hover {
+      background: #1a2332;
+    }
+
+    .layer-name {
+      font-size: 12px;
+      color: #d4dce6;
+    }
+
+    .layer-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .layer-btn {
+      background: transparent;
+      border: 1px solid #2e3b4e;
+      color: #8a9aad;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+    }
+
+    .layer-btn:hover {
+      background: #2e3b4e;
+      color: #d4dce6;
+    }
+
+    /* Center: 3D Viewport */
+    #viewport {
+      flex: 1;
+      position: relative;
+      background: #000;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Transform Gizmo Controls */
+    #transformControls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(10, 14, 20, 0.85);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(42, 56, 72, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #transformControls h4 {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      color: #7dd3fc;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .transform-btn-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .transform-btn {
+      background: #1e2836;
+      border: 2px solid #2e3b4e;
+      color: #8a9aad;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.2s;
+      flex: 1;
+      text-align: center;
+    }
+
+    .transform-btn:hover {
+      border-color: #3b82f6;
+      color: #d4dce6;
+    }
+
+    .transform-btn.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
+    .axis-input-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .axis-label {
+      font-size: 11px;
+      font-weight: 600;
+      width: 16px;
+      text-align: center;
+    }
+
+    .axis-label.x { color: #ef4444; }
+    .axis-label.y { color: #22c55e; }
+    .axis-label.z { color: #3b82f6; }
+
+    .axis-input {
+      flex: 1;
+      background: #1e2836;
+      border: 1px solid #2e3b4e;
+      color: #d4dce6;
+      padding: 4px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      width: 60px;
+    }
+
+    #viewportOverlay {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(10, 14, 20, 0.85);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(42, 56, 72, 0.6);
+      font-size: 12px;
+      line-height: 1.6;
+      pointer-events: none;
+      max-width: 300px;
+    }
+
+    #viewportOverlay h4 {
+      color: #7dd3fc;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    #viewportOverlay div {
+      color: #8a9aad;
+    }
+
+    /* CAM-003: Flight Mode Indicator */
+    #flightModeIndicator {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(10, 14, 20, 0.9);
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 2px solid #3b82f6;
+      font-size: 14px;
+      font-weight: 600;
+      color: #7dd3fc;
+      pointer-events: none;
+      display: none;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      transition: opacity 0.3s ease;
+    }
+
+    #flightModeIndicator.visible {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    #flightModeIndicator .speed-display {
+      color: #fff;
+      font-size: 16px;
+      margin-top: 4px;
+    }
+
+    #flightModeIndicator .speed-fast {
+      color: #22c55e;
+    }
+
+    #flightModeIndicator .speed-slow {
+      color: #fbbf24;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SEL-001: Box Selection Canvas */
+    #selectionCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .selection-box {
+      position: absolute;
+      border: 2px solid rgba(59, 130, 246, 0.8);
+      background: rgba(59, 130, 246, 0.1);
+      pointer-events: none;
+      display: none;
+    }
+
+    .selection-box.active {
+      display: block;
+    }
+
+    /* Right Panel: AI Guidance & Environment */
+    #rightPanel {
+      width: 320px;
+      background: #0f1419;
+      border-left: 1px solid #2a3848;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .ai-suggestion-box {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .ai-suggestion-box h4 {
+      font-size: 13px;
+      color: #93c5fd;
+      margin-bottom: 8px;
+    }
+
+    .ai-suggestion-box p {
+      font-size: 12px;
+      color: #dbeafe;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .ai-suggestion-box button {
+      background: #3b82f6;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      margin-right: 6px;
+      transition: background 0.2s;
+    }
+
+    .ai-suggestion-box button:hover {
+      background: #2563eb;
+    }
+
+    .env-control-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    /* Bottom Timeline */
+    #timeline {
+      height: 100px;
+      background: #0f1419;
+      border-top: 1px solid #2a3848;
+      padding: 12px 16px;
+      overflow-x: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timeline-frame {
+      min-width: 60px;
+      height: 60px;
+      background: #1e2836;
+      border: 2px solid #2e3b4e;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #8a9aad;
+    }
+
+    .timeline-frame.active {
+      border-color: #3b82f6;
+      background: #1e3a8a;
+      color: #93c5fd;
+    }
+
+    .timeline-frame:hover {
+      border-color: #3b82f6;
+    }
+
+    /* Status Bar */
+    #statusBar {
+      background: #0a0e14;
+      border-top: 1px solid #2a3848;
+      padding: 6px 16px;
+      font-size: 11px;
+      color: #8a9aad;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0f1419;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #2e3b4e;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b4e6e;
+    }
+
+    /* Radial Transform Menu */
+    #radialMenu {
+      position: fixed;
+      display: none;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    #radialMenu.active {
+      display: block;
+      pointer-events: all;
+    }
+
+    .radial-menu-center {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      border: 3px solid #3b82f6;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+    }
+
+    .radial-menu-item {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #1e2836 0%, #2e3b4e 100%);
+      border: 2px solid #3b82f6;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #d4dce6;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .radial-menu-item:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      transform: translate(-50%, -50%) scale(1.15);
+      border-color: #60a5fa;
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.6);
+    }
+
+    .radial-menu-item .icon {
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+
+    .radial-menu-item .label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ENV-002: Fog Preset Button Styles */
+    .fog-preset-btn:hover {
+      background: #252f3d !important;
+      border-color: #3d5066 !important;
+      transform: translateY(-1px);
+    }
+
+    .fog-preset-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ENV-005: Camera Preset Button Styles */
+    .camera-preset-btn:hover {
+      background: #252f3d !important;
+      border-color: #3d5066 !important;
+      transform: translateY(-1px);
+    }
+
+    .camera-preset-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Toolbar -->
+  <div id="toolbar">
+    <div class="toolbar-section">
+      <button onclick="newProject()">New</button>
+      <button onclick="saveProject()">Save</button>
+      <button onclick="loadProject()">Load</button>
+      <button onclick="exportModel()">Export</button>
+    </div>
+
+    <div class="toolbar-section">
+      <label>Project:</label>
+      <input type="text" id="projectId" value="untitled" style="width: 120px;">
+    </div>
+
+    <div class="toolbar-section">
+      <label>Autosave:</label>
+      <input type="number" id="autosaveInterval" value="30" min="10" max="300">
+      <span style="font-size: 11px; color: #8a9aad;">s</span>
+    </div>
+
+    <div class="toolbar-section">
+      <label>Export:</label>
+      <select id="exportFormat">
+        <option value="gltf">glTF</option>
+        <option value="obj">OBJ</option>
+        <option value="stl">STL</option>
+      </select>
+    </div>
+
+    <div class="toolbar-section">
+      <label>Grid:</label>
+      <input type="number" id="snapToGrid" value="0.5" min="0" max="5" step="0.1">
+    </div>
+
+    <div class="toolbar-section" style="margin-left: auto;">
+      <button onclick="undo()">Undo</button>
+      <button onclick="redo()">Redo</button>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div id="main">
+    <!-- Left Panel -->
+    <div id="leftPanel">
+      <div class="panel-section">
+        <h3>🖌️ Brush Controls</h3>
+        <div class="control-row">
+          <label>Radius</label>
+          <input type="range" id="brushRadius" min="0.1" max="2.0" step="0.05" value="0.35">
+          <input type="number" id="brushRadiusValue" min="0.1" max="2.0" step="0.05" value="0.35">
+        </div>
+        <div class="control-row">
+          <label>Strength</label>
+          <input type="range" id="brushStrength" min="0.02" max="0.5" step="0.01" value="0.15">
+          <input type="number" id="brushStrengthValue" min="0.02" max="0.5" step="0.01" value="0.15">
+        </div>
+        <div class="control-row">
+          <label>Hardness</label>
+          <input type="range" id="brushHardness" min="0" max="1" step="0.05" value="0.7">
+          <input type="number" id="brushHardnessValue" min="0" max="1" step="0.05" value="0.7">
+        </div>
+        <div class="control-row">
+          <label>Falloff</label>
+          <select id="brushFalloff">
+            <option value="smooth">Smooth</option>
+            <option value="linear">Linear</option>
+            <option value="sharp">Sharp</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label>Symmetry</label>
+          <select id="symmetryAxis">
+            <option value="none">None</option>
+            <option value="x">X-Axis</option>
+            <option value="y">Y-Axis</option>
+            <option value="z">Z-Axis</option>
+            <option value="xy">XY</option>
+            <option value="xz">XZ</option>
+            <option value="xyz">XYZ</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label>Pressure</label>
+          <input type="range" id="pressureResponse" min="0" max="1" step="0.1" value="0.5">
+        </div>
+        <div class="control-row">
+          <label>Spacing</label>
+          <input type="range" id="strokeSpacing" min="0.01" max="0.5" step="0.01" value="0.1">
+        </div>
+
+        <h3 style="margin-top: 16px;">Shape</h3>
+        <div class="brush-shape-grid">
+          <div class="brush-shape-btn active" data-shape="circle">Circle</div>
+          <div class="brush-shape-btn" data-shape="triangle">Triangle</div>
+          <div class="brush-shape-btn" data-shape="leaf">Leaf</div>
+          <div class="brush-shape-btn" data-shape="square">Square</div>
+          <div class="brush-shape-btn" data-shape="star">Star</div>
+          <div class="brush-shape-btn" data-shape="custom">Custom</div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>📚 Layers</h3>
+        <div class="layer-list" id="layerList">
+          <div class="layer-item active">
+            <span class="layer-name">Layer 1</span>
+            <div class="layer-controls">
+              <button class="layer-btn">👁️</button>
+              <button class="layer-btn">🔒</button>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 4px; margin-top: 8px;">
+          <button style="flex: 1; padding: 8px; background: #16a34a; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-weight: 500;" onclick="incrementLayer()">+ Increment</button>
+          <button style="flex: 1; padding: 8px; background: #dc2626; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-weight: 500;" onclick="decrementLayer()">− Decrement</button>
+        </div>
+        <button style="margin-top: 4px; width: 100%; padding: 8px; background: #2563eb; border: none; color: #fff; border-radius: 4px; cursor: pointer;" onclick="addLayer()">+ New Layer</button>
+        
+        <div class="control-row" style="margin-top: 12px;">
+          <label>Blend Mode</label>
+          <select id="layerBlendMode">
+            <option value="normal">Normal</option>
+            <option value="add">Add</option>
+            <option value="multiply">Multiply</option>
+            <option value="overlay">Overlay</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label>Opacity</label>
+          <input type="range" id="layerOpacity" min="0" max="1" step="0.05" value="1.0">
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>🎨 Material</h3>
+        <div class="control-row">
+          <label>Preset</label>
+          <select id="materialPreset">
+            <option value="standard">Standard</option>
+            <option value="metallic">Metallic</option>
+            <option value="rough">Rough Stone</option>
+            <option value="wood">Wood</option>
+            <option value="bark">Fine Bark</option>
+            <option value="chunky">Chunky Rock</option>
+            <option value="waves">Layered Waves</option>
+            <option value="plastic">Plastic</option>
+            <option value="glass">Glass</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label>Displacement</label>
+          <input type="range" id="displacementDepth" min="0" max="2" step="0.1" value="0.5">
+        </div>
+        <div class="control-row">
+          <label>Detail Level</label>
+          <input type="range" id="detailLevel" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="control-row">
+          <label>Color Tint</label>
+          <input type="color" id="colorTint" value="#6f513a">
+        </div>
+        <div class="control-row">
+          <label>Auto-Normal</label>
+          <input type="checkbox" id="autoNormalRefresh" checked>
+        </div>
+        <button style="width: 100%; margin-top: 8px; padding: 8px; background: #1e40af; border: none; color: #fff; border-radius: 4px; cursor: pointer;" onclick="applyProceduralPattern()">Apply Procedural Pattern</button>
+      </div>
+    </div>
+
+    <!-- Center Viewport -->
+    <div id="viewport">
+      <canvas id="canvas3d"></canvas>
+      
+      <!-- Transform Controls Widget -->
+      <div id="transformControls">
+        <h4>🎯 Transform</h4>
+        <div class="transform-btn-group">
+          <button class="transform-btn" id="orbitModeBtn" onclick="setTransformMode('orbit')">Orbit</button>
+          <button class="transform-btn" id="translateModeBtn" onclick="setTransformMode('translate')">Move</button>
+        </div>
+        <div id="positionInputs" style="display: none;">
+          <div class="axis-input-group">
+            <span class="axis-label x">X</span>
+            <input type="number" class="axis-input" id="posX" step="0.1" value="0">
+          </div>
+          <div class="axis-input-group">
+            <span class="axis-label y">Y</span>
+            <input type="number" class="axis-input" id="posY" step="0.1" value="1">
+          </div>
+          <div class="axis-input-group">
+            <span class="axis-label z">Z</span>
+            <input type="number" class="axis-input" id="posZ" step="0.1" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div id="viewportOverlay">
+        <h4>🎯 Quick Guide</h4>
+        <div><strong>B/C/L Keys:</strong> Box/Circle/Lasso Select</div>
+        <div><strong>I/G/H Keys:</strong> Invert/Grow/Shrink Selection</div>
+        <div><strong>Escape:</strong> Clear Selection</div>
+        <div><strong>Ctrl+A:</strong> Select All</div>
+        <div><strong>+ / -:</strong> Build / Carve Layers</div>
+        <div><strong>F Key:</strong> Flight Mode (WASD)</div>
+      </div>
+      
+      <!-- Copyright & IP Protection UI -->
+      <div style="position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(255,255,255,0.3); pointer-events: none; z-index: 10000;" id="buildWatermark">
+        PPG-HUMAN-${Date.now()} | Patent Pending | © 2025 Jeremy
+      </div>
+      
+      <div style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 6px 10px; border-radius: 4px; font-size: 10px; color: #0ff; border: 1px solid #0ff; z-index: 10000; pointer-events: none;">
+        PixelProdigy™ Human Sculpt v1.0.0-alpha<br>
+        © 2025 Jeremy/EugeNEOusXR - Proprietary
+      </div>
+
+      <!-- CAM-003: Flight Mode Indicator -->
+      <div id="flightModeIndicator">
+        <div>✈️ FLIGHT MODE</div>
+        <div class="speed-display" id="flightSpeedDisplay">Speed: 1.0x</div>
+      </div>
+
+      <!-- SEL-001: Box Selection Overlay -->
+      <div id="selectionCanvas">
+        <div id="selectionBox" class="selection-box"></div>
+      </div>
+
+      <!-- Radial Transform Menu -->
+      <div id="radialMenu">
+        <div class="radial-menu-center">⚡</div>
+        <div class="radial-menu-item" data-transform="move" style="top: -90px; left: 0;">
+          <div class="icon">↕️</div>
+          <div class="label">Move</div>
+        </div>
+        <div class="radial-menu-item" data-transform="rotate" style="top: -64px; left: 64px;">
+          <div class="icon">🔄</div>
+          <div class="label">Rotate</div>
+        </div>
+        <div class="radial-menu-item" data-transform="scale" style="top: 0; left: 90px;">
+          <div class="icon">📐</div>
+          <div class="label">Scale</div>
+        </div>
+        <div class="radial-menu-item" data-transform="stretch" style="top: 64px; left: 64px;">
+          <div class="icon">↔️</div>
+          <div class="label">Stretch</div>
+        </div>
+        <div class="radial-menu-item" data-transform="sharpen" style="top: 90px; left: 0;">
+          <div class="icon">🔺</div>
+          <div class="label">Sharpen</div>
+        </div>
+        <div class="radial-menu-item" data-transform="smooth" style="top: 64px; left: -64px;">
+          <div class="icon">〰️</div>
+          <div class="label">Smooth</div>
+        </div>
+        <div class="radial-menu-item" data-transform="extend" style="top: 0; left: -90px;">
+          <div class="icon">➡️</div>
+          <div class="label">Extend</div>
+        </div>
+        <div class="radial-menu-item" data-transform="shrink" style="top: -64px; left: -64px;">
+          <div class="icon">⬅️</div>
+          <div class="label">Shrink</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div id="rightPanel">
+      <div class="panel-section">
+        <h3>🤖 AI Guidance</h3>
+        
+        <div class="ai-suggestion-box">
+          <h4>💡 Suggestion</h4>
+          <p id="aiSuggestionText">Click "Ask AI" to get sculpting suggestions based on your current scene.</p>
+          <button onclick="applyAISuggestion()">Apply</button>
+          <button onclick="dismissAISuggestion()">Dismiss</button>
+        </div>
+
+        <div class="control-row">
+          <label>Model</label>
+          <select id="aiModel">
+            <option value="openai">OpenAI GPT-4</option>
+            <option value="gemini">Google Gemini Pro</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>Template</label>
+          <select id="promptTemplate">
+            <option value="organic">Organic Forms</option>
+            <option value="architectural">Architectural</option>
+            <option value="natural">Natural Terrain</option>
+            <option value="character">Character</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>Pattern Seed</label>
+          <input type="number" id="patternSeed" value="42" min="0">
+        </div>
+
+        <div class="control-row">
+          <label>Guidance Strength</label>
+          <input type="range" id="guidanceStrength" min="0" max="1" step="0.1" value="0.7">
+        </div>
+
+        <div class="control-row">
+          <label>Refresh Rate</label>
+          <input type="number" id="suggestionRefreshRate" value="5" min="1" max="60">
+          <span style="font-size: 11px; color: #8a9aad;">s</span>
+        </div>
+
+        <div class="control-row">
+          <label>Auto-Apply</label>
+          <input type="checkbox" id="autoApplyThreshold">
+        </div>
+
+        <div class="control-row">
+          <label>Overlay</label>
+          <input type="checkbox" id="feedbackOverlay" checked>
+        </div>
+
+        <button style="width: 100%; margin-top: 12px; padding: 10px; background: #2563eb; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-weight: 500;" onclick="askAI()">Ask AI</button>
+      </div>
+
+      <div class="panel-section">
+        <h3>🌍 Environment</h3>
+        
+        <div class="env-control-grid">
+          <div class="control-row">
+            <label>Theme</label>
+            <select id="sceneTheme">
+              <option value="studio">Studio</option>
+              <option value="outdoor">Outdoor</option>
+              <option value="sunset">Sunset</option>
+              <option value="night">Night</option>
+              <option value="underwater">Underwater</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <label>Lighting</label>
+            <select id="lightingRig">
+              <option value="three-point">Three-Point</option>
+              <option value="natural">Natural</option>
+              <option value="dramatic">Dramatic</option>
+              <option value="soft">Soft</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <label>Time of Day</label>
+            <input type="range" id="timeOfDay" min="0" max="24" step="0.5" value="12">
+            <span id="timeOfDayValue" style="font-size: 11px; color: #8a9aad;">12:00</span>
+          </div>
+
+          <div class="control-row">
+            <label>Fog Density</label>
+            <input type="range" id="fogDensity" min="0" max="0.1" step="0.005" value="0.05">
+            <span id="fogDensityValue" style="font-size: 11px; color: #8a9aad;">0.05</span>
+          </div>
+
+          <!-- ENV-002: Fog Preset Buttons -->
+          <div class="control-row" style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button class="fog-preset-btn" data-preset="none" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onclick="applyFogPreset('none')">None</button>
+            <button class="fog-preset-btn" data-preset="light" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onclick="applyFogPreset('light')">Light</button>
+            <button class="fog-preset-btn" data-preset="medium" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onclick="applyFogPreset('medium')">Medium</button>
+            <button class="fog-preset-btn" data-preset="heavy" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onclick="applyFogPreset('heavy')">Heavy</button>
+          </div>
+
+          <div class="control-row">
+            <label>Ground Size</label>
+            <input type="number" id="groundPlaneSize" value="30" min="10" max="100" step="5" style="width: 70px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; padding: 6px 8px; border-radius: 4px; font-size: 12px;">
+            <span style="font-size: 11px; color: #8a9aad; margin-left: 4px;">m</span>
+          </div>
+
+          <!-- ENV-003: Ground Size Preset Buttons -->
+          <div class="control-row" style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button style="flex: 1; min-width: 50px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='#252f3d'" onmouseout="this.style.background='#1e2836'" onclick="updateGroundPlane(10)">10m</button>
+            <button style="flex: 1; min-width: 50px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='#252f3d'" onmouseout="this.style.background='#1e2836'" onclick="updateGroundPlane(30)">30m</button>
+            <button style="flex: 1; min-width: 50px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='#252f3d'" onmouseout="this.style.background='#1e2836'" onclick="updateGroundPlane(50)">50m</button>
+            <button style="flex: 1; min-width: 50px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='#252f3d'" onmouseout="this.style.background='#1e2836'" onclick="updateGroundPlane(100)">100m</button>
+          </div>
+
+          <!-- ENV-004: Ground Material Preset Buttons -->
+          <div class="control-row">
+            <label style="margin-bottom: 6px; display: block;">Material</label>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button class="material-preset-btn" data-material="grass" style="flex: 1; min-width: 70px; padding: 8px 6px; background: linear-gradient(135deg, #2d5016 0%, #3a6b1e 100%); border: 1px solid #4a7f2a; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.3);" onclick="applyGroundMaterial('grass')">🌿 Grass</button>
+              <button class="material-preset-btn" data-material="concrete" style="flex: 1; min-width: 70px; padding: 8px 6px; background: linear-gradient(135deg, #555555 0%, #666666 100%); border: 1px solid #777777; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.3);" onclick="applyGroundMaterial('concrete')">🏗️ Concrete</button>
+              <button class="material-preset-btn" data-material="sand" style="flex: 1; min-width: 70px; padding: 8px 6px; background: linear-gradient(135deg, #c2a569 0%, #d4b778 100%); border: 1px solid #e0c889; color: #2a2520; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s; text-shadow: 0 1px 2px rgba(255,255,255,0.2);" onclick="applyGroundMaterial('sand')">🏖️ Sand</button>
+              <button class="material-preset-btn" data-material="water" style="flex: 1; min-width: 70px; padding: 8px 6px; background: linear-gradient(135deg, #1e90ff 0%, #4da6ff 100%); border: 1px solid #6bb8ff; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.3);" onclick="applyGroundMaterial('water')">💧 Water</button>
+              <button class="material-preset-btn" data-material="metal" style="flex: 1; min-width: 70px; padding: 8px 6px; background: linear-gradient(135deg, #888888 0%, #aaaaaa 100%); border: 1px solid #bbbbbb; color: #1a1a1a; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s; text-shadow: 0 1px 2px rgba(255,255,255,0.2);" onclick="applyGroundMaterial('metal')">⚙️ Metal</button>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <label>Gravity</label>
+            <select id="gravityAxis">
+              <option value="-y">-Y (Down)</option>
+              <option value="+y">+Y (Up)</option>
+              <option value="-z">-Z</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <label>Orbit Speed</label>
+            <input type="range" id="cameraOrbitSpeed" min="0.1" max="2" step="0.1" value="0.5">
+            <span id="cameraOrbitSpeedValue" style="font-size: 11px; color: #8a9aad;">0.5x</span>
+          </div>
+
+          <!-- ENV-005: Camera Position Presets -->
+          <div class="control-row">
+            <label style="margin-bottom: 6px; display: block;">Camera View</label>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button class="camera-preset-btn" data-view="top" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s;" onclick="setCameraView('top')">⬆️ Top</button>
+              <button class="camera-preset-btn" data-view="front" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s;" onclick="setCameraView('front')">👁️ Front</button>
+              <button class="camera-preset-btn" data-view="side" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s;" onclick="setCameraView('side')">➡️ Side</button>
+              <button class="camera-preset-btn" data-view="isometric" style="flex: 1; min-width: 60px; padding: 8px 6px; background: #1e2836; border: 1px solid #2e3b4e; color: #d4dce6; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; transition: all 0.2s;" onclick="setCameraView('isometric')">📐 Iso</button>
+            </div>
+          </div>
+        </div>
+
+        <button style="width: 100%; margin-top: 12px; padding: 8px; background: #1e40af; border: none; color: #fff; border-radius: 4px; cursor: pointer;" onclick="loadHDRI()">Load HDRI</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div id="timeline">
+    <div class="timeline-frame active">Frame 1</div>
+    <div class="timeline-frame">Frame 2</div>
+    <div class="timeline-frame">Frame 3</div>
+    <div class="timeline-frame">Frame 4</div>
+    <div class="timeline-frame">+ Add</div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="statusBar">
+    <span id="statusLeft">Ready</span>
+    <span id="statusRight">Vertices: 0 | Triangles: 0</span>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // ═══════════════════════════════════════════════════════════════════
+    // BUILD FINGERPRINT & COPYRIGHT ENFORCEMENT
+    // ═══════════════════════════════════════════════════════════════════
+    const BUILD_INFO = {
+      version: '1.0.0-alpha',
+      buildDate: new Date().toISOString(),
+      fingerprint: `PPG-HUMAN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      copyright: '© 2025 Jeremy (EugeNEOusXR/PixelProdigy)',
+      license: 'PROPRIETARY',
+      patentStatus: 'Pending',
+      uniqueInnovations: [
+        'Lasso-guided laser cutting',
+        'Dual-window architecture',
+        'Selection utilities (SEL-004)',
+        'Physics-based destruction'
+      ]
+    };
+
+    // Log build info to console (forensic tracking)
+    console.log('%c═══════════════════════════════════════════', 'color: #0ff; font-weight: bold;');
+    console.log('%cPixelProdigy Human Sculpt Window', 'color: #0ff; font-size: 18px; font-weight: bold;');
+    console.log('%c═══════════════════════════════════════════', 'color: #0ff; font-weight: bold;');
+    console.log('Build Info:', BUILD_INFO);
+    console.log('%cPROPRIETARY & CONFIDENTIAL', 'color: #f00; font-weight: bold; font-size: 14px;');
+    console.log('%cUnauthorized use, copying, or distribution prohibited', 'color: #ff0;');
+    console.log('%cPatent Pending | Trademark: PixelProdigy™', 'color: #0f0;');
+    console.log('Innovations:', BUILD_INFO.uniqueInnovations);
+    console.log('═══════════════════════════════════════════\n');
+
+    // Store build fingerprint in session
+    sessionStorage.setItem('ppg_build_fingerprint', BUILD_INFO.fingerprint);
+    sessionStorage.setItem('ppg_session_start', Date.now());
+    
+    // Send heartbeat to AI window (for inter-window communication)
+    setInterval(() => {
+      localStorage.setItem('ppg_human_heartbeat', Date.now().toString());
+    }, 1000);
+    
+    // Update watermark with actual build fingerprint
+    const watermark = document.getElementById('buildWatermark');
+    if (watermark) {
+      watermark.textContent = `${BUILD_INFO.fingerprint} | Patent Pending | ${BUILD_INFO.copyright}`;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // THREE.JS SCENE SETUP
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0e14);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.set(5, 4, 7);
+
+    const canvas = document.getElementById('canvas3d');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.rotateSpeed = 0.5; // ENV-006: Initialize orbit speed
+
+    // CAM-001: Key tracking for WASD flight controls
+    const keyState = {
+      w: false,
+      a: false,
+      s: false,
+      d: false,
+      q: false,
+      e: false,
+      shift: false,
+      ctrl: false
+    };
+    let flyMode = false;
+
+    // SEL-001: Box selection state
+    let selectionMode = false;
+    let selectionStart = { x: 0, y: 0 };
+    let selectionEnd = { x: 0, y: 0 };
+    let isSelecting = false;
+    const selectedVertices = new Set();
+    const selectionBox = document.getElementById('selectionBox');
+
+    // SEL-002: Circle selection state
+    let circleSelectMode = false;
+    let circleRadius = 50; // pixels
+    let circleCenter = { x: 0, y: 0 };
+    let circleModifyMode = null; // null, 'build', or 'carve'
+    const circleSelectOverlay = document.createElement('div');
+    circleSelectOverlay.id = 'circleSelectOverlay';
+    circleSelectOverlay.style.position = 'absolute';
+    circleSelectOverlay.style.border = '2px solid cyan';
+    circleSelectOverlay.style.borderRadius = '50%';
+    circleSelectOverlay.style.pointerEvents = 'none';
+    circleSelectOverlay.style.display = 'none';
+    circleSelectOverlay.style.zIndex = '1000';
+    document.getElementById('selectionCanvas').appendChild(circleSelectOverlay);
+
+    // SEL-003: Lasso selection state
+    let lassoSelectMode = false;
+    let lassoPath = []; // Array of {x, y} points
+    let lassoActive = false; // Currently drawing lasso
+    const lassoCanvas = document.createElement('canvas');
+    lassoCanvas.id = 'lassoCanvas';
+    lassoCanvas.style.position = 'absolute';
+    lassoCanvas.style.top = '0';
+    lassoCanvas.style.left = '0';
+    lassoCanvas.style.pointerEvents = 'none';
+    lassoCanvas.style.display = 'none';
+    lassoCanvas.style.zIndex = '1000';
+    document.getElementById('selectionCanvas').appendChild(lassoCanvas);
+    const lassoCtx = lassoCanvas.getContext('2d');
+
+    // Helper function to check if any selection tool is active
+    function isAnySelectionToolActive() {
+      return selectionMode || circleSelectMode || lassoSelectMode;
+    }
+
+    // Axis helper
+    const axisHelper = new THREE.AxesHelper(3);
+    scene.add(axisHelper);
+
+    // Grid helper
+    const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+    gridHelper.position.y = -2;
+    scene.add(gridHelper);
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0x4a6073, 0.45));
+    const dirLight = new THREE.DirectionalLight(0x9dcfff, 1.6);
+    dirLight.position.set(6, 14, 10);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    // Ground (ENV-003: Made accessible globally via window for dynamic recreation)
+    window.ground = new THREE.Mesh(
+      new THREE.CylinderGeometry(30, 30, 0.4, 48),
+      new THREE.MeshStandardMaterial({ color: 0x101a24, roughness: 0.95 })
+    );
+    window.ground.position.y = -2.2;
+    window.ground.receiveShadow = true;
+    scene.add(window.ground);
+
+    // Sample sculpt target (cylinder)
+    const sculptGeometry = new THREE.CylinderGeometry(0.8, 1.0, 6, 128, 96, false);
+    sculptGeometry.translate(0, 1, 0);
+    const sculptMaterial = new THREE.MeshStandardMaterial({
+      color: 0x6f513a,
+      roughness: 0.82,
+      metalness: 0.05
+    });
+    const sculptMesh = new THREE.Mesh(sculptGeometry, sculptMaterial);
+    sculptMesh.castShadow = true;
+    scene.add(sculptMesh);
+
+    // Store base positions for layer system
+    const basePositions = sculptGeometry.attributes.position.array.slice();
+    const vertexCount = sculptGeometry.attributes.position.count;
+
+    // Raycaster and pointer for sculpting
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let isSculpting = false;
+    let lastStrokePoint = null;
+
+    // Brush indicator - create different geometries for each shape
+    const brushGeometries = {
+      circle: new THREE.RingGeometry(0.95, 1, 64),
+      triangle: new THREE.BufferGeometry(),
+      leaf: new THREE.BufferGeometry(),
+      square: new THREE.BufferGeometry(),
+      star: new THREE.BufferGeometry()
+    };
+
+    // Build triangle brush shape
+    const triVertices = new Float32Array([
+      0, 1, 0,
+      -0.866, -0.5, 0,
+      0.866, -0.5, 0,
+      0, 1, 0
+    ]);
+    brushGeometries.triangle.setAttribute('position', new THREE.BufferAttribute(triVertices, 3));
+
+    // Build leaf brush shape (curved teardrop)
+    const leafPoints = [];
+    for (let i = 0; i <= 32; i++) {
+      const t = i / 32;
+      const angle = t * Math.PI * 2;
+      const r = 0.3 + Math.sin(t * Math.PI) * 0.7;
+      leafPoints.push(new THREE.Vector3(Math.cos(angle) * r, Math.sin(angle) * r * 1.2, 0));
+    }
+    brushGeometries.leaf.setFromPoints(leafPoints);
+
+    // Build square brush shape
+    const squareVertices = new Float32Array([
+      -1, -1, 0,
+      1, -1, 0,
+      1, 1, 0,
+      -1, 1, 0,
+      -1, -1, 0
+    ]);
+    brushGeometries.square.setAttribute('position', new THREE.BufferAttribute(squareVertices, 3));
+
+    // Build star brush shape (5-pointed)
+    const starPoints = [];
+    for (let i = 0; i <= 10; i++) {
+      const angle = (i / 10) * Math.PI * 2 - Math.PI / 2;
+      const r = i % 2 === 0 ? 1 : 0.4;
+      starPoints.push(new THREE.Vector3(Math.cos(angle) * r, Math.sin(angle) * r, 0));
+    }
+    starPoints.push(starPoints[0]); // close the shape
+    brushGeometries.star.setFromPoints(starPoints);
+
+    const brushIndicator = new THREE.Line(
+      brushGeometries.circle,
+      new THREE.LineBasicMaterial({ 
+        color: 0x5dd4fc, 
+        transparent: true, 
+        opacity: 0.75,
+        linewidth: 2
+      })
+    );
+    brushIndicator.visible = false;
+    scene.add(brushIndicator);
+
+    function updateBrushShape() {
+      const shape = state.brushShape;
+      if (brushGeometries[shape]) {
+        brushIndicator.geometry = brushGeometries[shape];
+      } else {
+        // fallback to circle for custom
+        brushIndicator.geometry = brushGeometries.circle;
+      }
+    }
+
+    // Undo/Redo system
+    const undoStack = [];
+    const redoStack = [];
+    const MAX_UNDO_STEPS = 50;
+    
+    let currentAISuggestion = null;
+    let transformMode = 'orbit'; // 'orbit' or 'translate'
+
+    // State
+    const state = {
+      brushRadius: 0.35,
+      brushStrength: 0.15,
+      brushHardness: 0.7,
+      brushFalloff: 'smooth',
+      brushShape: 'circle',
+      symmetryAxis: 'none',
+      pressureResponse: 0.5,
+      strokeSpacing: 0.1,
+      activeLayer: 0,
+      layers: [new Float32Array(sculptGeometry.attributes.position.array.length)],
+      layerBlendMode: 'normal',
+      layerOpacity: 1.0,
+      materialPreset: 'standard',
+      displacementDepth: 0.5,
+      detailLevel: 1.0,
+      colorTint: '#6f513a',
+      autoNormalRefresh: true,
+      projectId: 'untitled',
+      autosaveInterval: 30,
+      exportFormat: 'gltf',
+      snapToGrid: 0.5,
+      aiModel: 'openai',
+      promptTemplate: 'organic',
+      patternSeed: 42,
+      guidanceStrength: 0.7,
+      suggestionRefreshRate: 5,
+      autoApplyThreshold: false,
+      feedbackOverlay: true,
+      sceneTheme: 'studio',
+      lightingRig: 'three-point',
+      timeOfDay: 12,
+      fogDensity: 0.05,
+      groundPlaneSize: 30,
+      gravityAxis: '-y',
+      cameraOrbitSpeed: 0.5
+    };
+
+    // UI synchronization
+    function syncUI() {
+      document.getElementById('brushRadius').value = state.brushRadius;
+      document.getElementById('brushRadiusValue').value = state.brushRadius;
+      document.getElementById('brushStrength').value = state.brushStrength;
+      document.getElementById('brushStrengthValue').value = state.brushStrength;
+      document.getElementById('brushHardness').value = state.brushHardness;
+      document.getElementById('brushHardnessValue').value = state.brushHardness;
+      document.getElementById('brushFalloff').value = state.brushFalloff;
+      document.getElementById('symmetryAxis').value = state.symmetryAxis;
+      document.getElementById('pressureResponse').value = state.pressureResponse;
+      document.getElementById('strokeSpacing').value = state.strokeSpacing;
+      document.getElementById('layerBlendMode').value = state.layerBlendMode;
+      document.getElementById('layerOpacity').value = state.layerOpacity;
+      document.getElementById('materialPreset').value = state.materialPreset;
+      document.getElementById('displacementDepth').value = state.displacementDepth;
+      document.getElementById('detailLevel').value = state.detailLevel;
+      document.getElementById('colorTint').value = state.colorTint;
+      document.getElementById('autoNormalRefresh').checked = state.autoNormalRefresh;
+      document.getElementById('projectId').value = state.projectId;
+      document.getElementById('autosaveInterval').value = state.autosaveInterval;
+      document.getElementById('exportFormat').value = state.exportFormat;
+      document.getElementById('snapToGrid').value = state.snapToGrid;
+      document.getElementById('aiModel').value = state.aiModel;
+      document.getElementById('promptTemplate').value = state.promptTemplate;
+      document.getElementById('patternSeed').value = state.patternSeed;
+      document.getElementById('guidanceStrength').value = state.guidanceStrength;
+      document.getElementById('suggestionRefreshRate').value = state.suggestionRefreshRate;
+      document.getElementById('autoApplyThreshold').checked = state.autoApplyThreshold;
+      document.getElementById('feedbackOverlay').checked = state.feedbackOverlay;
+      document.getElementById('sceneTheme').value = state.sceneTheme;
+      document.getElementById('lightingRig').value = state.lightingRig;
+      document.getElementById('timeOfDay').value = state.timeOfDay;
+      document.getElementById('timeOfDayValue').textContent = `${Math.floor(state.timeOfDay)}:${String(Math.round((state.timeOfDay % 1) * 60)).padStart(2, '0')}`;
+      document.getElementById('fogDensity').value = state.fogDensity;
+      document.getElementById('fogDensityValue').textContent = state.fogDensity.toFixed(3);
+      document.getElementById('groundPlaneSize').value = state.groundPlaneSize;
+      document.getElementById('gravityAxis').value = state.gravityAxis;
+      document.getElementById('cameraOrbitSpeed').value = state.cameraOrbitSpeed;
+      document.getElementById('cameraOrbitSpeedValue').textContent = `${state.cameraOrbitSpeed.toFixed(1)}x`;
+    }
+
+    // Bind UI events
+    document.getElementById('brushRadius').addEventListener('input', (e) => {
+      state.brushRadius = parseFloat(e.target.value);
+      document.getElementById('brushRadiusValue').value = state.brushRadius;
+    });
+    document.getElementById('brushRadiusValue').addEventListener('input', (e) => {
+      state.brushRadius = parseFloat(e.target.value);
+      document.getElementById('brushRadius').value = state.brushRadius;
+    });
+    document.getElementById('brushStrength').addEventListener('input', (e) => {
+      state.brushStrength = parseFloat(e.target.value);
+      document.getElementById('brushStrengthValue').value = state.brushStrength;
+    });
+    document.getElementById('brushStrengthValue').addEventListener('input', (e) => {
+      state.brushStrength = parseFloat(e.target.value);
+      document.getElementById('brushStrength').value = state.brushStrength;
+    });
+    document.getElementById('brushHardness').addEventListener('input', (e) => {
+      state.brushHardness = parseFloat(e.target.value);
+      document.getElementById('brushHardnessValue').value = state.brushHardness;
+    });
+    document.getElementById('brushHardnessValue').addEventListener('input', (e) => {
+      state.brushHardness = parseFloat(e.target.value);
+      document.getElementById('brushHardness').value = state.brushHardness;
+    });
+    document.getElementById('brushFalloff').addEventListener('change', (e) => state.brushFalloff = e.target.value);
+    document.getElementById('symmetryAxis').addEventListener('change', (e) => state.symmetryAxis = e.target.value);
+    document.getElementById('pressureResponse').addEventListener('input', (e) => state.pressureResponse = parseFloat(e.target.value));
+    document.getElementById('strokeSpacing').addEventListener('input', (e) => state.strokeSpacing = parseFloat(e.target.value));
+    document.getElementById('layerBlendMode').addEventListener('change', (e) => state.layerBlendMode = e.target.value);
+    document.getElementById('layerOpacity').addEventListener('input', (e) => state.layerOpacity = parseFloat(e.target.value));
+    document.getElementById('materialPreset').addEventListener('change', (e) => state.materialPreset = e.target.value);
+    document.getElementById('displacementDepth').addEventListener('input', (e) => state.displacementDepth = parseFloat(e.target.value));
+    document.getElementById('detailLevel').addEventListener('input', (e) => state.detailLevel = parseFloat(e.target.value));
+    document.getElementById('colorTint').addEventListener('input', (e) => {
+      state.colorTint = e.target.value;
+      sculptMaterial.color.set(e.target.value);
+    });
+    document.getElementById('autoNormalRefresh').addEventListener('change', (e) => state.autoNormalRefresh = e.target.checked);
+    document.getElementById('projectId').addEventListener('input', (e) => state.projectId = e.target.value);
+    document.getElementById('autosaveInterval').addEventListener('input', (e) => state.autosaveInterval = parseInt(e.target.value));
+    document.getElementById('exportFormat').addEventListener('change', (e) => state.exportFormat = e.target.value);
+    document.getElementById('snapToGrid').addEventListener('input', (e) => state.snapToGrid = parseFloat(e.target.value));
+    document.getElementById('aiModel').addEventListener('change', (e) => state.aiModel = e.target.value);
+    document.getElementById('promptTemplate').addEventListener('change', (e) => state.promptTemplate = e.target.value);
+    document.getElementById('patternSeed').addEventListener('input', (e) => state.patternSeed = parseInt(e.target.value));
+    document.getElementById('guidanceStrength').addEventListener('input', (e) => state.guidanceStrength = parseFloat(e.target.value));
+    document.getElementById('suggestionRefreshRate').addEventListener('input', (e) => state.suggestionRefreshRate = parseInt(e.target.value));
+    document.getElementById('autoApplyThreshold').addEventListener('change', (e) => state.autoApplyThreshold = e.target.checked);
+    document.getElementById('feedbackOverlay').addEventListener('change', (e) => state.feedbackOverlay = e.target.checked);
+    document.getElementById('sceneTheme').addEventListener('change', (e) => state.sceneTheme = e.target.value);
+    document.getElementById('lightingRig').addEventListener('change', (e) => state.lightingRig = e.target.value);
+    document.getElementById('timeOfDay').addEventListener('input', (e) => {
+      state.timeOfDay = parseFloat(e.target.value);
+      document.getElementById('timeOfDayValue').textContent = `${Math.floor(state.timeOfDay)}:${String(Math.round((state.timeOfDay % 1) * 60)).padStart(2, '0')}`;
+    });
+    document.getElementById('fogDensity').addEventListener('input', (e) => {
+      state.fogDensity = parseFloat(e.target.value);
+      document.getElementById('fogDensityValue').textContent = state.fogDensity.toFixed(3);
+      applyFog(state.fogDensity, true); // ENV-001: Wire fog slider
+    });
+    document.getElementById('groundPlaneSize').addEventListener('change', (e) => {
+      const newSize = parseFloat(e.target.value);
+      updateGroundPlane(newSize); // ENV-003: Dynamic ground plane (use 'change' to avoid recreating while typing)
+    });
+    document.getElementById('gravityAxis').addEventListener('change', (e) => state.gravityAxis = e.target.value);
+    document.getElementById('cameraOrbitSpeed').addEventListener('input', (e) => {
+      const speed = parseFloat(e.target.value);
+      state.cameraOrbitSpeed = speed;
+      controls.rotateSpeed = speed; // ENV-006: Wire orbit speed
+      document.getElementById('cameraOrbitSpeedValue').textContent = `${speed.toFixed(1)}x`;
+      console.log(`🔄 Orbit speed: ${speed.toFixed(1)}x`);
+    });
+
+    // CAM-001: Keyboard event listeners for flight controls
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      
+      // Track WASD keys
+      if (key === 'w') keyState.w = true;
+      if (key === 'a') keyState.a = true;
+      if (key === 's') keyState.s = true;
+      if (key === 'd') keyState.d = true;
+      if (key === 'q') keyState.q = true;
+      if (key === 'e') keyState.e = true;
+      
+      // Track modifiers
+      if (e.shiftKey) keyState.shift = true;
+      if (e.ctrlKey) keyState.ctrl = true;
+      
+      // Toggle flight mode with 'F' key
+      if (key === 'f' && !e.repeat) {
+        flyMode = !flyMode;
+        controls.enabled = !flyMode; // CAM-002: Disable orbit controls in flight mode
+        console.log(`✈️ Flight mode: ${flyMode ? 'ENABLED' : 'DISABLED'}`);
+        if (flyMode) {
+          console.log('🎮 Controls: WASD (move), Q/E (down/up), Shift (fast), Ctrl (slow), F (toggle off)');
+        } else {
+          console.log('🌍 OrbitControls re-enabled (mouse drag to rotate)');
+        }
+      }
+
+      // SEL-001: Toggle box select mode with 'B' key
+      if (key === 'b' && !e.repeat) {
+        selectionMode = !selectionMode;
+        console.log(`📦 Box Select mode: ${selectionMode ? 'ENABLED (click-drag to select)' : 'DISABLED'}`);
+        if (selectionMode) {
+          console.log('🎯 Hold Shift to ADD, Ctrl to REMOVE from selection');
+          canvas.style.cursor = 'crosshair';
+        } else {
+          canvas.style.cursor = 'default';
+        }
+      }
+
+      // SEL-002: Toggle circle select mode with 'C' key
+      if (key === 'c' && !e.repeat) {
+        // Disable other selection modes
+        if (selectionMode) {
+          selectionMode = false;
+          selectionBox.style.display = 'none';
+        }
+        if (lassoSelectMode) {
+          lassoSelectMode = false;
+          lassoCanvas.style.display = 'none';
+          lassoActive = false;
+          lassoPath = [];
+        }
+        
+        circleSelectMode = !circleSelectMode;
+        console.log(`⭕ Circle Select mode: ${circleSelectMode ? 'ENABLED' : 'DISABLED'}`);
+        if (circleSelectMode) {
+          console.log('🎯 Move mouse to select | Scroll to change radius | Hold Shift=ADD, Ctrl=REMOVE');
+          console.log('💡 Press + to BUILD, - to CARVE within circle');
+          circleSelectOverlay.style.display = 'block';
+          canvas.style.cursor = 'none';
+        } else {
+          circleSelectOverlay.style.display = 'none';
+          canvas.style.cursor = 'default';
+          circleModifyMode = null;
+        }
+      }
+
+      // SEL-003: Toggle lasso select mode with 'L' key
+      if (key === 'l' && !e.repeat) {
+        // Disable other selection modes
+        if (selectionMode) {
+          selectionMode = false;
+          selectionBox.style.display = 'none';
+        }
+        if (circleSelectMode) {
+          circleSelectMode = false;
+          circleSelectOverlay.style.display = 'none';
+          circleModifyMode = null;
+        }
+        
+        lassoSelectMode = !lassoSelectMode;
+        console.log(`🎨 Lasso Select mode: ${lassoSelectMode ? 'ENABLED' : 'DISABLED'}`);
+        if (lassoSelectMode) {
+          console.log('🎯 Click to start path | Move to draw | Click to add points | Double-click or Enter to complete');
+          console.log('💡 Hold Shift=ADD, Ctrl=REMOVE from selection | Escape=Cancel');
+          lassoCanvas.style.display = 'block';
+          lassoCanvas.width = canvas.width;
+          lassoCanvas.height = canvas.height;
+          canvas.style.cursor = 'crosshair';
+        } else {
+          lassoCanvas.style.display = 'none';
+          canvas.style.cursor = 'default';
+          lassoActive = false;
+          lassoPath = [];
+        }
+      }
+
+      // SEL-003: Complete or cancel lasso selection
+      if (lassoSelectMode) {
+        if (key === 'enter' && lassoPath.length > 2) {
+          // Complete lasso selection
+          performLassoSelection(e.shiftKey, e.ctrlKey);
+          lassoActive = false;
+          lassoPath = [];
+          clearLassoCanvas();
+        } else if (key === 'escape') {
+          // Cancel lasso
+          lassoActive = false;
+          lassoPath = [];
+          clearLassoCanvas();
+          console.log('🚫 Lasso selection cancelled');
+        }
+      }
+
+      // Apply layer modification to selection with +/- keys
+      if (key === '=' || key === '+') {
+        if (circleSelectMode) {
+          // Circle select mode: toggle build mode
+          circleModifyMode = (circleModifyMode === 'build') ? null : 'build';
+          circleSelectOverlay.style.borderColor = circleModifyMode === 'build' ? '#00ff00' : 'cyan';
+          console.log(`🟢 Circle BUILD mode: ${circleModifyMode === 'build' ? 'ACTIVE' : 'OFF'}`);
+        } else if (selectedVertices.size > 0) {
+          applyLayerModification(selectedVertices, 0.1); // Build up
+          console.log(`➕ BUILT UP ${selectedVertices.size} vertices | +0.10 layer`);
+        } else {
+          console.log('⚠️ No vertices selected. Use Box Select (B) or Circle Select (C) first!');
+        }
+      }
+      if (key === '-' || key === '_') {
+        if (circleSelectMode) {
+          // Circle select mode: toggle carve mode
+          circleModifyMode = (circleModifyMode === 'carve') ? null : 'carve';
+          circleSelectOverlay.style.borderColor = circleModifyMode === 'carve' ? '#ff0000' : 'cyan';
+          console.log(`🔴 Circle CARVE mode: ${circleModifyMode === 'carve' ? 'ACTIVE' : 'OFF'}`);
+        } else if (selectedVertices.size > 0) {
+          applyLayerModification(selectedVertices, -0.1); // Carve away
+          console.log(`➖ CARVED ${selectedVertices.size} vertices | -0.10 layer`);
+        } else {
+          console.log('⚠️ No vertices selected. Use Box Select (B) or Circle Select (C) first!');
+        }
+      }
+
+      // SEL-004: Selection Utilities
+      if (key === 'i' && !e.repeat) {
+        // Invert Selection
+        invertSelection();
+      }
+      if (key === 'g' && !e.repeat && !isAnySelectionToolActive()) {
+        // Grow Selection (expand to neighbors)
+        growSelection();
+      }
+      if (key === 'h' && !e.repeat && !isAnySelectionToolActive()) {
+        // Shrink Selection (contract inward)
+        shrinkSelection();
+      }
+      if (key === 'escape') {
+        // Clear Selection or cancel selection mode
+        if (lassoSelectMode && lassoActive) {
+          lassoActive = false;
+          lassoPath = [];
+          clearLassoCanvas();
+          console.log('🚫 Lasso cancelled');
+        } else if (selectedVertices.size > 0) {
+          clearSelection();
+        }
+      }
+      // Ctrl+A: Select All
+      if (e.ctrlKey && key === 'a') {
+        e.preventDefault();
+        selectAll();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const key = e.key.toLowerCase();
+      
+      // Release WASD keys
+      if (key === 'w') keyState.w = false;
+      if (key === 'a') keyState.a = false;
+      if (key === 's') keyState.s = false;
+      if (key === 'd') keyState.d = false;
+      if (key === 'q') keyState.q = false;
+      if (key === 'e') keyState.e = false;
+      
+      // Release modifiers
+      if (!e.shiftKey) keyState.shift = false;
+      if (!e.ctrlKey) keyState.ctrl = false;
+    });
+
+    // SEL-001: Box selection mouse handlers
+    canvas.addEventListener('mousedown', (e) => {
+      // SEL-003: Lasso selection click
+      if (lassoSelectMode) {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        
+        // Check for double-click to complete
+        if (lassoActive && lassoPath.length > 0) {
+          const lastPoint = lassoPath[lassoPath.length - 1];
+          const dist = Math.sqrt(Math.pow(clickX - lastPoint.x, 2) + Math.pow(clickY - lastPoint.y, 2));
+          
+          // If click near start point or double-click, complete selection
+          if (lassoPath.length > 2 && dist < 15) {
+            performLassoSelection(e.shiftKey, e.ctrlKey);
+            lassoActive = false;
+            lassoPath = [];
+            clearLassoCanvas();
+            return;
+          }
+        }
+        
+        // Start or add point to lasso path
+        lassoActive = true;
+        lassoPath.push({ x: clickX, y: clickY });
+        drawLassoPath();
+        console.log(`🎨 Lasso point ${lassoPath.length} added`);
+        return;
+      }
+      
+      if (!selectionMode) return;
+
+      isSelecting = true;
+      const rect = canvas.getBoundingClientRect();
+      selectionStart.x = e.clientX - rect.left;
+      selectionStart.y = e.clientY - rect.top;
+      selectionEnd.x = selectionStart.x;
+      selectionEnd.y = selectionStart.y;
+
+      // Show selection box
+      selectionBox.classList.add('active');
+      updateSelectionBox();
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // SEL-003: Lasso path preview
+      if (lassoSelectMode && lassoActive && lassoPath.length > 0) {
+        drawLassoPath(mouseX, mouseY);
+        return;
+      }
+
+      // SEL-002: Circle select updates
+      if (circleSelectMode) {
+        circleCenter.x = mouseX;
+        circleCenter.y = mouseY;
+        updateCircleSelectOverlay();
+        
+        // Perform live circle selection or modification
+        performCircleSelection(e.shiftKey, e.ctrlKey);
+        return;
+      }
+
+      // SEL-001: Box select updates
+      if (!isSelecting) return;
+      selectionEnd.x = mouseX;
+      selectionEnd.y = mouseY;
+      updateSelectionBox();
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+      if (!isSelecting) return;
+
+      isSelecting = false;
+      selectionBox.classList.remove('active');
+
+      // Perform vertex selection
+      performBoxSelection(e.shiftKey, e.ctrlKey);
+    });
+
+    // SEL-002: Mouse wheel for circle radius adjustment
+    canvas.addEventListener('wheel', (e) => {
+      if (!circleSelectMode) return;
+      
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -5 : 5;
+      circleRadius = Math.max(10, Math.min(200, circleRadius + delta));
+      updateCircleSelectOverlay();
+      console.log(`⭕ Circle radius: ${circleRadius}px`);
+    }, { passive: false });
+
+    // Update selection box visual
+    function updateSelectionBox() {
+      const left = Math.min(selectionStart.x, selectionEnd.x);
+      const top = Math.min(selectionStart.y, selectionEnd.y);
+      const width = Math.abs(selectionEnd.x - selectionStart.x);
+      const height = Math.abs(selectionEnd.y - selectionStart.y);
+
+      selectionBox.style.left = `${left}px`;
+      selectionBox.style.top = `${top}px`;
+      selectionBox.style.width = `${width}px`;
+      selectionBox.style.height = `${height}px`;
+    }
+
+    // Perform vertex selection based on box bounds
+    function performBoxSelection(addToSelection, removeFromSelection) {
+      const positions = sculptGeometry.attributes.position;
+      const vertexCount = positions.count;
+      const tempVec = new THREE.Vector3();
+      
+      // Get selection bounds
+      const minX = Math.min(selectionStart.x, selectionEnd.x);
+      const maxX = Math.max(selectionStart.x, selectionEnd.x);
+      const minY = Math.min(selectionStart.y, selectionEnd.y);
+      const maxY = Math.max(selectionStart.y, selectionEnd.y);
+
+      // Clear selection if not adding/removing
+      if (!addToSelection && !removeFromSelection) {
+        selectedVertices.clear();
+      }
+
+      let newSelections = 0;
+
+      // Test each vertex
+      for (let i = 0; i < vertexCount; i++) {
+        tempVec.fromBufferAttribute(positions, i);
+        
+        // Transform to world space
+        tempVec.applyMatrix4(sculptMesh.matrixWorld);
+        
+        // Project to screen space
+        tempVec.project(camera);
+        
+        // Convert to canvas coordinates
+        const canvas = renderer.domElement;
+        const screenX = (tempVec.x * 0.5 + 0.5) * canvas.width;
+        const screenY = (-tempVec.y * 0.5 + 0.5) * canvas.height;
+
+        // Check if within selection box
+        const inBox = screenX >= minX && screenX <= maxX && screenY >= minY && screenY <= maxY;
+
+        if (inBox) {
+          if (removeFromSelection) {
+            selectedVertices.delete(i);
+          } else {
+            selectedVertices.add(i);
+            newSelections++;
+          }
+        }
+      }
+
+      // Log selection results (NO automatic modification)
+      if (removeFromSelection) {
+        console.log(`➖ Removed from selection | Total: ${selectedVertices.size}`);
+      } else if (addToSelection) {
+        console.log(`➕ Added to selection | Total: ${selectedVertices.size}`);
+      } else {
+        // Clear previous selection and select new
+        console.log(`📦 Selected ${selectedVertices.size} vertices`);
+      }
+
+      // Just highlight selection - no automatic layer changes
+      highlightSelectedVertices(selectedVertices);
+      updateStatus(`Selected: ${selectedVertices.size} vertices | Press + or - to modify layers`);
+    }
+
+    // SEL-002: Update circle select overlay position and size
+    function updateCircleSelectOverlay() {
+      const diameter = circleRadius * 2;
+      circleSelectOverlay.style.left = `${circleCenter.x - circleRadius}px`;
+      circleSelectOverlay.style.top = `${circleCenter.y - circleRadius}px`;
+      circleSelectOverlay.style.width = `${diameter}px`;
+      circleSelectOverlay.style.height = `${diameter}px`;
+    }
+
+    // SEL-002: Circle selection logic
+    function performCircleSelection(addToSelection, removeFromSelection) {
+      if (!sculptGeometry) return;
+
+      const positions = sculptGeometry.attributes.position;
+      const verticesInCircle = new Set();
+
+      // Project vertices to screen space and check if within circle
+      for (let i = 0; i < positions.count; i++) {
+        const vertex = new THREE.Vector3(
+          positions.getX(i),
+          positions.getY(i),
+          positions.getZ(i)
+        );
+
+        // Convert to screen space
+        const projected = vertex.clone().project(camera);
+        const screenX = (projected.x * 0.5 + 0.5) * canvas.width;
+        const screenY = ((-projected.y * 0.5) + 0.5) * canvas.height;
+
+        // Check if within circle (distance from center)
+        const dx = screenX - circleCenter.x;
+        const dy = screenY - circleCenter.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= circleRadius) {
+          verticesInCircle.add(i);
+        }
+      }
+
+      // Apply modification mode if active
+      if (circleModifyMode === 'build') {
+        applyLayerModification(verticesInCircle, 0.1);
+        highlightSelectedVertices(verticesInCircle);
+        return;
+      } else if (circleModifyMode === 'carve') {
+        applyLayerModification(verticesInCircle, -0.1);
+        highlightSelectedVertices(verticesInCircle);
+        return;
+      }
+
+      // Otherwise, just update selection
+      if (removeFromSelection) {
+        verticesInCircle.forEach(v => selectedVertices.delete(v));
+      } else if (addToSelection) {
+        verticesInCircle.forEach(v => selectedVertices.add(v));
+      } else {
+        selectedVertices.clear();
+        verticesInCircle.forEach(v => selectedVertices.add(v));
+      }
+
+      highlightSelectedVertices(selectedVertices);
+      updateStatus(`Selected: ${selectedVertices.size} vertices | Radius: ${circleRadius}px`);
+    }
+
+    // SEL-003: Draw lasso path on canvas
+    function drawLassoPath(previewX, previewY) {
+      clearLassoCanvas();
+      
+      if (lassoPath.length === 0) return;
+      
+      lassoCtx.strokeStyle = '#00ffff';
+      lassoCtx.lineWidth = 2;
+      lassoCtx.setLineDash([5, 5]);
+      lassoCtx.lineCap = 'round';
+      lassoCtx.lineJoin = 'round';
+      
+      // Draw path
+      lassoCtx.beginPath();
+      lassoCtx.moveTo(lassoPath[0].x, lassoPath[0].y);
+      
+      for (let i = 1; i < lassoPath.length; i++) {
+        lassoCtx.lineTo(lassoPath[i].x, lassoPath[i].y);
+      }
+      
+      // Draw preview line to cursor
+      if (previewX !== undefined && previewY !== undefined) {
+        lassoCtx.lineTo(previewX, previewY);
+        // Line back to start to show closure
+        lassoCtx.lineTo(lassoPath[0].x, lassoPath[0].y);
+      } else if (lassoPath.length > 2) {
+        // Close the path
+        lassoCtx.lineTo(lassoPath[0].x, lassoPath[0].y);
+      }
+      
+      lassoCtx.stroke();
+      
+      // Draw points
+      lassoCtx.fillStyle = '#00ffff';
+      lassoPath.forEach(point => {
+        lassoCtx.beginPath();
+        lassoCtx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+        lassoCtx.fill();
+      });
+      
+      // Draw start point larger
+      if (lassoPath.length > 0) {
+        lassoCtx.fillStyle = '#00ff00';
+        lassoCtx.beginPath();
+        lassoCtx.arc(lassoPath[0].x, lassoPath[0].y, 6, 0, Math.PI * 2);
+        lassoCtx.fill();
+      }
+    }
+
+    // SEL-003: Clear lasso canvas
+    function clearLassoCanvas() {
+      lassoCtx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
+    }
+
+    // SEL-003: Point-in-polygon test
+    function pointInPolygon(x, y, polygon) {
+      let inside = false;
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].x, yi = polygon[i].y;
+        const xj = polygon[j].x, yj = polygon[j].y;
+        
+        const intersect = ((yi > y) !== (yj > y))
+          && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    // SEL-003: Lasso selection logic
+    function performLassoSelection(addToSelection, removeFromSelection) {
+      if (!sculptGeometry || lassoPath.length < 3) {
+        console.log('⚠️ Need at least 3 points to complete lasso');
+        return;
+      }
+
+      const positions = sculptGeometry.attributes.position;
+      const verticesInLasso = new Set();
+
+      // Project vertices to screen space and check if within lasso polygon
+      for (let i = 0; i < positions.count; i++) {
+        const vertex = new THREE.Vector3(
+          positions.getX(i),
+          positions.getY(i),
+          positions.getZ(i)
+        );
+
+        // Convert to screen space
+        const projected = vertex.clone().project(camera);
+        const screenX = (projected.x * 0.5 + 0.5) * canvas.width;
+        const screenY = ((-projected.y * 0.5) + 0.5) * canvas.height;
+
+        // Check if within lasso polygon
+        if (pointInPolygon(screenX, screenY, lassoPath)) {
+          verticesInLasso.add(i);
+        }
+      }
+
+      // Update selection based on modifiers
+      if (removeFromSelection) {
+        verticesInLasso.forEach(v => selectedVertices.delete(v));
+        console.log(`➖ Removed from selection | Total: ${selectedVertices.size}`);
+      } else if (addToSelection) {
+        verticesInLasso.forEach(v => selectedVertices.add(v));
+        console.log(`➕ Added to selection | Total: ${selectedVertices.size}`);
+      } else {
+        selectedVertices.clear();
+        verticesInLasso.forEach(v => selectedVertices.add(v));
+        console.log(`🎨 Lasso selected ${selectedVertices.size} vertices`);
+      }
+
+      highlightSelectedVertices(selectedVertices);
+      updateStatus(`Selected: ${selectedVertices.size} vertices | Press + or - to modify layers`);
+    }
+
+    // SEL-004: Selection Utilities
+
+    // Invert Selection
+    function invertSelection() {
+      if (!sculptGeometry) return;
+      
+      const totalVertices = sculptGeometry.attributes.position.count;
+      const newSelection = new Set();
+      
+      for (let i = 0; i < totalVertices; i++) {
+        if (!selectedVertices.has(i)) {
+          newSelection.add(i);
+        }
+      }
+      
+      selectedVertices.clear();
+      newSelection.forEach(v => selectedVertices.add(v));
+      
+      highlightSelectedVertices(selectedVertices);
+      updateStatus(`Inverted selection: ${selectedVertices.size} vertices`);
+      console.log(`🔄 Inverted selection | Now selected: ${selectedVertices.size} vertices`);
+    }
+
+    // Grow Selection (expand to neighboring vertices)
+    function growSelection() {
+      if (!sculptGeometry || selectedVertices.size === 0) {
+        console.log('⚠️ No vertices selected to grow');
+        return;
+      }
+      
+      const positions = sculptGeometry.attributes.position;
+      const neighbors = new Set();
+      
+      // Find neighboring vertices (within threshold distance)
+      const threshold = 0.3; // Distance threshold for neighbors
+      
+      selectedVertices.forEach(selectedIndex => {
+        const sx = positions.getX(selectedIndex);
+        const sy = positions.getY(selectedIndex);
+        const sz = positions.getZ(selectedIndex);
+        
+        // Check all vertices for proximity
+        for (let i = 0; i < positions.count; i++) {
+          if (selectedVertices.has(i)) continue; // Skip already selected
+          
+          const dx = positions.getX(i) - sx;
+          const dy = positions.getY(i) - sy;
+          const dz = positions.getZ(i) - sz;
+          const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          
+          if (distance < threshold) {
+            neighbors.add(i);
+          }
+        }
+      });
+      
+      // Add neighbors to selection
+      const beforeCount = selectedVertices.size;
+      neighbors.forEach(v => selectedVertices.add(v));
+      const grownCount = selectedVertices.size - beforeCount;
+      
+      highlightSelectedVertices(selectedVertices);
+      updateStatus(`Grown selection: +${grownCount} vertices (${selectedVertices.size} total)`);
+      console.log(`📈 Grown selection | Added: ${grownCount} | Total: ${selectedVertices.size}`);
+    }
+
+    // Shrink Selection (contract inward, remove edge vertices)
+    function shrinkSelection() {
+      if (!sculptGeometry || selectedVertices.size === 0) {
+        console.log('⚠️ No vertices selected to shrink');
+        return;
+      }
+      
+      const positions = sculptGeometry.attributes.position;
+      const edgeVertices = new Set();
+      
+      // Find edge vertices (those with unselected neighbors)
+      const threshold = 0.3;
+      
+      selectedVertices.forEach(selectedIndex => {
+        const sx = positions.getX(selectedIndex);
+        const sy = positions.getY(selectedIndex);
+        const sz = positions.getZ(selectedIndex);
+        
+        // Check if any nearby vertex is NOT selected
+        let hasUnselectedNeighbor = false;
+        
+        for (let i = 0; i < positions.count; i++) {
+          if (selectedVertices.has(i)) continue;
+          
+          const dx = positions.getX(i) - sx;
+          const dy = positions.getY(i) - sy;
+          const dz = positions.getZ(i) - sz;
+          const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          
+          if (distance < threshold) {
+            hasUnselectedNeighbor = true;
+            break;
+          }
+        }
+        
+        if (hasUnselectedNeighbor) {
+          edgeVertices.add(selectedIndex);
+        }
+      });
+      
+      // Remove edge vertices from selection
+      const beforeCount = selectedVertices.size;
+      edgeVertices.forEach(v => selectedVertices.delete(v));
+      const shrunkCount = beforeCount - selectedVertices.size;
+      
+      highlightSelectedVertices(selectedVertices);
+      updateStatus(`Shrunk selection: -${shrunkCount} vertices (${selectedVertices.size} total)`);
+      console.log(`📉 Shrunk selection | Removed: ${shrunkCount} | Total: ${selectedVertices.size}`);
+    }
+
+    // Clear Selection
+    function clearSelection() {
+      const count = selectedVertices.size;
+      selectedVertices.clear();
+      highlightSelectedVertices(selectedVertices);
+      updateStatus('Selection cleared');
+      console.log(`🗑️ Cleared selection | Removed: ${count} vertices`);
+    }
+
+    // Select All
+    function selectAll() {
+      if (!sculptGeometry) return;
+      
+      const totalVertices = sculptGeometry.attributes.position.count;
+      selectedVertices.clear();
+      
+      for (let i = 0; i < totalVertices; i++) {
+        selectedVertices.add(i);
+      }
+      
+      highlightSelectedVertices(selectedVertices);
+      updateStatus(`Selected all: ${selectedVertices.size} vertices`);
+      console.log(`✅ Selected all vertices | Total: ${selectedVertices.size}`);
+    }
+
+    // Apply layer modification to selected vertices (called separately)
+    function applyLayerModification(vertices, intensity) {
+      if (vertices.size === 0) {
+        console.log('⚠️ No vertices selected');
+        return;
+      }
+      
+      const positions = sculptGeometry.attributes.position;
+      const normals = sculptGeometry.attributes.normal;
+      
+      vertices.forEach(i => {
+        // Get vertex normal (direction to push/pull)
+        const nx = normals.getX(i);
+        const ny = normals.getY(i);
+        const nz = normals.getZ(i);
+
+        // Move vertex along its normal
+        positions.setX(i, positions.getX(i) + nx * intensity);
+        positions.setY(i, positions.getY(i) + ny * intensity);
+        positions.setZ(i, positions.getZ(i) + nz * intensity);
+      });
+
+      // Update geometry
+      positions.needsUpdate = true;
+      sculptGeometry.computeVertexNormals();
+      
+      console.log(`🎨 Modified ${vertices.size} vertices | Intensity: ${intensity > 0 ? '+' : ''}${intensity.toFixed(2)}`);
+    }
+
+    // Highlight selected vertices visually
+    function highlightSelectedVertices(vertices) {
+      // Add color attribute if not exists
+      if (!sculptGeometry.attributes.color) {
+        const colors = new Float32Array(sculptGeometry.attributes.position.count * 3);
+        // Set default white color for all vertices
+        for (let i = 0; i < colors.length; i += 3) {
+          colors[i] = 1.0;     // R
+          colors[i + 1] = 1.0; // G
+          colors[i + 2] = 1.0; // B
+        }
+        sculptGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        // Update material to use vertex colors
+        sculptMesh.material.vertexColors = true;
+        sculptMesh.material.needsUpdate = true;
+      }
+
+      const colors = sculptGeometry.attributes.color;
+      
+      // Reset all vertices to white first
+      for (let i = 0; i < colors.count; i++) {
+        colors.setXYZ(i, 1.0, 1.0, 1.0); // White
+      }
+
+      // Highlight selected vertices in cyan
+      vertices.forEach(index => {
+        colors.setXYZ(index, 0.0, 1.0, 1.0); // Cyan highlight
+      });
+
+      colors.needsUpdate = true;
+      console.log(`✨ Highlighted ${vertices.size} vertices in cyan`);
+    }
+
+    // Brush shape selector
+    document.querySelectorAll('.brush-shape-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.brush-shape-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.brushShape = btn.getAttribute('data-shape');
+        updateBrushShape(); // Update cursor shape
+        updateStatus(`Brush shape: ${state.brushShape}`);
+      });
+    });
+
+    // Global functions (toolbar)
+    window.newProject = () => {
+      if (confirm('Start a new project? Unsaved changes will be lost.')) {
+        state.projectId = 'untitled';
+        state.layers = [new Float32Array(sculptGeometry.attributes.position.array.length)];
+        state.activeLayer = 0;
+        syncUI();
+        updateStatus('New project created');
+      }
+    };
+
+    window.saveProject = () => {
+      const data = JSON.stringify(state);
+      localStorage.setItem(`pixelprodigy3d_${state.projectId}`, data);
+      updateStatus(`Project "${state.projectId}" saved`);
+    };
+
+    window.loadProject = () => {
+      const id = prompt('Enter project ID:');
+      if (!id) return;
+      const data = localStorage.getItem(`pixelprodigy3d_${id}`);
+      if (data) {
+        Object.assign(state, JSON.parse(data));
+        syncUI();
+        updateStatus(`Project "${id}" loaded`);
+      } else {
+        alert('Project not found');
+      }
+    };
+
+    window.exportModel = () => {
+      updateStatus(`Exporting as ${state.exportFormat.toUpperCase()}...`);
+      // TODO: export logic
+    };
+
+    // ==================== UNDO/REDO SYSTEM ====================
+    
+    function captureState() {
+      // Deep clone current layer state
+      const snapshot = {
+        layers: state.layers.map(layer => new Float32Array(layer)),
+        activeLayer: state.activeLayer
+      };
+      return snapshot;
+    }
+
+    function restoreState(snapshot) {
+      state.layers = snapshot.layers.map(layer => new Float32Array(layer));
+      state.activeLayer = snapshot.activeLayer;
+      recomposeGeometry();
+    }
+
+    function pushUndo() {
+      const snapshot = captureState();
+      undoStack.push(snapshot);
+      
+      // Limit stack size
+      if (undoStack.length > MAX_UNDO_STEPS) {
+        undoStack.shift();
+      }
+      
+      // Clear redo stack on new action
+      redoStack.length = 0;
+    }
+
+    window.undo = () => {
+      if (undoStack.length === 0) {
+        updateStatus('Nothing to undo');
+        return;
+      }
+      
+      // Push current state to redo before undoing
+      const currentSnapshot = captureState();
+      redoStack.push(currentSnapshot);
+      
+      // Restore previous state
+      const previousSnapshot = undoStack.pop();
+      restoreState(previousSnapshot);
+      
+      updateStatus(`Undo (${undoStack.length} steps remaining)`);
+    };
+
+    window.redo = () => {
+      if (redoStack.length === 0) {
+        updateStatus('Nothing to redo');
+        return;
+      }
+      
+      // Push current state to undo before redoing
+      const currentSnapshot = captureState();
+      undoStack.push(currentSnapshot);
+      
+      // Restore next state
+      const nextSnapshot = redoStack.pop();
+      restoreState(nextSnapshot);
+      
+      updateStatus(`Redo (${redoStack.length} steps remaining)`);
+    };
+
+    // ==================== END UNDO/REDO SYSTEM ====================
+
+    // ==================== TRANSFORM & LAYER SYSTEM ====================
+    
+    window.setTransformMode = (mode) => {
+      transformMode = mode;
+      
+      const orbitBtn = document.getElementById('orbitModeBtn');
+      const translateBtn = document.getElementById('translateModeBtn');
+      const posInputs = document.getElementById('positionInputs');
+      
+      if (mode === 'orbit') {
+        orbitBtn.classList.add('active');
+        translateBtn.classList.remove('active');
+        posInputs.style.display = 'none';
+        controls.enabled = true;
+        axisHelper.visible = true;
+        gridHelper.visible = true;
+        updateStatus('Orbit mode - rotate camera');
+      } else if (mode === 'translate') {
+        orbitBtn.classList.remove('active');
+        translateBtn.classList.add('active');
+        posInputs.style.display = 'block';
+        controls.enabled = false;
+        axisHelper.visible = true;
+        gridHelper.visible = true;
+        syncPositionInputs();
+        updateStatus('Translate mode - move object');
+      }
+    };
+
+    function syncPositionInputs() {
+      document.getElementById('posX').value = sculptMesh.position.x.toFixed(2);
+      document.getElementById('posY').value = sculptMesh.position.y.toFixed(2);
+      document.getElementById('posZ').value = sculptMesh.position.z.toFixed(2);
+    }
+
+    function updateObjectPosition() {
+      const x = parseFloat(document.getElementById('posX').value);
+      const y = parseFloat(document.getElementById('posY').value);
+      const z = parseFloat(document.getElementById('posZ').value);
+      
+      sculptMesh.position.set(x, y, z);
+      updateStatus(`Position: (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)})`);
+    }
+
+    // Position input listeners
+    document.getElementById('posX').addEventListener('input', updateObjectPosition);
+    document.getElementById('posY').addEventListener('input', updateObjectPosition);
+    document.getElementById('posZ').addEventListener('input', updateObjectPosition);
+
+    window.addLayer = () => {
+      state.layers.push(new Float32Array(sculptGeometry.attributes.position.array.length));
+      state.activeLayer = state.layers.length - 1;
+      updateLayerUI();
+      updateStatus(`Layer ${state.activeLayer + 1} added`);
+    };
+
+    function updateLayerUI() {
+      const layerList = document.getElementById('layerList');
+      layerList.innerHTML = '';
+      
+      state.layers.forEach((layer, index) => {
+        const layerItem = document.createElement('div');
+        layerItem.className = 'layer-item' + (index === state.activeLayer ? ' active' : '');
+        layerItem.onclick = () => selectLayer(index);
+        
+        layerItem.innerHTML = `
+          <span class="layer-name">Layer ${index + 1}</span>
+          <div class="layer-controls">
+            <button class="layer-btn" onclick="event.stopPropagation(); toggleLayerVisibility(${index})">👁️</button>
+            <button class="layer-btn" onclick="event.stopPropagation(); deleteLayer(${index})">🗑️</button>
+          </div>
+        `;
+        
+        layerList.appendChild(layerItem);
+      });
+    }
+
+    window.selectLayer = (index) => {
+      state.activeLayer = index;
+      updateLayerUI();
+      updateStatus(`Layer ${index + 1} selected`);
+    };
+
+    window.toggleLayerVisibility = (index) => {
+      // TODO: implement layer visibility toggle
+      updateStatus(`Layer ${index + 1} visibility toggled`);
+    };
+
+    window.deleteLayer = (index) => {
+      if (state.layers.length <= 1) {
+        updateStatus('Cannot delete last layer');
+        return;
+      }
+      
+      if (confirm(`Delete Layer ${index + 1}?`)) {
+        pushUndo();
+        state.layers.splice(index, 1);
+        if (state.activeLayer >= state.layers.length) {
+          state.activeLayer = state.layers.length - 1;
+        }
+        updateLayerUI();
+        recomposeGeometry();
+        updateStatus(`Layer ${index + 1} deleted`);
+      }
+    };
+
+    // Material preset application
+    function applyMaterialPreset() {
+      const preset = state.materialPreset;
+      
+      switch(preset) {
+        case 'metallic':
+          sculptMaterial.color.setHex(0x888888);
+          sculptMaterial.metalness = 0.95;
+          sculptMaterial.roughness = 0.15;
+          break;
+        case 'rough':
+          sculptMaterial.color.setHex(0x7a7a7a);
+          sculptMaterial.metalness = 0.05;
+          sculptMaterial.roughness = 0.98;
+          break;
+        case 'wood':
+          sculptMaterial.color.setHex(0x6f513a);
+          sculptMaterial.metalness = 0.0;
+          sculptMaterial.roughness = 0.85;
+          break;
+        case 'bark':
+          sculptMaterial.color.setHex(0x4a3828);
+          sculptMaterial.metalness = 0.0;
+          sculptMaterial.roughness = 0.95;
+          break;
+        case 'chunky':
+          sculptMaterial.color.setHex(0x6b6b6b);
+          sculptMaterial.metalness = 0.02;
+          sculptMaterial.roughness = 0.92;
+          break;
+        case 'waves':
+          sculptMaterial.color.setHex(0x5a7a8a);
+          sculptMaterial.metalness = 0.15;
+          sculptMaterial.roughness = 0.6;
+          break;
+        case 'plastic':
+          sculptMaterial.color.setHex(0x5588ff);
+          sculptMaterial.metalness = 0.1;
+          sculptMaterial.roughness = 0.4;
+          break;
+        case 'glass':
+          sculptMaterial.color.setHex(0xaaccff);
+          sculptMaterial.metalness = 0.1;
+          sculptMaterial.roughness = 0.05;
+          sculptMaterial.transparent = true;
+          sculptMaterial.opacity = 0.6;
+          break;
+        default: // standard
+          sculptMaterial.color.setHex(0x6f513a);
+          sculptMaterial.metalness = 0.05;
+          sculptMaterial.roughness = 0.82;
+          sculptMaterial.transparent = false;
+          sculptMaterial.opacity = 1.0;
+      }
+      
+      sculptMaterial.needsUpdate = true;
+      updateStatus(`Material: ${preset}`);
+    }
+
+    // Procedural pattern generators based on material type
+    window.applyProceduralPattern = () => {
+      pushUndo();
+      const preset = state.materialPreset;
+      
+      switch(preset) {
+        case 'bark':
+          applyBarkPattern();
+          break;
+        case 'chunky':
+          applyChunkyPattern();
+          break;
+        case 'waves':
+          applyWavePattern();
+          break;
+        case 'rough':
+          applyRoughPattern();
+          break;
+        default:
+          updateStatus('No procedural pattern for this material');
+          return;
+      }
+      
+      updateStatus(`Applied ${preset} procedural pattern`);
+    };
+
+    function applyBarkPattern() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = state.displacementDepth * 0.015;
+      const detail = state.detailLevel;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Vertical bark ridges with fine detail
+        const angle = Math.atan2(z, x);
+        const ridgeCount = 16 * detail;
+        const ridge = Math.sin(angle * ridgeCount);
+        
+        // Fine grain texture
+        const fineGrain = Math.sin(y * 50 * detail) * Math.cos(angle * 30 * detail);
+        
+        // Vertical cracks
+        const crack = Math.abs(Math.sin(angle * 8)) < 0.1 ? -0.3 : 0;
+        
+        const displacement = (ridge * 0.6 + fineGrain * 0.3 + crack) * strength;
+        const radial = Math.sqrt(x * x + z * z) + 0.001;
+        
+        activeLayer[idx]     += (x / radial) * displacement;
+        activeLayer[idx + 2] += (z / radial) * displacement;
+      }
+      
+      recomposeGeometry();
+    }
+
+    function applyChunkyPattern() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = state.displacementDepth * 0.025;
+      const detail = state.detailLevel;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Large chunky blocks
+        const chunkX = Math.floor((x + y) * 3 * detail);
+        const chunkY = Math.floor(y * 2.5 * detail);
+        const chunkZ = Math.floor((z + y) * 3 * detail);
+        
+        // Hash function for randomness
+        const hash = Math.sin(chunkX * 12.9898 + chunkY * 78.233 + chunkZ * 37.719) * 43758.5453;
+        const noise = (hash - Math.floor(hash)) * 2 - 1;
+        
+        // Sharp edges between chunks
+        const edgeX = Math.abs(Math.sin((x + y) * 3 * detail * Math.PI));
+        const edgeZ = Math.abs(Math.sin((z + y) * 3 * detail * Math.PI));
+        const edgeFactor = Math.min(edgeX, edgeZ) < 0.2 ? -0.5 : 1;
+        
+        const displacement = noise * edgeFactor * strength;
+        const radial = Math.sqrt(x * x + z * z) + 0.001;
+        
+        activeLayer[idx]     += (x / radial) * displacement;
+        activeLayer[idx + 1] += displacement * 0.3;
+        activeLayer[idx + 2] += (z / radial) * displacement;
+      }
+      
+      recomposeGeometry();
+    }
+
+    function applyWavePattern() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = state.displacementDepth * 0.02;
+      const detail = state.detailLevel;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Horizontal layered waves
+        const wave1 = Math.sin(y * 4 * detail) * 0.5;
+        const wave2 = Math.sin(y * 8 * detail + Math.atan2(z, x) * 2) * 0.3;
+        const wave3 = Math.cos(y * 16 * detail) * 0.2;
+        
+        // Radial modulation
+        const radial = Math.sqrt(x * x + z * z) + 0.001;
+        const radialWave = Math.sin(radial * 10 * detail) * 0.15;
+        
+        const displacement = (wave1 + wave2 + wave3 + radialWave) * strength;
+        
+        activeLayer[idx]     += (x / radial) * displacement;
+        activeLayer[idx + 2] += (z / radial) * displacement;
+      }
+      
+      recomposeGeometry();
+    }
+
+    function applyRoughPattern() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = state.displacementDepth * 0.012;
+      const detail = state.detailLevel;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Multi-scale noise for rough texture
+        const noise1 = Math.sin(x * 20 * detail + y * 15 * detail) * 0.4;
+        const noise2 = Math.cos(y * 40 * detail + z * 30 * detail) * 0.3;
+        const noise3 = Math.sin((x + z) * 60 * detail) * 0.2;
+        
+        // Hash-based micro detail
+        const hash = Math.sin(i * 0.1 + y * 10) * 43758.5453;
+        const microDetail = ((hash - Math.floor(hash)) * 2 - 1) * 0.1;
+        
+        const displacement = (noise1 + noise2 + noise3 + microDetail) * strength;
+        const radial = Math.sqrt(x * x + z * z) + 0.001;
+        
+        activeLayer[idx]     += (x / radial) * displacement;
+        activeLayer[idx + 1] += displacement * 0.2;
+        activeLayer[idx + 2] += (z / radial) * displacement;
+      }
+      
+      recomposeGeometry();
+    }
+
+    // Material preset listener
+    document.getElementById('materialPreset').addEventListener('change', (e) => {
+      state.materialPreset = e.target.value;
+      applyMaterialPreset();
+    });
+
+    // ==================== END TRANSFORM & LAYER SYSTEM ====================
+
+    window.askAI = async () => {
+      updateStatus('Asking AI...');
+      const endpoint = `http://localhost:3000${state.aiModel === 'openai' ? '/api/openai' : '/api/gemini'}`;
+      const prompt = `Generate a detailed sculpting suggestion for a ${state.promptTemplate} style 3D environment. Include specific techniques, areas to focus on, and brush settings recommendations. Current iteration count: ${aiIterationLog.length}. Recent patterns: ${JSON.stringify(window.aiPatterns || {}).substring(0, 200)}`;
+      
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        // Store suggestion for apply functionality
+        currentAISuggestion = data;
+        
+        // Extract text from response (handle different API formats)
+        let suggestionText = 'No suggestion received';
+        if (state.aiModel === 'openai') {
+          suggestionText = data.choices?.[0]?.message?.content || data.text || suggestionText;
+        } else if (state.aiModel === 'gemini') {
+          suggestionText = data.candidates?.[0]?.content?.parts?.[0]?.text || data.text || suggestionText;
+        }
+        
+        document.getElementById('aiSuggestionText').textContent = suggestionText;
+        updateStatus('AI suggestion received');
+        
+        // Log AI interaction
+        logAIIteration('aiSuggestion', { 
+          model: state.aiModel, 
+          template: state.promptTemplate,
+          suggestionLength: suggestionText.length
+        });
+      } catch (error) {
+        console.error('AI request failed:', error);
+        updateStatus('AI request failed - make sure server is running on port 3000');
+        document.getElementById('aiSuggestionText').textContent = `Error: Could not connect to AI server. Run "npm start" to start the backend.\n\nDetails: ${error.message}\n\nMake sure the server is running on http://localhost:3000`;
+      }
+    };
+
+    window.applyAISuggestion = () => {
+      if (!currentAISuggestion) {
+        updateStatus('No AI suggestion to apply');
+        return;
+      }
+      
+      pushUndo(); // Save state before applying
+      
+      // Parse AI suggestion and apply sculpting patterns
+      const suggestionText = document.getElementById('aiSuggestionText').textContent.toLowerCase();
+      
+      // Apply pattern based on keywords in suggestion
+      if (suggestionText.includes('organic') || suggestionText.includes('natural') || suggestionText.includes('flow')) {
+        applyAIPatternOrganic();
+        logAIIteration('aiPatternApplied', { pattern: 'organic' });
+      } else if (suggestionText.includes('geometric') || suggestionText.includes('angular') || suggestionText.includes('sharp')) {
+        applyAIPatternGeometric();
+        logAIIteration('aiPatternApplied', { pattern: 'geometric' });
+      } else if (suggestionText.includes('smooth') || suggestionText.includes('soft') || suggestionText.includes('rounded')) {
+        applyAIPatternSmooth();
+        logAIIteration('aiPatternApplied', { pattern: 'smooth' });
+      } else {
+        // Default: apply subtle variation
+        applyAIPatternSubtle();
+        logAIIteration('aiPatternApplied', { pattern: 'subtle' });
+      }
+      
+      updateStatus('AI suggestion applied');
+    };
+
+    function applyAIPatternOrganic() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = 0.03 * state.guidanceStrength;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Organic noise pattern
+        const noise = Math.sin(x * 3 + y * 2) * Math.cos(z * 4 + y) * strength;
+        const radial = Math.sqrt(x * x + z * z);
+        const weight = Math.exp(-radial * 0.5); // Falloff from center
+        
+        activeLayer[idx]     += (x / (radial + 0.1)) * noise * weight;
+        activeLayer[idx + 1] += noise * weight * 0.5;
+        activeLayer[idx + 2] += (z / (radial + 0.1)) * noise * weight;
+      }
+      
+      recomposeGeometry();
+    }
+
+    function applyAIPatternGeometric() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = 0.04 * state.guidanceStrength;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Geometric facets
+        const angle = Math.atan2(z, x);
+        const facets = 8;
+        const facetAngle = Math.floor(angle / (Math.PI * 2 / facets)) * (Math.PI * 2 / facets);
+        const displacement = Math.cos(y * 5) * strength;
+        
+        activeLayer[idx]     += Math.cos(facetAngle) * displacement;
+        activeLayer[idx + 2] += Math.sin(facetAngle) * displacement;
+      }
+      
+      recomposeGeometry();
+    }
+
+    function applyAIPatternSmooth() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = 0.02 * state.guidanceStrength;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const y = posAttr.array[idx + 1];
+        
+        // Smooth waves
+        const wave = Math.sin(y * 2.5) * strength;
+        const radial = Math.sqrt(
+          posAttr.array[idx] * posAttr.array[idx] + 
+          posAttr.array[idx + 2] * posAttr.array[idx + 2]
+        );
+        
+        activeLayer[idx]     += (posAttr.array[idx] / (radial + 0.1)) * wave;
+        activeLayer[idx + 2] += (posAttr.array[idx + 2] / (radial + 0.1)) * wave;
+      }
+      
+      recomposeGeometry();
+    }
+
+    function applyAIPatternSubtle() {
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = 0.015 * state.guidanceStrength;
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const hash = Math.sin(i * 12.9898 + i * 78.233) * 43758.5453;
+        const noise = (hash - Math.floor(hash)) * 2 - 1;
+        
+        activeLayer[idx]     += noise * strength * 0.3;
+        activeLayer[idx + 1] += noise * strength * 0.5;
+        activeLayer[idx + 2] += noise * strength * 0.3;
+      }
+      
+      recomposeGeometry();
+    }
+
+    window.dismissAISuggestion = () => {
+      document.getElementById('aiSuggestionText').textContent = 'Click "Ask AI" to get sculpting suggestions.';
+      updateStatus('AI suggestion dismissed');
+    };
+
+    window.loadHDRI = () => {
+      updateStatus('HDRI loader (not yet implemented)');
+      // TODO: file picker + HDR loader
+    };
+
+    function updateStatus(msg) {
+      document.getElementById('statusLeft').textContent = msg;
+    }
+
+    // ==================== BRUSH SYSTEM ====================
+    
+    // Falloff functions
+    function falloffSmooth(t) {
+      return t * t * (3 - 2 * t);
+    }
+
+    function falloffLinear(t) {
+      return t;
+    }
+
+    function falloffSharp(t) {
+      return t * t * t;
+    }
+
+    function getFalloff(distance, radius, hardness) {
+      if (distance > radius) return 0;
+      const t = 1 - (distance / radius);
+      const hardnessFactor = Math.pow(t, 1 + (1 - hardness) * 3);
+      
+      switch (state.brushFalloff) {
+        case 'linear': return hardnessFactor * falloffLinear(t);
+        case 'sharp': return hardnessFactor * falloffSharp(t);
+        default: return hardnessFactor * falloffSmooth(t);
+      }
+    }
+
+    // Brush shape masks
+    function maskCircle(u, v, radius) {
+      const dist = Math.hypot(u, v);
+      if (dist > radius) return 0;
+      return getFalloff(dist, radius, state.brushHardness);
+    }
+
+    function maskTriangle(u, v, radius) {
+      const nv = v / radius;
+      if (nv < -0.35 || nv > 1.05) return 0;
+      const halfWidth = (1 - nv) * radius * 0.9;
+      if (Math.abs(u) > halfWidth) return 0;
+      const dist = Math.max(Math.abs(u) / (halfWidth + 1e-6), nv);
+      const t = Math.max(0, 1 - dist);
+      return t * getFalloff(Math.hypot(u, v), radius, state.brushHardness);
+    }
+
+    function maskLeaf(u, v, radius) {
+      const along = v / (radius * 1.1);
+      if (along < -0.3 || along > 1.1) return 0;
+      const width = radius * (0.15 + (1 - along) * 0.95);
+      const leftCurve = (Math.sin(along * Math.PI) * 0.4 + 0.6);
+      const rightCurve = (Math.cos(along * Math.PI * 0.6) * 0.35 + 0.65);
+      const uNorm = u / width;
+      const limit = u < 0 ? leftCurve : rightCurve;
+      if (Math.abs(uNorm) > limit) return 0;
+      const dist = Math.max(Math.abs(uNorm) / limit, along);
+      const t = Math.max(0, 1 - dist);
+      return t * getFalloff(Math.hypot(u, v), radius, state.brushHardness);
+    }
+
+    function maskSquare(u, v, radius) {
+      if (Math.abs(u) > radius || Math.abs(v) > radius) return 0;
+      const dist = Math.max(Math.abs(u), Math.abs(v));
+      return getFalloff(dist, radius, state.brushHardness);
+    }
+
+    function maskStar(u, v, radius) {
+      const angle = Math.atan2(v, u);
+      const dist = Math.hypot(u, v);
+      const points = 5;
+      const innerRadius = radius * 0.4;
+      const spike = Math.abs(Math.sin(angle * points)) * (radius - innerRadius) + innerRadius;
+      if (dist > spike) return 0;
+      return getFalloff(dist, radius, state.brushHardness);
+    }
+
+    function getBrushMask(u, v, radius) {
+      switch (state.brushShape) {
+        case 'triangle': return maskTriangle(u, v, radius);
+        case 'leaf': return maskLeaf(u, v, radius);
+        case 'square': return maskSquare(u, v, radius);
+        case 'star': return maskStar(u, v, radius);
+        case 'custom': return maskCircle(u, v, radius); // TODO: custom texture
+        default: return maskCircle(u, v, radius);
+      }
+    }
+
+    // Recompose geometry from base + layers
+    function recomposeGeometry() {
+      const posAttr = sculptGeometry.attributes.position;
+      const targetArray = posAttr.array;
+      targetArray.set(basePositions);
+
+      for (const layer of state.layers) {
+        for (let i = 0; i < targetArray.length; i++) {
+          targetArray[i] += layer[i];
+        }
+      }
+
+      posAttr.needsUpdate = true;
+      sculptGeometry.computeBoundingBox();
+      sculptGeometry.computeBoundingSphere();
+      
+      if (state.autoNormalRefresh) {
+        sculptGeometry.computeVertexNormals();
+        sculptGeometry.attributes.normal.needsUpdate = true;
+      }
+    }
+
+    // Apply brush stroke at hit point
+    function applyBrush(hitPoint, hitNormal, invert = false) {
+      const posAttr = sculptGeometry.attributes.position;
+      const normAttr = sculptGeometry.attributes.normal;
+      const activeLayer = state.layers[state.activeLayer];
+
+      // Transform hit point to local space
+      const localPoint = sculptMesh.worldToLocal(hitPoint.clone());
+      
+      // Build local tangent frame
+      const normalMatrix = new THREE.Matrix3().getNormalMatrix(sculptMesh.matrixWorld);
+      const localNormal = hitNormal.clone().applyMatrix3(normalMatrix).normalize();
+      
+      const up = Math.abs(localNormal.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+      const tangent = new THREE.Vector3().crossVectors(up, localNormal).normalize();
+      const bitangent = new THREE.Vector3().crossVectors(localNormal, tangent).normalize();
+
+      const sign = invert ? -1 : 1;
+      const strength = state.brushStrength * sign * (1 + state.pressureResponse * 0.2); // TODO: real pressure
+      const radius = state.brushRadius;
+
+      const tempVec = new THREE.Vector3();
+      const tempNorm = new THREE.Vector3();
+
+      // Apply symmetry
+      const symmetryPoints = [localPoint.clone()];
+      
+      if (state.symmetryAxis !== 'none') {
+        const axes = state.symmetryAxis.split('');
+        const mirrorCount = Math.pow(2, axes.length);
+        
+        for (let i = 1; i < mirrorCount; i++) {
+          const mirrored = localPoint.clone();
+          if (axes.includes('x') && (i & 1)) mirrored.x = -mirrored.x;
+          if (axes.includes('y') && (i & 2)) mirrored.y = -mirrored.y;
+          if (axes.includes('z') && (i & 4)) mirrored.z = -mirrored.z;
+          symmetryPoints.push(mirrored);
+        }
+      }
+
+      // Apply brush to each symmetry point
+      for (const anchor of symmetryPoints) {
+        for (let i = 0; i < vertexCount; i++) {
+          const idx = i * 3;
+          tempVec.set(
+            posAttr.array[idx],
+            posAttr.array[idx + 1],
+            posAttr.array[idx + 2]
+          );
+
+          tempVec.sub(anchor);
+          const u = tempVec.dot(tangent);
+          const v = tempVec.dot(bitangent);
+
+          const weight = getBrushMask(u, v, radius);
+          if (weight <= 0) continue;
+
+          tempNorm.set(
+            normAttr.array[idx],
+            normAttr.array[idx + 1],
+            normAttr.array[idx + 2]
+          ).normalize();
+
+          const delta = strength * weight;
+          activeLayer[idx]     += tempNorm.x * delta;
+          activeLayer[idx + 1] += tempNorm.y * delta;
+          activeLayer[idx + 2] += tempNorm.z * delta;
+        }
+      }
+
+      recomposeGeometry();
+    }
+
+    // Update brush indicator position
+    function updateBrushIndicator(hitPoint, hitNormal) {
+      brushIndicator.position.copy(hitPoint);
+      brushIndicator.lookAt(hitPoint.clone().add(hitNormal));
+      brushIndicator.scale.set(state.brushRadius, state.brushRadius, state.brushRadius);
+      brushIndicator.visible = true;
+    }
+
+    // Pointer move handler
+    canvas.addEventListener('pointermove', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObject(sculptMesh, false);
+
+      if (hits.length > 0) {
+        const hit = hits[0];
+        const worldNormal = hit.face.normal.clone()
+          .applyMatrix3(new THREE.Matrix3().getNormalMatrix(sculptMesh.matrixWorld))
+          .normalize();
+        
+        updateBrushIndicator(hit.point, worldNormal);
+
+        // Stroke spacing check
+        if (isSculpting) {
+          if (!lastStrokePoint || hit.point.distanceTo(lastStrokePoint) >= state.strokeSpacing) {
+            applyBrush(hit.point, worldNormal, event.shiftKey);
+            lastStrokePoint = hit.point.clone();
+          }
+        }
+      } else {
+        brushIndicator.visible = false;
+      }
+    });
+
+    // Pointer down handler
+    canvas.addEventListener('pointerdown', (event) => {
+      if (event.button === 0) {
+        // Don't sculpt if any selection tool is active
+        if (isAnySelectionToolActive()) return;
+        
+        // Only sculpt in orbit mode, not in translate mode
+        if (transformMode !== 'orbit') return;
+        
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObject(sculptMesh, false);
+
+        if (hits.length > 0) {
+          // Capture undo state before starting stroke
+          pushUndo();
+          
+          isSculpting = true;
+          controls.enabled = false;
+          const hit = hits[0];
+          const worldNormal = hit.face.normal.clone()
+            .applyMatrix3(new THREE.Matrix3().getNormalMatrix(sculptMesh.matrixWorld))
+            .normalize();
+          
+          applyBrush(hit.point, worldNormal, event.shiftKey);
+          lastStrokePoint = hit.point.clone();
+        }
+      }
+    });
+
+    // Pointer up handler
+    canvas.addEventListener('pointerup', () => {
+      isSculpting = false;
+      if (transformMode === 'orbit') {
+        controls.enabled = true;
+      }
+      lastStrokePoint = null;
+    });
+
+    // Mouse wheel: adjust radius (or strength with Ctrl)
+    canvas.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      const delta = event.deltaY > 0 ? -0.04 : 0.04;
+
+      if (event.ctrlKey) {
+        state.brushStrength = Math.max(0.02, Math.min(0.5, state.brushStrength + delta * 0.5));
+        document.getElementById('brushStrength').value = state.brushStrength;
+        document.getElementById('brushStrengthValue').value = state.brushStrength;
+        updateStatus(`Strength: ${state.brushStrength.toFixed(2)}`);
+      } else {
+        state.brushRadius = Math.max(0.1, Math.min(2.0, state.brushRadius + delta));
+        document.getElementById('brushRadius').value = state.brushRadius;
+        document.getElementById('brushRadiusValue').value = state.brushRadius;
+        updateStatus(`Radius: ${state.brushRadius.toFixed(2)}`);
+      }
+    }, { passive: false });
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (event) => {
+      const key = event.key.toLowerCase();
+      
+      if (key === 'tab') {
+        event.preventDefault();
+        state.activeLayer = (state.activeLayer + 1) % state.layers.length;
+        updateStatus(`Layer ${state.activeLayer + 1}/${state.layers.length}`);
+      }
+      
+      if (key === 'r') {
+        sculptGeometry.computeVertexNormals();
+        sculptGeometry.attributes.normal.needsUpdate = true;
+        updateStatus('Normals rebuilt');
+      }
+      
+      if (key === 'backspace') {
+        state.layers[state.activeLayer].fill(0);
+        recomposeGeometry();
+        updateStatus(`Layer ${state.activeLayer + 1} cleared`);
+      }
+
+      // Quick shape select
+      if (key === '1') {
+        state.brushShape = 'circle';
+        document.querySelectorAll('.brush-shape-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-shape="circle"]').classList.add('active');
+        updateBrushShape();
+        updateStatus('Brush: Circle');
+      }
+      if (key === '2') {
+        state.brushShape = 'triangle';
+        document.querySelectorAll('.brush-shape-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-shape="triangle"]').classList.add('active');
+        updateBrushShape();
+        updateStatus('Brush: Triangle');
+      }
+      if (key === '3') {
+        state.brushShape = 'leaf';
+        document.querySelectorAll('.brush-shape-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-shape="leaf"]').classList.add('active');
+        updateBrushShape();
+        updateStatus('Brush: Leaf');
+      }
+      if (key === '4') {
+        state.brushShape = 'square';
+        document.querySelectorAll('.brush-shape-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-shape="square"]').classList.add('active');
+        updateBrushShape();
+        updateStatus('Brush: Square');
+      }
+      if (key === '5') {
+        state.brushShape = 'star';
+        document.querySelectorAll('.brush-shape-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-shape="star"]').classList.add('active');
+        updateBrushShape();
+        updateStatus('Brush: Star');
+      }
+      
+      // Undo/Redo shortcuts
+      if ((event.ctrlKey || event.metaKey) && key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        window.undo();
+      }
+      if ((event.ctrlKey || event.metaKey) && (key === 'y' || (key === 'z' && event.shiftKey))) {
+        event.preventDefault();
+        window.redo();
+      }
+      
+      // Transform mode shortcuts
+      if (key === 'o') {
+        window.setTransformMode('orbit');
+      }
+      if (key === 'm') {
+        window.setTransformMode('translate');
+      }
+    });
+
+    // ==================== END BRUSH SYSTEM ====================
+
+    // ==================== INCREMENT/DECREMENT LAYER SYSTEM ====================
+    
+    window.incrementLayer = () => {
+      pushUndo();
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = 0.05; // Build up strength
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Radial expansion pattern
+        const radial = Math.sqrt(x * x + z * z);
+        const normalizedDist = radial / 2.0;
+        const buildUp = strength * (1 - normalizedDist * 0.3);
+        
+        activeLayer[idx]     += (x / (radial + 0.1)) * buildUp;
+        activeLayer[idx + 1] += buildUp * 0.5;
+        activeLayer[idx + 2] += (z / (radial + 0.1)) * buildUp;
+      }
+      
+      recomposeGeometry();
+      updateStatus('Layer incremented - building up');
+      
+      // Log for AI tracking
+      logAIIteration('increment', { strength, vertexCount, layerIndex: state.activeLayer });
+    };
+
+    window.decrementLayer = () => {
+      pushUndo();
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      const strength = -0.05; // Tear away strength (negative)
+      
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const y = posAttr.array[idx + 1];
+        const z = posAttr.array[idx + 2];
+        
+        // Radial contraction pattern
+        const radial = Math.sqrt(x * x + z * z);
+        const normalizedDist = radial / 2.0;
+        const tearAway = strength * (1 - normalizedDist * 0.3);
+        
+        activeLayer[idx]     += (x / (radial + 0.1)) * tearAway;
+        activeLayer[idx + 1] += tearAway * 0.5;
+        activeLayer[idx + 2] += (z / (radial + 0.1)) * tearAway;
+      }
+      
+      recomposeGeometry();
+      updateStatus('Layer decremented - tearing away');
+      
+      // Log for AI tracking
+      logAIIteration('decrement', { strength, vertexCount, layerIndex: state.activeLayer });
+    };
+
+    // ==================== LIGHTING & THEME SYSTEM ====================
+    
+    window.applyLightingRig = (rig) => {
+      state.lightingRig = rig;
+      
+      switch(rig) {
+        case 'three-point':
+          dirLight.intensity = 1.6;
+          dirLight.position.set(6, 14, 10);
+          dirLight.color.setHex(0x9dcfff);
+          scene.add(new THREE.AmbientLight(0x4a6073, 0.45));
+          break;
+        case 'natural':
+          dirLight.intensity = 2.0;
+          dirLight.position.set(10, 20, 5);
+          dirLight.color.setHex(0xfff4e6);
+          scene.add(new THREE.AmbientLight(0x7a9cc6, 0.35));
+          break;
+        case 'dramatic':
+          dirLight.intensity = 2.5;
+          dirLight.position.set(-8, 12, -8);
+          dirLight.color.setHex(0xff9966);
+          scene.add(new THREE.AmbientLight(0x1a1a2e, 0.2));
+          break;
+        case 'soft':
+          dirLight.intensity = 1.2;
+          dirLight.position.set(5, 15, 8);
+          dirLight.color.setHex(0xf0f0f0);
+          scene.add(new THREE.AmbientLight(0x8fa3b0, 0.6));
+          break;
+      }
+      
+      updateStatus(`Lighting: ${rig}`);
+      logAIIteration('lightingChange', { rig });
+    };
+
+    // ENV-001: Wire Fog Density Slider
+    window.applyFog = (density = state.fogDensity, useExponential = true) => {
+      if (density === 0) {
+        scene.fog = null;
+        console.log('🌫️ Fog disabled');
+      } else {
+        const fogColor = scene.background || new THREE.Color(0x87ceeb);
+        
+        if (useExponential) {
+          // THREE.FogExp2: exponential fog (density: 0-0.1)
+          scene.fog = new THREE.FogExp2(fogColor, density);
+          console.log(`🌫️ Exponential fog applied | Density: ${density.toFixed(3)} | Color: #${fogColor.getHexString()}`);
+        } else {
+          // THREE.Fog: linear fog (near: 20, far: 20-100)
+          const far = 20 + (density * 800); // Map 0-0.1 to 20-100
+          scene.fog = new THREE.Fog(fogColor, 20, far);
+          console.log(`🌫️ Linear fog applied | Near: 20 | Far: ${far.toFixed(1)} | Color: #${fogColor.getHexString()}`);
+        }
+      }
+      
+      updateStatus(`Fog density: ${density.toFixed(2)}`);
+      logAIIteration('fogChange', { density, type: useExponential ? 'exponential' : 'linear' });
+    };
+
+    // ENV-002: Fog Preset Buttons
+    window.applyFogPreset = (preset) => {
+      const presets = {
+        none: 0,
+        light: 0.02,
+        medium: 0.05,
+        heavy: 0.1
+      };
+
+      const density = presets[preset];
+      if (density === undefined) {
+        console.error(`❌ Invalid fog preset: ${preset}`);
+        return;
+      }
+
+      // Update state and slider
+      state.fogDensity = density;
+      document.getElementById('fogDensity').value = density;
+      document.getElementById('fogDensityValue').textContent = density.toFixed(3);
+
+      // Apply fog
+      applyFog(density, true);
+
+      // Visual feedback: highlight active button
+      document.querySelectorAll('.fog-preset-btn').forEach(btn => {
+        if (btn.getAttribute('data-preset') === preset) {
+          btn.style.background = '#2563eb';
+          btn.style.borderColor = '#3b82f6';
+        } else {
+          btn.style.background = '#1e2836';
+          btn.style.borderColor = '#2e3b4e';
+        }
+      });
+
+      console.log(`🎚️ Fog preset applied: ${preset} (${density.toFixed(3)})`);
+      updateStatus(`Fog preset: ${preset.charAt(0).toUpperCase() + preset.slice(1)}`);
+      logAIIteration('fogPreset', { preset, density });
+    };
+
+    // ENV-003: Dynamic Ground Plane Size
+    window.updateGroundPlane = (newSize) => {
+      if (!newSize || newSize < 10 || newSize > 100) {
+        console.error(`❌ Invalid ground size: ${newSize} (must be 10-100)`);
+        return;
+      }
+
+      console.log(`🏗️ Recreating ground plane | Old size: ${state.groundPlaneSize} | New size: ${newSize}`);
+
+      // Step 1: Remove old ground from scene
+      scene.remove(ground);
+
+      // Step 2: Dispose old geometry and material (memory cleanup)
+      if (ground.geometry) {
+        ground.geometry.dispose();
+        console.log('♻️ Old ground geometry disposed');
+      }
+      if (ground.material) {
+        ground.material.dispose();
+        console.log('♻️ Old ground material disposed');
+      }
+
+      // Step 3: Create new ground mesh with new size
+      ground = new THREE.Mesh(
+        new THREE.CylinderGeometry(newSize, newSize, 0.4, 48),
+        new THREE.MeshStandardMaterial({ color: 0x101a24, roughness: 0.95 })
+      );
+      ground.position.y = -2.2;
+      ground.receiveShadow = true;
+
+      // Step 4: Add new ground to scene
+      scene.add(ground);
+
+      // Step 5: Update state and input field
+      state.groundPlaneSize = newSize;
+      document.getElementById('groundPlaneSize').value = newSize;
+
+      console.log(`✅ Ground plane recreated | Size: ${newSize} | Vertices: ${ground.geometry.attributes.position.count}`);
+      updateStatus(`Ground size: ${newSize}m`);
+      logAIIteration('groundResize', { size: newSize });
+    };
+
+    // ENV-004: Ground Material Presets
+    window.applyGroundMaterial = (material) => {
+      const materials = {
+        grass: {
+          color: 0x2d5016,
+          roughness: 0.95,
+          metalness: 0,
+          name: 'Grass',
+          emoji: '🌿'
+        },
+        concrete: {
+          color: 0x555555,
+          roughness: 0.8,
+          metalness: 0,
+          name: 'Concrete',
+          emoji: '🏗️'
+        },
+        sand: {
+          color: 0xc2a569,
+          roughness: 0.9,
+          metalness: 0,
+          name: 'Sand',
+          emoji: '🏖️'
+        },
+        water: {
+          color: 0x1e90ff,
+          roughness: 0.1,
+          metalness: 0.3,
+          name: 'Water',
+          emoji: '💧'
+        },
+        metal: {
+          color: 0x888888,
+          roughness: 0.3,
+          metalness: 0.9,
+          name: 'Metal',
+          emoji: '⚙️'
+        }
+      };
+
+      const mat = materials[material];
+      if (!mat) {
+        console.error(`❌ Invalid material: ${material}`);
+        return;
+      }
+
+      console.log(`🎨 Applying ground material: ${mat.emoji} ${mat.name}`);
+      console.log(`   Color: #${mat.color.toString(16).padStart(6, '0')} | Roughness: ${mat.roughness} | Metalness: ${mat.metalness}`);
+
+      // Update ground material properties
+      window.ground.material.color.setHex(mat.color);
+      window.ground.material.roughness = mat.roughness;
+      window.ground.material.metalness = mat.metalness;
+      window.ground.material.needsUpdate = true;
+
+      // Visual feedback: add glow effect to active button
+      document.querySelectorAll('.material-preset-btn').forEach(btn => {
+        if (btn.getAttribute('data-material') === material) {
+          btn.style.transform = 'scale(1.05)';
+          btn.style.boxShadow = '0 0 12px rgba(59, 130, 246, 0.6)';
+        } else {
+          btn.style.transform = 'scale(1)';
+          btn.style.boxShadow = 'none';
+        }
+      });
+
+      console.log(`✅ Material applied: ${mat.emoji} ${mat.name}`);
+      updateStatus(`Ground material: ${mat.name}`);
+      logAIIteration('materialChange', { material, color: mat.color, roughness: mat.roughness, metalness: mat.metalness });
+    };
+
+    // ENV-005: Camera Position Presets with Smooth Transitions
+    let cameraTransition = {
+      active: false,
+      startPos: new THREE.Vector3(),
+      targetPos: new THREE.Vector3(),
+      frame: 0,
+      totalFrames: 60 // 1 second at 60fps
+    };
+
+    window.setCameraView = (view) => {
+      const views = {
+        top: { x: 0, y: 10, z: 0, name: 'Top', emoji: '⬆️' },
+        front: { x: 0, y: 0, z: 10, name: 'Front', emoji: '👁️' },
+        side: { x: 10, y: 0, z: 0, name: 'Side', emoji: '➡️' },
+        isometric: { x: 7, y: 7, z: 7, name: 'Isometric', emoji: '📐' }
+      };
+
+      const targetView = views[view];
+      if (!targetView) {
+        console.error(`❌ Invalid camera view: ${view}`);
+        return;
+      }
+
+      console.log(`📹 Setting camera view: ${targetView.emoji} ${targetView.name}`);
+      console.log(`   Target position: (${targetView.x}, ${targetView.y}, ${targetView.z})`);
+
+      // Store start and target positions
+      cameraTransition.startPos.copy(camera.position);
+      cameraTransition.targetPos.set(targetView.x, targetView.y, targetView.z);
+      cameraTransition.frame = 0;
+      cameraTransition.active = true;
+
+      // Visual feedback: highlight active button
+      document.querySelectorAll('.camera-preset-btn').forEach(btn => {
+        if (btn.getAttribute('data-view') === view) {
+          btn.style.background = '#2563eb';
+          btn.style.borderColor = '#3b82f6';
+        } else {
+          btn.style.background = '#1e2836';
+          btn.style.borderColor = '#2e3b4e';
+        }
+      });
+
+      updateStatus(`Camera: ${targetView.name} view`);
+      logAIIteration('cameraView', { view, position: targetView });
+    };
+
+    // Update camera transition in animate loop (will be added in next step)
+    function updateCameraTransition() {
+      if (!cameraTransition.active) return;
+
+      cameraTransition.frame++;
+      const t = cameraTransition.frame / cameraTransition.totalFrames;
+
+      // Smooth easing function (ease-in-out)
+      const easeT = t < 0.5 
+        ? 2 * t * t 
+        : -1 + (4 - 2 * t) * t;
+
+      // Lerp camera position
+      camera.position.lerpVectors(
+        cameraTransition.startPos,
+        cameraTransition.targetPos,
+        easeT
+      );
+
+      // Update orbit controls target to look at origin
+      controls.target.set(0, 0, 0);
+      controls.update();
+
+      // End transition
+      if (cameraTransition.frame >= cameraTransition.totalFrames) {
+        cameraTransition.active = false;
+        console.log(`✅ Camera transition complete | Final position: (${camera.position.x.toFixed(2)}, ${camera.position.y.toFixed(2)}, ${camera.position.z.toFixed(2)})`);
+      }
+    }
+
+    // CAM-002: Camera Movement Function (Flight Controls)
+    function updateCameraMovement() {
+      // CAM-003: Update flight mode indicator visibility
+      const indicator = document.getElementById('flightModeIndicator');
+      const speedDisplay = document.getElementById('flightSpeedDisplay');
+      
+      if (!flyMode) {
+        indicator.classList.remove('visible');
+        return;
+      }
+
+      // Show indicator when in flight mode
+      indicator.classList.add('visible');
+
+      // Base movement speed
+      const baseSpeed = 0.1;
+      let speedMultiplier = 1;
+
+      // Apply speed modifiers
+      if (keyState.shift) speedMultiplier = 3;   // Fast mode (Shift)
+      if (keyState.ctrl) speedMultiplier = 0.25; // Slow mode (Ctrl)
+
+      const speed = baseSpeed * speedMultiplier;
+
+      // CAM-003: Update speed display with color coding
+      speedDisplay.textContent = `Speed: ${(speed / baseSpeed).toFixed(2)}x`;
+      speedDisplay.className = 'speed-display';
+      if (speedMultiplier > 1) {
+        speedDisplay.classList.add('speed-fast');
+      } else if (speedMultiplier < 1) {
+        speedDisplay.classList.add('speed-slow');
+      }
+
+      // Calculate direction vectors from camera orientation
+      const forward = new THREE.Vector3();
+      const right = new THREE.Vector3();
+      const up = new THREE.Vector3(0, 1, 0); // World up
+
+      // Get camera's forward direction (negative Z in camera space)
+      camera.getWorldDirection(forward);
+      
+      // Get camera's right direction (cross product of up and forward)
+      right.crossVectors(forward, up).normalize();
+
+      // Movement vectors
+      const movement = new THREE.Vector3();
+
+      // WASD movement (horizontal plane + forward/back)
+      if (keyState.w) movement.add(forward.multiplyScalar(speed));
+      if (keyState.s) movement.add(forward.multiplyScalar(-speed));
+      if (keyState.a) movement.add(right.multiplyScalar(-speed));
+      if (keyState.d) movement.add(right.multiplyScalar(speed));
+
+      // QE vertical movement (world up/down)
+      if (keyState.q) movement.y -= speed; // Q = down
+      if (keyState.e) movement.y += speed; // E = up
+
+      // Apply movement to camera
+      camera.position.add(movement);
+
+      // Disable OrbitControls while in flight mode
+      controls.enabled = !flyMode;
+    }
+
+    window.applySceneTheme = (theme) => {
+      state.sceneTheme = theme;
+      
+      switch(theme) {
+        case 'studio':
+          scene.background = new THREE.Color(0x0a0e14);
+          applyFog(0); // No fog in studio
+          applyLightingRig('three-point');
+          break;
+        case 'outdoor':
+          scene.background = new THREE.Color(0x87ceeb);
+          state.fogDensity = 0.02;
+          applyFog(0.02, false); // Linear fog for outdoor
+          applyLightingRig('natural');
+          break;
+        case 'sunset':
+          scene.background = new THREE.Color(0xff6b35);
+          state.fogDensity = 0.015;
+          applyFog(0.015, true); // Exponential fog for sunset
+          applyLightingRig('dramatic');
+          break;
+        case 'night':
+          scene.background = new THREE.Color(0x0a0a1a);
+          state.fogDensity = 0.02;
+          applyFog(0.02, true); // Exponential fog for night
+          dirLight.intensity = 0.8;
+          dirLight.color.setHex(0x6688ff);
+          break;
+        case 'underwater':
+          scene.background = new THREE.Color(0x004466);
+          state.fogDensity = 0.025;
+          applyFog(0.025, true); // Exponential fog for underwater
+          dirLight.intensity = 1.0;
+          dirLight.color.setHex(0x44aaff);
+          break;
+      }
+      
+      // Sync slider with theme fog
+      document.getElementById('fogDensity').value = state.fogDensity;
+      
+      updateStatus(`Theme: ${theme}`);
+      logAIIteration('themeChange', { theme });
+    };
+
+    // Wire lighting and theme controls
+    document.getElementById('lightingRig').addEventListener('change', (e) => {
+      applyLightingRig(e.target.value);
+    });
+
+    document.getElementById('sceneTheme').addEventListener('change', (e) => {
+      applySceneTheme(e.target.value);
+    });
+
+    // ==================== AI PATTERN TRACING SYSTEM ====================
+    
+    const aiIterationLog = [];
+    const MAX_LOG_ENTRIES = 1000;
+
+    function logAIIteration(toolType, data) {
+      const entry = {
+        timestamp: Date.now(),
+        toolType,
+        data,
+        vertexSnapshot: null, // Could store partial snapshot for pattern analysis
+        brushState: {
+          shape: state.brushShape,
+          radius: state.brushRadius,
+          strength: state.brushStrength,
+          hardness: state.brushHardness
+        },
+        materialState: {
+          preset: state.materialPreset,
+          displacement: state.displacementDepth,
+          detail: state.detailLevel
+        }
+      };
+      
+      aiIterationLog.push(entry);
+      
+      // Keep log size manageable
+      if (aiIterationLog.length > MAX_LOG_ENTRIES) {
+        aiIterationLog.shift();
+      }
+      
+      // Analyze patterns every 10 iterations
+      if (aiIterationLog.length % 10 === 0) {
+        analyzePatterns();
+      }
+    }
+
+    function analyzePatterns() {
+      // Pattern analysis for AI learning
+      const recentEntries = aiIterationLog.slice(-50);
+      const toolUsage = {};
+      const avgBrushRadius = recentEntries.reduce((sum, e) => sum + (e.brushState?.radius || 0), 0) / recentEntries.length;
+      const avgStrength = recentEntries.reduce((sum, e) => sum + (e.brushState?.strength || 0), 0) / recentEntries.length;
+      
+      recentEntries.forEach(entry => {
+        toolUsage[entry.toolType] = (toolUsage[entry.toolType] || 0) + 1;
+      });
+      
+      const patterns = {
+        toolUsageFrequency: toolUsage,
+        averageBrushRadius: avgBrushRadius,
+        averageStrength: avgStrength,
+        mostUsedTool: Object.entries(toolUsage).sort((a, b) => b[1] - a[1])[0]?.[0],
+        sessionLength: aiIterationLog.length
+      };
+      
+      // Store patterns for AI to reference
+      window.aiPatterns = patterns;
+      
+      console.log('AI Pattern Analysis:', patterns);
+    }
+
+    window.getAIIterationLog = () => {
+      return {
+        log: aiIterationLog,
+        patterns: window.aiPatterns || {}
+      };
+    };
+
+    // ==================== RADIAL TRANSFORM MENU SYSTEM ====================
+    
+    const radialMenu = document.getElementById('radialMenu');
+    let currentTransformTool = null;
+
+    canvas.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      
+      // Position radial menu at cursor
+      radialMenu.style.left = `${event.clientX}px`;
+      radialMenu.style.top = `${event.clientY}px`;
+      radialMenu.classList.add('active');
+      
+      updateStatus('Transform menu open - select a tool');
+    });
+
+    // Close radial menu on click outside or escape
+    document.addEventListener('click', (event) => {
+      if (!radialMenu.contains(event.target) && radialMenu.classList.contains('active')) {
+        radialMenu.classList.remove('active');
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && radialMenu.classList.contains('active')) {
+        radialMenu.classList.remove('active');
+      }
+    });
+
+    // Radial menu item selection
+    document.querySelectorAll('.radial-menu-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const transform = item.getAttribute('data-transform');
+        currentTransformTool = transform;
+        radialMenu.classList.remove('active');
+        applyTransformTool(transform);
+      });
+    });
+
+    function applyTransformTool(tool) {
+      pushUndo();
+      const posAttr = sculptGeometry.attributes.position;
+      const activeLayer = state.layers[state.activeLayer];
+      
+      switch(tool) {
+        case 'move':
+          updateStatus('Move tool active - use axis handles');
+          window.setTransformMode('translate');
+          break;
+          
+        case 'rotate':
+          updateStatus('Rotate applied');
+          for (let i = 0; i < vertexCount; i++) {
+            const idx = i * 3;
+            const x = posAttr.array[idx];
+            const z = posAttr.array[idx + 2];
+            const angle = Math.PI / 12; // 15 degrees
+            activeLayer[idx]     += x * (Math.cos(angle) - 1) - z * Math.sin(angle);
+            activeLayer[idx + 2] += x * Math.sin(angle) + z * (Math.cos(angle) - 1);
+          }
+          recomposeGeometry();
+          break;
+          
+        case 'scale':
+          updateStatus('Scale applied - uniform grow');
+          for (let i = 0; i < vertexCount; i++) {
+            const idx = i * 3;
+            const scaleFactor = 0.05;
+            activeLayer[idx]     += posAttr.array[idx] * scaleFactor;
+            activeLayer[idx + 1] += posAttr.array[idx + 1] * scaleFactor;
+            activeLayer[idx + 2] += posAttr.array[idx + 2] * scaleFactor;
+          }
+          recomposeGeometry();
+          break;
+          
+        case 'stretch':
+          updateStatus('Stretch applied - elongate Y');
+          for (let i = 0; i < vertexCount; i++) {
+            const idx = i * 3;
+            activeLayer[idx + 1] += posAttr.array[idx + 1] * 0.1;
+          }
+          recomposeGeometry();
+          break;
+          
+        case 'sharpen':
+          updateStatus('Sharpen applied - enhance edges');
+          for (let i = 0; i < vertexCount; i++) {
+            const idx = i * 3;
+            const x = posAttr.array[idx];
+            const y = posAttr.array[idx + 1];
+            const z = posAttr.array[idx + 2];
+            const radial = Math.sqrt(x * x + z * z);
+            
+            // Move vertices away from center, creating sharper angles
+            const sharpness = 0.02;
+            activeLayer[idx]     += (x / (radial + 0.1)) * sharpness * Math.abs(Math.sin(y * 8));
+            activeLayer[idx + 2] += (z / (radial + 0.1)) * sharpness * Math.abs(Math.sin(y * 8));
+          }
+          recomposeGeometry();
+          break;
+          
+        case 'smooth':
+          updateStatus('Smooth applied - softening edges');
+          // Simple Laplacian smoothing
+          const tempLayer = new Float32Array(activeLayer.length);
+          for (let i = 0; i < vertexCount; i++) {
+            const idx = i * 3;
+            // Average with neighboring vertices (simplified)
+            const neighbors = 4;
+            let sumX = 0, sumY = 0, sumZ = 0;
+            for (let n = -neighbors; n <= neighbors; n++) {
+              const nIdx = ((i + n + vertexCount) % vertexCount) * 3;
+              sumX += activeLayer[nIdx];
+              sumY += activeLayer[nIdx + 1];
+              sumZ += activeLayer[nIdx + 2];
+            }
+            const count = neighbors * 2 + 1;
+            tempLayer[idx]     = sumX / count;
+            tempLayer[idx + 1] = sumY / count;
+            tempLayer[idx + 2] = sumZ / count;
+          }
+          activeLayer.set(tempLayer);
+          recomposeGeometry();
+          break;
+          
+        case 'extend':
+          updateStatus('Extend applied - push outward');
+          for (let i = 0; i < vertexCount; i++) {
+            const idx = i * 3;
+            const x = posAttr.array[idx];
+            const z = posAttr.array[idx + 2];
+            const radial = Math.sqrt(x * x + z * z);
+            const extend = 0.05;
+            activeLayer[idx]     += (x / (radial + 0.1)) * extend;
+            activeLayer[idx + 2] += (z / (radial + 0.1)) * extend;
+          }
+          recomposeGeometry();
+          break;
+          
+        case 'shrink':
+          updateStatus('Shrink applied - pull inward');
+          for (let i = 0; i < vertexCount; i++) {
+            const idx = i * 3;
+            const x = posAttr.array[idx];
+            const z = posAttr.array[idx + 2];
+            const radial = Math.sqrt(x * x + z * z);
+            const shrink = -0.05;
+            activeLayer[idx]     += (x / (radial + 0.1)) * shrink;
+            activeLayer[idx + 2] += (z / (radial + 0.1)) * shrink;
+          }
+          recomposeGeometry();
+          break;
+      }
+      
+      logAIIteration(tool, { vertexCount, layerIndex: state.activeLayer });
+    }
+
+    // ==================== INTERACTIVE AXIS GIZMO SYSTEM ====================
+    
+    // Create interactive axis handles (arrows for dragging)
+    let axisArrows = null;
+    let isDraggingAxis = false;
+    let dragStartPoint = null;
+    let dragAxis = null;
+
+    function createAxisArrows() {
+      const arrowGroup = new THREE.Group();
+      
+      const arrowLength = 1.5;
+      const arrowColor = {
+        x: 0xef4444,
+        y: 0x22c55e,
+        z: 0x3b82f6
+      };
+      
+      // X axis arrow
+      const xArrow = new THREE.ArrowHelper(
+        new THREE.Vector3(1, 0, 0),
+        new THREE.Vector3(0, 0, 0),
+        arrowLength,
+        arrowColor.x,
+        0.3,
+        0.2
+      );
+      xArrow.userData = { axis: 'x' };
+      arrowGroup.add(xArrow);
+      
+      // Y axis arrow
+      const yArrow = new THREE.ArrowHelper(
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, 0, 0),
+        arrowLength,
+        arrowColor.y,
+        0.3,
+        0.2
+      );
+      yArrow.userData = { axis: 'y' };
+      arrowGroup.add(yArrow);
+      
+      // Z axis arrow
+      const zArrow = new THREE.ArrowHelper(
+        new THREE.Vector3(0, 0, 1),
+        new THREE.Vector3(0, 0, 0),
+        arrowLength,
+        arrowColor.z,
+        0.3,
+        0.2
+      );
+      zArrow.userData = { axis: 'z' };
+      arrowGroup.add(zArrow);
+      
+      arrowGroup.visible = false;
+      return arrowGroup;
+    }
+
+    axisArrows = createAxisArrows();
+    scene.add(axisArrows);
+
+    // Update arrow position to follow object
+    function updateAxisArrows() {
+      if (transformMode === 'translate') {
+        axisArrows.position.copy(sculptMesh.position);
+        axisArrows.visible = true;
+      } else {
+        axisArrows.visible = false;
+      }
+    }
+
+    // Axis dragging logic
+    canvas.addEventListener('pointerdown', (event) => {
+      if (transformMode === 'translate' && event.button === 0) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        raycaster.setFromCamera(pointer, camera);
+        
+        // Check if clicking on axis arrows
+        const arrowIntersects = [];
+        axisArrows.children.forEach(arrow => {
+          // Create invisible larger cone for easier clicking
+          const hits = raycaster.intersectObject(arrow, true);
+          if (hits.length > 0) {
+            arrowIntersects.push({ arrow, distance: hits[0].distance });
+          }
+        });
+        
+        if (arrowIntersects.length > 0) {
+          // Sort by distance and pick closest
+          arrowIntersects.sort((a, b) => a.distance - b.distance);
+          const closest = arrowIntersects[0].arrow;
+          dragAxis = closest.userData.axis;
+          isDraggingAxis = true;
+          dragStartPoint = sculptMesh.position.clone();
+          controls.enabled = false;
+          updateStatus(`Dragging ${dragAxis.toUpperCase()} axis`);
+        }
+      }
+    });
+
+    canvas.addEventListener('pointermove', (event) => {
+      if (isDraggingAxis && dragAxis) {
+        const rect = canvas.getBoundingClientRect();
+        const moveX = (event.clientX - rect.left) / rect.width;
+        const moveY = (event.clientY - rect.top) / rect.height;
+        
+        const sensitivity = 5.0;
+        
+        if (dragAxis === 'x') {
+          sculptMesh.position.x = dragStartPoint.x + (moveX - 0.5) * sensitivity;
+        } else if (dragAxis === 'y') {
+          sculptMesh.position.y = dragStartPoint.y - (moveY - 0.5) * sensitivity;
+        } else if (dragAxis === 'z') {
+          sculptMesh.position.z = dragStartPoint.z + (moveX - 0.5) * sensitivity;
+        }
+        
+        syncPositionInputs();
+        updateAxisArrows();
+      }
+    });
+
+    canvas.addEventListener('pointerup', () => {
+      if (isDraggingAxis) {
+        isDraggingAxis = false;
+        dragAxis = null;
+        dragStartPoint = null;
+        updateStatus('Axis drag complete');
+      }
+    });
+
+    // ==================== END NEW SYSTEMS ====================
+
+    // Initialize UI
+    window.setTransformMode('orbit');
+    updateLayerUI();
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      updateAxisArrows(); // Update interactive axis gizmo
+      updateCameraTransition(); // ENV-005: Smooth camera transitions
+      updateCameraMovement(); // CAM-002: Flight controls
+      
+      // Update stats
+      const verts = sculptGeometry.attributes.position.count;
+      const tris = sculptGeometry.index ? sculptGeometry.index.count / 3 : verts / 3;
+      document.getElementById('statusRight').textContent = `Vertices: ${verts} | Triangles: ${Math.floor(tris)}`;
+      
+      renderer.render(scene, camera);
+    }
+
+    // Window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    });
+
+    syncUI();
+    applyFog(state.fogDensity, true); // ENV-001: Initialize fog on load
+    animate();
+    updateStatus('Ready – start sculpting!');
+  </script>
+</body>
+</html>

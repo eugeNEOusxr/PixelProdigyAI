@@ -1,0 +1,420 @@
+{
+  "systemId": "SM_CINEMA_SYSTEM",
+  "name": "Long-Distance Shared Cinema",
+  "type": "Social Entertainment System",
+  "version": "1.0",
+  
+  "overview": {
+    "purpose": "Watch movies/shows together with remote friends/partners",
+    "mechanism": "Synced playback + webcam overlay + spatial audio",
+    "primaryUseCase": "Date nights with girlfriend across distance",
+    "location": "Living Room"
+  },
+  
+  "hardware": {
+    "projector": {
+      "objectId": "obj_cinema_projector_001",
+      "type": "Holographic 8K Projector",
+      "position": "Ceiling recessed",
+      "screenSize": "120 inch equivalent",
+      "resolution": "7680 × 4320 (8K)",
+      "hdr": true,
+      "brightness": "3000 lumens",
+      "contrast": "1,000,000:1",
+      "throwDistance": "Short throw (3m)",
+      "keystone": "Auto-correction"
+    },
+    
+    "screenArea": {
+      "location": "Living Room North Wall",
+      "type": "Holographic projection (no physical screen)",
+      "size": "3m × 1.7m (120 inch diagonal)",
+      "adjustable": "Can resize 80-150 inch",
+      "3dCapable": true
+    },
+    
+    "soundSystem": {
+      "type": "Dolby Atmos 7.2.4",
+      "configuration": {
+        "frontSpeakers": 3,
+        "surroundSpeakers": 4,
+        "ceilingSpeakers": 4,
+        "subwoofers": 2
+      },
+      "invisible": true,
+      "inWall": true,
+      "power": "1500W total",
+      "calibration": "AI-optimized for room"
+    },
+    
+    "webcams": {
+      "mainCamera": {
+        "objectId": "obj_webcam_4k_001",
+        "resolution": "4K",
+        "fps": 60,
+        "location": "Above TV (ceiling mounted)",
+        "tracking": "Auto-track faces",
+        "nightVision": "Low-light optimized",
+        "microphone": "Built-in noise cancelling"
+      },
+      
+      "wideAngle": {
+        "objectId": "obj_webcam_wide_001",
+        "resolution": "1080p",
+        "fov": "120° wide angle",
+        "location": "Living room corner",
+        "purpose": "Show full room/multiple people"
+      }
+    },
+    
+    "microphones": {
+      "array": {
+        "count": 4,
+        "type": "Beamforming array",
+        "noiseCancellation": "AI-powered",
+        "location": "Ceiling corners",
+        "range": "Full room coverage"
+      }
+    }
+  },
+  
+  "features": {
+    "syncedPlayback": {
+      "enabled": true,
+      "precision": "±50ms sync",
+      "autoAdjust": "Continuous synchronization",
+      "buffering": "Pre-buffer both sides",
+      "controls": {
+        "play": "Synced across all viewers",
+        "pause": "Synced pause",
+        "skip": "Democratic voting or host control",
+        "volume": "Individual control"
+      }
+    },
+    
+    "webcamOverlay": {
+      "enabled": true,
+      "positions": [
+        "Top-right corner",
+        "Top-left corner",
+        "Bottom-right corner",
+        "Bottom-left corner",
+        "Side-by-side",
+        "Picture-in-picture"
+      ],
+      "defaultPosition": "Top-right corner",
+      "size": "Adjustable (10-30% of screen)",
+      "transparency": "Optional slight transparency",
+      "border": "Customizable frame",
+      
+      "videoQuality": {
+        "resolution": "1080p",
+        "fps": 30,
+        "bitrate": "5 Mbps",
+        "latency": "< 200ms"
+      },
+      
+      "effects": {
+        "beautify": "Optional light enhancement",
+        "backgroundBlur": "Blur behind person",
+        "filters": "Color filters available",
+        "layout": "Can show multiple people"
+      }
+    },
+    
+    "spatialAudio": {
+      "enabled": true,
+      "voiceChat": {
+        "quality": "HD voice",
+        "noiseSuppression": "Advanced",
+        "echoCancellation": true,
+        "soundLevels": "Voice + movie audio balanced"
+      },
+      
+      "immersiveSound": {
+        "movieAudio": "Dolby Atmos surround",
+        "voicePosition": "Sounds like partner is next to you",
+        "spatialVoice": "3D positioned based on webcam location",
+        "ambientSound": "Optional (can hear their room)"
+      }
+    },
+    
+    "sharedReactions": {
+      "enabled": true,
+      "realtime": true,
+      "types": [
+        "😂 Laugh",
+        "😢 Cry",
+        "😱 Gasp/Shock",
+        "❤️ Love it",
+        "👏 Applause",
+        "🤔 Thinking",
+        "😴 Bored",
+        "🍿 Snack time"
+      ],
+      "display": "Floating emojis on screen",
+      "sound": "Optional reaction sounds",
+      "vibration": "Haptic feedback on couch (optional)"
+    },
+    
+    "democraticControls": {
+      "modes": [
+        "Host Only (one person controls)",
+        "Democratic Vote (majority wins)",
+        "Free For All (anyone can control)",
+        "Turn-Based (alternate control)"
+      ],
+      "defaultMode": "Democratic Vote",
+      
+      "votingSystem": {
+        "pauseRequest": "Vote needed",
+        "skipScene": "Vote to skip",
+        "endMovie": "Vote to end",
+        "voteTime": "10 seconds to vote",
+        "majority": "51% needed"
+      }
+    },
+    
+    "snackSync": {
+      "enabled": true,
+      "feature": "Coordinated snack breaks",
+      "notification": "Both get 'snack time' alert",
+      "pauseTimer": "5-minute snack pause",
+      "resume": "Synced countdown to resume"
+    }
+  },
+  
+  "contentSources": {
+    "streaming": {
+      "netflix": {
+        "integrated": true,
+        "sharedAccount": "Optional",
+        "syncMethod": "Netflix Party protocol"
+      },
+      "youtube": {
+        "integrated": true,
+        "sharedPlayback": true,
+        "ads": "Synced or skip together"
+      },
+      "disneyPlus": {
+        "integrated": true,
+        "groupWatch": "Native support"
+      },
+      "hulu": {
+        "integrated": true,
+        "watchParty": "Built-in"
+      },
+      "primeVideo": {
+        "integrated": true,
+        "watchParty": "Built-in"
+      },
+      "appleTV": {
+        "integrated": true,
+        "sharePlay": "Supported"
+      }
+    },
+    
+    "personalFiles": {
+      "uploaded": true,
+      "formats": ["MP4", "MKV", "AVI", "MOV"],
+      "storage": "Unlimited MyPlace storage",
+      "streaming": "P2P between viewers",
+      "quality": "Up to 4K HDR"
+    },
+    
+    "liveTV": {
+      "supported": true,
+      "channels": "Based on subscriptions",
+      "syncMethod": "Time-delay compensation"
+    }
+  },
+  
+  "sessions": {
+    "activeSession": null,
+    "sessionHistory": [
+      {
+        "sessionId": "session_20251015_001",
+        "date": "2025-10-15",
+        "participants": ["Jeremy", "Sarah"],
+        "content": "The Matrix (Netflix)",
+        "duration": "2h 16m",
+        "reactions": {
+          "laughs": 12,
+          "gasps": 8,
+          "loves": 23
+        },
+        "rating": "Both loved it ❤️"
+      }
+    ],
+    
+    "upcomingSession": {
+      "scheduled": "2025-10-16 8:00 PM",
+      "participants": ["Jeremy", "Sarah"],
+      "content": "TBD (will choose together)",
+      "reminder": "30 min before"
+    }
+  },
+  
+  "seating": {
+    "primaryCouch": "obj_sky_sofa_001",
+    "capacity": 6,
+    "optimalPositions": [
+      {
+        "user": "jeremy",
+        "seat": "Left side",
+        "webcamAngle": "Perfect frame",
+        "soundDirection": "Optimized"
+      },
+      {
+        "user": "girlfriend",
+        "seat": "Right side (virtual)",
+        "projection": "As if sitting next to Jeremy",
+        "spatialAudio": "Voice from right side"
+      }
+    ],
+    
+    "lighting": {
+      "scene": "Cinema Mode",
+      "brightness": "Dimmed 20%",
+      "accentLights": "Soft ambient glow",
+      "automation": "Auto-dim when movie starts"
+    }
+  },
+  
+  "privacySettings": {
+    "cameraControl": {
+      "toggle": "Easy on/off",
+      "indicator": "LED when camera active",
+      "blurBackground": "Optional",
+      "pauseVideo": "Pause camera during bathroom break"
+    },
+    
+    "microphoneControl": {
+      "toggle": "Mute/unmute",
+      "pushToTalk": "Optional mode",
+      "audioIndicator": "Visual when mic active"
+    },
+    
+    "recordingPolicy": {
+      "allowRecording": "Requires both consent",
+      "indicator": "Clear recording notice",
+      "storage": "Encrypted personal storage only"
+    }
+  },
+  
+  "automation": {
+    "dateNightRoutine": {
+      "trigger": "Scheduled or voice command",
+      "actions": [
+        "Dim lights to cinema mode",
+        "Close window tints for darkness",
+        "Activate cinema system",
+        "Connect with girlfriend",
+        "Display content selection",
+        "Adjust temperature to cozy",
+        "Optional: Light fireplace hologram"
+      ]
+    },
+    
+    "endMovieRoutine": {
+      "trigger": "Movie ends",
+      "actions": [
+        "Gradually increase lights",
+        "Show 'What's next?' options",
+        "Save watch history",
+        "Option to continue hanging out",
+        "Return environment to normal"
+      ]
+    }
+  },
+  
+  "aiIntegration": {
+    "aurora": {
+      "capabilities": [
+        "Suggest movies based on mood",
+        "Find content both viewers will enjoy",
+        "Manage scheduling and reminders",
+        "Handle technical troubleshooting",
+        "Adjust audio/video automatically",
+        "Translate subtitles in real-time"
+      ],
+      
+      "voiceCommands": [
+        "Aurora, start movie night with Sarah",
+        "Aurora, what should we watch?",
+        "Aurora, pause for snack break",
+        "Aurora, turn up the dialogue",
+        "Aurora, show me romantic movies",
+        "Aurora, reconnect the cinema"
+      ]
+    }
+  },
+  
+  "troubleshooting": {
+    "commonIssues": {
+      "syncLag": {
+        "solution": "Auto-buffer adjustment",
+        "fallback": "Manual sync control"
+      },
+      "audioEcho": {
+        "solution": "AI echo cancellation",
+        "fallback": "Reduce mic volume"
+      },
+      "videoQuality": {
+        "solution": "Auto-adjust based on bandwidth",
+        "fallback": "Lower resolution temporarily"
+      },
+      "connectionDrop": {
+        "solution": "Auto-reconnect within 30s",
+        "fallback": "Manual rejoin"
+      }
+    },
+    
+    "support": {
+      "helpButton": "In-system help",
+      "aiTroubleshooter": "Aurora diagnoses issues",
+      "liveSupport": "24/7 technical support"
+    }
+  },
+  
+  "statistics": {
+    "totalMovies": 47,
+    "totalHours": 124.5,
+    "favoriteGenre": "Sci-Fi",
+    "averageSession": "2.2 hours",
+    "mostWatchedWith": "Sarah (girlfriend)",
+    "reactionStats": {
+      "laughs": 342,
+      "cries": 28,
+      "loves": 189,
+      "gasps": 156
+    }
+  },
+  
+  "futureFeatures": [
+    "VR cinema mode (3D environment)",
+    "Multi-party viewing (3+ people)",
+    "Interactive movie voting",
+    "AI-suggested watch lists",
+    "Subtitle customization per viewer",
+    "Haptic feedback couch sync",
+    "Smell-o-vision integration (future)",
+    "Virtual popcorn sharing",
+    "Watch parties with strangers",
+    "Live commentary from actors"
+  ],
+  
+  "metadata": {
+    "designedBy": [
+      "AI Personality #37 (Entertainment Venue Architect)",
+      "AI Personality #59 (Signal Processing Expert)",
+      "AI Personality #62 (AR/VR Developer)"
+    ],
+    "created": "2025-10-16",
+    "status": "Active",
+    "primaryUsers": ["Jeremy", "Sarah"],
+    "usageFrequency": "3-4 times per week",
+    "satisfaction": "10/10",
+    "notes": "Best feature ever for long-distance relationships"
+  }
+}

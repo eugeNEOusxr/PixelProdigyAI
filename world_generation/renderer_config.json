@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "name": "4K Adaptive Renderer",
+  "description": "Production-ready multi-resolution rendering system",
+  "components": {
+    "renderTargetManager": "render_target_manager.json",
+    "adaptivePipeline": "adaptive_render_pipeline.json",
+    "performanceMonitor": "performance_monitor.json",
+    "qualityAdjuster": "quality_adjuster.json",
+    "framePacer": "frame_pacer.json",
+    "postProcessing": "post_processing_pipeline.json",
+    "debugVisualizer": "debug_visualizer.json"
+  },
+  "integration": {
+    "vls": "4k_integration_state.json",
+    "shaders": "shaders_4k/",
+    "lod": "dynamic_lod_manager.js"
+  },
+  "documentation": "4K_INTEGRATION_COMPLETE.md"
+}

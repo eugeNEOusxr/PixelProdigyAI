@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4K Photorealistic College Building - PixelProdigyAI</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #1a2a3a 0%, #2a3545 50%, #3a4a5a 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        canvas {
+            display: block;
+        }
+
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+        }
+
+        #info h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #4af;
+        }
+
+        #info p {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: #4af;
+            font-weight: bold;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4af;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #stats {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Loading 4K Photorealistic Building...</div>
+    </div>
+
+    <div id="info">
+        <h2>🏛️ 4K Photorealistic Building</h2>
+        <p><span class="highlight">WASD:</span> Move camera</p>
+        <p><span class="highlight">Mouse:</span> Look around</p>
+        <p><span class="highlight">Space:</span> Move up</p>
+        <p><span class="highlight">Shift:</span> Move down</p>
+        <p><span class="highlight">Features:</span></p>
+        <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>Glass curtain walls</li>
+            <li>Dramatic interior lighting</li>
+            <li>Grand entrance stairs</li>
+            <li>Structural pillars</li>
+            <li>Architectural lighting</li>
+            <li>PBR materials</li>
+        </ul>
+    </div>
+
+    <div id="stats">
+        <div>FPS: <span id="fps">--</span></div>
+        <div>Triangles: <span id="triangles">--</span></div>
+        <div>Quality: <span class="highlight">4K Ready</span></div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb); // Sky blue
+        scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
+
+        // Camera
+        const camera = new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(0, 15, 80);
+
+        // Renderer with optimized settings
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            powerPreference: "high-performance"
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        document.body.appendChild(renderer.domElement);
+
+        // === PHOTOREALISTIC BUILDING SYSTEM ===
+        
+        function createBrickTexture(baseColor) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = `#${baseColor.toString(16).padStart(6, '0')}`;
+            ctx.fillRect(0, 0, 512, 512);
+
+            const brickWidth = 64;
+            const brickHeight = 24;
+            const mortarSize = 2;
+
+            for (let y = 0; y < 512; y += brickHeight + mortarSize) {
+                for (let x = 0; x < 512; x += brickWidth + mortarSize) {
+                    const offsetX = (Math.floor(y / (brickHeight + mortarSize)) % 2) * (brickWidth / 2);
+                    const variation = Math.random() * 20 - 10;
+                    const r = Math.min(255, Math.max(0, (baseColor >> 16 & 255) + variation));
+                    const g = Math.min(255, Math.max(0, (baseColor >> 8 & 255) + variation));
+                    const b = Math.min(255, Math.max(0, (baseColor & 255) + variation));
+                    
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.fillRect(x + offsetX, y, brickWidth, brickHeight);
+                }
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(8, 8);
+            return texture;
+        }
+
+        function createBrickNormalMap() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#8080ff';
+            ctx.fillRect(0, 0, 512, 512);
+
+            const brickWidth = 64;
+            const brickHeight = 24;
+            const mortarSize = 2;
+
+            ctx.strokeStyle = '#6060a0';
+            ctx.lineWidth = 2;
+
+            for (let y = 0; y < 512; y += brickHeight + mortarSize) {
+                for (let x = 0; x < 512; x += brickWidth + mortarSize) {
+                    const offsetX = (Math.floor(y / (brickHeight + mortarSize)) % 2) * (brickWidth / 2);
+                    ctx.strokeRect(x + offsetX, y, brickWidth, brickHeight);
+                }
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(8, 8);
+            return texture;
+        }
+
+        function createStonePanelTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#d4c4a8';
+            ctx.fillRect(0, 0, 512, 512);
+
+            for (let i = 0; i < 200; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                const size = Math.random() * 3 + 1;
+                
+                ctx.fillStyle = `rgba(${180 + Math.random() * 40}, ${170 + Math.random() * 40}, ${140 + Math.random() * 40}, 0.3)`;
+                ctx.fillRect(x, y, size, size);
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(4, 4);
+            return texture;
+        }
+
+        function createConcreteTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#cccccc';
+            ctx.fillRect(0, 0, 512, 512);
+
+            for (let i = 0; i < 1000; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                const size = Math.random() * 2;
+                
+                ctx.fillStyle = `rgba(${Math.random() * 50 + 180}, ${Math.random() * 50 + 180}, ${Math.random() * 50 + 180}, 0.5)`;
+                ctx.fillRect(x, y, size, size);
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(6, 6);
+            return texture;
+        }
+
+        // Materials library (optimized to reduce shader complexity)
+        const materials = {
+            darkBrick: new THREE.MeshStandardMaterial({
+                color: 0x3a3a3a,
+                roughness: 0.9,
+                metalness: 0.0,
+                map: createBrickTexture(0x3a3a3a)
+                // Removed normalMap to reduce shader complexity
+            }),
+
+            stonePanel: new THREE.MeshStandardMaterial({
+                color: 0xd4c4a8,
+                roughness: 0.4,
+                metalness: 0.0,
+                map: createStonePanelTexture()
+            }),
+
+            // Simplified glass - using MeshStandardMaterial instead of MeshPhysicalMaterial
+            curtainGlass: new THREE.MeshStandardMaterial({
+                color: 0xaaccee,
+                roughness: 0.1,
+                metalness: 0.1,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            }),
+
+            darkMetal: new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                roughness: 0.3,
+                metalness: 0.9
+            }),
+
+            smoothConcrete: new THREE.MeshStandardMaterial({
+                color: 0xcccccc,
+                roughness: 0.5,
+                metalness: 0.0,
+                map: createConcreteTexture()
+            }),
+
+            brushedMetal: new THREE.MeshStandardMaterial({
+                color: 0x888888,
+                roughness: 0.4,
+                metalness: 0.95
+            })
+        };
+
+        // Build the photorealistic building
+        const buildingGroup = new THREE.Group();
+        const width = 60;
+        const depth = 40;
+        const height = 30;
+        const floors = 3;
+        const floorHeight = height / floors;
+
+        // 1. Foundation plaza
+        const plazaWidth = width + 20;
+        const plazaDepth = depth + 15;
+        const plaza = new THREE.Mesh(
+            new THREE.BoxGeometry(plazaWidth, 0.5, plazaDepth),
+            materials.smoothConcrete
+        );
+        plaza.position.y = -0.25;
+        plaza.receiveShadow = true;
+        plaza.castShadow = true;
+        buildingGroup.add(plaza);
+
+        // 2. Main structure (brick and stone sections)
+        for (let floor = 0; floor < floors; floor++) {
+            const material = (floor % 2 === 0) ? materials.darkBrick : materials.stonePanel;
+            const solidSectionWidth = width * 0.15;
+
+            // Left section
+            const leftSection = new THREE.Mesh(
+                new THREE.BoxGeometry(solidSectionWidth, floorHeight, depth),
+                material
+            );
+            leftSection.position.set(-width / 2 + solidSectionWidth / 2, floorHeight / 2 + floor * floorHeight, 0);
+            leftSection.castShadow = true;
+            leftSection.receiveShadow = true;
+            buildingGroup.add(leftSection);
+
+            // Right section
+            const rightSection = new THREE.Mesh(
+                new THREE.BoxGeometry(solidSectionWidth, floorHeight, depth),
+                material
+            );
+            rightSection.position.set(width / 2 - solidSectionWidth / 2, floorHeight / 2 + floor * floorHeight, 0);
+            rightSection.castShadow = true;
+            rightSection.receiveShadow = true;
+            buildingGroup.add(rightSection);
+
+            // Back wall
+            const backWall = new THREE.Mesh(
+                new THREE.BoxGeometry(width, floorHeight, depth * 0.1),
+                material
+            );
+            backWall.position.set(0, floorHeight / 2 + floor * floorHeight, -depth / 2 + depth * 0.05);
+            backWall.castShadow = true;
+            backWall.receiveShadow = true;
+            buildingGroup.add(backWall);
+        }
+
+        // 3. Glass curtain walls
+        const glassWidth = width * 0.6;
+        for (let floor = 0; floor < floors; floor++) {
+            const glassPanel = new THREE.Mesh(
+                new THREE.BoxGeometry(glassWidth, floorHeight - 0.3, 0.15),
+                materials.curtainGlass
+            );
+            glassPanel.position.set(0, floorHeight / 2 + floor * floorHeight, depth / 2 - 0.5);
+            glassPanel.receiveShadow = true;
+            buildingGroup.add(glassPanel);
+
+            // Vertical frames
+            const frameDividers = 5;
+            for (let i = 0; i <= frameDividers; i++) {
+                const frameX = -glassWidth / 2 + (i * glassWidth / frameDividers);
+                const verticalFrame = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.15, floorHeight, 0.2),
+                    materials.darkMetal
+                );
+                verticalFrame.position.set(frameX, floorHeight / 2 + floor * floorHeight, depth / 2 - 0.5);
+                verticalFrame.castShadow = true;
+                buildingGroup.add(verticalFrame);
+            }
+
+            // Horizontal frame
+            const horizontalFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(glassWidth, 0.3, 0.2),
+                materials.darkMetal
+            );
+            horizontalFrame.position.set(0, floor * floorHeight, depth / 2 - 0.5);
+            horizontalFrame.castShadow = true;
+            buildingGroup.add(horizontalFrame);
+        }
+
+        // 4. Grand entrance stairs
+        const stairWidth = width * 0.5;
+        const numSteps = 12;
+        const stepHeight = 0.18;
+        const stepDepth = 0.35;
+
+        for (let i = 0; i < numSteps; i++) {
+            const step = new THREE.Mesh(
+                new THREE.BoxGeometry(stairWidth, stepHeight, stepDepth),
+                materials.smoothConcrete
+            );
+            step.position.set(0, i * stepHeight, depth / 2 + 2 + i * stepDepth);
+            step.castShadow = true;
+            step.receiveShadow = true;
+            buildingGroup.add(step);
+
+            // Step lighting - removed to reduce shader complexity
+            // The main lights will illuminate the stairs
+        }
+
+        // Handrails
+        const handrailHeight = numSteps * stepHeight;
+        const handrailDepth = numSteps * stepDepth;
+
+        for (let side = -1; side <= 1; side += 2) {
+            const post = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.08, 0.08, handrailHeight + 1, 16),
+                materials.brushedMetal
+            );
+            post.position.set(side * stairWidth / 2, handrailHeight / 2, depth / 2 + 2 + handrailDepth / 2);
+            post.castShadow = true;
+            buildingGroup.add(post);
+
+            const rail = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.05, 0.05, handrailDepth, 16),
+                materials.brushedMetal
+            );
+            rail.rotation.x = Math.PI / 2;
+            rail.position.set(side * stairWidth / 2, handrailHeight, depth / 2 + 2 + handrailDepth / 2);
+            rail.castShadow = true;
+            buildingGroup.add(rail);
+
+            for (let b = 0; b < numSteps; b += 2) {
+                const baluster = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.03, 0.03, handrailHeight - (b * stepHeight), 8),
+                    materials.brushedMetal
+                );
+                baluster.position.set(
+                    side * stairWidth / 2,
+                    (handrailHeight - (b * stepHeight)) / 2 + (b * stepHeight),
+                    depth / 2 + 2 + b * stepDepth
+                );
+                baluster.castShadow = true;
+                buildingGroup.add(baluster);
+            }
+        }
+
+        // 5. Structural pillars
+        const pillarPositions = [
+            { x: -width * 0.35, z: depth / 2 + 1 },
+            { x: -width * 0.15, z: depth / 2 + 1 },
+            { x: width * 0.15, z: depth / 2 + 1 },
+            { x: width * 0.35, z: depth / 2 + 1 }
+        ];
+
+        pillarPositions.forEach(pos => {
+            const pillar = new THREE.Mesh(
+                new THREE.BoxGeometry(1.2, height, 1.2),
+                materials.darkMetal
+            );
+            pillar.position.set(pos.x, height / 2, pos.z);
+            pillar.castShadow = true;
+            pillar.receiveShadow = true;
+            buildingGroup.add(pillar);
+
+            const capital = new THREE.Mesh(
+                new THREE.BoxGeometry(1.5, 0.5, 1.5),
+                materials.darkMetal
+            );
+            capital.position.set(pos.x, height, pos.z);
+            capital.castShadow = true;
+            buildingGroup.add(capital);
+
+            const base = new THREE.Mesh(
+                new THREE.BoxGeometry(1.5, 0.5, 1.5),
+                materials.darkMetal
+            );
+            base.position.set(pos.x, 0, pos.z);
+            base.castShadow = true;
+            buildingGroup.add(base);
+        });
+
+        // 6. Interior lighting (optimized - fewer lights)
+        for (let floor = 0; floor < floors; floor++) {
+            // Reduced from 5 lights per floor to 2 lights per floor
+            for (let i = -1; i <= 1; i += 2) {
+                const interiorLight = new THREE.PointLight(0xffeecc, 3.0, 20);
+                interiorLight.position.set(i * 10, floorHeight / 2 + floor * floorHeight, 0);
+                interiorLight.castShadow = false; // Disabled shadows to reduce complexity
+                buildingGroup.add(interiorLight);
+
+                const glowGeometry = new THREE.SphereGeometry(0.4, 8, 8); // Reduced segments
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffee,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                glow.position.copy(interiorLight.position);
+                buildingGroup.add(glow);
+            }
+        }
+
+        // 7. Soffit lighting (reduced from 20+ lights to 4 lights)
+        for (let x = -width / 3; x <= width / 3; x += width / 3) {
+            const soffit = new THREE.PointLight(0xffeeaa, 1.5, 8);
+            soffit.position.set(x, height - 0.5, depth / 2 + 3);
+            soffit.castShadow = false;
+            buildingGroup.add(soffit);
+        }
+
+        // Pillar uplights (reduced from 4 spotlights to 2 spotlights)
+        [pillarPositions[0], pillarPositions[3]].forEach(pos => {
+            const uplight = new THREE.SpotLight(0xaaccff, 2.0, 25, Math.PI / 5, 0.5);
+            uplight.position.set(pos.x, 0.1, pos.z);
+            uplight.target.position.set(pos.x, height, pos.z);
+            uplight.castShadow = false; // Disabled to reduce complexity
+            buildingGroup.add(uplight);
+            buildingGroup.add(uplight.target);
+        });
+
+        // 8. Modern roof
+        const roofWidth = width + 4;
+        const roofDepth = depth + 6;
+        const roof = new THREE.Mesh(
+            new THREE.BoxGeometry(roofWidth, 0.8, roofDepth),
+            materials.darkMetal
+        );
+        roof.position.set(0, height + 0.4, 0);
+        roof.castShadow = true;
+        roof.receiveShadow = true;
+        buildingGroup.add(roof);
+
+        scene.add(buildingGroup);
+
+        // Lighting setup (dusk atmosphere) - optimized
+        const ambientLight = new THREE.AmbientLight(0x5566aa, 0.4); // Increased ambient
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xffaa77, 1.5);
+        sunLight.position.set(100, 50, 100);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048; // Reduced from 4096
+        sunLight.shadow.mapSize.height = 2048; // Reduced from 4096
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 500;
+        sunLight.shadow.camera.left = -100;
+        sunLight.shadow.camera.right = 100;
+        sunLight.shadow.camera.top = 100;
+        sunLight.shadow.camera.bottom = -100;
+        scene.add(sunLight);
+
+        const skyLight = new THREE.HemisphereLight(0x4466bb, 0x332211, 0.6);
+        scene.add(skyLight);
+
+        // Ground
+        const groundGeometry = new THREE.PlaneGeometry(300, 300);
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x3a5a4a,
+            roughness: 0.8,
+            metalness: 0.0
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -1;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Controls
+        const keys = {};
+        document.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
+        document.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
+
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Animation loop
+        let lastTime = performance.now();
+        let frames = 0;
+        let lastFpsUpdate = lastTime;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const currentTime = performance.now();
+            const delta = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+
+            // FPS counter
+            frames++;
+            if (currentTime - lastFpsUpdate > 1000) {
+                document.getElementById('fps').textContent = frames;
+                frames = 0;
+                lastFpsUpdate = currentTime;
+            }
+
+            // Camera movement
+            const speed = 20 * delta;
+            if (keys['w']) camera.position.z -= speed;
+            if (keys['s']) camera.position.z += speed;
+            if (keys['a']) camera.position.x -= speed;
+            if (keys['d']) camera.position.x += speed;
+            if (keys[' ']) camera.position.y += speed;
+            if (keys['shift']) camera.position.y -= speed;
+
+            // Mouse look
+            camera.rotation.y = -mouseX * 0.5;
+            camera.rotation.x = mouseY * 0.3;
+
+            renderer.render(scene, camera);
+        }
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Hide loading screen
+        document.getElementById('loading').style.display = 'none';
+
+        // Update stats
+        document.getElementById('triangles').textContent = renderer.info.render.triangles.toLocaleString();
+
+        animate();
+    </script>
+</body>
+</html>

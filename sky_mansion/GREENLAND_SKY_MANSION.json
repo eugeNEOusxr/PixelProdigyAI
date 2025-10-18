@@ -1,0 +1,318 @@
+{
+  "propertyId": "MYPLACE_SKY_MANSION_001",
+  "name": "Greenland Sky Mansion",
+  "owner": {
+    "userId": "user_jeremy",
+    "username": "eugeneousxr",
+    "displayName": "Jeremy",
+    "email": "jeremy@eugeneousos.com"
+  },
+  
+  "location": {
+    "district": "Sky_Mansions_District_01",
+    "plotId": "SM_PLOT_001",
+    "plotNumber": 1,
+    "coordinates": {
+      "latitude": 64.1836,
+      "longitude": -51.7214,
+      "elevation": 3048,
+      "region": "Above Nuuk, Greenland"
+    },
+    "viewDirection": "North (Prime Aurora Viewing)"
+  },
+  
+  "ownership": {
+    "claimDate": "2025-10-16T00:00:00Z",
+    "claimPosition": 1,
+    "claimCost": 0,
+    "claimStatus": "FIRST_CLAIM_EVER",
+    "currentValue": "Priceless",
+    "marketEstimate": 50000
+  },
+  
+  "architecture": {
+    "style": "Futuristic Minimalist",
+    "type": "Sky Mansion Modern",
+    "architect": "AI Personality #25 (Residential Architect)",
+    
+    "dimensions": {
+      "footprint": {
+        "length": 50,
+        "width": 40,
+        "unit": "meters"
+      },
+      "height": 15,
+      "floors": 3,
+      "totalArea": 600,
+      "livingArea": 550,
+      "unit": "square meters"
+    },
+    
+    "exterior": {
+      "walls": {
+        "material": "Ultra-Modern Composite",
+        "color": "#FFFFFF",
+        "finish": "High Gloss",
+        "texture": "Smooth Reflective",
+        "properties": ["Self-Cleaning", "Weather-Resistant", "UV-Reflective"]
+      },
+      
+      "trim": {
+        "material": "Aluminum Alloy",
+        "color": "#000000",
+        "finish": "Matte Black",
+        "locations": ["Doorways", "Windows", "Roof Edge", "Gutters", "Accent Lines"],
+        "width": "15cm"
+      },
+      
+      "roof": {
+        "type": "Northern Lights Observatory Dome",
+        "material": "Smart Glass Composite",
+        "transparency": "99.9%",
+        "tintable": true,
+        "retractable": true,
+        "sections": 4,
+        "features": [
+          "Aurora Enhancement System",
+          "Climate Control",
+          "Rain Sensors",
+          "Snow Melt",
+          "Star Map Projection"
+        ]
+      },
+      
+      "windows": {
+        "type": "Floor-to-Ceiling Smart Glass",
+        "coverage": "80% of wall area",
+        "features": [
+          "Electrochromic Tinting",
+          "Privacy Mode",
+          "UV Filtering",
+          "Sound Dampening",
+          "Shatterproof"
+        ],
+        "frame": "Black Aluminum"
+      }
+    }
+  },
+  
+  "addOns": [
+    {
+      "id": "addon_northern_lights_roof",
+      "name": "Northern Lights Observatory Roof",
+      "cost": 4.99,
+      "purchaseDate": "2025-10-16",
+      "rarity": "exclusive",
+      "active": true
+    },
+    {
+      "id": "addon_landing_pad",
+      "name": "Rooftop Landing Pad",
+      "cost": 9.99,
+      "purchaseDate": "2025-10-16",
+      "rarity": "legendary",
+      "active": true
+    },
+    {
+      "id": "addon_infinity_hot_tub",
+      "name": "Rooftop Infinity Hot Tub",
+      "cost": 2.99,
+      "purchaseDate": "2025-10-16",
+      "rarity": "rare",
+      "active": true
+    }
+  ],
+  
+  "totalInvestment": 17.97,
+  
+  "floors": {
+    "floor1": {
+      "level": "Ground Floor",
+      "ceilingHeight": 4.2,
+      "rooms": ["Entryway", "Living Room", "Kitchen", "Dining Area", "Powder Room"]
+    },
+    "floor2": {
+      "level": "Second Floor",
+      "ceilingHeight": 3.6,
+      "rooms": ["Master Bedroom", "Master Bathroom", "Guest Bedroom 1", "Guest Bedroom 2", "Guest Bathroom", "Office/Studio"]
+    },
+    "floor3": {
+      "level": "Observatory & Rooftop",
+      "ceilingHeight": 4.8,
+      "rooms": ["Observatory Dome", "Rooftop Deck"]
+    }
+  },
+  
+  "aiAssistant": {
+    "name": "Aurora",
+    "personalityId": 30,
+    "personalityName": "Interior Designer",
+    "secondaryTraits": [43, 51],
+    "voice": "Warm Professional Female",
+    "avatar": "Holographic Presence",
+    "capabilities": [
+      "Home Automation",
+      "Furniture Arrangement",
+      "Lighting Control",
+      "Climate Management",
+      "Security Monitoring",
+      "Guest Management",
+      "Aurora Predictions",
+      "Entertainment Control"
+    ]
+  },
+  
+  "technology": {
+    "voiceControl": "Full Home Integration",
+    "automation": {
+      "lighting": "Adaptive to Time & Mood",
+      "climate": "Zone-Controlled Smart",
+      "security": "AI-Monitored 24/7",
+      "entertainment": "Voice-Activated"
+    },
+    "security": {
+      "biometric": true,
+      "aiSurveillance": true,
+      "privacyMode": "Invisible from Outside",
+      "accessControl": "Multi-Factor"
+    },
+    "connectivity": {
+      "internet": "10 Gbps Fiber",
+      "wifi": "WiFi 7 Mesh",
+      "smart_devices": "200+ Connected"
+    }
+  },
+  
+  "socialFeatures": {
+    "portals": {
+      "enabled": true,
+      "maxActive": 8,
+      "currentActive": 2,
+      "portals": [
+        {
+          "id": "portal_001",
+          "friendId": "user_girlfriend",
+          "friendName": "Sarah",
+          "location": "Living Room East Wall",
+          "appearance": "Swirling Pink Energy",
+          "status": "active",
+          "alwaysOpen": true,
+          "knockRequired": false
+        },
+        {
+          "id": "portal_002",
+          "friendId": "user_mike",
+          "friendName": "Mike",
+          "location": "Living Room South Wall",
+          "appearance": "Blue Digital Gateway",
+          "status": "invite_only",
+          "knockRequired": true
+        }
+      ]
+    },
+    
+    "sharedCinema": {
+      "enabled": true,
+      "location": "Living Room",
+      "screenSize": "120 inch equivalent",
+      "quality": "8K HDR",
+      "features": [
+        "Synced Playback",
+        "Webcam Overlay",
+        "Spatial Audio",
+        "Voice Chat",
+        "Shared Reactions",
+        "Democratic Controls"
+      ],
+      "contentSources": ["Netflix", "YouTube", "Disney+", "Hulu", "Prime Video", "Personal Files"]
+    }
+  },
+  
+  "streaming": {
+    "enabled": true,
+    "platforms": {
+      "twitch": {
+        "connected": true,
+        "username": "eugeneousxr"
+      },
+      "youtube": {
+        "connected": true,
+        "channel": "EugeneousOS"
+      },
+      "tiktok": {
+        "connected": true,
+        "handle": "@eugeneousxr"
+      }
+    },
+    "revenueShare": "70/30 Split",
+    "equipment": {
+      "cameras": ["4K Tracking Webcam", "360° Room Camera", "Drone Camera"],
+      "microphones": ["Broadcast Quality Condenser", "Lapel Mic"],
+      "lighting": ["3-Point RGB Professional", "Ambient LED Strips"]
+    }
+  },
+  
+  "sustainability": {
+    "power": "Solar Panels on Extended Wings",
+    "water": "Atmospheric Water Harvesting",
+    "waste": "Zero-Waste Recycling System",
+    "heating": "Geothermal Heat Pump Simulation",
+    "carbonFootprint": "Net Zero"
+  },
+  
+  "stats": {
+    "totalVisitors": 0,
+    "uniqueVisitors": 0,
+    "averageVisitDuration": null,
+    "propertyRating": null,
+    "completionStatus": {
+      "structure": "100%",
+      "furniture": "85%",
+      "decor": "60%",
+      "landscaping": "90%",
+      "tech": "95%"
+    }
+  },
+  
+  "achievements": [
+    {
+      "id": "first_claim",
+      "name": "First to the Sky",
+      "description": "First person ever to claim a Sky Mansion plot",
+      "rarity": "unique",
+      "icon": "🏆",
+      "dateEarned": "2025-10-16"
+    },
+    {
+      "id": "aurora_enthusiast",
+      "name": "Aurora Enthusiast",
+      "description": "Purchased the Northern Lights Observatory Roof",
+      "rarity": "exclusive",
+      "icon": "🌌",
+      "dateEarned": "2025-10-16"
+    },
+    {
+      "id": "sky_pilot",
+      "name": "Sky Pilot",
+      "description": "Installed a Landing Pad for aerial access",
+      "rarity": "legendary",
+      "icon": "🚁",
+      "dateEarned": "2025-10-16"
+    }
+  ],
+  
+  "futureExpansions": [
+    "Guest House Module",
+    "Meditation Dome",
+    "Workshop/Maker Space",
+    "Indoor Garden Atrium",
+    "Virtual Pet Area"
+  ],
+  
+  "metadata": {
+    "created": "2025-10-16T00:00:00Z",
+    "lastModified": "2025-10-16T00:00:00Z",
+    "version": "1.0.0",
+    "status": "Active"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "checkInterval": 1000,
+  "thresholds": {
+    "green": 0.6,
+    "yellow": 0.8,
+    "orange": 0.9,
+    "red": 0.95
+  },
+  "actions": {
+    "yellow": [
+      "disable_4k_new_loads",
+      "reduce_cache_size"
+    ],
+    "orange": [
+      "downgrade_4k_to_1080p",
+      "unload_distant_objects"
+    ],
+    "red": [
+      "emergency_unload",
+      "force_garbage_collection"
+    ]
+  }
+}

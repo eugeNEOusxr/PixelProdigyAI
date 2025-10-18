@@ -1,0 +1,5453 @@
+{
+  "version": "1.0",
+  "generated": "2025-10-16T16:14:11.854Z",
+  "totalTables": 41,
+  "lootTables": {
+    "containers": {
+      "common_chest": {
+        "type": "container",
+        "name": "common_chest",
+        "level": 1,
+        "goldMin": 10,
+        "goldMax": 50,
+        "itemCountMin": 1,
+        "itemCountMax": 3,
+        "loot": [
+          {
+            "itemId": "furniture_14136",
+            "name": "Mahogany Wardrobe",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10973",
+            "name": "Magical Gold Vein",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_5756",
+            "name": "Birch Chest",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_1068",
+            "name": "Ivory Couch",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_3989",
+            "name": "Mahogany Desk",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_9918",
+            "name": "Steel Wand",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_5616",
+            "name": "Scale Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1755",
+            "name": "Scale Helmet",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7",
+            "name": "Steel Mace",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1396",
+            "name": "Dragon Axe",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16680",
+            "name": "Chain Belt",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12073",
+            "name": "Magical Flower",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14938",
+            "name": "Common Coal Deposit",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10573",
+            "name": "Magical Herb",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11698",
+            "name": "Magical Rock",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_2716",
+            "name": "Rich Rock",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2467",
+            "name": "Ranger's Helmet",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8593",
+            "name": "Dragon Mace",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1993",
+            "name": "Ancient Hammer",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1891",
+            "name": "Plate Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3434",
+            "name": "Rich Flower",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6548",
+            "name": "Silver Hammer",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7882",
+            "name": "Demon Staff",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_380",
+            "name": "Common Plant",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14700",
+            "name": "Common Flower",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "uncommon_chest": {
+        "type": "container",
+        "name": "uncommon_chest",
+        "level": 10,
+        "goldMin": 50,
+        "goldMax": 150,
+        "itemCountMin": 2,
+        "itemCountMax": 4,
+        "loot": [
+          {
+            "itemId": "resource_9343",
+            "name": "Magical Iron Vein",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_185",
+            "name": "Silk Desk",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_8137",
+            "name": "Silk Couch",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_13147",
+            "name": "Ivory Dresser",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_8666",
+            "name": "Mahogany Dresser",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11678",
+            "name": "Ancient Axe",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8556",
+            "name": "Gold Sword",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_9240",
+            "name": "Gold Hammer",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_4618",
+            "name": "Scale Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_5862",
+            "name": "Leather Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5109",
+            "name": "Silver Axe",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_15948",
+            "name": "Scale Belt",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8733",
+            "name": "Plate Chestplate",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7797",
+            "name": "Royal Helmet",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8195",
+            "name": "Royal Helmet",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1154",
+            "name": "Gold Staff",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1583",
+            "name": "Royal Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4550",
+            "name": "Ancient Flower",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7809",
+            "name": "Dragon Wand",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11698",
+            "name": "Iron Crossbow",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12473",
+            "name": "Leather Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13201",
+            "name": "Common Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7882",
+            "name": "Demon Staff",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9491",
+            "name": "Plate Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12045",
+            "name": "Leather Pauldrons",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "rare_chest": {
+        "type": "container",
+        "name": "rare_chest",
+        "level": 20,
+        "goldMin": 150,
+        "goldMax": 500,
+        "itemCountMin": 3,
+        "itemCountMax": 6,
+        "loot": [
+          {
+            "itemId": "furniture_8588",
+            "name": "Birch Bed",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_1932",
+            "name": "Birch Dresser",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_13726",
+            "name": "Leather Boots",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11273",
+            "name": "Rare Mushroom",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10001",
+            "name": "Demon Staff",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9696",
+            "name": "Ancient Plant",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1465",
+            "name": "Knight's Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_15570",
+            "name": "Knight's Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8266",
+            "name": "Scale Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_266",
+            "name": "Ancient Mace",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2035",
+            "name": "Mithril Axe",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2688",
+            "name": "Leather Boots",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13552",
+            "name": "Rare Shrub",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2772",
+            "name": "Dragon Mace",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4227",
+            "name": "Ancient Iron Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17209",
+            "name": "Royal Boots",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10101",
+            "name": "Royal Pauldrons",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11277",
+            "name": "Knight's Leggings",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11483",
+            "name": "Royal Pauldrons",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11872",
+            "name": "Royal Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_453",
+            "name": "Iron Bow",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2942",
+            "name": "Knight's Boots",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1119",
+            "name": "Abundant Coal Deposit",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12694",
+            "name": "Plate Pauldrons",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3491",
+            "name": "Magical Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "epic_chest": {
+        "type": "container",
+        "name": "epic_chest",
+        "level": 40,
+        "goldMin": 500,
+        "goldMax": 2000,
+        "itemCountMin": 4,
+        "itemCountMax": 8,
+        "loot": [
+          {
+            "itemId": "furniture_13974",
+            "name": "Silk Chair",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6510",
+            "name": "Rich Silver Vein",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_2373",
+            "name": "Ivory Desk",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2676",
+            "name": "Gold Sword",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_885",
+            "name": "Velvet Bed",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12299",
+            "name": "Royal Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1218",
+            "name": "Silver Sword",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6572",
+            "name": "Dragon Staff",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4704",
+            "name": "Silver Greatsword",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17968",
+            "name": "Knight's Belt",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_14126",
+            "name": "Ranger's Chestplate",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_36",
+            "name": "Chain Leggings",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6024",
+            "name": "Rare Shrub",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5308",
+            "name": "Iron Hammer",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3943",
+            "name": "Mithril Bow",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4391",
+            "name": "Common Rock",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_9716",
+            "name": "Ancient Crossbow",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_13849",
+            "name": "Leather Leggings",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5864",
+            "name": "Demon Staff",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7685",
+            "name": "Silver Greatsword",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_590",
+            "name": "Steel Staff",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2235",
+            "name": "Scale Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7750",
+            "name": "Plate Gauntlets",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3157",
+            "name": "Rare Crystal",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9155",
+            "name": "Mage's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "legendary_chest": {
+        "type": "container",
+        "name": "legendary_chest",
+        "level": 60,
+        "goldMin": 2000,
+        "goldMax": 10000,
+        "itemCountMin": 5,
+        "itemCountMax": 10,
+        "loot": [
+          {
+            "itemId": "resource_4232",
+            "name": "Ancient Coal Deposit",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2744",
+            "name": "Royal Helmet",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_5176",
+            "name": "Royal Belt",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6754",
+            "name": "Knight's Belt",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_13298",
+            "name": "Mage's Chestplate",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9701",
+            "name": "Common Rock",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8184",
+            "name": "Common Bush",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1625",
+            "name": "Rich Gold Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17601",
+            "name": "Leather Leggings",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_681",
+            "name": "Ancient Silver Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12638",
+            "name": "Ancient Iron Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5401",
+            "name": "Rare Shrub",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17972",
+            "name": "Royal Pauldrons",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17163",
+            "name": "Rich Rock",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1401",
+            "name": "Common Iron Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10786",
+            "name": "Common Copper Vein",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16956",
+            "name": "Scale Belt",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17233",
+            "name": "Royal Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16486",
+            "name": "Mage's Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11228",
+            "name": "Scale Gauntlets",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6718",
+            "name": "Gold Wand",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5777",
+            "name": "Magical Plant",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10904",
+            "name": "Mithril Hammer",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18928",
+            "name": "Ancient Coal Deposit",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17604",
+            "name": "Knight's Gauntlets",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "barrel": {
+        "type": "container",
+        "name": "barrel",
+        "level": 1,
+        "goldMin": 5,
+        "goldMax": 25,
+        "itemCountMin": 1,
+        "itemCountMax": 2,
+        "loot": [
+          {
+            "itemId": "resource_17930",
+            "name": "Abundant Herb",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1711",
+            "name": "Mage's Helmet",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10858",
+            "name": "Ancient Bow",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11675",
+            "name": "Mithril Mace",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10819",
+            "name": "Gold Spear",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_4305",
+            "name": "Plate Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18800",
+            "name": "Magical Crystal",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_13990",
+            "name": "Ranger's Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2695",
+            "name": "Knight's Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3192",
+            "name": "Chain Chestplate",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14351",
+            "name": "Abundant Silver Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1317",
+            "name": "Abundant Coal Deposit",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3148",
+            "name": "Abundant Herb",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1685",
+            "name": "Rare Crystal",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6483",
+            "name": "Common Herb",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_4925",
+            "name": "Scale Boots",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6269",
+            "name": "Ancient Staff",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1583",
+            "name": "Royal Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13690",
+            "name": "Magical Herb",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2248",
+            "name": "Silver Wand",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6186",
+            "name": "Iron Greatsword",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12960",
+            "name": "Ancient Mushroom",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16246",
+            "name": "Common Iron Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8115",
+            "name": "Ancient Staff",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13201",
+            "name": "Common Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "crate": {
+        "type": "container",
+        "name": "crate",
+        "level": 1,
+        "goldMin": 10,
+        "goldMax": 40,
+        "itemCountMin": 1,
+        "itemCountMax": 3,
+        "loot": [
+          {
+            "itemId": "resource_4138",
+            "name": "Magical Herb",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_7441",
+            "name": "Ivory Stool",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_4222",
+            "name": "Birch Bed",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_3153",
+            "name": "Silk Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_13795",
+            "name": "Birch Chair",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7311",
+            "name": "Magical Coal Deposit",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1083",
+            "name": "Magical Tree",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18502",
+            "name": "Common Gold Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_486",
+            "name": "Rich Tree",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16724",
+            "name": "Ranger's Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10519",
+            "name": "Silver Axe",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17426",
+            "name": "Ancient Iron Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16380",
+            "name": "Abundant Plant",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18576",
+            "name": "Rare Copper Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_15838",
+            "name": "Abundant Silver Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_14311",
+            "name": "Royal Belt",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_725",
+            "name": "Gold Wand",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11435",
+            "name": "Gold Axe",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_906",
+            "name": "Silver Crossbow",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_4141",
+            "name": "Mage's Leggings",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6186",
+            "name": "Iron Greatsword",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14700",
+            "name": "Common Flower",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_5123",
+            "name": "Knight's Gauntlets",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1986",
+            "name": "Rare Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12960",
+            "name": "Ancient Mushroom",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "treasure_chest": {
+        "type": "container",
+        "name": "treasure_chest",
+        "level": 50,
+        "goldMin": 3000,
+        "goldMax": 15000,
+        "itemCountMin": 6,
+        "itemCountMax": 12,
+        "loot": [
+          {
+            "itemId": "armor_7081",
+            "name": "Chain Chestplate",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12049",
+            "name": "Ancient Copper Vein",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8561",
+            "name": "Knight's Gauntlets",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7948",
+            "name": "Leather Chestplate",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4528",
+            "name": "Ancient Herb",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_9026",
+            "name": "Demon Bow",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14181",
+            "name": "Common Shrub",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10930",
+            "name": "Common Plant",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9962",
+            "name": "Rich Herb",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_15752",
+            "name": "Abundant Coal Deposit",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2182",
+            "name": "Ranger's Leggings",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10870",
+            "name": "Ranger's Gauntlets",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3268",
+            "name": "Royal Pauldrons",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_5888",
+            "name": "Plate Pauldrons",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6070",
+            "name": "Gold Crossbow",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3341",
+            "name": "Magical Crystal",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1855",
+            "name": "Knight's Belt",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5554",
+            "name": "Gold Sword",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3805",
+            "name": "Iron Bow",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1817",
+            "name": "Knight's Pauldrons",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_15197",
+            "name": "Abundant Plant",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_14082",
+            "name": "Ranger's Pauldrons",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10311",
+            "name": "Knight's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_15163",
+            "name": "Scale Boots",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8882",
+            "name": "Rich Mushroom",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "enemies": {
+      "goblin": {
+        "type": "enemy",
+        "name": "goblin",
+        "level": 3,
+        "difficulty": "common",
+        "goldMin": 5,
+        "goldMax": 15,
+        "dropChance": 0.4,
+        "loot": [
+          {
+            "itemId": "resource_2655",
+            "name": "Common Herb",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_4236",
+            "name": "Oak Couch",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_11569",
+            "name": "Mahogany Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_3653",
+            "name": "Birch Desk",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_7627",
+            "name": "Velvet Stool",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2585",
+            "name": "Ancient Axe",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4701",
+            "name": "Silver Crossbow",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10850",
+            "name": "Abundant Plant",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11550",
+            "name": "Steel Mace",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12995",
+            "name": "Knight's Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3289",
+            "name": "Leather Belt",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7499",
+            "name": "Gold Spear",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6525",
+            "name": "Silver Wand",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7099",
+            "name": "Ancient Crystal",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7616",
+            "name": "Demon Dagger",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_19893",
+            "name": "Magical Tree",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1993",
+            "name": "Ancient Hammer",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6821",
+            "name": "Royal Helmet",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7112",
+            "name": "Ancient Iron Vein",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17014",
+            "name": "Ancient Herb",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16705",
+            "name": "Common Copper Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7273",
+            "name": "Ancient Crystal",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9693",
+            "name": "Ancient Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6548",
+            "name": "Silver Hammer",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11643",
+            "name": "Ancient Shrub",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "orc": {
+        "type": "enemy",
+        "name": "orc",
+        "level": 8,
+        "difficulty": "common",
+        "goldMin": 15,
+        "goldMax": 30,
+        "dropChance": 0.4,
+        "loot": [
+          {
+            "itemId": "furniture_4147",
+            "name": "Silk Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_29",
+            "name": "Mahogany Cabinet",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_1049",
+            "name": "Pine Chair",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10909",
+            "name": "Rich Crystal",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_13421",
+            "name": "Silk Couch",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6742",
+            "name": "Iron Crossbow",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3343",
+            "name": "Rich Crystal",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_4959",
+            "name": "Ranger's Leggings",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11259",
+            "name": "Demon Wand",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8298",
+            "name": "Ancient Greatsword",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8584",
+            "name": "Chain Boots",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_384",
+            "name": "Common Iron Vein",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_15498",
+            "name": "Magical Flower",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6003",
+            "name": "Rich Rock",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_2073",
+            "name": "Rare Flower",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9321",
+            "name": "Leather Pauldrons",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4324",
+            "name": "Ancient Mushroom",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18090",
+            "name": "Rare Iron Vein",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_803",
+            "name": "Gold Sword",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5517",
+            "name": "Rare Tree",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_13991",
+            "name": "Mage's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13201",
+            "name": "Common Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_453",
+            "name": "Iron Bow",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13303",
+            "name": "Abundant Rock",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_324",
+            "name": "Steel Axe",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "skeleton": {
+        "type": "enemy",
+        "name": "skeleton",
+        "level": 5,
+        "difficulty": "common",
+        "goldMin": 8,
+        "goldMax": 20,
+        "dropChance": 0.4,
+        "loot": [
+          {
+            "itemId": "resource_5494",
+            "name": "Common Gold Vein",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_9443",
+            "name": "Silk Desk",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_3990",
+            "name": "Oak Wardrobe",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_2089",
+            "name": "Velvet Chest",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_880",
+            "name": "Silk Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7898",
+            "name": "Gold Wand",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1160",
+            "name": "Royal Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4331",
+            "name": "Iron Dagger",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8344",
+            "name": "Mage's Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6751",
+            "name": "Ancient Hammer",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9542",
+            "name": "Abundant Bush",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10238",
+            "name": "Leather Gauntlets",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8695",
+            "name": "Ranger's Chestplate",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6353",
+            "name": "Scale Leggings",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9930",
+            "name": "Royal Boots",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6773",
+            "name": "Iron Sword",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1427",
+            "name": "Steel Crossbow",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1891",
+            "name": "Plate Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16677",
+            "name": "Common Gold Vein",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7524",
+            "name": "Ancient Coal Deposit",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9693",
+            "name": "Ancient Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6186",
+            "name": "Iron Greatsword",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11643",
+            "name": "Ancient Shrub",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16705",
+            "name": "Common Copper Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10927",
+            "name": "Common Crystal",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "zombie": {
+        "type": "enemy",
+        "name": "zombie",
+        "level": 6,
+        "difficulty": "common",
+        "goldMin": 10,
+        "goldMax": 25,
+        "dropChance": 0.4,
+        "loot": [
+          {
+            "itemId": "furniture_13387",
+            "name": "Oak Chair",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_13996",
+            "name": "Silk Chest",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_274",
+            "name": "Steel Sword",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_13821",
+            "name": "Pine Chest",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_7237",
+            "name": "Oak Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6701",
+            "name": "Rich Copper Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6620",
+            "name": "Leather Helmet",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2226",
+            "name": "Iron Greatsword",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8711",
+            "name": "Dragon Greatsword",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_284",
+            "name": "Leather Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10238",
+            "name": "Leather Gauntlets",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4653",
+            "name": "Demon Axe",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5370",
+            "name": "Iron Sword",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16609",
+            "name": "Mage's Boots",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_9603",
+            "name": "Gold Hammer",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10484",
+            "name": "Rich Crystal",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8977",
+            "name": "Mithril Staff",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1899",
+            "name": "Gold Staff",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1098",
+            "name": "Leather Helmet",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10264",
+            "name": "Mage's Belt",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3645",
+            "name": "Mithril Wand",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_562",
+            "name": "Steel Axe",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13627",
+            "name": "Common Plant",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_324",
+            "name": "Steel Axe",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9693",
+            "name": "Ancient Silver Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "wolf": {
+        "type": "enemy",
+        "name": "wolf",
+        "level": 4,
+        "difficulty": "common",
+        "goldMin": 5,
+        "goldMax": 12,
+        "dropChance": 0.4,
+        "loot": [
+          {
+            "itemId": "resource_3185",
+            "name": "Abundant Tree",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5390",
+            "name": "Dragon Wand",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_3066",
+            "name": "Pine Bench",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_1149",
+            "name": "Birch Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_7766",
+            "name": "Birch Bench",
+            "rarity": "common",
+            "dropChance": 0.8,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3914",
+            "name": "Abundant Crystal",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6361",
+            "name": "Leather Helmet",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6643",
+            "name": "Silver Dagger",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12166",
+            "name": "Ranger's Helmet",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_169",
+            "name": "Scale Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8643",
+            "name": "Rare Crystal",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3265",
+            "name": "Mage's Chestplate",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6938",
+            "name": "Iron Hammer",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4406",
+            "name": "Dragon Hammer",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9212",
+            "name": "Scale Leggings",
+            "rarity": "rare",
+            "dropChance": 0.04,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4596",
+            "name": "Common Herb",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9323",
+            "name": "Magical Flower",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2467",
+            "name": "Ranger's Helmet",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1487",
+            "name": "Rare Silver Vein",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4796",
+            "name": "Rare Shrub",
+            "rarity": "epic",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16246",
+            "name": "Common Iron Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14891",
+            "name": "Common Coal Deposit",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16705",
+            "name": "Common Copper Vein",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6056",
+            "name": "Ancient Mace",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4572",
+            "name": "Ancient Crossbow",
+            "rarity": "legendary",
+            "dropChance": 0.001,
+            "quantity": 1
+          }
+        ]
+      },
+      "bear": {
+        "type": "enemy",
+        "name": "bear",
+        "level": 12,
+        "difficulty": "uncommon",
+        "goldMin": 25,
+        "goldMax": 60,
+        "dropChance": 0.6,
+        "loot": [
+          {
+            "itemId": "resource_12752",
+            "name": "Common Rock",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_5297",
+            "name": "Pine Cabinet",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_9442",
+            "name": "Silk Chest",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_4724",
+            "name": "Silk Cabinet",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_3238",
+            "name": "Ivory Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13115",
+            "name": "Abundant Plant",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_13895",
+            "name": "Royal Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2469",
+            "name": "Royal Leggings",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8741",
+            "name": "Knight's Helmet",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_4217",
+            "name": "Scale Belt",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1833",
+            "name": "Abundant Flower",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8950",
+            "name": "Leather Chestplate",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_947",
+            "name": "Mithril Crossbow",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18047",
+            "name": "Magical Gold Vein",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13221",
+            "name": "Rich Silver Vein",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7809",
+            "name": "Dragon Wand",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10701",
+            "name": "Steel Hammer",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2399",
+            "name": "Chain Leggings",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11698",
+            "name": "Iron Crossbow",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10783",
+            "name": "Mithril Bow",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9649",
+            "name": "Plate Belt",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6548",
+            "name": "Silver Hammer",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_562",
+            "name": "Steel Axe",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4572",
+            "name": "Ancient Crossbow",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12045",
+            "name": "Leather Pauldrons",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          }
+        ]
+      },
+      "troll": {
+        "type": "enemy",
+        "name": "troll",
+        "level": 18,
+        "difficulty": "uncommon",
+        "goldMin": 50,
+        "goldMax": 120,
+        "dropChance": 0.6,
+        "loot": [
+          {
+            "itemId": "resource_12309",
+            "name": "Rich Shrub",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_11665",
+            "name": "Pine Chest",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_9115",
+            "name": "Oak Stool",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_7407",
+            "name": "Velvet Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_13571",
+            "name": "Ivory Table",
+            "rarity": "common",
+            "dropChance": 0.6,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17985",
+            "name": "Magical Bush",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4259",
+            "name": "Iron Wand",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2740",
+            "name": "Iron Wand",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1776",
+            "name": "Mithril Bow",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3574",
+            "name": "Scale Leggings",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13934",
+            "name": "Common Iron Vein",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11345",
+            "name": "Ancient Tree",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13091",
+            "name": "Rich Mushroom",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8864",
+            "name": "Royal Helmet",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_5978",
+            "name": "Mage's Chestplate",
+            "rarity": "rare",
+            "dropChance": 0.08,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8933",
+            "name": "Dragon Wand",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13485",
+            "name": "Ancient Gold Vein",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4513",
+            "name": "Abundant Rock",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4995",
+            "name": "Ancient Shrub",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11045",
+            "name": "Abundant Herb",
+            "rarity": "epic",
+            "dropChance": 0.02,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10",
+            "name": "Gold Mace",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12893",
+            "name": "Mage's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18147",
+            "name": "Rich Flower",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14623",
+            "name": "Abundant Rock",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3365",
+            "name": "Iron Dagger",
+            "rarity": "legendary",
+            "dropChance": 0.002,
+            "quantity": 1
+          }
+        ]
+      },
+      "dark_knight": {
+        "type": "enemy",
+        "name": "dark_knight",
+        "level": 25,
+        "difficulty": "rare",
+        "goldMin": 100,
+        "goldMax": 250,
+        "dropChance": 0.75,
+        "loot": [
+          {
+            "itemId": "armor_10190",
+            "name": "Scale Belt",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_14528",
+            "name": "Mahogany Table",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_12333",
+            "name": "Ebony Table",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_12875",
+            "name": "Mahogany Chair",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_9004",
+            "name": "Birch Dresser",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2194",
+            "name": "Gold Axe",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16227",
+            "name": "Plate Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_15747",
+            "name": "Mage's Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7499",
+            "name": "Royal Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_4320",
+            "name": "Mage's Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3590",
+            "name": "Knight's Gauntlets",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8233",
+            "name": "Scale Boots",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11234",
+            "name": "Ancient Mace",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2127",
+            "name": "Knight's Helmet",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2799",
+            "name": "Mage's Helmet",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17450",
+            "name": "Common Silver Vein",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11698",
+            "name": "Iron Crossbow",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10016",
+            "name": "Knight's Boots",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3360",
+            "name": "Scale Belt",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11081",
+            "name": "Leather Helmet",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1641",
+            "name": "Scale Gauntlets",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16757",
+            "name": "Plate Boots",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2568",
+            "name": "Ancient Spear",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3365",
+            "name": "Iron Dagger",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12057",
+            "name": "Scale Pauldrons",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          }
+        ]
+      },
+      "demon": {
+        "type": "enemy",
+        "name": "demon",
+        "level": 35,
+        "difficulty": "rare",
+        "goldMin": 200,
+        "goldMax": 500,
+        "dropChance": 0.75,
+        "loot": [
+          {
+            "itemId": "armor_1183",
+            "name": "Leather Belt",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_1143",
+            "name": "Pine Stool",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_6060",
+            "name": "Ebony Stool",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_562",
+            "name": "Silk Table",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_7653",
+            "name": "Ivory Chest",
+            "rarity": "common",
+            "dropChance": 0.4,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11679",
+            "name": "Mithril Sword",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_9847",
+            "name": "Silver Dagger",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_19550",
+            "name": "Rich Bush",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6046",
+            "name": "Scale Belt",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8027",
+            "name": "Mage's Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.35,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7657",
+            "name": "Royal Pauldrons",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16400",
+            "name": "Ancient Coal Deposit",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3316",
+            "name": "Ancient Herb",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17194",
+            "name": "Mage's Belt",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1584",
+            "name": "Common Coal Deposit",
+            "rarity": "rare",
+            "dropChance": 0.18,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5674",
+            "name": "Magical Copper Vein",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2417",
+            "name": "Plate Belt",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11354",
+            "name": "Royal Belt",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4912",
+            "name": "Demon Spear",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1212",
+            "name": "Knight's Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.06,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8729",
+            "name": "Ancient Herb",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_590",
+            "name": "Steel Staff",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7447",
+            "name": "Chain Chestplate",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_12057",
+            "name": "Scale Pauldrons",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5314",
+            "name": "Ancient Axe",
+            "rarity": "legendary",
+            "dropChance": 0.01,
+            "quantity": 1
+          }
+        ]
+      },
+      "dragon_whelp": {
+        "type": "enemy",
+        "name": "dragon_whelp",
+        "level": 45,
+        "difficulty": "epic",
+        "goldMin": 400,
+        "goldMax": 1000,
+        "dropChance": 0.9,
+        "loot": [
+          {
+            "itemId": "weapon_9654",
+            "name": "Demon Dagger",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_10604",
+            "name": "Birch Bed",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7335",
+            "name": "Common Mushroom",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5482",
+            "name": "Iron Greatsword",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1621",
+            "name": "Iron Dagger",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3798",
+            "name": "Magical Gold Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_14930",
+            "name": "Royal Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6667",
+            "name": "Ranger's Chestplate",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6928",
+            "name": "Gold Axe",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7253",
+            "name": "Royal Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3060",
+            "name": "Rare Rock",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_5368",
+            "name": "Ranger's Pauldrons",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1353",
+            "name": "Chain Pauldrons",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2764",
+            "name": "Silver Axe",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11602",
+            "name": "Mithril Spear",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5554",
+            "name": "Gold Sword",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13342",
+            "name": "Abundant Crystal",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5840",
+            "name": "Rare Tree",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_2639",
+            "name": "Abundant Rock",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_15977",
+            "name": "Ranger's Helmet",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_14607",
+            "name": "Knight's Chestplate",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9155",
+            "name": "Mage's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8624",
+            "name": "Gold Mace",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6350",
+            "name": "Royal Gauntlets",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5845",
+            "name": "Magical Shrub",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "resources": {
+      "tree": {
+        "type": "resource",
+        "name": "tree",
+        "level": 1,
+        "yields": [
+          "wood",
+          "stick",
+          "sap"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 1,
+        "gatherTime": 3.05,
+        "respawnTime": 65
+      },
+      "iron_vein": {
+        "type": "resource",
+        "name": "iron_vein",
+        "level": 10,
+        "yields": [
+          "iron_ore",
+          "stone"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 2,
+        "gatherTime": 3.5,
+        "respawnTime": 110
+      },
+      "gold_vein": {
+        "type": "resource",
+        "name": "gold_vein",
+        "level": 30,
+        "yields": [
+          "gold_ore",
+          "stone"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 4,
+        "gatherTime": 4.5,
+        "respawnTime": 210
+      },
+      "silver_vein": {
+        "type": "resource",
+        "name": "silver_vein",
+        "level": 20,
+        "yields": [
+          "silver_ore",
+          "stone"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 3,
+        "gatherTime": 4,
+        "respawnTime": 160
+      },
+      "herb": {
+        "type": "resource",
+        "name": "herb",
+        "level": 5,
+        "yields": [
+          "healing_herb",
+          "mana_herb"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 1,
+        "gatherTime": 3.25,
+        "respawnTime": 85
+      },
+      "crystal": {
+        "type": "resource",
+        "name": "crystal",
+        "level": 40,
+        "yields": [
+          "magic_crystal",
+          "crystal_shard"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 5,
+        "gatherTime": 5,
+        "respawnTime": 260
+      },
+      "coal_deposit": {
+        "type": "resource",
+        "name": "coal_deposit",
+        "level": 15,
+        "yields": [
+          "coal",
+          "stone"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 2,
+        "gatherTime": 3.75,
+        "respawnTime": 135
+      },
+      "mushroom": {
+        "type": "resource",
+        "name": "mushroom",
+        "level": 8,
+        "yields": [
+          "mushroom",
+          "spores"
+        ],
+        "quantityMin": 1,
+        "quantityMax": 1,
+        "gatherTime": 3.4,
+        "respawnTime": 100
+      }
+    },
+    "bosses": {
+      "forest_guardian": {
+        "type": "boss",
+        "name": "forest_guardian",
+        "level": 15,
+        "goldMin": 1500,
+        "goldMax": 7500,
+        "guaranteedDrops": 2,
+        "bonusItems": [
+          3,
+          5
+        ],
+        "guaranteedLoot": [
+          {
+            "itemId": "armor_3271",
+            "name": "Ranger's Boots",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_11277",
+            "name": "Knight's Leggings",
+            "rarity": "epic",
+            "guaranteed": true
+          }
+        ],
+        "bonusLoot": [
+          {
+            "itemId": "resource_1376",
+            "name": "Abundant Crystal",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_56",
+            "name": "Velvet Stool",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_8792",
+            "name": "Ivory Desk",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2009",
+            "name": "Steel Spear",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_9241",
+            "name": "Mahogany Bench",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17554",
+            "name": "Chain Helmet",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_19340",
+            "name": "Rare Bush",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8635",
+            "name": "Abundant Flower",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7696",
+            "name": "Abundant Shrub",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_16454",
+            "name": "Ranger's Gauntlets",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5242",
+            "name": "Dragon Axe",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3054",
+            "name": "Mage's Helmet",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12591",
+            "name": "Abundant Herb",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17214",
+            "name": "Common Bush",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10040",
+            "name": "Common Bush",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9613",
+            "name": "Royal Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16159",
+            "name": "Magical Bush",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9226",
+            "name": "Rare Copper Vein",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4596",
+            "name": "Common Herb",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_962",
+            "name": "Gold Sword",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_562",
+            "name": "Steel Axe",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10193",
+            "name": "Ranger's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7089",
+            "name": "Steel Greatsword",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6186",
+            "name": "Iron Greatsword",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7619",
+            "name": "Mithril Mace",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ],
+        "uniqueDrops": [
+          {
+            "itemId": "forest_guardian_unique_1",
+            "name": "Forest Guardian's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 15,
+            "description": "A legendary item once wielded by Forest Guardian"
+          },
+          {
+            "itemId": "forest_guardian_unique_2",
+            "name": "Forest Guardian's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 15,
+            "description": "A legendary item once wielded by Forest Guardian"
+          },
+          {
+            "itemId": "forest_guardian_unique_3",
+            "name": "Forest Guardian's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 15,
+            "description": "A legendary item once wielded by Forest Guardian"
+          }
+        ]
+      },
+      "mountain_king": {
+        "type": "boss",
+        "name": "mountain_king",
+        "level": 30,
+        "goldMin": 3000,
+        "goldMax": 15000,
+        "guaranteedDrops": 3,
+        "bonusItems": [
+          4,
+          7
+        ],
+        "guaranteedLoot": [
+          {
+            "itemId": "armor_17764",
+            "name": "Scale Boots",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_4717",
+            "name": "Scale Helmet",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_8316",
+            "name": "Chain Gauntlets",
+            "rarity": "epic",
+            "guaranteed": true
+          }
+        ],
+        "bonusLoot": [
+          {
+            "itemId": "armor_4090",
+            "name": "Chain Chestplate",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_1483",
+            "name": "Ebony Dresser",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_12235",
+            "name": "Mahogany Dresser",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_2349",
+            "name": "Silk Bookshelf",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_2485",
+            "name": "Pine Couch",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_19543",
+            "name": "Ancient Tree",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1098",
+            "name": "Rich Flower",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1237",
+            "name": "Ancient Coal Deposit",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8311",
+            "name": "Ancient Rock",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6573",
+            "name": "Ancient Bush",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3054",
+            "name": "Mage's Helmet",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5017",
+            "name": "Abundant Herb",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6840",
+            "name": "Leather Helmet",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7453",
+            "name": "Leather Helmet",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_13761",
+            "name": "Mage's Leggings",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2898",
+            "name": "Iron Sword",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_671",
+            "name": "Magical Coal Deposit",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13275",
+            "name": "Magical Copper Vein",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18142",
+            "name": "Rare Copper Vein",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7044",
+            "name": "Mithril Dagger",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3157",
+            "name": "Rare Crystal",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18423",
+            "name": "Common Tree",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17095",
+            "name": "Royal Gauntlets",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7612",
+            "name": "Silver Mace",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9155",
+            "name": "Mage's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ],
+        "uniqueDrops": [
+          {
+            "itemId": "mountain_king_unique_1",
+            "name": "Mountain King's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 30,
+            "description": "A legendary item once wielded by Mountain King"
+          },
+          {
+            "itemId": "mountain_king_unique_2",
+            "name": "Mountain King's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 30,
+            "description": "A legendary item once wielded by Mountain King"
+          }
+        ]
+      },
+      "sea_leviathan": {
+        "type": "boss",
+        "name": "sea_leviathan",
+        "level": 45,
+        "goldMin": 4500,
+        "goldMax": 22500,
+        "guaranteedDrops": 4,
+        "bonusItems": [
+          5,
+          10
+        ],
+        "guaranteedLoot": [
+          {
+            "itemId": "armor_17008",
+            "name": "Plate Gauntlets",
+            "rarity": "epic",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_5864",
+            "name": "Demon Staff",
+            "rarity": "epic",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_7904",
+            "name": "Iron Mace",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_590",
+            "name": "Steel Staff",
+            "rarity": "legendary",
+            "guaranteed": true
+          }
+        ],
+        "bonusLoot": [
+          {
+            "itemId": "weapon_2676",
+            "name": "Gold Sword",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_639",
+            "name": "Rich Bush",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_614",
+            "name": "Ancient Greatsword",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4504",
+            "name": "Iron Axe",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "furniture_3977",
+            "name": "Ivory Desk",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_2739",
+            "name": "Ancient Copper Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9109",
+            "name": "Mage's Chestplate",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10576",
+            "name": "Dragon Staff",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3923",
+            "name": "Ancient Axe",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11094",
+            "name": "Silver Greatsword",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6649",
+            "name": "Scale Leggings",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3174",
+            "name": "Leather Chestplate",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1353",
+            "name": "Chain Pauldrons",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_9436",
+            "name": "Scale Gauntlets",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2425",
+            "name": "Royal Helmet",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6539",
+            "name": "Abundant Plant",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8247",
+            "name": "Common Bush",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12599",
+            "name": "Rich Flower",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11526",
+            "name": "Ancient Gold Vein",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17785",
+            "name": "Ancient Silver Vein",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2118",
+            "name": "Royal Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4971",
+            "name": "Demon Spear",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_15995",
+            "name": "Royal Boots",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_16731",
+            "name": "Ancient Iron Vein",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6718",
+            "name": "Gold Wand",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ],
+        "uniqueDrops": [
+          {
+            "itemId": "sea_leviathan_unique_1",
+            "name": "Sea Leviathan's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 45,
+            "description": "A legendary item once wielded by Sea Leviathan"
+          },
+          {
+            "itemId": "sea_leviathan_unique_2",
+            "name": "Sea Leviathan's Blade",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 45,
+            "description": "A legendary item once wielded by Sea Leviathan"
+          }
+        ]
+      },
+      "ancient_dragon": {
+        "type": "boss",
+        "name": "ancient_dragon",
+        "level": 60,
+        "goldMin": 6000,
+        "goldMax": 30000,
+        "guaranteedDrops": 5,
+        "bonusItems": [
+          7,
+          15
+        ],
+        "guaranteedLoot": [
+          {
+            "itemId": "weapon_8163",
+            "name": "Silver Bow",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_4104",
+            "name": "Gold Wand",
+            "rarity": "epic",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_13263",
+            "name": "Scale Helmet",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_6969",
+            "name": "Knight's Belt",
+            "rarity": "epic",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_7853",
+            "name": "Royal Chestplate",
+            "rarity": "rare",
+            "guaranteed": true
+          }
+        ],
+        "bonusLoot": [
+          {
+            "itemId": "resource_16164",
+            "name": "Rich Coal Deposit",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8592",
+            "name": "Mithril Greatsword",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3736",
+            "name": "Silver Sword",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3233",
+            "name": "Steel Crossbow",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3839",
+            "name": "Silver Bow",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11261",
+            "name": "Chain Leggings",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3599",
+            "name": "Ancient Shrub",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1617",
+            "name": "Iron Hammer",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1194",
+            "name": "Gold Bow",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_8453",
+            "name": "Royal Belt",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_15920",
+            "name": "Rare Silver Vein",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2793",
+            "name": "Ancient Sword",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3063",
+            "name": "Demon Greatsword",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3809",
+            "name": "Mithril Staff",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_505",
+            "name": "Steel Spear",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14263",
+            "name": "Rare Plant",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10663",
+            "name": "Ancient Rock",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10571",
+            "name": "Rare Coal Deposit",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_9044",
+            "name": "Rich Crystal",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13524",
+            "name": "Abundant Silver Vein",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18928",
+            "name": "Ancient Coal Deposit",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8724",
+            "name": "Ancient Mushroom",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8366",
+            "name": "Rich Crystal",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_13786",
+            "name": "Rare Herb",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4971",
+            "name": "Demon Spear",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ],
+        "uniqueDrops": [
+          {
+            "itemId": "ancient_dragon_unique_1",
+            "name": "Ancient Dragon's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 60,
+            "description": "A legendary item once wielded by Ancient Dragon"
+          },
+          {
+            "itemId": "ancient_dragon_unique_2",
+            "name": "Ancient Dragon's Blade",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 60,
+            "description": "A legendary item once wielded by Ancient Dragon"
+          }
+        ]
+      },
+      "lich_lord": {
+        "type": "boss",
+        "name": "lich_lord",
+        "level": 50,
+        "goldMin": 5000,
+        "goldMax": 25000,
+        "guaranteedDrops": 4,
+        "bonusItems": [
+          6,
+          12
+        ],
+        "guaranteedLoot": [
+          {
+            "itemId": "weapon_11229",
+            "name": "Iron Hammer",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_5822",
+            "name": "Steel Wand",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_3792",
+            "name": "Silver Bow",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_2774",
+            "name": "Ancient Crossbow",
+            "rarity": "rare",
+            "guaranteed": true
+          }
+        ],
+        "bonusLoot": [
+          {
+            "itemId": "furniture_7300",
+            "name": "Mahogany Desk",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_2044",
+            "name": "Common Iron Vein",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18675",
+            "name": "Abundant Shrub",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10087",
+            "name": "Ranger's Belt",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10733",
+            "name": "Leather Belt",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7680",
+            "name": "Abundant Crystal",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6829",
+            "name": "Plate Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1468",
+            "name": "Plate Boots",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7828",
+            "name": "Plate Belt",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2969",
+            "name": "Ancient Bow",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1865",
+            "name": "Abundant Herb",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10901",
+            "name": "Abundant Gold Vein",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4963",
+            "name": "Steel Hammer",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_3182",
+            "name": "Mithril Spear",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_1153",
+            "name": "Rare Bush",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_14543",
+            "name": "Leather Leggings",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_17461",
+            "name": "Magical Herb",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8316",
+            "name": "Mithril Sword",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_11907",
+            "name": "Ranger's Chestplate",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10107",
+            "name": "Mithril Staff",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10658",
+            "name": "Demon Greatsword",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_7519",
+            "name": "Ancient Plant",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_14279",
+            "name": "Common Mushroom",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1932",
+            "name": "Gold Hammer",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_10311",
+            "name": "Knight's Leggings",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ],
+        "uniqueDrops": [
+          {
+            "itemId": "lich_lord_unique_1",
+            "name": "Lich Lord's Armor",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 50,
+            "description": "A legendary item once wielded by Lich Lord"
+          },
+          {
+            "itemId": "lich_lord_unique_2",
+            "name": "Lich Lord's Armor",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 50,
+            "description": "A legendary item once wielded by Lich Lord"
+          },
+          {
+            "itemId": "lich_lord_unique_3",
+            "name": "Lich Lord's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 50,
+            "description": "A legendary item once wielded by Lich Lord"
+          }
+        ]
+      },
+      "demon_overlord": {
+        "type": "boss",
+        "name": "demon_overlord",
+        "level": 70,
+        "goldMin": 7000,
+        "goldMax": 35000,
+        "guaranteedDrops": 6,
+        "bonusItems": [
+          8,
+          20
+        ],
+        "guaranteedLoot": [
+          {
+            "itemId": "armor_4588",
+            "name": "Royal Belt",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_12238",
+            "name": "Leather Boots",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_1811",
+            "name": "Demon Sword",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_7577",
+            "name": "Dragon Dagger",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_6668",
+            "name": "Silver Bow",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_5411",
+            "name": "Mithril Spear",
+            "rarity": "rare",
+            "guaranteed": true
+          }
+        ],
+        "bonusLoot": [
+          {
+            "itemId": "armor_14850",
+            "name": "Leather Boots",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_7245",
+            "name": "Gold Greatsword",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6763",
+            "name": "Steel Bow",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5606",
+            "name": "Rich Shrub",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10100",
+            "name": "Steel Dagger",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_2888",
+            "name": "Rich Silver Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8730",
+            "name": "Common Flower",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18376",
+            "name": "Ancient Plant",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6058",
+            "name": "Ancient Iron Vein",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_5243",
+            "name": "Rich Shrub",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_9269",
+            "name": "Iron Staff",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_18616",
+            "name": "Common Rock",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_604",
+            "name": "Ancient Sword",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_295",
+            "name": "Steel Bow",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_254",
+            "name": "Mithril Bow",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_15091",
+            "name": "Rich Coal Deposit",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_11452",
+            "name": "Rare Flower",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_10483",
+            "name": "Rich Shrub",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_12922",
+            "name": "Ancient Gold Vein",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_3341",
+            "name": "Magical Crystal",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8724",
+            "name": "Ancient Mushroom",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2730",
+            "name": "Plate Gauntlets",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_4909",
+            "name": "Ancient Bush",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_6010",
+            "name": "Magical Coal Deposit",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "resource_8892",
+            "name": "Abundant Mushroom",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ],
+        "uniqueDrops": [
+          {
+            "itemId": "demon_overlord_unique_1",
+            "name": "Demon Overlord's Blade",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 70,
+            "description": "A legendary item once wielded by Demon Overlord"
+          },
+          {
+            "itemId": "demon_overlord_unique_2",
+            "name": "Demon Overlord's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 70,
+            "description": "A legendary item once wielded by Demon Overlord"
+          },
+          {
+            "itemId": "demon_overlord_unique_3",
+            "name": "Demon Overlord's Armor",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 70,
+            "description": "A legendary item once wielded by Demon Overlord"
+          }
+        ]
+      },
+      "world_eater": {
+        "type": "boss",
+        "name": "world_eater",
+        "level": 100,
+        "goldMin": 10000,
+        "goldMax": 50000,
+        "guaranteedDrops": 10,
+        "bonusItems": [
+          15,
+          30
+        ],
+        "guaranteedLoot": [
+          {
+            "itemId": "weapon_2143",
+            "name": "Dragon Mace",
+            "rarity": "epic",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_5260",
+            "name": "Silver Mace",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_106",
+            "name": "Dragon Spear",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_5659",
+            "name": "Leather Helmet",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_3776",
+            "name": "Silver Crossbow",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_8545",
+            "name": "Chain Helmet",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_12798",
+            "name": "Ranger's Chestplate",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_11025",
+            "name": "Mage's Chestplate",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "weapon_1505",
+            "name": "Mithril Dagger",
+            "rarity": "rare",
+            "guaranteed": true
+          },
+          {
+            "itemId": "armor_13309",
+            "name": "Chain Belt",
+            "rarity": "rare",
+            "guaranteed": true
+          }
+        ],
+        "bonusLoot": [
+          {
+            "itemId": "armor_4362",
+            "name": "Chain Leggings",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_1470",
+            "name": "Ranger's Pauldrons",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8424",
+            "name": "Iron Sword",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10486",
+            "name": "Silver Axe",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8275",
+            "name": "Iron Bow",
+            "rarity": "common",
+            "dropChance": 0.2,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11833",
+            "name": "Steel Bow",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_17799",
+            "name": "Plate Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_2907",
+            "name": "Silver Sword",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6822",
+            "name": "Dragon Mace",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_3439",
+            "name": "Royal Pauldrons",
+            "rarity": "uncommon",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8588",
+            "name": "Dragon Dagger",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_7404",
+            "name": "Plate Boots",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_2171",
+            "name": "Scale Belt",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_6734",
+            "name": "Steel Wand",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1878",
+            "name": "Silver Crossbow",
+            "rarity": "rare",
+            "dropChance": 0.3,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1201",
+            "name": "Demon Mace",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_381",
+            "name": "Mithril Dagger",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_11316",
+            "name": "Dragon Bow",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_10936",
+            "name": "Steel Sword",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_5045",
+            "name": "Mithril Hammer",
+            "rarity": "epic",
+            "dropChance": 0.15,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_6117",
+            "name": "Chain Boots",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_8655",
+            "name": "Gold Crossbow",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_4856",
+            "name": "Steel Dagger",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "weapon_1036",
+            "name": "Demon Greatsword",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          },
+          {
+            "itemId": "armor_180",
+            "name": "Plate Pauldrons",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "quantity": 1
+          }
+        ],
+        "uniqueDrops": [
+          {
+            "itemId": "world_eater_unique_1",
+            "name": "World Eater's Amulet",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 100,
+            "description": "A legendary item once wielded by World Eater"
+          },
+          {
+            "itemId": "world_eater_unique_2",
+            "name": "World Eater's Blade",
+            "rarity": "legendary",
+            "dropChance": 0.05,
+            "unique": true,
+            "level": 100,
+            "description": "A legendary item once wielded by World Eater"
+          }
+        ]
+      }
+    },
+    "quests": {
+      "tutorial_quest": {
+        "type": "quest",
+        "name": "tutorial_quest",
+        "level": 1,
+        "goldReward": 50,
+        "experienceReward": 100,
+        "itemRewards": [
+          {
+            "itemId": "decoration_5112",
+            "name": "Lantern",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "resource_16108",
+            "name": "Common Tree",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      },
+      "main_story_1": {
+        "type": "quest",
+        "name": "main_story_1",
+        "level": 5,
+        "goldReward": 250,
+        "experienceReward": 500,
+        "itemRewards": [
+          {
+            "itemId": "armor_12679",
+            "name": "Knight's Helmet",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "weapon_5852",
+            "name": "Silver Axe",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "armor_3456",
+            "name": "Mage's Chestplate",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      },
+      "main_story_2": {
+        "type": "quest",
+        "name": "main_story_2",
+        "level": 15,
+        "goldReward": 750,
+        "experienceReward": 1500,
+        "itemRewards": [
+          {
+            "itemId": "weapon_4295",
+            "name": "Mithril Staff",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "weapon_2659",
+            "name": "Dragon Bow",
+            "rarity": "uncommon",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "armor_13215",
+            "name": "Chain Gauntlets",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "resource_2858",
+            "name": "Rich Silver Vein",
+            "rarity": "uncommon",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      },
+      "side_quest": {
+        "type": "quest",
+        "name": "side_quest",
+        "level": 10,
+        "goldReward": 500,
+        "experienceReward": 1000,
+        "itemRewards": [
+          {
+            "itemId": "resource_9585",
+            "name": "Common Iron Vein",
+            "rarity": "rare",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "weapon_11175",
+            "name": "Ancient Spear",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      },
+      "epic_quest": {
+        "type": "quest",
+        "name": "epic_quest",
+        "level": 30,
+        "goldReward": 1500,
+        "experienceReward": 3000,
+        "itemRewards": [
+          {
+            "itemId": "weapon_3278",
+            "name": "Silver Bow",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "resource_6233",
+            "name": "Common Tree",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "furniture_5106",
+            "name": "Silk Couch",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "furniture_5870",
+            "name": "Ebony Wardrobe",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "furniture_5469",
+            "name": "Velvet Wardrobe",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      },
+      "legendary_quest": {
+        "type": "quest",
+        "name": "legendary_quest",
+        "level": 50,
+        "goldReward": 2500,
+        "experienceReward": 5000,
+        "itemRewards": [
+          {
+            "itemId": "resource_15773",
+            "name": "Common Bush",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "armor_10",
+            "name": "Royal Helmet",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "weapon_924",
+            "name": "Silver Staff",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "weapon_11866",
+            "name": "Ancient Crossbow",
+            "rarity": "rare",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "armor_6568",
+            "name": "Plate Pauldrons",
+            "rarity": "rare",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "furniture_12252",
+            "name": "Velvet Table",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "armor_12986",
+            "name": "Royal Gauntlets",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      },
+      "daily_quest": {
+        "type": "quest",
+        "name": "daily_quest",
+        "level": 20,
+        "goldReward": 1000,
+        "experienceReward": 2000,
+        "itemRewards": [
+          {
+            "itemId": "resource_10336",
+            "name": "Magical Tree",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "resource_4723",
+            "name": "Rare Crystal",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      },
+      "weekly_quest": {
+        "type": "quest",
+        "name": "weekly_quest",
+        "level": 25,
+        "goldReward": 1250,
+        "experienceReward": 2500,
+        "itemRewards": [
+          {
+            "itemId": "resource_13418",
+            "name": "Rich Flower",
+            "rarity": "uncommon",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "vehicle_2669",
+            "name": "Merchant's Airship",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "vehicle_5100",
+            "name": "Swift Carriage",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          },
+          {
+            "itemId": "vehicle_7395",
+            "name": "War Carriage",
+            "rarity": "common",
+            "quantity": 1,
+            "choice": false
+          }
+        ]
+      }
+    }
+  }
+}

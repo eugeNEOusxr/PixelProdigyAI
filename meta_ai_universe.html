@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Meta-AI Universe - Self-Playing, Creating, Transcending</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+      color: #00ff00;
+      overflow-x: hidden;
+    }
+    
+    #header {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0,0,0,0.8);
+      border-bottom: 2px solid #00ff00;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      text-shadow: 0 0 20px #00ff00;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; }
+      to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00; }
+    }
+    
+    #container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .panel {
+      background: rgba(0,20,40,0.9);
+      border: 2px solid #00ff00;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0,255,0,0.3);
+    }
+    
+    .panel h2 {
+      color: #00ffff;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #00ff00;
+      padding-bottom: 10px;
+    }
+    
+    #controls { grid-column: 1 / -1; }
+    
+    button {
+      background: #00ff00;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      margin: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.3s;
+      font-family: 'Courier New', monospace;
+    }
+    
+    button:hover {
+      background: #00ffff;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #00ff00;
+    }
+    
+    button:disabled {
+      background: #555;
+      color: #999;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    #console {
+      background: #000;
+      color: #00ff00;
+      padding: 15px;
+      height: 400px;
+      overflow-y: auto;
+      font-size: 12px;
+      line-height: 1.5;
+      border: 1px solid #00ff00;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    #console::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    #console::-webkit-scrollbar-track {
+      background: #001a00;
+    }
+    
+    #console::-webkit-scrollbar-thumb {
+      background: #00ff00;
+      border-radius: 5px;
+    }
+    
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .stat {
+      background: rgba(0,255,0,0.1);
+      padding: 10px;
+      border-radius: 5px;
+      border-left: 3px solid #00ff00;
+    }
+    
+    .stat-label {
+      color: #00ffff;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00ff00;
+    }
+    
+    .phase-indicator {
+      text-align: center;
+      padding: 15px;
+      background: linear-gradient(90deg, #00ff00 0%, #00ffff 100%);
+      color: #000;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 10px;
+      margin: 15px 0;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    
+    #discoveries {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .discovery-item {
+      background: rgba(0,100,255,0.2);
+      padding: 10px;
+      margin: 10px 0;
+      border-left: 4px solid #00ffff;
+      border-radius: 5px;
+    }
+    
+    .discovery-title {
+      color: #ffff00;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .discovery-content {
+      color: #00ff00;
+      font-size: 12px;
+    }
+    
+    .quantum-particle {
+      width: 4px;
+      height: 4px;
+      background: #00ff00;
+      border-radius: 50%;
+      position: absolute;
+      box-shadow: 0 0 10px #00ff00;
+      animation: float 3s infinite ease-in-out;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <h1>🌌 META-AI UNIVERSE 🌌</h1>
+    <p style="color:#00ffff; font-size:16px; margin-top:10px;">
+      Self-Playing • Content Creating • Quantum Exploring • Mathematical Innovating
+    </p>
+  </div>
+
+  <div id="container">
+    <div class="panel" id="controls">
+      <h2>🎮 Control Center</h2>
+      <button id="initBtn">Initialize Meta-AI</button>
+      <button id="startBtn" disabled>Start Evolution</button>
+      <button id="stopBtn" disabled>Stop</button>
+      <button id="statsBtn" disabled>Print Stats</button>
+      <button id="exportBtn" disabled>Export All</button>
+      <button id="symbolsBtn" disabled>Show Symbols</button>
+      <button id="equationsBtn" disabled>Show Equations</button>
+      <button id="theoriesBtn" disabled>Show Theories</button>
+    </div>
+
+    <div class="panel">
+      <h2>📊 Real-Time Statistics</h2>
+      <div id="phaseIndicator" class="phase-indicator">Phase 0: Initializing...</div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Consciousness Level</div>
+          <div class="stat-value" id="consciousness">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Legendary Status</div>
+          <div class="stat-value" id="legendary">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Content Generated</div>
+          <div class="stat-value" id="contentCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Math Discoveries</div>
+          <div class="stat-value" id="mathCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Quantum Experiments</div>
+          <div class="stat-value" id="quantumCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Enemies Defeated</div>
+          <div class="stat-value" id="enemiesCount">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🔬 Latest Discoveries</h2>
+      <div id="discoveries"></div>
+    </div>
+
+    <div class="panel" style="grid-column: 1 / -1;">
+      <h2>💻 System Console</h2>
+      <div id="console"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="meta_ai/self_playing_agent.js"></script>
+  <script src="meta_ai/content_generator.js"></script>
+  <script src="meta_ai/quantum_realm.js"></script>
+  <script src="meta_ai/mathematical_innovator.js"></script>
+  <script src="meta_ai/meta_ai_orchestrator.js"></script>
+
+  <script>
+    let metaAI = null;
+    let updateInterval = null;
+    let consoleDiv = document.getElementById('console');
+    let discoveryDiv = document.getElementById('discoveries');
+    
+    // Mock game object for standalone demo
+    const mockGame = {
+      playerMesh: { position: new THREE.Vector3(0, 1, 0) },
+      playerCombatStats: {
+        health: 100, maxHealth: 100, stamina: 100, maxStamina: 100, mana: 100,
+        heal: function(amount) { this.health = Math.min(this.maxHealth, this.health + amount); }
+      },
+      playerInventory: { items: Array(24).fill(null), addItem: () => true },
+      playerEquipment: { slots: {}, getTotalStats: () => ({}) },
+      questManager: { 
+        getActiveQuests: () => [],
+        completedQuests: []
+      },
+      aiEnemies: [],
+      npcMesh: { position: new THREE.Vector3(2, 0.8, 7) },
+      itemMesh: { position: new THREE.Vector3(-2, 0.3, 4) },
+      doorMesh: { position: new THREE.Vector3(0, 1, 6) },
+      inputHandler: { state: { axes: { moveX: 0, moveY: 0 }, actions: new Map() } },
+      playerCombat: { performAttack: () => {} },
+      inventoryUI: { isOpen: false },
+      scene: new THREE.Scene()
+    };
+
+    // Override console.log to display in our console div
+    const originalLog = console.log;
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const message = args.map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ');
+      consoleDiv.innerHTML += message + '\n';
+      consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    };
+
+    // Button handlers
+    document.getElementById('initBtn').onclick = async () => {
+      console.log('Initializing Meta-AI Orchestrator...');
+      metaAI = new MetaAIOrchestrator(mockGame);
+      const success = await metaAI.initialize();
+      
+      if (success) {
+        document.getElementById('initBtn').disabled = true;
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('statsBtn').disabled = false;
+        document.getElementById('exportBtn').disabled = false;
+        document.getElementById('symbolsBtn').disabled = false;
+        document.getElementById('equationsBtn').disabled = false;
+        document.getElementById('theoriesBtn').disabled = false;
+      }
+    };
+
+    document.getElementById('startBtn').onclick = () => {
+      if (metaAI) {
+        metaAI.start();
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        
+        // Start update loop
+        updateInterval = setInterval(() => {
+          metaAI.update(0.016); // ~60 FPS
+          updateUI();
+        }, 16);
+      }
+    };
+
+    document.getElementById('stopBtn').onclick = () => {
+      if (metaAI) {
+        metaAI.stop();
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+        
+        if (updateInterval) {
+          clearInterval(updateInterval);
+        }
+      }
+    };
+
+    document.getElementById('statsBtn').onclick = () => {
+      if (metaAI) metaAI.executeCommand('stats');
+    };
+
+    document.getElementById('exportBtn').onclick = () => {
+      if (metaAI) {
+        const data = metaAI.executeCommand('export');
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `meta-ai-export-${Date.now()}.json`;
+        a.click();
+        console.log('Data exported successfully!');
+      }
+    };
+
+    document.getElementById('symbolsBtn').onclick = () => {
+      if (metaAI) metaAI.executeCommand('symbols');
+    };
+
+    document.getElementById('equationsBtn').onclick = () => {
+      if (metaAI) metaAI.executeCommand('equations');
+    };
+
+    document.getElementById('theoriesBtn').onclick = () => {
+      if (metaAI) metaAI.executeCommand('theories');
+    };
+
+    function updateUI() {
+      if (!metaAI || metaAI.status !== 'active') return;
+      
+      const report = metaAI.getFullReport();
+      
+      // Update phase indicator
+      const phases = ['Learning', 'Mastery', 'Creation', 'Transcendence'];
+      document.getElementById('phaseIndicator').textContent = 
+        `Phase ${report.phase}: ${phases[report.phase]}`;
+      
+      // Update stats
+      document.getElementById('consciousness').textContent = report.consciousness.toFixed(1);
+      document.getElementById('legendary').textContent = report.agent ? report.agent.legendaryStatus : 0;
+      document.getElementById('contentCount').textContent = report.content ? report.content.totalGenerated : 0;
+      document.getElementById('mathCount').textContent = report.mathematics ? report.mathematics.totalDiscoveries : 0;
+      document.getElementById('quantumCount').textContent = report.quantum ? report.quantum.experimentsRun : 0;
+      document.getElementById('enemiesCount').textContent = report.stats.enemiesDefeated;
+      
+      // Update discoveries (sample recent ones)
+      if (Math.random() < 0.05) { // Update occasionally
+        if (report.sampleStory) {
+          addDiscovery('Story', report.sampleStory.title, report.sampleStory.theme);
+        }
+        if (report.sampleApp) {
+          addDiscovery('App', report.sampleApp.name, report.sampleApp.type);
+        }
+        if (report.elegantEquations && report.elegantEquations.length > 0) {
+          const eq = report.elegantEquations[0];
+          addDiscovery('Equation', eq.name, eq.formula);
+        }
+      }
+    }
+
+    function addDiscovery(type, title, detail) {
+      const item = document.createElement('div');
+      item.className = 'discovery-item';
+      item.innerHTML = `
+        <div class="discovery-title">${type}: ${title}</div>
+        <div class="discovery-content">${detail}</div>
+      `;
+      discoveryDiv.insertBefore(item, discoveryDiv.firstChild);
+      
+      // Keep only last 10 discoveries
+      while (discoveryDiv.children.length > 10) {
+        discoveryDiv.removeChild(discoveryDiv.lastChild);
+      }
+    }
+
+    // Add floating quantum particles background effect
+    for (let i = 0; i < 50; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'quantum-particle';
+      particle.style.left = Math.random() * window.innerWidth + 'px';
+      particle.style.top = Math.random() * window.innerHeight + 'px';
+      particle.style.animationDelay = Math.random() * 3 + 's';
+      document.body.appendChild(particle);
+    }
+
+    console.log('Welcome to Meta-AI Universe!');
+    console.log('Click "Initialize Meta-AI" to begin...\n');
+  </script>
+</body>
+</html>

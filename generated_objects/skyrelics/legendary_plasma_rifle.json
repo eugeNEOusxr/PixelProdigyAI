@@ -1,0 +1,32 @@
+{
+  "tier": "PRO",
+  "object_id": "legendary_plasma_rifle_x9_001",
+  "name": "X9 Voidreaper Plasma Rifle",
+  "category": "weapon",
+  "sub_category": "energy_weapon",
+  "rarity": "legendary",
+  "price_usd": 49.99,
+  "price_mpt": 25000,
+  "subscription_required": "pro",
+  "gene_code": "RIFLE > body > angular sci-fi forward 95cm polymer black tactical\nRIFLE > barrel > energy-conduit glowing-purple cooling-vents repeat 12\nRIFLE > stock > collapsible shoulder-mount adjustable ergonomic rubberized\nRIFLE > scope > holographic purple-reticle targeting-computer ai-assisted\nRIFLE > magazine > energy-cell glowing-purple 60-shots capacity quick-release\nRIFLE > grip > textured ergonomic trigger-guard safety-integrated ambidextrous\nRIFLE > rail > picatinny top-mounted accessory-ready modular\nRIFLE > lights > tactical repeat 2 strobe-capable high-lumens rail-mounted\nRIFLE > laser > targeting red-dot adjustable zeroing-capability\nRIFLE > particles > muzzle-flash purple-plasma expanding cone-shaped\nRIFLE > particles > charge-up energy-gathering glowing-intensifying\nRIFLE > particles > trail plasma-bolt purple-streak dissipating\nRIFLE > audio > charge-up whine-building pitch-rising tension\nRIFLE > audio > fire plasma-burst explosive crackling energy\nRIFLE > audio > reload click-whir mechanical smooth efficient\nRIFLE > stats > damage 280-340 energy-damage range-200m burst-fire\nRIFLE > stats > fire-rate 600rpm magazine-60 reload-2.5s accurate\nRIFLE > stats > recoil low-moderate controllable stabilized",
+  "vls_code": "RIFLE:A95B30C15.PLASMA-BARREL+VENTS*12.HOLO-SCOPE.PART:FLASH+TRAIL",
+  "polygon_count": 68000,
+  "vertex_count": 78000,
+  "game_stats": {
+    "damage": {
+      "min": 280,
+      "max": 340,
+      "type": "energy"
+    },
+    "fire_rate": 600,
+    "magazine": 60,
+    "reload_time": 2.5,
+    "range": 200,
+    "recoil": 0.3,
+    "fire_modes": [
+      "single",
+      "burst",
+      "auto"
+    ]
+  }
+}

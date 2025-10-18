@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "chunkCount": 16,
+  "loadingStrategy": "distance-based",
+  "priorities": {
+    "camera_focus": 1,
+    "nearby_objects": 0.8,
+    "distant_objects": 0.3,
+    "offscreen": 0.1
+  },
+  "networkBandwidth": {
+    "4G": 26214400,
+    "5G": 104857600,
+    "WiFi": 52428800,
+    "Ethernet": 1048576000
+  },
+  "caching": {
+    "maxCacheSize": 4294967296,
+    "evictionPolicy": "LRU",
+    "preloadDistance": 100
+  }
+}

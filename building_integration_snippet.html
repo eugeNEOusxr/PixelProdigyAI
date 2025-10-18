@@ -1,0 +1,204 @@
+<!-- 
+    BUILDING SYSTEM INTEGRATION FOR PIXELVERSE_COMPLETE.HTML
+    
+    Add this code to your existing pixelverse_complete.html file
+-->
+
+<!-- ========== STEP 1: Add Script Tag (in <head> or before closing </body>) ========== -->
+<script src="building_system_integration.js"></script>
+
+
+<!-- ========== STEP 2: Add to Controls Panel ========== -->
+<!-- Find your #controls div and add this control item: -->
+<div class="control-item">
+    <span class="key">C</span>
+    <span>Building Catalog</span>
+</div>
+
+
+<!-- ========== STEP 3: Initialize Building System ========== -->
+<!-- Add this code AFTER your scene, camera, and renderer are created -->
+<script>
+    // ... your existing THREE.js setup ...
+    
+    // Initialize Building System (add this after scene is ready)
+    if (typeof BuildingSystem !== 'undefined' && scene && camera) {
+        window.buildingSystem = new BuildingSystem(scene, camera);
+        console.log('✅ Building System integrated into PixelVerse');
+    } else {
+        console.warn('⚠️ Building System not available or scene not ready');
+    }
+</script>
+
+
+<!-- ========== OPTIONAL: Add Building Counter to HUD ========== -->
+<!-- Add this to your stats bar or HUD -->
+<div class="stat">
+    <span>🏗️ Buildings:</span>
+    <span class="stat-value" id="building-count">0</span>
+</div>
+
+<!-- Update counter in your game loop or after building placement -->
+<script>
+    function updateBuildingCounter() {
+        if (window.buildingSystem) {
+            const counter = document.getElementById('building-count');
+            if (counter) {
+                counter.textContent = buildingSystem.placedBuildings.length;
+            }
+        }
+    }
+    
+    // Call this in your animation loop or after placing buildings
+    setInterval(updateBuildingCounter, 1000); // Update every second
+</script>
+
+
+<!-- ========== COMPLETE INTEGRATION EXAMPLE ========== -->
+<!--
+    Here's a complete example showing exactly where to add the code:
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PixelVerse Complete - With Buildings</title>
+    
+    <!-- Your existing styles -->
+    <style>
+        /* ... your existing CSS ... */
+    </style>
+</head>
+<body>
+    <!-- Your existing HUD -->
+    <div id="hud">
+        <div id="stats-bar">
+            <div class="stat">
+                <span>❤️ Health:</span>
+                <span class="stat-value" id="health">100</span>
+            </div>
+            <!-- ADD THIS: Building counter -->
+            <div class="stat">
+                <span>🏗️ Buildings:</span>
+                <span class="stat-value" id="building-count">0</span>
+            </div>
+        </div>
+        
+        <div id="controls">
+            <h3>Controls</h3>
+            <!-- Your existing controls -->
+            <div class="control-item">
+                <span class="key">WASD</span>
+                <span>Move</span>
+            </div>
+            <!-- ADD THIS: Building control -->
+            <div class="control-item">
+                <span class="key">C</span>
+                <span>Building Catalog</span>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="canvas3d"></canvas>
+
+    <!-- THREE.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+    
+    <!-- ADD THIS: Building System Integration -->
+    <script src="building_system_integration.js"></script>
+    
+    <!-- Your main game script -->
+    <script>
+        // Your existing game initialization
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), antialias: true });
+        
+        // ... your existing setup code ...
+        
+        // ADD THIS: Initialize Building System
+        window.addEventListener('load', () => {
+            if (typeof BuildingSystem !== 'undefined') {
+                window.buildingSystem = new BuildingSystem(scene, camera);
+                console.log('✅ Building System integrated');
+                
+                // Update building counter
+                setInterval(() => {
+                    if (window.buildingSystem) {
+                        const counter = document.getElementById('building-count');
+                        if (counter) {
+                            counter.textContent = buildingSystem.placedBuildings.length;
+                        }
+                    }
+                }, 1000);
+            }
+        });
+        
+        // Your existing game loop
+        function animate() {
+            requestAnimationFrame(animate);
+            // ... your existing animation code ...
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
+
+
+<!-- ========== TESTING ========== -->
+<!--
+    After integration, test by:
+    1. Open your game in browser
+    2. Press 'C' - catalog should appear
+    3. Click any building - it should place
+    4. Refresh page - building should still be there
+    5. Check console - should see "Building System integrated"
+-->
+
+
+<!-- ========== QUICK FIX FOR COMMON ISSUES ========== -->
+<script>
+    // If buildings don't appear, add this debug code:
+    window.debugBuildingSystem = function() {
+        console.log('Scene:', scene);
+        console.log('Camera:', camera);
+        console.log('Building System:', window.buildingSystem);
+        console.log('Placed Buildings:', window.buildingSystem?.placedBuildings.length);
+        console.log('LocalStorage:', localStorage.getItem('pixelverse_buildings'));
+    };
+    
+    // Run in console: debugBuildingSystem()
+</script>
+
+
+<!-- ========== ADVANCED: Add Keyboard Shortcuts ========== -->
+<script>
+    // Optional: Add more keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (!window.buildingSystem) return;
+        
+        switch(e.code) {
+            case 'KeyC':
+                // Building catalog (already handled by BuildingSystem)
+                break;
+            
+            case 'KeyV':
+                // Quick save
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    window.buildingSystem.saveBuildings();
+                }
+                break;
+            
+            case 'KeyE':
+                // Export to JSON
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    window.buildingSystem.exportToJSON();
+                }
+                break;
+        }
+    });
+</script>

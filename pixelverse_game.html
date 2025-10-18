@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelVerse - 3D Action RPG</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #canvas3d {
+      display: block;
+      width: 100%;
+      height: 100vh;
+    }
+
+    /* UI Container */
+    #ui-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    #ui-overlay > * {
+      pointer-events: auto;
+    }
+
+    /* Top Bar */
+    #top-bar {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 15px 30px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      border: 2px solid rgba(102, 126, 234, 0.5);
+    }
+
+    .stat-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .stat-icon {
+      font-size: 20px;
+    }
+
+    /* Control Panel */
+    #control-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      min-width: 200px;
+      border: 2px solid rgba(102, 126, 234, 0.5);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin: 5px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Camera Mode Badge */
+    #camera-badge {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #00ff00;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 2px solid #00ff00;
+    }
+
+    /* Help Panel */
+    #help-panel {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 300px;
+      border: 2px solid rgba(102, 126, 234, 0.5);
+      color: #fff;
+    }
+
+    #help-panel h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .key-binding {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 12px;
+    }
+
+    .key {
+      background: rgba(102, 126, 234, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Welcome Screen */
+    #welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity 1s ease-out;
+    }
+
+    #welcome-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .logo {
+      font-size: 72px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .tagline {
+      font-size: 24px;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    #start-game-btn {
+      padding: 20px 60px;
+      font-size: 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    #start-game-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .feature-list {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 900px;
+    }
+
+    .feature {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .feature-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .feature-title {
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .feature-desc {
+      color: #888;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Welcome Screen -->
+  <div id="welcome-screen">
+    <div class="logo">🎮 PixelVerse</div>
+    <div class="tagline">A Revolutionary 3D Action RPG Experience</div>
+    <button id="start-game-btn">START ADVENTURE</button>
+    
+    <div class="feature-list">
+      <div class="feature">
+        <div class="feature-icon">⚔️</div>
+        <div class="feature-title">Dynamic Combat</div>
+        <div class="feature-desc">Real-time action combat with combos & abilities</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎒</div>
+        <div class="feature-title">Deep Crafting</div>
+        <div class="feature-desc">Craft items, upgrade gear, gather resources</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌟</div>
+        <div class="feature-title">Skill Progression</div>
+        <div class="feature-desc">Level up, unlock abilities, customize builds</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🗺️</div>
+        <div class="feature-title">AI World Gen</div>
+        <div class="feature-desc">Procedurally generated worlds to explore</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌐</div>
+        <div class="feature-title">Multiplayer</div>
+        <div class="feature-desc">Team up or compete with other players</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">💾</div>
+        <div class="feature-title">Cloud Saves</div>
+        <div class="feature-desc">Your progress saved automatically</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D Canvas -->
+  <canvas id="canvas3d"></canvas>
+
+  <!-- UI Overlay -->
+  <div id="ui-overlay">
+    <!-- Top Bar Stats -->
+    <div id="top-bar">
+      <div class="stat-display">
+        <span class="stat-icon">⭐</span>
+        <span>Level: <span id="level-display">1</span></span>
+      </div>
+      <div class="stat-display">
+        <span class="stat-icon">❤️</span>
+        <span id="health-display">100/100</span>
+      </div>
+      <div class="stat-display">
+        <span class="stat-icon">⚡</span>
+        <span id="stamina-display">100/100</span>
+      </div>
+      <div class="stat-display">
+        <span class="stat-icon">💎</span>
+        <span id="mana-display">100/100</span>
+      </div>
+      <div class="stat-display">
+        <span class="stat-icon">💰</span>
+        <span id="gold-display">0</span>
+      </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div id="control-panel">
+      <button class="btn" id="inventoryBtn">🎒 Inventory (H)</button>
+      <button class="btn" id="craftBtn">🔨 Craft (C)</button>
+      <button class="btn" id="statsBtn">📊 Character (P)</button>
+      <button class="btn" id="worldGenBtn">🌍 World Gen (G)</button>
+      <button class="btn" id="multiplayerBtn">🌐 Multiplayer (M)</button>
+      <button class="btn" id="audioBtn">🎵 Audio (U)</button>
+      <button class="btn" id="mapFogBtn">🌫️ Toggle Fog</button>
+      <button class="btn" id="settingsBtn">⚙️ Settings</button>
+    </div>
+
+    <!-- Camera Mode Badge -->
+    <div id="camera-badge">
+      Camera: <span id="mode-display">Third Person</span>
+    </div>
+
+    <!-- Help Panel -->
+    <div id="help-panel">
+      <h3>⌨️ Controls</h3>
+      <div class="key-binding">
+        <span>Move</span>
+        <span class="key">WASD</span>
+      </div>
+      <div class="key-binding">
+        <span>Look Around</span>
+        <span class="key">Mouse</span>
+      </div>
+      <div class="key-binding">
+        <span>Jump</span>
+        <span class="key">SPACE</span>
+      </div>
+      <div class="key-binding">
+        <span>Attack</span>
+        <span class="key">Left Click</span>
+      </div>
+      <div class="key-binding">
+        <span>Camera Mode</span>
+        <span class="key">V</span>
+      </div>
+      <div class="key-binding">
+        <span>Inventory</span>
+        <span class="key">H</span>
+      </div>
+      <div class="key-binding">
+        <span>Craft</span>
+        <span class="key">C</span>
+      </div>
+      <div class="key-binding">
+        <span>Character</span>
+        <span class="key">P</span>
+      </div>
+      <div class="key-binding">
+        <span>Run Tests</span>
+        <span class="key">F9 / F12</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- THREE.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  
+  <!-- Core Systems -->
+  <script src="world_generation/loading_screen.js"></script>
+  <script src="world_generation/particle_effects.js"></script>
+  <script src="world_generation/minimap.js"></script>
+  <script src="game_mechanics/currency.js"></script>
+  <script src="game_mechanics/skill_tree.js"></script>
+  <script src="game_mechanics/ability_manager.js"></script>
+  
+  <!-- Character & Animation -->
+  <script src="character/character_models.js"></script>
+  <script src="character/animation_system.js"></script>
+  
+  <!-- Inventory & Items -->
+  <script src="game_mechanics/inventory_system.js"></script>
+  <script src="game_mechanics/inventory_ui.js"></script>
+  <script src="game_mechanics/item_database.js"></script>
+  
+  <!-- Combat -->
+  <script src="game_mechanics/combat_system.js"></script>
+  <script src="game_mechanics/combat_ui.js"></script>
+  
+  <!-- AI & Dialogue -->
+  <script src="game_mechanics/ai_system.js"></script>
+  <script src="game_mechanics/dialogue_quest_system.js"></script>
+  
+  <!-- Graphics & Effects -->
+  <script src="graphics/graphics_effects_system.js"></script>
+  
+  <!-- Audio -->
+  <script src="audio/audio_system.js"></script>
+  
+  <!-- Save System -->
+  <script src="game_mechanics/save_system.js"></script>
+  
+  <!-- Input & Camera -->
+  <script src="input/input_handler.js"></script>
+  <script src="camera/camera_controller.js"></script>
+  
+  <!-- Object Interaction -->
+  <script src="game_mechanics/object_interaction.js"></script>
+  
+  <!-- Task 22 Systems -->
+  <script src="task_22_performance_optimizer.js"></script>
+  <script src="task_22_level_progression_system.js"></script>
+  <script src="task_22_crafting_system.js"></script>
+  <script src="task_22_world_generator.js"></script>
+  <script src="task_22_multiplayer_client.js"></script>
+  <script src="task_22_enhanced_audio_controller.js"></script>
+  <script src="task_22_bug_testing_system.js"></script>
+  <script src="task_22_edge_case_handler.js"></script>
+  <script src="task_22_integration_test_suite.js"></script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════
+    // PIXELVERSE GAME - MAIN INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    console.log('🎮 PixelVerse script loaded!');
+    
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('✅ DOM ready, setting up game...');
+      initializeGame();
+    });
+    
+    function initializeGame() {
+      console.log('🎮 Initializing PixelVerse...');
+      
+    let scene, camera, renderer, clock;
+    let playerMesh, groundMesh;
+    let cameraController, inputHandler, animationController;
+    let playerInventory, playerEquipment, inventoryUI;
+    let playerCombatStats, playerCombat, combatUI;
+    let effectsController, audioSystem;
+    let saveManager, miniMap;
+    let abilityManager, skillTree, playerWallet;
+    let loadingScreen, performanceOptimizer, particleEffects;
+    let craftingManager, craftingUI;
+    let levelProgressionController, levelProgressionUI;
+    let aiWorldGenerator, aiWorldGeneratorUI;
+    let multiplayerClient, multiplayerUI;
+    let enhancedAudioController;
+    let bugTestingSystem, edgeCaseHandler, integrationTestSuite;
+    
+    // Start Game Button
+    const startBtn = document.getElementById('start-game-btn');
+    console.log('Start button:', startBtn);
+    if (!startBtn) {
+      console.error('❌ Start button not found!');
+      return;
+    }
+    
+    startBtn.addEventListener('click', () => {
+      console.log('🎮 Start button clicked!');
+      document.getElementById('welcome-screen').classList.add('hidden');
+      setTimeout(initGame, 1000);
+    });
+    
+    async function initGame() {
+      try {
+        console.log('🎮 Starting PixelVerse...');
+        
+        // Loading Screen
+        console.log('Creating loading screen...');
+        loadingScreen = new LoadingScreen();
+        loadingScreen.setProgress(5, 'Initializing 3D engine...');
+        
+        // Scene Setup
+        console.log('Creating scene...');
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xff0000); // BRIGHT RED for testing
+        scene.fog = new THREE.Fog(0x87CEEB, 50, 200);
+        clock = new THREE.Clock();
+        
+        loadingScreen.setProgress(10, 'Setting up renderer...');
+        
+        // Renderer
+        console.log('Creating renderer...');
+        const canvas = document.getElementById('canvas3d');
+        console.log('Canvas element:', canvas);
+        if (!canvas) {
+          throw new Error('Canvas element not found!');
+        }
+        
+        renderer = new THREE.WebGLRenderer({ 
+          canvas: canvas, 
+          antialias: true 
+        });
+        console.log('Renderer created:', renderer);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        console.log('Renderer size set to:', window.innerWidth, 'x', window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        loadingScreen.setProgress(15, 'Creating camera...');
+        
+        // Camera
+        camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.set(0, 5, 10);
+        
+        loadingScreen.setProgress(20, 'Loading graphics systems...');
+        
+        // Graphics & Effects
+        effectsController = new EffectsController(scene, renderer);
+        particleEffects = new ParticleEffects(scene);
+        
+        loadingScreen.setProgress(25, 'Setting up audio...');
+        
+        // Audio System
+        audioSystem = new AudioSystem();
+        await audioSystem.init();
+        enhancedAudioController = new EnhancedAudioController(audioSystem);
+        
+        loadingScreen.setProgress(30, 'Creating world...');
+        
+        // Ground
+        const groundGeo = new THREE.PlaneGeometry(200, 200, 50, 50);
+        const groundMat = new THREE.MeshStandardMaterial({ 
+          color: 0x4a7c59,
+          roughness: 0.8,
+          metalness: 0.2
+        });
+        groundMesh = new THREE.Mesh(groundGeo, groundMat);
+        groundMesh.rotation.x = -Math.PI / 2;
+        groundMesh.receiveShadow = true;
+        scene.add(groundMesh);
+        
+        // Add some terrain variation
+        const vertices = groundMesh.geometry.attributes.position;
+        for (let i = 0; i < vertices.count; i++) {
+          const x = vertices.getX(i);
+          const y = vertices.getY(i);
+          const height = Math.sin(x * 0.1) * Math.cos(y * 0.1) * 2;
+          vertices.setZ(i, height);
+        }
+        groundMesh.geometry.attributes.position.needsUpdate = true;
+        groundMesh.geometry.computeVertexNormals();
+        
+        loadingScreen.setProgress(35, 'Creating character...');
+        
+        // Character
+        playerMesh = CharacterFactory.createStylizedCharacter();
+        playerMesh.position.set(0, 1, 0);
+        playerMesh.castShadow = true;
+        scene.add(playerMesh);
+        
+        // Animation
+        animationController = new AnimationController(playerMesh);
+        animationController.setGroundHeight(0);
+        
+        loadingScreen.setProgress(40, 'Setting up systems...');
+        
+        // Input & Camera Control
+        inputHandler = new InputHandler();
+        cameraController = new CameraController(camera, playerMesh, inputHandler);
+        
+        loadingScreen.setProgress(45, 'Loading inventory...');
+        
+        // Inventory System
+        playerInventory = new Inventory(24);
+        playerEquipment = new Equipment();
+        inventoryUI = new InventoryUI(playerInventory, playerEquipment);
+        
+        // Add starting items
+        playerInventory.addItem(ItemDatabase.createPotion());
+        playerInventory.addItem(ItemDatabase.createPotion());
+        playerInventory.addItem(ItemDatabase.createSword());
+        playerInventory.addItem(ItemDatabase.createShield());
+        
+        loadingScreen.setProgress(50, 'Setting up combat...');
+        
+        // Combat System
+        playerCombatStats = new CombatStats({
+          maxHealth: 100,
+          maxStamina: 100,
+          maxMana: 100,
+          attack: 10,
+          defense: 5,
+          speed: 5
+        });
+        playerCombat = new CombatController(playerMesh, playerCombatStats);
+        combatUI = new CombatUI(playerCombatStats);
+        
+        loadingScreen.setProgress(55, 'Loading abilities...');
+        
+        // Abilities & Skills
+        abilityManager = new AbilityManager(playerMesh);
+        skillTree = new SkillTree();
+        
+        loadingScreen.setProgress(60, 'Setting up progression...');
+        
+        // Level Progression
+        levelProgressionController = new LevelProgressionController();
+        levelProgressionUI = new LevelProgressionUI(levelProgressionController);
+        
+        loadingScreen.setProgress(65, 'Loading crafting...');
+        
+        // Crafting System
+        craftingManager = new CraftingManager(playerInventory);
+        craftingUI = new CraftingUI(craftingManager, playerInventory);
+        
+        loadingScreen.setProgress(70, 'Setting up economy...');
+        
+        // Economy
+        playerWallet = new Currency(100, 0, 0);
+        
+        loadingScreen.setProgress(75, 'Creating world generator...');
+        
+        // AI World Generator
+        aiWorldGenerator = new AIWorldGenerator(scene);
+        aiWorldGeneratorUI = new AIWorldGeneratorUI(aiWorldGenerator);
+        
+        loadingScreen.setProgress(80, 'Setting up multiplayer...');
+        
+        // Multiplayer
+        multiplayerClient = new MultiplayerClient();
+        multiplayerUI = new MultiplayerUI(multiplayerClient);
+        
+        loadingScreen.setProgress(85, 'Loading utilities...');
+        
+        // Save System
+        saveManager = new SaveManager();
+        
+        // Mini-map
+        miniMap = new MiniMap(scene, playerMesh);
+        
+        // Performance Optimizer
+        performanceOptimizer = new PerformanceOptimizer(
+          scene, renderer, particleEffects, effectsController
+        );
+        
+        loadingScreen.setProgress(90, 'Initializing testing systems...');
+        
+        // Testing Systems
+        edgeCaseHandler = new EdgeCaseHandler();
+        bugTestingSystem = new BugTestingSystem({
+          scene, camera, renderer,
+          playerMesh, playerInventory, playerCombatStats,
+          abilityManager, craftingManager,
+          levelProgressionController, aiWorldGenerator,
+          multiplayerClient, saveManager
+        });
+        integrationTestSuite = new IntegrationTestSuite({
+          scene, camera, renderer,
+          playerMesh, playerInventory, playerCombatStats,
+          abilityManager, craftingManager,
+          levelProgressionController, aiWorldGenerator,
+          multiplayerClient, saveManager
+        });
+        
+        loadingScreen.setProgress(95, 'Setting up lighting...');
+        
+        // Lighting
+        const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+        sun.position.set(50, 100, 50);
+        sun.castShadow = true;
+        sun.shadow.mapSize.width = 2048;
+        sun.shadow.mapSize.height = 2048;
+        sun.shadow.camera.near = 0.5;
+        sun.shadow.camera.far = 500;
+        sun.shadow.camera.left = -100;
+        sun.shadow.camera.right = 100;
+        sun.shadow.camera.top = 100;
+        sun.shadow.camera.bottom = -100;
+        scene.add(sun);
+        
+        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambient);
+        
+        // Hemisphere light for outdoor feel
+        const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x4a7c59, 0.6);
+        scene.add(hemiLight);
+        
+        loadingScreen.setProgress(100, 'Starting game...');
+        
+        // Setup UI Event Handlers
+        setupUIHandlers();
+        
+        // Hide loading screen
+        setTimeout(() => {
+          loadingScreen.hide();
+          console.log('🎮 PixelVerse Ready!');
+          
+          // Welcome particle effect
+          if (particleEffects) {
+            particleEffects.levelUpEffect(new THREE.Vector3(0, 2, 0));
+          }
+          
+          // Start game loop
+          animate();
+          
+          console.log('🎮 Game loop started!');
+          console.log('Scene objects:', scene.children.length);
+          console.log('Camera position:', camera.position);
+          console.log('Renderer size:', renderer.getSize(new THREE.Vector2()));
+          
+          // Start auto-save
+          saveManager.startAutoSave(getGameState());
+          
+          // Play ambient music
+          if (audioSystem.initialized) {
+            audioSystem.playAmbient('forest');
+          }
+        }, 500);
+        
+      } catch (error) {
+        console.error('❌ Failed to initialize game:', error);
+        console.error('Error message:', error.message);
+        console.error('Stack:', error.stack);
+        alert(`Failed to start game: ${error.message}\n\nCheck console (F12) for details.`);
+        
+        // Try to hide loading screen on error
+        if (loadingScreen) {
+          setTimeout(() => loadingScreen.hide(), 100);
+        }
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // UI EVENT HANDLERS
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    function setupUIHandlers() {
+      // Inventory
+      document.getElementById('inventoryBtn').onclick = () => {
+        inventoryUI.toggle();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+      
+      // Crafting
+      document.getElementById('craftBtn').onclick = () => {
+        craftingUI.toggle('workbench');
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+      
+      // Character Stats
+      document.getElementById('statsBtn').onclick = () => {
+        levelProgressionUI.toggleCharacterSheet();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+      
+      // World Generator
+      document.getElementById('worldGenBtn').onclick = () => {
+        aiWorldGeneratorUI.toggle();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+      
+      // Multiplayer
+      document.getElementById('multiplayerBtn').onclick = () => {
+        multiplayerUI.toggle();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+      
+      // Audio
+      document.getElementById('audioBtn').onclick = () => {
+        enhancedAudioController.toggle();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+      
+      // Fog Toggle
+      document.getElementById('mapFogBtn').onclick = () => {
+        miniMap.toggleFogOfWar();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+      
+      // Camera Toggle
+      inputHandler.onAction('toggle_camera', () => {
+        cameraController.toggleMode();
+        document.getElementById('mode-display').textContent = cameraController.mode;
+      });
+      
+      // Keyboard shortcuts
+      inputHandler.onAction('inventory', () => inventoryUI.toggle());
+      inputHandler.onAction('craft', () => craftingUI.toggle('workbench'));
+      inputHandler.onAction('character_sheet', () => levelProgressionUI.toggleCharacterSheet());
+      inputHandler.onAction('world_gen', () => aiWorldGeneratorUI.toggle());
+      inputHandler.onAction('multiplayer', () => multiplayerUI.toggle());
+      inputHandler.onAction('audio_controls', () => enhancedAudioController.toggle());
+      
+      // Test shortcuts
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'F9') {
+          e.preventDefault();
+          bugTestingSystem.runAllTests();
+        }
+        if (e.key === 'F12') {
+          e.preventDefault();
+          integrationTestSuite.runAllTests();
+        }
+      });
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // GAME LOOP
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    let frameCount = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = clock.getDelta();
+      
+      // Debug log every 60 frames
+      frameCount++;
+      if (frameCount % 60 === 0) {
+        console.log('Animating... Frame:', frameCount);
+      }
+      
+      // Update systems
+      if (inputHandler) inputHandler.update();
+      if (cameraController) cameraController.update(dt);
+      if (animationController) animationController.update(dt);
+      if (playerCombat) playerCombat.update(dt);
+      if (combatUI) combatUI.update();
+      if (abilityManager) abilityManager.update(dt);
+      if (effectsController) effectsController.update(dt);
+      if (particleEffects) particleEffects.update(dt);
+      if (miniMap) miniMap.update();
+      if (performanceOptimizer) performanceOptimizer.update(dt);
+      if (multiplayerClient && multiplayerClient.connected) {
+        multiplayerClient.sendPlayerUpdate({
+          position: playerMesh.position,
+          rotation: playerMesh.rotation
+        });
+      }
+      
+      // Update UI displays
+      updateUIDisplays();
+      
+      // Render
+      if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+      } else {
+        console.error('Missing renderer, scene, or camera!', { renderer: !!renderer, scene: !!scene, camera: !!camera });
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // UI UPDATES
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    function updateUIDisplays() {
+      if (!levelProgressionController || !playerCombatStats || !playerWallet) return;
+      
+      document.getElementById('level-display').textContent = 
+        levelProgressionController.playerStats.level;
+      
+      document.getElementById('health-display').textContent = 
+        `${Math.round(playerCombatStats.health)}/${playerCombatStats.maxHealth}`;
+      
+      document.getElementById('stamina-display').textContent = 
+        `${Math.round(playerCombatStats.stamina)}/${playerCombatStats.maxStamina}`;
+      
+      document.getElementById('mana-display').textContent = 
+        `${Math.round(playerCombatStats.mana)}/${playerCombatStats.maxMana}`;
+      
+      document.getElementById('gold-display').textContent = 
+        playerWallet.gold;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // GAME STATE
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    function getGameState() {
+      return {
+        player: {
+          position: playerMesh.position.toArray(),
+          rotation: playerMesh.rotation.toArray(),
+          stats: playerCombatStats,
+          inventory: playerInventory,
+          equipment: playerEquipment,
+          wallet: playerWallet,
+          level: levelProgressionController.playerStats
+        },
+        world: {
+          time: clock.getElapsedTime(),
+          weather: 'clear'
+        }
+      };
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // WINDOW RESIZE
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    window.addEventListener('resize', () => {
+      if (!camera || !renderer) return;
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    } // End of initializeGame()
+    
+    console.log('🎮 PixelVerse script loaded - waiting for DOM...');
+  </script>
+
+</body>
+</html>

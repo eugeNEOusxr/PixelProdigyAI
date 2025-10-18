@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "strategy": "memory-aware",
+  "triggers": {
+    "memoryPressure": 0.8,
+    "frameRate": 45,
+    "thermalThrottle": true
+  },
+  "downgradePaths": {
+    "4K": "1080p",
+    "1080p": "720p",
+    "720p": "360p"
+  },
+  "hysteresis": 0.1
+}

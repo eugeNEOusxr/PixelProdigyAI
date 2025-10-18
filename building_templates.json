@@ -1,0 +1,448 @@
+{
+  "buildingLibrary": {
+    "photorealisticModern": {
+      "name": "Modern Academic Building",
+      "type": "photorealistic",
+      "materials": {
+        "darkBrick": {
+          "color": "0x3a3a3a",
+          "roughness": 0.9,
+          "metalness": 0.0,
+          "texture": "procedural_brick"
+        },
+        "stonePanel": {
+          "color": "0xd4c4a8",
+          "roughness": 0.4,
+          "metalness": 0.0,
+          "texture": "procedural_stone"
+        },
+        "curtainGlass": {
+          "color": "0xaaccee",
+          "roughness": 0.1,
+          "metalness": 0.1,
+          "transparent": true,
+          "opacity": 0.3
+        },
+        "darkMetal": {
+          "color": "0x1a1a1a",
+          "roughness": 0.3,
+          "metalness": 0.9
+        }
+      },
+      "dimensions": {
+        "width": 60,
+        "depth": 40,
+        "height": 30,
+        "floors": 3
+      },
+      "features": [
+        "glass_curtain_walls",
+        "structural_pillars",
+        "grand_stairs",
+        "interior_lighting",
+        "architectural_lighting"
+      ],
+      "lighting": {
+        "ambient": {
+          "color": "0x5566aa",
+          "intensity": 0.4
+        },
+        "sun": {
+          "color": "0xffaa77",
+          "intensity": 1.5,
+          "position": [100, 50, 100]
+        },
+        "interior": {
+          "color": "0xffeecc",
+          "intensity": 3.0,
+          "count": 6
+        }
+      }
+    },
+    
+    "marbleArchitectural": {
+      "name": "Marble Building with Black Trim",
+      "type": "architectural_detail",
+      "materials": {
+        "marble": {
+          "color": "0xf5f5f5",
+          "roughness": 0.15,
+          "metalness": 0.2,
+          "texture": "procedural_marble",
+          "clearcoat": 0.8,
+          "clearcoatRoughness": 0.1
+        },
+        "blackTrim": {
+          "color": "0x0a0a0a",
+          "roughness": 0.2,
+          "metalness": 0.3,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05
+        },
+        "reflectiveGlass": {
+          "color": "0xaaddff",
+          "roughness": 0.05,
+          "metalness": 0.1,
+          "transparent": true,
+          "opacity": 0.35
+        }
+      },
+      "dimensions": {
+        "width": 40,
+        "depth": 30,
+        "height": 25,
+        "floors": 3
+      },
+      "features": [
+        "marble_walls",
+        "black_trim_edging",
+        "doorway_with_trim",
+        "window_seals",
+        "gutter_underskirts",
+        "lightning_bolt_roof",
+        "hard_cut_corners"
+      ],
+      "details": {
+        "doorway": {
+          "width": 4,
+          "height": 8,
+          "trimWidth": 0.12
+        },
+        "windows": {
+          "width": 2.5,
+          "height": 3,
+          "perFloor": 5,
+          "sealThickness": 0.08
+        },
+        "gutters": {
+          "depth": 0.3,
+          "height": 0.15,
+          "underskirtHeight": 0.08
+        },
+        "roof": {
+          "overhang": 3.0,
+          "thickness": 0.4,
+          "sections": 3,
+          "pattern": "lightning_bolt",
+          "angles": [
+            "Math.PI / 8",
+            "-Math.PI / 6",
+            "Math.PI / 10"
+          ]
+        }
+      },
+      "lighting": {
+        "ambient": {
+          "color": "0xffffff",
+          "intensity": 0.4
+        },
+        "sun": {
+          "color": "0xffffee",
+          "intensity": 1.2,
+          "position": [50, 80, 50]
+        }
+      }
+    },
+    
+    "gothicCollege": {
+      "name": "Gothic College Building",
+      "type": "historical",
+      "materials": {
+        "stoneWalls": {
+          "color": "0x8b7355",
+          "roughness": 0.9,
+          "metalness": 0.0,
+          "texture": "rough_stone"
+        },
+        "darkStone": {
+          "color": "0x4a4035",
+          "roughness": 0.85,
+          "metalness": 0.0
+        },
+        "stainedGlass": {
+          "color": "0xff6633",
+          "roughness": 0.1,
+          "transparent": true,
+          "opacity": 0.6
+        }
+      },
+      "dimensions": {
+        "width": 35,
+        "depth": 50,
+        "height": 40,
+        "floors": 4
+      },
+      "features": [
+        "arched_windows",
+        "stone_pillars",
+        "peaked_roof",
+        "tower_spires",
+        "stone_carvings"
+      ]
+    },
+    
+    "futuristicGlass": {
+      "name": "Futuristic Glass Dome",
+      "type": "sci_fi",
+      "materials": {
+        "holographicGlass": {
+          "color": "0x00ffff",
+          "roughness": 0.01,
+          "metalness": 0.0,
+          "transparent": true,
+          "opacity": 0.2,
+          "emissive": "0x0088ff",
+          "emissiveIntensity": 0.3
+        },
+        "chromeMetal": {
+          "color": "0xcccccc",
+          "roughness": 0.1,
+          "metalness": 1.0
+        }
+      },
+      "dimensions": {
+        "radius": 30,
+        "height": 35,
+        "segments": 32
+      },
+      "features": [
+        "geodesic_dome",
+        "holographic_panels",
+        "neon_lighting",
+        "floating_platforms"
+      ],
+      "lighting": {
+        "ambient": {
+          "color": "0x0033ff",
+          "intensity": 0.5
+        },
+        "neon": {
+          "colors": ["0x00ffff", "0xff00ff", "0xffff00"],
+          "intensity": 2.0
+        }
+      }
+    },
+    
+    "medievalCastle": {
+      "name": "Medieval Stone Castle",
+      "type": "historical",
+      "materials": {
+        "roughStone": {
+          "color": "0x6b5d52",
+          "roughness": 0.95,
+          "metalness": 0.0,
+          "texture": "stone_blocks"
+        },
+        "woodBeams": {
+          "color": "0x4a3728",
+          "roughness": 0.8,
+          "metalness": 0.0
+        },
+        "torchLight": {
+          "color": "0xff6600",
+          "intensity": 1.5
+        }
+      },
+      "dimensions": {
+        "width": 45,
+        "depth": 45,
+        "height": 35,
+        "towerHeight": 50
+      },
+      "features": [
+        "stone_walls",
+        "battlements",
+        "towers",
+        "drawbridge",
+        "torch_lighting",
+        "arrow_slits"
+      ]
+    },
+    
+    "cyberpunkNightclub": {
+      "name": "Neon Cyberpunk Nightclub",
+      "type": "sci_fi",
+      "materials": {
+        "darkMetal": {
+          "color": "0x1a1a1a",
+          "roughness": 0.4,
+          "metalness": 0.9
+        },
+        "neonPink": {
+          "color": "0xff0099",
+          "emissive": "0xff0099",
+          "emissiveIntensity": 2.0
+        },
+        "neonCyan": {
+          "color": "0x00ffff",
+          "emissive": "0x00ffff",
+          "emissiveIntensity": 2.0
+        },
+        "reflectiveFloor": {
+          "color": "0x000000",
+          "roughness": 0.1,
+          "metalness": 0.9
+        }
+      },
+      "dimensions": {
+        "width": 40,
+        "depth": 50,
+        "height": 20
+      },
+      "features": [
+        "neon_signs",
+        "holographic_displays",
+        "reflective_surfaces",
+        "colored_lighting",
+        "fog_effects"
+      ],
+      "lighting": {
+        "ambient": {
+          "color": "0x110022",
+          "intensity": 0.2
+        },
+        "neon": {
+          "colors": ["0xff0099", "0x00ffff", "0xff00ff"],
+          "intensity": 3.0,
+          "pulsing": true
+        }
+      }
+    },
+    
+    "underwaterFacility": {
+      "name": "Underwater Research Facility",
+      "type": "sci_fi",
+      "materials": {
+        "reinforcedGlass": {
+          "color": "0x88ccff",
+          "roughness": 0.02,
+          "metalness": 0.0,
+          "transparent": true,
+          "opacity": 0.4,
+          "ior": 1.52
+        },
+        "titaniumFrame": {
+          "color": "0x99aabb",
+          "roughness": 0.3,
+          "metalness": 0.95
+        },
+        "waterEffects": {
+          "color": "0x0066aa",
+          "transparent": true,
+          "opacity": 0.8
+        }
+      },
+      "dimensions": {
+        "radius": 25,
+        "height": 15,
+        "tubes": 4
+      },
+      "features": [
+        "glass_tubes",
+        "airlocks",
+        "bubble_effects",
+        "underwater_lighting",
+        "caustic_effects"
+      ],
+      "lighting": {
+        "ambient": {
+          "color": "0x003366",
+          "intensity": 0.3
+        },
+        "interior": {
+          "color": "0xffffff",
+          "intensity": 1.5
+        }
+      }
+    }
+  },
+  
+  "textureGenerators": {
+    "procedural_brick": {
+      "type": "canvas",
+      "size": 512,
+      "brickWidth": 64,
+      "brickHeight": 24,
+      "mortarSize": 2,
+      "colorVariation": 10
+    },
+    "procedural_stone": {
+      "type": "canvas",
+      "size": 512,
+      "speckleCount": 200,
+      "speckleSize": 3
+    },
+    "procedural_marble": {
+      "type": "canvas",
+      "size": 1024,
+      "veinCount": 40,
+      "veinComplexity": 4,
+      "subtleVeins": 60
+    },
+    "rough_stone": {
+      "type": "canvas",
+      "size": 512,
+      "blockSize": 128,
+      "mortarWidth": 4
+    },
+    "stone_blocks": {
+      "type": "canvas",
+      "size": 512,
+      "blockSize": 85,
+      "irregularity": 5
+    }
+  },
+  
+  "placedBuildings": {
+    "example": [
+      {
+        "type": "marbleArchitectural",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "y": 0
+        },
+        "scale": 1.0,
+        "timestamp": "2025-10-16T00:00:00Z"
+      }
+    ]
+  },
+  
+  "buildingPresets": {
+    "campus_layout_1": [
+      {
+        "type": "marbleArchitectural",
+        "position": {"x": 0, "y": 0, "z": 0},
+        "name": "Main Library"
+      },
+      {
+        "type": "photorealisticModern",
+        "position": {"x": 80, "y": 0, "z": 0},
+        "name": "Science Building"
+      },
+      {
+        "type": "gothicCollege",
+        "position": {"x": -80, "y": 0, "z": 0},
+        "name": "Historic Hall"
+      }
+    ],
+    
+    "futuristic_district": [
+      {
+        "type": "futuristicGlass",
+        "position": {"x": 0, "y": 0, "z": 0}
+      },
+      {
+        "type": "cyberpunkNightclub",
+        "position": {"x": 60, "y": 0, "z": 0}
+      },
+      {
+        "type": "underwaterFacility",
+        "position": {"x": -60, "y": -20, "z": 0}
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "enabled": true,
+  "pooling": {
+    "enabled": true,
+    "maxTargets": 16,
+    "reuseStrategy": "size-based"
+  },
+  "targets": {
+    "scene_4k": {
+      "width": 3840,
+      "height": 2160,
+      "format": "RGBA16F",
+      "mipLevels": 1,
+      "samples": 1,
+      "usage": "render_target"
+    },
+    "scene_1080p": {
+      "width": 1920,
+      "height": 1080,
+      "format": "RGBA16F",
+      "mipLevels": 1,
+      "samples": 1,
+      "usage": "render_target"
+    },
+    "scene_720p": {
+      "width": 1280,
+      "height": 720,
+      "format": "RGBA8",
+      "mipLevels": 1,
+      "samples": 1,
+      "usage": "render_target"
+    },
+    "scene_360p": {
+      "width": 640,
+      "height": 360,
+      "format": "RGBA8",
+      "mipLevels": 1,
+      "samples": 1,
+      "usage": "render_target"
+    },
+    "depth": {
+      "width": "adaptive",
+      "height": "adaptive",
+      "format": "DEPTH24_STENCIL8",
+      "mipLevels": 1,
+      "samples": 1,
+      "usage": "depth_stencil"
+    },
+    "shadow_map": {
+      "width": 2048,
+      "height": 2048,
+      "format": "DEPTH32F",
+      "mipLevels": 1,
+      "samples": 1,
+      "usage": "shadow_map"
+    }
+  },
+  "resize": {
+    "automatic": true,
+    "preserveContent": false,
+    "smoothTransition": true
+  }
+}
