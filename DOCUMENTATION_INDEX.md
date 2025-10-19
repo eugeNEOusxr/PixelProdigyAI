@@ -6,6 +6,17 @@
 1. Start here → [VISUAL_FEATURE_MAP.md](VISUAL_FEATURE_MAP.md) - ASCII overview of all features
 2. Then read → [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) - 4-week sprint plan
 
+**For Business/Monetization:**
+1. Strategy → [MONETIZATION_STRATEGY.md](MONETIZATION_STRATEGY.md) - Revenue model & tiers
+2. Legal → [TERMS_OF_SERVICE.md](TERMS_OF_SERVICE.md) - User agreements & IP rights
+3. Roadmap → [BUSINESS_IMPLEMENTATION_CHECKLIST.md](BUSINESS_IMPLEMENTATION_CHECKLIST.md) - 20-week plan
+4. Architecture → [IP_PROTECTION_ARCHITECTURE.md](IP_PROTECTION_ARCHITECTURE.md) - Data & IP security
+
+**For Security:**
+1. Overview → [ANTI_HACK_COMPLETE.md](ANTI_HACK_COMPLETE.md) - 10 layers of protection ⭐ NEW
+2. Details → [SECURITY_ARCHITECTURE.md](SECURITY_ARCHITECTURE.md) - Full documentation
+3. Testing → [security_test.html](security_test.html) - Interactive test suite
+
 **For AI Agent Implementation:**
 1. Read protocol → [AI_COMMAND_PROTOCOL.md](AI_COMMAND_PROTOCOL.md) - Command structure & examples
 2. Follow checklist → [AI_EXECUTION_CHECKLIST.md](AI_EXECUTION_CHECKLIST.md) - Sequential execution guide

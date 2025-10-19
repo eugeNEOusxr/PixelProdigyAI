@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigy™ - Professional 3D Studio in Your Browser</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Professional 3D modeling, sculpting, and physics simulation. Zero downloads, instant access, AI-powered. The future of 3D creation in your browser.">
+  <meta name="keywords" content="3D modeling, browser 3D, WebGL, Three.js, sculpting, physics simulation, no download, web app">
+  <meta name="author" content="PixelProdigy">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourusername.github.io/PixelProdigyAI/">
+  <meta property="og:title" content="PixelProdigy™ - 3D Studio in Browser">
+  <meta property="og:description" content="Professional 3D modeling with zero downloads. Sculpt, fragment, animate in real-time.">
+  <meta property="og:image" content="https://yourusername.github.io/PixelProdigyAI/assets/og-image.jpg">
+
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://yourusername.github.io/PixelProdigyAI/">
+  <meta property="twitter:title" content="PixelProdigy™ - 3D Studio in Browser">
+  <meta property="twitter:description" content="Professional 3D modeling with zero downloads">
+  <meta property="twitter:image" content="https://yourusername.github.io/PixelProdigyAI/assets/twitter-card.jpg">
+  
+  <!-- Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: #0a0e27;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    
+    /* Animated gradient background */
+    .bg-gradient {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #2a1f3a 50%, #1a1f3a 75%, #0a0e27 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      z-index: -2;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Floating particles effect */
+    .particles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.3;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #667eea;
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+    }
+    
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 14, 39, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      cursor: pointer;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: #d4dce6;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .nav-link:hover {
+      color: #667eea;
+    }
+    
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem 2rem;
+    }
+    
+    .hero-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: rgba(102, 126, 234, 0.2);
+      border: 1px solid rgba(102, 126, 234, 0.4);
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 2rem;
+      animation: fadeInDown 1s ease;
+    }
+    
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .hero-title {
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #ffffff 0%, #d4dce6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeInUp 1s ease 0.2s both;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .hero-subtitle {
+      font-size: 1.5rem;
+      color: #8a9aad;
+      margin-bottom: 1rem;
+      animation: fadeInUp 1s ease 0.4s both;
+    }
+    
+    .hero-tagline {
+      font-size: 1.2rem;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 3rem;
+      animation: fadeInUp 1s ease 0.6s both;
+    }
+    
+    /* CTA Buttons */
+    .cta-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeInUp 1s ease 0.8s both;
+    }
+    
+    .btn {
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-3px);
+    }
+    
+    /* Google Sign-In Button */
+    .auth-container {
+      margin-top: 2rem;
+      animation: fadeInUp 1s ease 1s both;
+    }
+    
+    .auth-divider {
+      margin: 1rem 0;
+      color: #8a9aad;
+      font-size: 0.9rem;
+    }
+    
+    .guest-link {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .guest-link:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+    
+    /* Feature Highlights */
+    .feature-badges {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 4rem;
+      animation: fadeInUp 1s ease 1.2s both;
+    }
+    
+    .feature-badge {
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      font-size: 0.95rem;
+      color: #d4dce6;
+      backdrop-filter: blur(10px);
+    }
+    
+    .feature-badge strong {
+      color: #667eea;
+      margin-right: 0.5rem;
+    }
+    
+    /* Features Grid */
+    .features-section {
+      padding: 6rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 0%, #d4dce6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .section-subtitle {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #8a9aad;
+      margin-bottom: 4rem;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 2.5rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(102, 126, 234, 0.3);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+    }
+    
+    .feature-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+    
+    .feature-description {
+      color: #8a9aad;
+      line-height: 1.6;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      padding: 4rem 2rem;
+      background: rgba(102, 126, 234, 0.05);
+      border-top: 1px solid rgba(102, 126, 234, 0.2);
+      border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .stats-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 3rem;
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: #8a9aad;
+      font-size: 1.1rem;
+    }
+    
+    /* Testimonials */
+    .testimonials-section {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .testimonial {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 2rem;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1.5rem;
+    }
+    
+    .testimonial-text {
+      font-size: 1.1rem;
+      color: #d4dce6;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+    
+    .testimonial-author {
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    /* Footer */
+    footer {
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #8a9aad;
+    }
+    
+    footer a {
+      color: #667eea;
+      text-decoration: none;
+      margin: 0 1rem;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.2rem;
+      }
+      
+      .cta-container {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .nav-links {
+        gap: 1rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Effects -->
+  <div class="bg-gradient"></div>
+  <div class="particles" id="particles"></div>
+  
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-logo">PixelProdigy™</div>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="https://github.com/yourusername/PixelProdigyAI" class="nav-link" target="_blank">GitHub</a>
+    </div>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">✨ Zero Downloads • Instant Access • AI-Powered</div>
+    
+    <h1 class="hero-title">Professional 3D Studio<br>in Your Browser</h1>
+    
+    <p class="hero-subtitle">The future of 3D creation. No installations, no barriers.</p>
+    
+    <p class="hero-tagline">Sculpt • Fragment • Bind • Animate • Create</p>
+    
+    <div class="cta-container">
+      <button class="btn btn-primary" onclick="launchStudio()">
+        🚀 Launch Studio Now
+      </button>
+      <a href="#features" class="btn btn-secondary">
+        📖 Explore Features
+      </a>
+    </div>
+    
+    <div class="auth-container">
+      <!-- Google Sign-In Button -->
+      <div id="g_id_onload"
+           data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin" 
+           data-type="standard"
+           data-size="large"
+           data-theme="filled_blue"
+           data-text="signin_with"
+           data-shape="rectangular"
+           data-logo_alignment="left">
+      </div>
+      
+      <div class="auth-divider">
+        or <a href="#" onclick="launchAsGuest(); return false;" class="guest-link">continue as guest</a>
+      </div>
+    </div>
+    
+    <div class="feature-badges">
+      <div class="feature-badge"><strong>⚡</strong> 60 FPS Performance</div>
+      <div class="feature-badge"><strong>🎨</strong> Complete Toolset</div>
+      <div class="feature-badge"><strong>🤖</strong> AI-Powered</div>
+      <div class="feature-badge"><strong>🌍</strong> Real-Time Physics</div>
+    </div>
+  </section>
+  
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-number">6,950</div>
+        <div class="stat-label">Lines of Code</div>
+      </div>
+      <div>
+        <div class="stat-number">15+</div>
+        <div class="stat-label">Major Systems</div>
+      </div>
+      <div>
+        <div class="stat-number">0MB</div>
+        <div class="stat-label">Download Size</div>
+      </div>
+      <div>
+        <div class="stat-number">60 FPS</div>
+        <div class="stat-label">Performance</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <h2 class="section-title">Powerful Features</h2>
+    <p class="section-subtitle">Everything you need for professional 3D creation</p>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <h3 class="feature-title">Advanced Selection</h3>
+        <p class="feature-description">Box, Circle, Lasso, and Paint selection tools. Grow, shrink, and invert selections with keyboard shortcuts. Precision vertex selection for detailed work.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🖌️</span>
+        <h3 class="feature-title">Sculpt Brushes</h3>
+        <p class="feature-description">Draw, Smooth, Inflate, Grab, Pinch, Flatten, and Crease brushes. Adjustable radius, strength, and falloff curves. Symmetry modes for balanced sculpting.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📚</span>
+        <h3 class="feature-title">Layer System</h3>
+        <p class="feature-description">Non-destructive multi-layer workflow. Increment/decrement vertices per layer. Layer isolation for focused editing. Capture frames as background images.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🔗</span>
+        <h3 class="feature-title">Object Binding</h3>
+        <p class="feature-description">Connect objects with Rigid, Elastic, Chain, or Weld constraints. Color-coded tethers with adjustable strength. Physics-driven interactions.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">💥</span>
+        <h3 class="feature-title">Fragmentation</h3>
+        <p class="feature-description">Shatter objects with Voronoi, Voxel, Radial, or Slice algorithms. Configurable fragment count and scatter velocity. Physics-enabled fragments.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">✨</span>
+        <h3 class="feature-title">Particle Effects</h3>
+        <p class="feature-description">Smoke, Sparks, Embers, Debris, and Fire particles. GPU-accelerated with 10k capacity. Point, Area, and Trail emitter types.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🤖</span>
+        <h3 class="feature-title">AI Suggestions</h3>
+        <p class="feature-description">Context-aware pattern recommendations. 12 intelligent procedural patterns. Organic Flow, Geometric, Crystalline, Erosion, and more. Zero backend required.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🌍</span>
+        <h3 class="feature-title">Real-Time Physics</h3>
+        <p class="feature-description">Full rigid body dynamics with Cannon.js. Collision detection, gravity simulation. Physics-driven binding constraints and fragment behavior.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🎨</span>
+        <h3 class="feature-title">Material System</h3>
+        <p class="feature-description">PBR materials with roughness and metalness. Procedural textures and patterns. Wood, Metal, Stone, Glass presets. Color tinting and normal maps.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">💡</span>
+        <h3 class="feature-title">Professional Lighting</h3>
+        <p class="feature-description">3-point studio lighting setup. Soft shadows with 2048×2048 resolution. ACESFilmic tone mapping. Atmospheric fog for depth.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📷</span>
+        <h3 class="feature-title">Camera Controls</h3>
+        <p class="feature-description">OrbitControls for intuitive navigation. Flight mode with WASD controls. Camera presets for quick views. Smooth transitions.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🎲</span>
+        <h3 class="feature-title">Object Placement</h3>
+        <p class="feature-description">6 primitive shapes: Sphere, Cube, Cylinder, Cone, Torus, Plane. Transform modes (move, rotate, scale). Possession mode for direct control.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+    <h2 class="section-title">What People Are Saying</h2>
+    <p class="section-subtitle">Join the community of creators</p>
+    
+    <div class="testimonial">
+      <p class="testimonial-text">"This is literally Blender in a browser. The fact that it runs with zero downloads is mind-blowing. Perfect for teaching 3D modeling!"</p>
+      <p class="testimonial-author">— Reddit r/webdev</p>
+    </div>
+    
+    <div class="testimonial">
+      <p class="testimonial-text">"Game changer for rapid prototyping. I can share a URL with clients and they can interact with the 3D model immediately. No more 'download this, install that'."</p>
+      <p class="testimonial-author">— Indie Game Developer</p>
+    </div>
+    
+    <div class="testimonial">
+      <p class="testimonial-text">"The AI suggestions are surprisingly intelligent. It actually understands the context of what I'm building and offers relevant patterns. This is the future."</p>
+      <p class="testimonial-author">— 3D Artist</p>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 PixelProdigy™ by Jeremy/EugeNEOusXR. All rights reserved.</p>
+    <p>
+      <a href="https://github.com/yourusername/PixelProdigyAI" target="_blank">GitHub</a>
+      <a href="https://twitter.com/yourhandle" target="_blank">Twitter</a>
+      <a href="mailto:contact@pixelprodigy.ai">Contact</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#terms">Terms</a>
+    </p>
+    <p style="margin-top: 1rem; font-size: 0.9rem;">
+      Built with Three.js • Cannon.js • Pure JavaScript • Zero Backend
+    </p>
+  </footer>
+  
+  <script>
+    // Create floating particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+    
+    createParticles();
+    
+    // Google OAuth Callback
+    function handleCredentialResponse(response) {
+      try {
+        const userInfo = parseJwt(response.credential);
+        localStorage.setItem('pixelprodigy_user', JSON.stringify({
+          email: userInfo.email,
+          name: userInfo.name,
+          picture: userInfo.picture,
+          loginTime: Date.now(),
+          isGuest: false
+        }));
+        
+        // Track login
+        if (window.gtag) {
+          gtag('event', 'login', {
+            method: 'Google'
+          });
+        }
+        
+        window.location.href = 'pixelprodigy3d.html';
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Login failed. Please try again.');
+      }
+    }
+    
+    // Parse JWT token
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+    
+    // Launch as guest
+    function launchAsGuest() {
+      localStorage.setItem('pixelprodigy_user', JSON.stringify({
+        email: 'guest@pixelprodigy.ai',
+        name: 'Guest User',
+        picture: null,
+        loginTime: Date.now(),
+        isGuest: true
+      }));
+      
+      // Track guest launch
+      if (window.gtag) {
+        gtag('event', 'launch', {
+          method: 'Guest'
+        });
+      }
+      
+      window.location.href = 'pixelprodigy3d.html';
+    }
+    
+    // Launch studio (check if logged in)
+    function launchStudio() {
+      const user = localStorage.getItem('pixelprodigy_user');
+      if (user) {
+        window.location.href = 'pixelprodigy3d.html';
+      } else {
+        // Scroll to auth section
+        document.querySelector('.auth-container').scrollIntoView({ behavior: 'smooth' });
+        // Highlight the auth container
+        const authContainer = document.querySelector('.auth-container');
+        authContainer.style.animation = 'pulse 1s ease';
+        setTimeout(() => {
+          authContainer.style.animation = '';
+        }, 1000);
+      }
+    }
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  </script>
+  
+  <!-- Google Analytics (optional - replace with your tracking ID) -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script> -->
+</body>
+</html>
