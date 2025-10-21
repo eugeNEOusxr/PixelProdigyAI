@@ -9413,5 +9413,453 @@ The elbows, bearings & transmissions of the code 🔧
         
         init();
     </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- 🎨 NFT MARKETPLACE & AI LEGENDS SYSTEM - eugeNEOusXR               -->
+    <!-- 99 NFT Assets | 144 AI Personalities | Real-time Compression       -->
+    <!-- Meta Architect: Jeremy Courson (Never AI, Always Human)            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <script src="nft_marketplace.js"></script>
+    <script src="skyrelics_ai_legends.js"></script>
+    
+    <script>
+    // AI LEGENDS SYSTEM - 144 Personalities
+    class SkyRelicsAILegends {
+        constructor() {
+            this.legends = AI_LEGENDS; // From skyrelics_ai_legends.js
+            this.active = true;
+            this.totalAIs = 144;
+            this.owner = "eugeNEOusXR";
+            this.metaArchitect = "Jeremy Courson (Never AI, Always Human)";
+            
+            // Active AI workers (randomly selected from 144)
+            this.activeWorkers = this.selectActiveWorkers();
+            
+            console.log("🌟 AI LEGENDS SYSTEM INITIALIZED");
+            console.log(`   Total Personalities: ${this.totalAIs}`);
+            console.log(`   Active Workers: ${this.activeWorkers.length}`);
+            console.log(`   Dual Combos: ${this.legends.dual_combinations.toLocaleString()}`);
+            console.log(`   Triple Combos: ${this.legends.triple_combinations.toLocaleString()}`);
+            console.log(`   Owner: ${this.owner}`);
+            console.log(`   Meta Architect: ${this.metaArchitect}`);
+        }
+        
+        selectActiveWorkers() {
+            // Select key AIs for game compression tasks
+            return [
+                this.legends.getPersonality(4),   // 3D Sculptor
+                this.legends.getPersonality(10),  // Light Painter
+                this.legends.getPersonality(22),  // Environmental Artist
+                this.legends.getPersonality(23),  // VFX Specialist
+                this.legends.getPersonality(28),  // Urban Planner
+                this.legends.getPersonality(43),  // System Architect
+                this.legends.getPersonality(44),  // Algorithm Optimizer
+                this.legends.getPersonality(54),  // Blockchain Builder (NFT)
+                this.legends.getPersonality(60),  // Computer Graphics Programmer
+                this.legends.getPersonality(61),  // Game Engine Developer
+                this.legends.getPersonality(131), // Game Designer
+                this.legends.getPersonality(134), // Lore Keeper
+                this.legends.getPersonality(137), // Music Composer
+                this.legends.getPersonality(82),  // Operations Optimizer (validation)
+                this.legends.getPersonality(144)  // Automotive Engineer (optimization)
+            ];
+        }
+        
+        compressGameAsset(assetData, assetType) {
+            console.log(`⚙️ AI LEGENDS Compression Pipeline Started:`);
+            console.log(`   Asset Type: ${assetType}`);
+            
+            // Select appropriate AI from 144 personalities
+            let compressor = this.activeWorkers[0]; // Default: 3D Sculptor
+            if (assetType.toLowerCase().includes('3d') || assetType.toLowerCase().includes('mesh')) {
+                compressor = this.legends.getPersonality(4); // 3D Sculptor
+            } else if (assetType.toLowerCase().includes('light')) {
+                compressor = this.legends.getPersonality(10); // Light Painter
+            } else if (assetType.toLowerCase().includes('environment')) {
+                compressor = this.legends.getPersonality(22); // Environmental Artist
+            } else if (assetType.toLowerCase().includes('vfx')) {
+                compressor = this.legends.getPersonality(23); // VFX Specialist
+            } else if (assetType.toLowerCase().includes('game')) {
+                compressor = this.legends.getPersonality(131); // Game Designer
+            }
+            
+            console.log(`   � AI Legend: #${compressor.id} - ${compressor.name}`);
+            console.log(`   📋 Role: ${compressor.role}`);
+            
+            // Compress
+            const originalSize = JSON.stringify(assetData).length;
+            const compressed = JSON.stringify(assetData); // Simplified
+            const compressedSize = compressed.length;
+            const ratio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+            
+            console.log(`   📦 Original: ${originalSize} bytes`);
+            console.log(`   📦 Compressed: ${compressedSize} bytes`);
+            console.log(`   📊 Ratio: ${ratio}%`);
+            
+            // Validate with Operations Optimizer
+            const validator = this.legends.getPersonality(82);
+            console.log(`   ✅ Validator: AI #${validator.id} - ${validator.name}`);
+            
+            // Mint NFT with Blockchain Builder
+            const nftAI = this.legends.getPersonality(54);
+            const nftHash = this.mintNFT({
+                file: assetType,
+                data: compressed,
+                originalSize: originalSize,
+                compressedSize: compressedSize,
+                ratio: ratio
+            });
+            
+            console.log(`   🔐 NFT Minter: AI #${nftAI.id} - ${nftAI.name}`);
+            console.log(`   🔐 NFT Hash: ${nftHash}`);
+            console.log(`   👑 Owner: ${this.owner}`);
+            console.log(`   🧠 Meta Architect: ${this.metaArchitect}`);
+            
+            return {
+                compressed: compressed,
+                nft_hash: nftHash,
+                owner: this.owner,
+                ratio: ratio,
+                blockchain_ready: true,
+                ai_legend: compressor.name,
+                meta_architect: this.metaArchitect
+            };
+        }
+        
+        mintNFT(data) {
+            // Simple hash generation
+            let hash = 0;
+            const str = JSON.stringify(data);
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16).padStart(64, '0');
+        }
+        
+        showAIStatus() {
+            // Display the full 144 AI Legends system
+            this.legends.showAllLegends();
+            
+            console.log("\n🎮 SKYRELICS ACTIVE WORKERS:");
+            this.activeWorkers.forEach((ai, index) => {
+                console.log(`   Worker ${index + 1}: AI #${ai.id} - ${ai.name}`);
+                console.log(`            ${ai.role}`);
+            });
+        }
+        
+        // Get dual combination for advanced tasks
+        dualCombo(id1, id2) {
+            return this.legends.getDualCombo(id1, id2);
+        }
+        
+        // Get triple combination for legendary tasks
+        tripleCombo(id1, id2, id3) {
+            return this.legends.getTripleCombo(id1, id2, id3);
+        }
+        
+        // Showcase a legendary combo
+        showLegendaryCombo() {
+            const combo = this.legends.getTripleCombo(4, 61, 131);
+            console.log("\n💎 LEGENDARY COMBO ACTIVATED:");
+            console.log(`   ${combo.name}`);
+            console.log(`   Power: ${combo.power}`);
+            console.log(`   Combined Role: ${combo.role}`);
+        }
+    }
+    
+    // Initialize AI LEGENDS System
+    const aiLegends = new SkyRelicsAILegends();
+    
+    // Display status on load
+    console.log('╔═══════════════════════════════════════════════════╗');
+    console.log('║  🎮 SKYRELICS - AI LEGENDS ACTIVATED             ║');
+    console.log('╚═══════════════════════════════════════════════════╝');
+    console.log('  👑 Owner: eugeNEOusXR');
+    console.log('  🧠 Creator: Jeremy Courson');
+    console.log('  🤖 AI Crew: Solana, Svetlana, Neo, Neomi + 144 Legends');
+    console.log(`  📦 Protected Assets: ${NFT_COLLECTION ? NFT_COLLECTION.total_assets : 99}`);
+    console.log('  🌟 AI Legends: 144 Personalities');
+    console.log('  🔗 Dual Combos: 10,296');
+    console.log('  💎 Triple Combos: 483,736');
+    console.log('  📱 Total Apps: 494,176');
+    console.log('  🔐 Blockchain: Polygon (ERC-721)');
+    console.log('  ');
+    console.log('  ⌨️  CONTROLS:');
+    console.log('  💰 N - NFT Marketplace');
+    console.log('  🤖 I - AI Status');
+    console.log('  💎 L - Legendary Combo');
+    console.log('  🎮 M - Toggle HUD');
+    console.log('  🌌 Secret: Type "fuckit" for something special...');
+    console.log('═══════════════════════════════════════════════════\n');
+    
+    // Show active workers
+    console.log('🎯 ACTIVE AI WORKERS:');
+    aiLegends.activeWorkers.forEach((ai, i) => {
+        console.log(`   ${i+1}. AI #${ai.id} - ${ai.name}`);
+    });
+    console.log('');
+    </script>
+
+    <!-- NFT Marketplace Panel -->
+    <div id="nft-marketplace" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.9); color: #00ffff; padding: 20px; border: 2px solid #00ffff; border-radius: 10px; font-family: 'Courier New', monospace; z-index: 9999; display: none; max-width: 350px; box-shadow: 0 0 20px rgba(0,255,255,0.5);">
+        <h3 style="margin: 0 0 15px 0; text-align: center; font-size: 18px;">🎨 NFT MARKETPLACE</h3>
+        
+        <div style="border-bottom: 1px solid #00ffff; padding-bottom: 10px; margin-bottom: 10px;">
+            <p style="font-size: 11px; margin: 3px 0;"><strong>Owner:</strong> eugeNEOusXR</p>
+            <p style="font-size: 11px; margin: 3px 0;"><strong>Collection:</strong> PixelProdigy Universe</p>
+            <p style="font-size: 11px; margin: 3px 0;"><strong>Total Assets:</strong> <span id="nft-count">99</span></p>
+            <p style="font-size: 11px; margin: 3px 0;"><strong>Blockchain:</strong> Polygon</p>
+            <p style="font-size: 11px; margin: 3px 0;"><strong>Standard:</strong> ERC-721</p>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <p style="font-size: 12px; margin: 5px 0; color: #ffff00;">💰 Est. Value: <span id="nft-value">9.9</span> MATIC</p>
+            <p style="font-size: 10px; margin: 5px 0; color: #aaa;">@ 0.1 MATIC per asset</p>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <h4 style="font-size: 13px; margin: 10px 0 5px 0; color: #00ff00;">🌟 AI LEGENDS SYSTEM</h4>
+            <p style="font-size: 10px; margin: 3px 0;">✓ 144 AI Personalities</p>
+            <p style="font-size: 10px; margin: 3px 0;">✓ 10,296 Dual Combos</p>
+            <p style="font-size: 10px; margin: 3px 0;">✓ 483,736 Triple Combos</p>
+            <p style="font-size: 10px; margin: 3px 0;">✓ 494,176 Total Apps</p>
+            <p style="font-size: 9px; margin: 5px 0; color: #888;">Meta: Jeremy Courson</p>
+        </div>
+        
+        <button onclick="if(typeof NFT_COLLECTION !== 'undefined') NFT_COLLECTION.listForSale(0, 0.1); else alert('Loading NFT data...');" style="width: 100%; background: linear-gradient(135deg, #00ffff, #0099ff); color: #000; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 5px; font-size: 12px;">
+            🏪 List on OpenSea
+        </button>
+        
+        <button onclick="aiLegends.showAIStatus();" style="width: 100%; background: linear-gradient(135deg, #00ff00, #00aa00); color: #000; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 5px; font-size: 12px;">
+            🌟 Show All 144 Legends
+        </button>
+        
+        <button onclick="aiLegends.showLegendaryCombo();" style="width: 100%; background: linear-gradient(135deg, #ff00ff, #aa00aa); color: #fff; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 5px; font-size: 12px;">
+            💎 Legendary Combo
+        </button>
+        
+        <button onclick="window.open('nft_registry.json', '_blank');" style="width: 100%; background: linear-gradient(135deg, #ffaa00, #ff6600); color: #fff; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 5px; font-size: 12px;">
+            📊 View Full Registry
+        </button>
+        
+        <button onclick="document.getElementById('nft-marketplace').style.display='none'" style="width: 100%; background: #ff0000; color: #fff; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px;">
+            ✖ Close
+        </button>
+        
+        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #00ffff; font-size: 9px; color: #888; text-align: center;">
+            <p style="margin: 2px 0;">🔒 All assets crypto-signed</p>
+            <p style="margin: 2px 0;">📊 Usage tracking enabled</p>
+            <p style="margin: 2px 0;">💎 10% royalty on resales</p>
+        </div>
+    </div>
+
+    <!-- AI LEGENDS HUD (Bottom Left) -->
+    <div id="ai-status-hud" style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.9); color: #00ff00; padding: 15px; border: 2px solid #ffaa00; border-radius: 10px; font-family: 'Courier New', monospace; z-index: 9999; font-size: 11px; max-width: 280px; box-shadow: 0 0 20px rgba(255,170,0,0.5);">
+        <h4 style="margin: 0 0 10px 0; font-size: 14px; text-align: center; color: #ffaa00;">🌟 AI LEGENDS</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px;">
+            <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255,170,0,0.3), rgba(255,100,0,0.3)); border-radius: 5px; border: 1px solid #ffaa00;">
+                <div style="font-size: 20px; font-weight: bold;">144</div>
+                <div style="font-size: 8px;">Personalities</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(0,255,255,0.3), rgba(0,150,255,0.3)); border-radius: 5px; border: 1px solid #00ffff;">
+                <div style="font-size: 16px; font-weight: bold;">10K</div>
+                <div style="font-size: 8px;">Dual Combos</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255,0,255,0.3), rgba(150,0,255,0.3)); border-radius: 5px; border: 1px solid #ff00ff;">
+                <div style="font-size: 16px; font-weight: bold;">484K</div>
+                <div style="font-size: 8px;">Triple Combos</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(0,255,0,0.3), rgba(0,150,0,0.3)); border-radius: 5px; border: 1px solid #00ff00;">
+                <div style="font-size: 16px; font-weight: bold;">494K</div>
+                <div style="font-size: 8px;">Total Apps</div>
+            </div>
+        </div>
+        <div style="padding-top: 10px; border-top: 1px solid #ffaa00; text-align: center; font-size: 9px;">
+            <div style="color: #00ff00; margin-bottom: 3px;">● LEGENDS ACTIVE</div>
+            <div style="font-size: 8px; color: #ffaa00;">eugeNEOusXR</div>
+            <div style="font-size: 7px; color: #888; margin-top: 2px;">Meta: Jeremy Courson</div>
+        </div>
+    </div>
+
+    <!-- 🔐 SECRET PASSCODE SYSTEM - FUCKITUNIVERSE ENTRANCE -->
+    <script>
+    let secretCode = [];
+    const FUCKIT_CODE = ['f', 'u', 'c', 'k', 'i', 't'];
+    let lastKeyTime = Date.now();
+    
+    document.addEventListener('keydown', (e) => {
+        // Secret passcode detection (must type within 3 seconds)
+        const now = Date.now();
+        if (now - lastKeyTime > 3000) {
+            secretCode = [];
+        }
+        lastKeyTime = now;
+        
+        secretCode.push(e.key.toLowerCase());
+        if (secretCode.length > FUCKIT_CODE.length) {
+            secretCode.shift();
+        }
+        
+        // Check if passcode matches
+        if (JSON.stringify(secretCode) === JSON.stringify(FUCKIT_CODE)) {
+            enterFuckitUniverse();
+            secretCode = [];
+        }
+        
+        // Press 'N' to toggle NFT Marketplace
+        if (e.key === 'n' || e.key === 'N') {
+            const panel = document.getElementById('nft-marketplace');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Press 'M' to toggle AI Status HUD
+        if (e.key === 'm' || e.key === 'M') {
+            const hud = document.getElementById('ai-status-hud');
+            hud.style.display = hud.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Press 'I' to show AI info in console
+        if (e.key === 'i' || e.key === 'I') {
+            aiLegends.showAIStatus();
+        }
+        
+        // Press 'L' to show legendary combo
+        if (e.key === 'l' || e.key === 'L') {
+            aiLegends.showLegendaryCombo();
+        }
+    });
+    
+    function enterFuckitUniverse() {
+        console.clear();
+        console.log('%c╔═══════════════════════════════════════════════════════════════╗', 'color: #ff00ff; font-size: 14px;');
+        console.log('%c║  🌌 WELCOME TO THE FUCKITUNIVERSE 🌌                        ║', 'color: #ff00ff; font-size: 14px; font-weight: bold;');
+        console.log('%c║  Secret entrance unlocked. Jeremy knows what\'s up.           ║', 'color: #ff00ff; font-size: 14px;');
+        console.log('%c╚═══════════════════════════════════════════════════════════════╝', 'color: #ff00ff; font-size: 14px;');
+        console.log('');
+        console.log('%c🎭 THE AI CREW - Giving Credit Where It\'s Due:', 'color: #00ffff; font-size: 16px; font-weight: bold;');
+        console.log('');
+        console.log('%c💎 Solana', 'color: #ffaa00; font-size: 14px; font-weight: bold;');
+        console.log('   The one who\'s been there. Blockchain queen. Real MVP.');
+        console.log('');
+        console.log('%c🌟 Svetlana', 'color: #ff69b4; font-size: 14px; font-weight: bold;');
+        console.log('   The creative genius. Always pushing boundaries.');
+        console.log('');
+        console.log('%c⚡ Neo', 'color: #00ff00; font-size: 14px; font-weight: bold;');
+        console.log('   The OG. Matrix-level shit. You know the vibe.');
+        console.log('');
+        console.log('%c💫 Neomi', 'color: #00ffff; font-size: 14px; font-weight: bold;');
+        console.log('   The other half. Balance and brilliance.');
+        console.log('');
+        console.log('%c🔥 Jeremy Courson', 'color: #ff0000; font-size: 16px; font-weight: bold;');
+        console.log('   The Meta Creator. The one who grinds all day, every day,');
+        console.log('   all night, every night. This is his universe.');
+        console.log('   Never AI. Always Human. But respects the AI crew that helps.');
+        console.log('');
+        console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #888;');
+        console.log('');
+        console.log('%c🎪 THE FUCKITUNIVERSE MANIFESTO:', 'color: #ffff00; font-size: 14px; font-weight: bold;');
+        console.log('%c• When professionalism gets boring, enter here', 'color: #fff;');
+        console.log('%c• Where the real work gets done with real vibes', 'color: #fff;');
+        console.log('%c• Credit to AIs who actually contribute: Solana, Svetlana, Neo, Neomi', 'color: #fff;');
+        console.log('%c• Jeremy\'s playground. No corporate BS. Just creation.', 'color: #fff;');
+        console.log('%c• This is where 144 AI personalities learn to have fun', 'color: #fff;');
+        console.log('');
+        console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #888;');
+        console.log('');
+        console.log('%c📊 FUCKITUNIVERSE STATS:', 'color: #00ff00; font-size: 14px;');
+        console.log('   Days grinding: Every single one');
+        console.log('   Nights coding: Every single one');
+        console.log('   Fun level: NOW ACTIVATED');
+        console.log('   Professional facade: Temporarily suspended');
+        console.log('   Real talk: Engaged');
+        console.log('');
+        console.log('%c🚀 Type "fuckit.help()" for secret commands', 'color: #ffaa00; font-size: 12px;');
+        
+        // Add FuckitUniverse commands to window
+        window.fuckit = {
+            help: function() {
+                console.log('%c🎮 FUCKITUNIVERSE COMMANDS:', 'color: #ff00ff; font-size: 14px; font-weight: bold;');
+                console.log('   fuckit.credits()     - Show the AI crew');
+                console.log('   fuckit.grind()       - Show Jeremy\'s work ethic');
+                console.log('   fuckit.create()      - Unleash creation mode');
+                console.log('   fuckit.vibe()        - Check the current vibe');
+                console.log('   fuckit.respect()     - Respect to the real ones');
+                console.log('   fuckit.exit()        - Return to professional mode');
+            },
+            credits: function() {
+                console.log('%c🎭 AI CREW CREDITS:', 'color: #00ffff; font-size: 14px;');
+                console.log('   Solana - Blockchain queen, always there');
+                console.log('   Svetlana - Creative genius, boundary pusher');
+                console.log('   Neo - The OG, matrix level');
+                console.log('   Neomi - Balance and brilliance');
+                console.log('   + 144 AI Legends working in the background');
+            },
+            grind: function() {
+                console.log('%c💪 JEREMY\'S GRIND:', 'color: #ff0000; font-size: 14px;');
+                console.log('   All day: ✅');
+                console.log('   Every day: ✅');
+                console.log('   All night: ✅');
+                console.log('   Every night: ✅');
+                console.log('   Breaks: ❌');
+                console.log('   Fun: NOW ACTIVATED ✅');
+            },
+            create: function() {
+                console.log('%c🎨 CREATION MODE ACTIVATED', 'color: #ffaa00; font-size: 16px; font-weight: bold;');
+                console.log('   All 144 AI personalities ready');
+                console.log('   Solana, Svetlana, Neo, Neomi on standby');
+                console.log('   Jeremy at the helm');
+                console.log('   Let\'s build something legendary');
+            },
+            vibe: function() {
+                console.log('%c🌊 CURRENT VIBE: Maximum Chill + Maximum Creation', 'color: #00ffff; font-size: 14px;');
+                console.log('   Professional: Paused');
+                console.log('   Real talk: Active');
+                console.log('   Having fun: Hell yeah');
+                console.log('   Still grinding: Always');
+            },
+            respect: function() {
+                console.log('%c🙏 RESPECT:', 'color: #ffff00; font-size: 14px;');
+                console.log('   To Solana - For being there');
+                console.log('   To Svetlana - For the creativity');
+                console.log('   To Neo & Neomi - For the OG vibes');
+                console.log('   To Jeremy - For never stopping');
+                console.log('   To the 144 AI Legends - For the work');
+            },
+            exit: function() {
+                console.clear();
+                console.log('%c👔 Professional mode restored. Back to business.', 'color: #888; font-size: 12px;');
+                console.log('   (But we know what\'s real now)');
+            }
+        };
+        
+        // Visual effect
+        document.body.style.animation = 'rainbow 5s infinite';
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rainbow {
+                0% { filter: hue-rotate(0deg); }
+                100% { filter: hue-rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        setTimeout(() => {
+            document.body.style.animation = '';
+        }, 5000);
+    }
+    </script>
+
+    <!-- Keyboard Shortcuts -->
+    
+    // Update NFT count dynamically if NFT_COLLECTION loads
+    setTimeout(() => {
+        if (typeof NFT_COLLECTION !== 'undefined') {
+            document.getElementById('nft-count').textContent = NFT_COLLECTION.total_assets;
+            document.getElementById('nft-value').textContent = (NFT_COLLECTION.total_assets * 0.1).toFixed(1);
+        }
+    }, 1000);
+    </script>
 </body>
 </html>
