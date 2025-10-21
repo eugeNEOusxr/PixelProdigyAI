@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PixelProdigy Sculpt</title>
+  <title>PixelProdigy Universe - Multi-Workspace Studio</title>
   <style>
     * {
       margin: 0;
@@ -38,6 +38,35 @@
     #header h1 {
       font-size: 24px;
       font-weight: 600;
+    }
+
+    .workspace-tabs {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .workspace-tab {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: all 0.2s;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .workspace-tab:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .workspace-tab.active {
+      background: #1a1a1a;
+      color: #fff;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
     }
 
     #sidebar {
@@ -178,80 +207,161 @@
 <body>
   <div id="container">
     <div id="header">
-      <h1>⚡ PixelProdigy Sculpt</h1>
-      <div style="flex: 1;"></div>
-      <div style="color: rgba(255,255,255,0.8); font-size: 14px;">3D Sculpting Studio</div>
+      <h1>⚡ PixelProdigy Universe</h1>
+      <div class="workspace-tabs">
+        <button class="workspace-tab active" onclick="switchWorkspace('sculpt', this)">3D Sculpt</button>
+        <button class="workspace-tab" onclick="switchWorkspace('css', this)">CSS Designer</button>
+        <button class="workspace-tab" onclick="switchWorkspace('word', this)">WordWeaver</button>
+        <button class="workspace-tab" onclick="switchWorkspace('campus', this)">Campus</button>
+        <button class="workspace-tab" onclick="switchWorkspace('perfect', this)">Perfect</button>
+      </div>
+      <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Multi-Workspace Studio</div>
     </div>
 
     <div id="sidebar">
-      <div class="section">
-        <div class="section-title">🔧 Mode</div>
-        <div class="tool-grid">
-          <button class="tool-btn active" onclick="setMode('add', this)">
-            <span class="tool-icon">➕</span>
-            <span>Add</span>
-          </button>
-          <button class="tool-btn" onclick="setMode('subtract', this)">
-            <span class="tool-icon">➖</span>
-            <span>Subtract</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">🎨 Primitives</div>
-        <div class="primitive-grid">
-          <button class="tool-btn active" onclick="setPrimitive('sphere', this)">
-            <span class="tool-icon">⚪</span>
-            <span>Sphere</span>
-          </button>
-          <button class="tool-btn" onclick="setPrimitive('cube', this)">
-            <span class="tool-icon">⬛</span>
-            <span>Cube</span>
-          </button>
-          <button class="tool-btn" onclick="setPrimitive('cylinder', this)">
-            <span class="tool-icon">🔵</span>
-            <span>Cylinder</span>
-          </button>
-          <button class="tool-btn" onclick="setPrimitive('cone', this)">
-            <span class="tool-icon">🔻</span>
-            <span>Cone</span>
-          </button>
-          <button class="tool-btn" onclick="setPrimitive('torus', this)">
-            <span class="tool-icon">🍩</span>
-            <span>Torus</span>
-          </button>
-          <button class="tool-btn" onclick="setPrimitive('pyramid', this)">
-            <span class="tool-icon">🔺</span>
-            <span>Pyramid</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">⚙️ Settings</div>
-        <div class="slider-control">
-          <div class="slider-label">
-            <span>Size</span>
-            <span id="sizeValue">0.5</span>
+      <!-- Sculpt Workspace -->
+      <div id="workspace-sculpt" class="workspace-content">
+        <div class="section">
+          <div class="section-title">🔧 Mode</div>
+          <div class="tool-grid">
+            <button class="tool-btn active" onclick="setMode('add', this)">
+              <span class="tool-icon">➕</span>
+              <span>Add</span>
+            </button>
+            <button class="tool-btn" onclick="setMode('subtract', this)">
+              <span class="tool-icon">➖</span>
+              <span>Subtract</span>
+            </button>
           </div>
-          <input type="range" min="0.1" max="2" step="0.1" value="0.5" oninput="updateSize(this.value)">
         </div>
-        <div class="slider-control">
-          <div class="slider-label">
-            <span>Angle</span>
-            <span id="angleValue">0°</span>
+
+        <div class="section">
+          <div class="section-title">🎨 Primitives</div>
+          <div class="primitive-grid">
+            <button class="tool-btn active" onclick="setPrimitive('sphere', this)">
+              <span class="tool-icon">⚪</span>
+              <span>Sphere</span>
+            </button>
+            <button class="tool-btn" onclick="setPrimitive('cube', this)">
+              <span class="tool-icon">⬛</span>
+              <span>Cube</span>
+            </button>
+            <button class="tool-btn" onclick="setPrimitive('cylinder', this)">
+              <span class="tool-icon">🔵</span>
+              <span>Cylinder</span>
+            </button>
+            <button class="tool-btn" onclick="setPrimitive('cone', this)">
+              <span class="tool-icon">🔻</span>
+              <span>Cone</span>
+            </button>
+            <button class="tool-btn" onclick="setPrimitive('torus', this)">
+              <span class="tool-icon">🍩</span>
+              <span>Torus</span>
+            </button>
+            <button class="tool-btn" onclick="setPrimitive('pyramid', this)">
+              <span class="tool-icon">🔺</span>
+              <span>Pyramid</span>
+            </button>
           </div>
-          <input type="range" min="0" max="360" step="15" value="0" oninput="updateAngle(this.value)">
+        </div>
+
+        <div class="section">
+          <div class="section-title">⚙️ Settings</div>
+          <div class="slider-control">
+            <div class="slider-label">
+              <span>Size</span>
+              <span id="sizeValue">0.5</span>
+            </div>
+            <input type="range" min="0.1" max="2" step="0.1" value="0.5" oninput="updateSize(this.value)">
+          </div>
+          <div class="slider-control">
+            <div class="slider-label">
+              <span>Angle</span>
+              <span id="angleValue">0°</span>
+            </div>
+            <input type="range" min="0" max="360" step="15" value="0" oninput="updateAngle(this.value)">
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">🎯 Actions</div>
+          <button class="tool-btn" onclick="clearScene()" style="width: 100%; grid-column: 1 / -1;">
+            <span class="tool-icon">🗑️</span>
+            <span>Clear All</span>
+          </button>
         </div>
       </div>
 
-      <div class="section">
-        <div class="section-title">🎯 Actions</div>
-        <button class="tool-btn" onclick="clearScene()" style="width: 100%; grid-column: 1 / -1;">
-          <span class="tool-icon">🗑️</span>
-          <span>Clear All</span>
-        </button>
+      <!-- CSS Designer Workspace -->
+      <div id="workspace-css" class="workspace-content" style="display: none;">
+        <div class="section">
+          <div class="section-title">💅 CSS Tools</div>
+          <div class="tool-grid">
+            <button class="tool-btn" onclick="alert('Gradient generator coming soon!')">
+              <span class="tool-icon">🌈</span>
+              <span>Gradient</span>
+            </button>
+            <button class="tool-btn" onclick="alert('Shadow generator coming soon!')">
+              <span class="tool-icon">🌫️</span>
+              <span>Shadow</span>
+            </button>
+            <button class="tool-btn" onclick="alert('Border designer coming soon!')">
+              <span class="tool-icon">🔲</span>
+              <span>Border</span>
+            </button>
+            <button class="tool-btn" onclick="alert('Animation builder coming soon!')">
+              <span class="tool-icon">🎬</span>
+              <span>Animate</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- WordWeaver Workspace -->
+      <div id="workspace-word" class="workspace-content" style="display: none;">
+        <div class="section">
+          <div class="section-title">📝 Writing Tools</div>
+          <div class="tool-grid">
+            <button class="tool-btn" onclick="alert('Text editor coming soon!')">
+              <span class="tool-icon">✍️</span>
+              <span>Editor</span>
+            </button>
+            <button class="tool-btn" onclick="alert('Templates coming soon!')">
+              <span class="tool-icon">📄</span>
+              <span>Templates</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campus Workspace -->
+      <div id="workspace-campus" class="workspace-content" style="display: none;">
+        <div class="section">
+          <div class="section-title">🏫 Campus Tools</div>
+          <div class="tool-grid">
+            <button class="tool-btn" onclick="alert('Building designer coming soon!')">
+              <span class="tool-icon">🏢</span>
+              <span>Buildings</span>
+            </button>
+            <button class="tool-btn" onclick="alert('Layout planner coming soon!')">
+              <span class="tool-icon">🗺️</span>
+              <span>Layout</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Perfect Workspace -->
+      <div id="workspace-perfect" class="workspace-content" style="display: none;">
+        <div class="section">
+          <div class="section-title">✨ Perfect Tools</div>
+          <div class="tool-grid">
+            <button class="tool-btn" onclick="alert('Perfect system coming soon!')">
+              <span class="tool-icon">⭐</span>
+              <span>Optimize</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -261,7 +371,7 @@
     </div>
 
     <div id="footer">
-      <div>Mode: <strong id="modeDisplay">ADD</strong> | Primitive: <strong id="primitiveDisplay">SPHERE</strong></div>
+      <div>Workspace: <strong id="workspaceDisplay">3D SCULPT</strong> | Mode: <strong id="modeDisplay">ADD</strong> | Primitive: <strong id="primitiveDisplay">SPHERE</strong></div>
       <div>Click viewport to place objects | Drag to rotate view</div>
       <div>Objects: <strong id="objectCount">0</strong></div>
     </div>
@@ -459,6 +569,35 @@
         objects = [];
         updateObjectCount();
       }
+    }
+
+    function switchWorkspace(workspace, btn) {
+      // Update tab UI
+      document.querySelectorAll('.workspace-tab').forEach(tab => tab.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Hide all workspace content
+      document.querySelectorAll('.workspace-content').forEach(content => {
+        content.style.display = 'none';
+      });
+
+      // Show selected workspace
+      const workspaceElement = document.getElementById(`workspace-${workspace}`);
+      if (workspaceElement) {
+        workspaceElement.style.display = 'block';
+      }
+
+      // Update display
+      const workspaceNames = {
+        'sculpt': '3D SCULPT',
+        'css': 'CSS DESIGNER',
+        'word': 'WORDWEAVER',
+        'campus': 'CAMPUS',
+        'perfect': 'PERFECT'
+      };
+      document.getElementById('workspaceDisplay').textContent = workspaceNames[workspace] || workspace.toUpperCase();
+      
+      console.log('Switched to:', workspace);
     }
 
     function updateObjectCount() {
