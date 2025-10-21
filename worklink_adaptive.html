@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkLink - Adaptive Creation Flow</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* FLOW INDICATOR - Shows what you're building */
+    #flowIndicator {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    #flowIndicator.pulse {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+    }
+
+    /* ADAPTIVE SIDEBAR - Changes based on flow */
+    #adaptiveSidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: #1a1a1a;
+      border-right: 2px solid #333;
+      padding: 80px 20px 20px 20px;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+
+    .flow-section {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: rgba(102, 126, 234, 0.05);
+      border-left: 3px solid #667eea;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .flow-section.active {
+      background: rgba(102, 126, 234, 0.15);
+      border-left-color: #00ff88;
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+    }
+
+    .flow-section.suggested {
+      background: rgba(255, 200, 0, 0.1);
+      border-left-color: #ffc800;
+    }
+
+    .flow-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .flow-section.active .flow-title {
+      color: #00ff88;
+    }
+
+    .flow-tools {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .flow-tool {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-tool:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+      transform: translateX(4px);
+    }
+
+    .flow-tool.hot {
+      background: rgba(255, 100, 100, 0.2);
+      border-color: #ff6464;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(255, 100, 100, 0.3); }
+      50% { box-shadow: 0 0 15px rgba(255, 100, 100, 0.6); }
+    }
+
+    /* LINK VISUALIZER - Shows connections between tools */
+    #linkVisualizer {
+      position: fixed;
+      bottom: 20px;
+      left: 300px;
+      right: 20px;
+      height: 100px;
+      background: rgba(26, 26, 26, 0.8);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .link-chain {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      overflow-x: auto;
+    }
+
+    .link-node {
+      min-width: 80px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .link-node.current {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .link-arrow {
+      color: #667eea;
+      font-size: 20px;
+    }
+
+    /* MAIN VIEWPORT */
+    #viewport {
+      position: fixed;
+      left: 280px;
+      top: 0;
+      right: 0;
+      bottom: 140px;
+      background: #0f0f0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* AI PREDICTION BOX */
+    #aiPrediction {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      width: 280px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      padding: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    #aiPrediction h3 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #667eea;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prediction-item {
+      background: rgba(102, 126, 234, 0.1);
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      border-left: 3px solid #ffc800;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .prediction-item:hover {
+      background: rgba(102, 126, 234, 0.2);
+      transform: translateX(4px);
+    }
+
+    .confidence {
+      display: inline-block;
+      background: #ffc800;
+      color: #000;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    /* HISTORY TIMELINE */
+    #historyTimeline {
+      position: fixed;
+      top: 80px;
+      left: 300px;
+      width: 200px;
+      background: rgba(26, 26, 26, 0.9);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    #historyTimeline h4 {
+      font-size: 12px;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .history-item {
+      font-size: 11px;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 4px;
+      border-radius: 4px;
+      border-left: 2px solid #667eea;
+    }
+
+    .history-time {
+      color: #888;
+      font-size: 10px;
+    }
+
+    /* QUICK ACTION BUTTONS */
+    .quick-actions {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quick-btn {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .quick-btn:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    /* ADAPTIVE TOOLTIP */
+    .adaptive-tooltip {
+      position: fixed;
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 2000;
+      border: 1px solid #667eea;
+    }
+  </style>
+</head>
+<body>
+  <!-- Flow Indicator -->
+  <div id="flowIndicator" class="pulse">
+    🎨 Starting creative flow...
+  </div>
+
+  <!-- Adaptive Sidebar -->
+  <div id="adaptiveSidebar">
+    <div class="flow-section active">
+      <div class="flow-title">🔥 Current Flow</div>
+      <div class="flow-tools">
+        <div class="flow-tool" onclick="startFlow('3d-sculpt')">
+          <span>🎨</span>
+          <span>3D Sculpting</span>
+        </div>
+        <div class="flow-tool" onclick="startFlow('gene-create')">
+          <span>🧬</span>
+          <span>GENE Creator</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section suggested">
+      <div class="flow-title">💡 Suggested Next</div>
+      <div class="flow-tools">
+        <div class="flow-tool hot" onclick="startFlow('marketplace')">
+          <span>🛒</span>
+          <span>Load Marketplace</span>
+        </div>
+        <div class="flow-tool" onclick="startFlow('css-style')">
+          <span>🎨</span>
+          <span>Style with CSS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="flow-title">📊 Analytics</div>
+      <div class="flow-tools">
+        <div class="flow-tool" onclick="showAnalytics()">
+          <span>📈</span>
+          <span>Pattern Analysis</span>
+        </div>
+        <div class="flow-tool" onclick="showHistory()">
+          <span>🕒</span>
+          <span>Session History</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="flow-title">🔗 WorkLinks</div>
+      <div class="flow-tools">
+        <div class="flow-tool" onclick="createLink()">
+          <span>➕</span>
+          <span>Create Link</span>
+        </div>
+        <div class="flow-tool" onclick="manageLinks()">
+          <span>⚙️</span>
+          <span>Manage Links</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Viewport -->
+  <div id="viewport">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Link Visualizer -->
+  <div id="linkVisualizer">
+    <div class="link-chain" id="linkChain">
+      <div class="link-node current">
+        <div>🎨</div>
+        <div>Start</div>
+      </div>
+      <div class="link-arrow">→</div>
+      <div class="link-node">
+        <div>🧬</div>
+        <div>GENE</div>
+      </div>
+      <div class="link-arrow">→</div>
+      <div class="link-node">
+        <div>🛒</div>
+        <div>Market</div>
+      </div>
+      <div class="link-arrow">→</div>
+      <div class="link-node">
+        <div>🚀</div>
+        <div>Deploy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Prediction Box -->
+  <div id="aiPrediction">
+    <h3>🤖 Next Steps</h3>
+    <div class="prediction-item" onclick="loadGeneObjects()">
+      Load 10K GENE objects <span class="confidence">95%</span>
+    </div>
+    <div class="prediction-item" onclick="openMarketplace()">
+      Create marketplace browser <span class="confidence">89%</span>
+    </div>
+    <div class="prediction-item" onclick="styleInterface()">
+      Style interface with CSS <span class="confidence">72%</span>
+    </div>
+  </div>
+
+  <!-- History Timeline -->
+  <div id="historyTimeline">
+    <h4>📜 Recent Actions</h4>
+    <div class="history-item">
+      Opened WorkLink <span class="history-time">Just now</span>
+    </div>
+    <div class="history-item">
+      Created pixelprodigy3d.html <span class="history-time">2 min ago</span>
+    </div>
+    <div class="history-item">
+      Generated 10K objects <span class="history-time">5 min ago</span>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <button class="quick-btn" onclick="quickSave()" title="Quick Save">💾</button>
+    <button class="quick-btn" onclick="quickExport()" title="Export">📤</button>
+    <button class="quick-btn" onclick="quickPreview()" title="Preview">👁️</button>
+  </div>
+
+  <!-- Adaptive Tooltip -->
+  <div class="adaptive-tooltip" id="tooltip"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // =============================================
+    // WORKLINK ADAPTIVE SYSTEM
+    // =============================================
+
+    let scene, camera, renderer;
+    let currentFlow = 'start';
+    let flowHistory = [];
+    let actionPatterns = {};
+
+    // Initialize Three.js Scene
+    function initScene() {
+      const canvas = document.getElementById('canvas');
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a0a);
+      scene.fog = new THREE.Fog(0x0a0a0a, 10, 50);
+
+      camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+      camera.position.set(5, 5, 5);
+      camera.lookAt(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      renderer.shadowMap.enabled = true;
+
+      // Lighting
+      const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambient);
+
+      const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+      directional.position.set(10, 10, 5);
+      directional.castShadow = true;
+      scene.add(directional);
+
+      const point = new THREE.PointLight(0x667eea, 1, 50);
+      point.position.set(0, 5, 0);
+      scene.add(point);
+
+      // Ground
+      const groundGeo = new THREE.PlaneGeometry(50, 50);
+      const groundMat = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a1a,
+        roughness: 0.9 
+      });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // Grid
+      const grid = new THREE.GridHelper(50, 50, 0x667eea, 0x333333);
+      scene.add(grid);
+
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    // =============================================
+    // FLOW DETECTION & ADAPTATION
+    // =============================================
+
+    function startFlow(flowType) {
+      currentFlow = flowType;
+      flowHistory.push({ type: flowType, timestamp: Date.now() });
+      
+      updateFlowIndicator(flowType);
+      updateSidebar(flowType);
+      updateLinkChain(flowType);
+      predictNextSteps(flowType);
+      
+      trackPattern(flowType);
+    }
+
+    function updateFlowIndicator(flowType) {
+      const indicator = document.getElementById('flowIndicator');
+      const flowNames = {
+        'start': '🎨 Starting creative flow...',
+        '3d-sculpt': '🎨 3D Sculpting Mode',
+        'gene-create': '🧬 GENE Creation Mode',
+        'marketplace': '🛒 Marketplace Browsing',
+        'css-style': '🎨 CSS Styling Mode'
+      };
+      indicator.textContent = flowNames[flowType] || flowType;
+      indicator.classList.add('pulse');
+      setTimeout(() => indicator.classList.remove('pulse'), 1000);
+    }
+
+    function updateSidebar(flowType) {
+      // Highlight relevant section
+      document.querySelectorAll('.flow-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      // Activate based on flow
+      if (flowType === '3d-sculpt' || flowType === 'gene-create') {
+        document.querySelectorAll('.flow-section')[0].classList.add('active');
+      }
+    }
+
+    function updateLinkChain(flowType) {
+      const nodes = document.querySelectorAll('.link-node');
+      nodes.forEach(node => node.classList.remove('current'));
+      
+      // Map flow to node
+      const flowIndex = {
+        'start': 0,
+        '3d-sculpt': 0,
+        'gene-create': 1,
+        'marketplace': 2
+      };
+      
+      if (flowIndex[flowType] !== undefined) {
+        nodes[flowIndex[flowType]].classList.add('current');
+      }
+    }
+
+    function predictNextSteps(flowType) {
+      // AI prediction based on current flow
+      const predictions = {
+        'start': [
+          { action: 'Load 10K GENE objects', confidence: 95 },
+          { action: 'Create marketplace browser', confidence: 89 },
+          { action: 'Start 3D sculpting', confidence: 78 }
+        ],
+        '3d-sculpt': [
+          { action: 'Export to GENE format', confidence: 92 },
+          { action: 'Load existing GENE', confidence: 85 },
+          { action: 'Switch to CSS styling', confidence: 70 }
+        ],
+        'gene-create': [
+          { action: 'Add to marketplace', confidence: 94 },
+          { action: 'Test in viewer', confidence: 88 },
+          { action: 'Export to file', confidence: 75 }
+        ]
+      };
+      
+      // Update AI prediction box
+      const predBox = document.getElementById('aiPrediction');
+      const preds = predictions[flowType] || predictions['start'];
+      
+      predBox.innerHTML = '<h3>🤖 Next Steps</h3>';
+      preds.forEach(pred => {
+        const div = document.createElement('div');
+        div.className = 'prediction-item';
+        div.innerHTML = `${pred.action} <span class="confidence">${pred.confidence}%</span>`;
+        div.onclick = () => executePrediction(pred.action);
+        predBox.appendChild(div);
+      });
+    }
+
+    function trackPattern(flowType) {
+      // Track user patterns
+      if (!actionPatterns[flowType]) {
+        actionPatterns[flowType] = 0;
+      }
+      actionPatterns[flowType]++;
+      
+      // Update history
+      const historyDiv = document.getElementById('historyTimeline');
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString();
+      
+      const historyItem = document.createElement('div');
+      historyItem.className = 'history-item';
+      historyItem.innerHTML = `${flowType} <span class="history-time">${timeStr}</span>`;
+      historyDiv.insertBefore(historyItem, historyDiv.children[1]);
+      
+      // Keep only last 10
+      while (historyDiv.children.length > 11) {
+        historyDiv.removeChild(historyDiv.lastChild);
+      }
+    }
+
+    // =============================================
+    // WORKLINK ACTIONS
+    // =============================================
+
+    function loadGeneObjects() {
+      startFlow('gene-create');
+      alert('Loading 10,000 GENE objects from /generated_objects/...');
+      // TODO: Implement GENE loader
+    }
+
+    function openMarketplace() {
+      startFlow('marketplace');
+      alert('Opening marketplace browser...');
+      // TODO: Integrate marketplace
+    }
+
+    function styleInterface() {
+      startFlow('css-style');
+      alert('Opening CSS Designer...');
+      // TODO: Open CSS workspace
+    }
+
+    function showAnalytics() {
+      let report = 'Pattern Analysis:\n\n';
+      for (let pattern in actionPatterns) {
+        report += `${pattern}: ${actionPatterns[pattern]} times\n`;
+      }
+      alert(report);
+    }
+
+    function showHistory() {
+      let report = 'Session History:\n\n';
+      flowHistory.slice(-10).forEach(item => {
+        const time = new Date(item.timestamp).toLocaleTimeString();
+        report += `${time} - ${item.type}\n`;
+      });
+      alert(report);
+    }
+
+    function createLink() {
+      alert('Create WorkLink: Connect two tools together\n\nExample: 3D Sculpt → GENE Export → Marketplace');
+    }
+
+    function manageLinks() {
+      alert('Manage WorkLinks: View and edit your tool connections');
+    }
+
+    function executePrediction(action) {
+      alert(`Executing: ${action}`);
+      // TODO: Route to correct function
+    }
+
+    function quickSave() {
+      alert('💾 Quick Save: Saving current state...');
+    }
+
+    function quickExport() {
+      alert('📤 Quick Export: Exporting to GENE format...');
+    }
+
+    function quickPreview() {
+      alert('👁️ Quick Preview: Opening preview window...');
+    }
+
+    // =============================================
+    // INITIALIZATION
+    // =============================================
+
+    window.addEventListener('load', () => {
+      initScene();
+      startFlow('start');
+      
+      // Simulate pattern detection
+      setTimeout(() => {
+        document.querySelector('.flow-tool.hot').style.animation = 'glow 1s ease-in-out infinite';
+      }, 2000);
+    });
+
+    // Responsive canvas
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('canvas');
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    });
+
+    // Adaptive tooltips
+    document.querySelectorAll('.flow-tool, .quick-btn').forEach(el => {
+      el.addEventListener('mouseenter', (e) => {
+        const tooltip = document.getElementById('tooltip');
+        tooltip.textContent = e.target.getAttribute('title') || e.target.textContent;
+        tooltip.style.opacity = '1';
+        tooltip.style.left = e.pageX + 'px';
+        tooltip.style.top = (e.pageY - 40) + 'px';
+      });
+      
+      el.addEventListener('mouseleave', () => {
+        document.getElementById('tooltip').style.opacity = '0';
+      });
+    });
+  </script>
+</body>
+</html>
