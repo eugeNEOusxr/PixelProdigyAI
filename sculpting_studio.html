@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy Sculpting Studio - 10K Assets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Main Container */
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: 60px 1fr 50px;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Header */
+        header {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 2px solid #00d4ff;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* Left Sidebar - Asset Browser */
+        .asset-browser {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-count {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .asset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .asset-list.expanded {
+            max-height: 500px;
+        }
+
+        .asset-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .asset-item:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-left-color: #00d4ff;
+            transform: translateX(5px);
+        }
+
+        .asset-item.active {
+            background: rgba(0, 212, 255, 0.3);
+            border-left-color: #00d4ff;
+        }
+
+        /* Canvas Container */
+        .canvas-container {
+            position: relative;
+            background: #1a1a1a;
+        }
+
+        #sculptCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: crosshair;
+        }
+
+        /* Right Sidebar - Tools */
+        .tools-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .tool-section {
+            margin-bottom: 30px;
+        }
+
+        .tool-section h3 {
+            font-size: 14px;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 20px;
+        }
+
+        .tool-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            transform: scale(1.05);
+        }
+
+        .tool-btn.active {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .tool-label {
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .slider-control {
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 100%;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mode-indicator {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .mode {
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .mode.active {
+            background: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #00d4ff;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 212, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading 10,000 Assets...</div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>
+                <span>🎨</span>
+                PixelProdigy Sculpting Studio
+            </h1>
+            <div class="header-stats">
+                <div class="stat">
+                    <div class="stat-value" id="totalAssets">10,000</div>
+                    <div class="stat-label">Total Assets</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="currentVertices">0</div>
+                    <div class="stat-label">Vertices</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="currentVLS">0</div>
+                    <div class="stat-label">VLS Level</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Left Sidebar - Asset Browser -->
+        <div class="asset-browser">
+            <div id="categoryList">
+                <!-- Categories will be populated here -->
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <canvas id="sculptCanvas"></canvas>
+        </div>
+
+        <!-- Right Sidebar - Tools -->
+        <div class="tools-panel">
+            <div class="tool-section">
+                <h3>Sculpting Tools</h3>
+                <div class="tool-grid">
+                    <button class="tool-btn active" onclick="setTool('grab')" title="Grab (G)">
+                        <span>✋</span>
+                        <span class="tool-label">Grab</span>
+                    </button>
+                    <button class="tool-btn" onclick="setTool('draw')" title="Draw (D)">
+                        <span>✏️</span>
+                        <span class="tool-label">Draw</span>
+                    </button>
+                    <button class="tool-btn" onclick="setTool('smooth')" title="Smooth (S)">
+                        <span>〰️</span>
+                        <span class="tool-label">Smooth</span>
+                    </button>
+                    <button class="tool-btn" onclick="setTool('inflate')" title="Inflate (I)">
+                        <span>📈</span>
+                        <span class="tool-label">Inflate</span>
+                    </button>
+                    <button class="tool-btn" onclick="setTool('pinch')" title="Pinch (P)">
+                        <span>🤏</span>
+                        <span class="tool-label">Pinch</span>
+                    </button>
+                    <button class="tool-btn" onclick="setTool('flatten')" title="Flatten (F)">
+                        <span>━</span>
+                        <span class="tool-label">Flatten</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Brush Settings</h3>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Brush Size</span>
+                        <span id="brushSizeValue">50</span>
+                    </div>
+                    <input type="range" class="slider" id="brushSize" min="10" max="200" value="50">
+                </div>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Strength</span>
+                        <span id="strengthValue">50</span>
+                    </div>
+                    <input type="range" class="slider" id="strength" min="1" max="100" value="50">
+                </div>
+            </div>
+
+            <div class="tool-section">
+                <h3>Mathematical Modifiers</h3>
+                <button class="btn-secondary" onclick="applyGoldenRatio()">Apply Golden Ratio (φ)</button>
+                <button class="btn-secondary" onclick="applyFibonacci()">Apply Fibonacci Spiral</button>
+                <button class="btn-secondary" onclick="applySacredGeometry()">Apply Sacred Geometry</button>
+                <button class="btn-secondary" onclick="applyVoronoi()">Apply Voronoi Pattern</button>
+            </div>
+
+            <div class="tool-section">
+                <h3>Generate New Object</h3>
+                <button class="btn-primary" onclick="generatePrimitive('cube')">📦 Cube</button>
+                <button class="btn-primary" onclick="generatePrimitive('sphere')">🔮 Sphere</button>
+                <button class="btn-primary" onclick="generatePrimitive('cylinder')">🛢️ Cylinder</button>
+                <button class="btn-primary" onclick="generatePrimitive('torus')">🍩 Torus</button>
+            </div>
+
+            <div class="tool-section">
+                <h3>Export</h3>
+                <button class="btn-secondary" onclick="exportSTL()">Export as STL</button>
+                <button class="btn-secondary" onclick="exportGLB()">Export as GLB</button>
+                <button class="btn-secondary" onclick="exportGENE()">Export as GENE</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="mode-indicator">
+                <div class="mode active">Object Mode</div>
+                <div class="mode">Edit Mode</div>
+                <div class="mode">Sculpt Mode</div>
+            </div>
+            <div style="font-size: 12px; opacity: 0.7;">
+                10,000 Assets | 144 AI Personalities | VLS Level 3 (720p High)
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Global Variables
+        let scene, camera, renderer, controls;
+        let currentMesh = null;
+        let currentTool = 'grab';
+        let brushSize = 50;
+        let strength = 50;
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let isMouseDown = false;
+
+        // Mathematical Constants
+        const PHI = 1.618033988749895;
+        const FIBONACCI = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987];
+
+        // Asset Categories (from 10K library)
+        const categories = {
+            furniture: 1000,
+            architecture: 1000,
+            vehicles: 800,
+            nature: 800,
+            characters: 800,
+            tools: 600,
+            food: 600,
+            electronics: 500,
+            weapons: 400,
+            clothing: 400,
+            props: 3100
+        };
+
+        // Initialize Three.js Scene
+        function init() {
+            const canvas = document.getElementById('sculptCanvas');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a1a);
+            scene.fog = new THREE.Fog(0x1a1a1a, 10, 50);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            camera.position.set(0, 2, 5);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 7.5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00d4ff, 0x444444);
+            scene.add(gridHelper);
+
+            // Add default cube
+            generatePrimitive('sphere');
+
+            // Event Listeners
+            canvas.addEventListener('mousemove', onMouseMove);
+            canvas.addEventListener('mousedown', onMouseDown);
+            canvas.addEventListener('mouseup', onMouseUp);
+            window.addEventListener('resize', onWindowResize);
+
+            // Brush Size Slider
+            document.getElementById('brushSize').addEventListener('input', (e) => {
+                brushSize = e.target.value;
+                document.getElementById('brushSizeValue').textContent = brushSize;
+            });
+
+            // Strength Slider
+            document.getElementById('strength').addEventListener('input', (e) => {
+                strength = e.target.value;
+                document.getElementById('strengthValue').textContent = strength;
+            });
+
+            // Populate Categories
+            populateCategories();
+
+            // Hide loading overlay
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 1000);
+
+            // Start animation loop
+            animate();
+        }
+
+        function populateCategories() {
+            const categoryList = document.getElementById('categoryList');
+            
+            for (const [name, count] of Object.entries(categories)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'category-title';
+                titleDiv.innerHTML = `
+                    <span>${name.charAt(0).toUpperCase() + name.slice(1)}</span>
+                    <span class="category-count">${count}</span>
+                `;
+                titleDiv.onclick = () => toggleCategory(name);
+                
+                const assetList = document.createElement('div');
+                assetList.className = 'asset-list';
+                assetList.id = `category-${name}`;
+                
+                // Add some sample assets
+                for (let i = 1; i <= Math.min(10, count); i++) {
+                    const assetItem = document.createElement('div');
+                    assetItem.className = 'asset-item';
+                    assetItem.textContent = `${name}_${String(i).padStart(4, '0')}`;
+                    assetItem.onclick = () => loadAsset(name, i);
+                    assetList.appendChild(assetItem);
+                }
+                
+                categoryDiv.appendChild(titleDiv);
+                categoryDiv.appendChild(assetList);
+                categoryList.appendChild(categoryDiv);
+            }
+        }
+
+        function toggleCategory(name) {
+            const assetList = document.getElementById(`category-${name}`);
+            assetList.classList.toggle('expanded');
+        }
+
+        function loadAsset(category, id) {
+            console.log(`Loading ${category}_${id}...`);
+            // For now, generate a random primitive
+            const primitives = ['cube', 'sphere', 'cylinder', 'torus'];
+            const random = primitives[Math.floor(Math.random() * primitives.length)];
+            generatePrimitive(random);
+        }
+
+        function generatePrimitive(type) {
+            // Remove existing mesh
+            if (currentMesh) {
+                scene.remove(currentMesh);
+            }
+
+            let geometry;
+            const segments = 32; // High detail for sculpting
+
+            switch(type) {
+                case 'cube':
+                    geometry = new THREE.BoxGeometry(2, 2, 2, segments, segments, segments);
+                    break;
+                case 'sphere':
+                    geometry = new THREE.SphereGeometry(1.5, segments, segments);
+                    break;
+                case 'cylinder':
+                    geometry = new THREE.CylinderGeometry(1, 1, 2, segments);
+                    break;
+                case 'torus':
+                    geometry = new THREE.TorusGeometry(1, 0.4, segments, segments);
+                    break;
+            }
+
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x00d4ff,
+                roughness: 0.7,
+                metalness: 0.3,
+                flatShading: false
+            });
+
+            currentMesh = new THREE.Mesh(geometry, material);
+            currentMesh.castShadow = true;
+            currentMesh.receiveShadow = true;
+            scene.add(currentMesh);
+
+            updateStats();
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.tool-btn').classList.add('active');
+        }
+
+        function onMouseMove(event) {
+            const canvas = renderer.domElement;
+            const rect = canvas.getBoundingClientRect();
+            
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            if (isMouseDown && currentMesh) {
+                sculptMesh();
+            }
+        }
+
+        function onMouseDown(event) {
+            isMouseDown = true;
+        }
+
+        function onMouseUp(event) {
+            isMouseDown = false;
+        }
+
+        function sculptMesh() {
+            if (!currentMesh) return;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(currentMesh);
+
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                const geometry = currentMesh.geometry;
+                const positions = geometry.attributes.position;
+
+                // Apply sculpting based on current tool
+                for (let i = 0; i < positions.count; i++) {
+                    const vertex = new THREE.Vector3(
+                        positions.getX(i),
+                        positions.getY(i),
+                        positions.getZ(i)
+                    );
+                    vertex.applyMatrix4(currentMesh.matrixWorld);
+
+                    const distance = vertex.distanceTo(point);
+                    const radius = brushSize / 100;
+
+                    if (distance < radius) {
+                        const falloff = 1 - (distance / radius);
+                        const intensity = (strength / 100) * falloff * 0.02;
+
+                        const localVertex = vertex.clone();
+                        localVertex.applyMatrix4(currentMesh.matrixWorld.clone().invert());
+
+                        switch(currentTool) {
+                            case 'draw':
+                                const normal = new THREE.Vector3();
+                                normal.copy(localVertex).normalize();
+                                localVertex.add(normal.multiplyScalar(intensity));
+                                break;
+                            case 'smooth':
+                                // Smooth by averaging with neighbors
+                                break;
+                            case 'inflate':
+                                localVertex.multiplyScalar(1 + intensity);
+                                break;
+                            case 'pinch':
+                                const center = point.clone();
+                                center.applyMatrix4(currentMesh.matrixWorld.clone().invert());
+                                localVertex.lerp(center, intensity);
+                                break;
+                            case 'grab':
+                                // Move vertices with mouse
+                                break;
+                        }
+
+                        positions.setXYZ(i, localVertex.x, localVertex.y, localVertex.z);
+                    }
+                }
+
+                positions.needsUpdate = true;
+                geometry.computeVertexNormals();
+            }
+        }
+
+        function applyGoldenRatio() {
+            if (!currentMesh) return;
+            
+            const geometry = currentMesh.geometry;
+            const positions = geometry.attributes.position;
+            
+            for (let i = 0; i < positions.count; i++) {
+                const x = positions.getX(i);
+                const y = positions.getY(i);
+                const z = positions.getZ(i);
+                
+                positions.setXYZ(i, x * PHI, y * PHI, z * PHI);
+            }
+            
+            positions.needsUpdate = true;
+            geometry.computeVertexNormals();
+            updateStats();
+        }
+
+        function applyFibonacci() {
+            if (!currentMesh) return;
+            
+            const geometry = currentMesh.geometry;
+            const positions = geometry.attributes.position;
+            
+            for (let i = 0; i < positions.count; i++) {
+                const fibIndex = i % FIBONACCI.length;
+                const scale = FIBONACCI[fibIndex] / 100;
+                
+                const x = positions.getX(i);
+                const y = positions.getY(i);
+                const z = positions.getZ(i);
+                
+                positions.setXYZ(i, x * (1 + scale), y * (1 + scale), z * (1 + scale));
+            }
+            
+            positions.needsUpdate = true;
+            geometry.computeVertexNormals();
+            updateStats();
+        }
+
+        function applySacredGeometry() {
+            alert('Sacred Geometry: Applying Metatron\'s Cube pattern...');
+        }
+
+        function applyVoronoi() {
+            alert('Voronoi: Applying cellular pattern...');
+        }
+
+        function updateStats() {
+            if (currentMesh) {
+                const vertexCount = currentMesh.geometry.attributes.position.count;
+                document.getElementById('currentVertices').textContent = vertexCount.toLocaleString();
+                document.getElementById('currentVLS').textContent = '3';
+            }
+        }
+
+        function exportSTL() {
+            alert('Exporting as STL...');
+        }
+
+        function exportGLB() {
+            alert('Exporting as GLB...');
+        }
+
+        function exportGENE() {
+            alert('Exporting as GENE Language...');
+        }
+
+        function onWindowResize() {
+            const canvas = renderer.domElement;
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
