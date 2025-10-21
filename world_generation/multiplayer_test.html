@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelVerse Multiplayer Test - Multi-Client Simulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .controls {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .control-group label {
+            min-width: 120px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #667eea;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        input {
+            flex: 1;
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            cursor: pointer;
+            transition: transform 0.2s;
+            min-width: 150px;
+            border: none;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .client-window {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 2px solid #667eea;
+        }
+
+        .client-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .client-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .client-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .status-dot.connected {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .client-body {
+            padding: 15px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .client-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .info-label {
+            opacity: 0.7;
+        }
+
+        .info-value {
+            font-weight: bold;
+        }
+
+        .client-chat {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .chat-msg {
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-size: 12px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-msg .username {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .chat-msg.global .username { color: #4CAF50; }
+        .chat-msg.system .username { color: #FF9800; }
+        .chat-msg.trade .username { color: #2196F3; }
+
+        .client-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .client-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 12px;
+            min-width: 0;
+        }
+
+        .stats-panel {
+            max-width: 800px;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .log-panel {
+            max-width: 800px;
+            margin: 30px auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 2px solid #667eea;
+            padding-left: 10px;
+        }
+
+        .log-entry.error { border-left-color: #f44336; }
+        .log-entry.success { border-left-color: #4CAF50; }
+        .log-entry.info { border-left-color: #2196F3; }
+
+        .timestamp {
+            opacity: 0.5;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 PixelVerse Multiplayer Test Suite</h1>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Server URL:</label>
+            <input type="text" id="server-url" value="ws://localhost:8081">
+            <button id="test-connection">Test Connection</button>
+        </div>
+
+        <div class="control-group">
+            <label>Number of Clients:</label>
+            <input type="number" id="num-clients" value="4" min="1" max="20">
+            <button id="spawn-clients">Spawn Clients</button>
+            <button id="disconnect-all">Disconnect All</button>
+        </div>
+
+        <div class="control-group">
+            <label>Test Scenario:</label>
+            <select id="test-scenario">
+                <option value="basic">Basic Chat</option>
+                <option value="movement">Movement Sync</option>
+                <option value="trade">Trading</option>
+                <option value="party">Party System</option>
+                <option value="combat">Combat Actions</option>
+                <option value="stress">Stress Test (Spam)</option>
+            </select>
+            <button id="run-scenario">Run Scenario</button>
+            <button id="stop-scenario">Stop</button>
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <h3>System Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-clients">0</div>
+                <div class="stat-label">Active Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-messages">0</div>
+                <div class="stat-label">Messages Sent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-received">0</div>
+                <div class="stat-label">Messages Received</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-errors">0</div>
+                <div class="stat-label">Errors</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-grid" id="client-grid"></div>
+
+    <div class="log-panel">
+        <h3>System Log</h3>
+        <div id="log-container"></div>
+    </div>
+
+    <script>
+        class TestClient {
+            constructor(id, username, serverUrl) {
+                this.id = id;
+                this.username = username;
+                this.serverUrl = serverUrl;
+                this.ws = null;
+                this.connected = false;
+                this.stats = {
+                    messagesSent: 0,
+                    messagesReceived: 0,
+                    errors: 0
+                };
+                this.chatLog = [];
+                this.player = null;
+            }
+
+            connect() {
+                return new Promise((resolve, reject) => {
+                    this.ws = new WebSocket(this.serverUrl);
+
+                    this.ws.onopen = () => {
+                        this.connected = true;
+                        this.authenticate();
+                        log(`Client ${this.username} connected`, 'success');
+                        updateClientUI(this);
+                        resolve();
+                    };
+
+                    this.ws.onmessage = (event) => {
+                        this.stats.messagesReceived++;
+                        const message = JSON.parse(event.data);
+                        this.handleMessage(message);
+                        updateStats();
+                    };
+
+                    this.ws.onerror = (error) => {
+                        this.stats.errors++;
+                        log(`Client ${this.username} error: ${error}`, 'error');
+                        updateStats();
+                        reject(error);
+                    };
+
+                    this.ws.onclose = () => {
+                        this.connected = false;
+                        log(`Client ${this.username} disconnected`, 'info');
+                        updateClientUI(this);
+                    };
+                });
+            }
+
+            authenticate() {
+                this.send({
+                    type: 'auth',
+                    data: {
+                        username: this.username,
+                        token: 'test_token_' + this.id
+                    }
+                });
+            }
+
+            send(message) {
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    this.ws.send(JSON.stringify(message));
+                    this.stats.messagesSent++;
+                    updateStats();
+                }
+            }
+
+            handleMessage(message) {
+                switch (message.type) {
+                    case 'auth_success':
+                        this.player = message.data.player;
+                        this.addChatLog(`Authenticated as ${this.username}`, 'system');
+                        break;
+                    case 'player_joined':
+                        this.addChatLog(`${message.data.username} joined`, 'system');
+                        break;
+                    case 'player_left':
+                        this.addChatLog(`Player left`, 'system');
+                        break;
+                    case 'chat_message':
+                        this.addChatLog(`[${message.data.username}] ${message.data.message}`, message.data.channel);
+                        break;
+                    case 'trade_request':
+                        this.addChatLog(`Trade request from ${message.data.username}`, 'trade');
+                        break;
+                    case 'party_invite':
+                        this.addChatLog(`Party invite from ${message.data.leaderName}`, 'system');
+                        break;
+                }
+                updateClientUI(this);
+            }
+
+            addChatLog(message, type = 'global') {
+                this.chatLog.push({ message, type, time: Date.now() });
+                if (this.chatLog.length > 50) {
+                    this.chatLog.shift();
+                }
+            }
+
+            sendChat(message, channel = 'global') {
+                this.send({
+                    type: 'chat',
+                    data: { message, channel }
+                });
+            }
+
+            sendMove() {
+                if (!this.player) return;
+                
+                const pos = this.player.position;
+                pos.x += (Math.random() - 0.5) * 10;
+                pos.z += (Math.random() - 0.5) * 10;
+
+                this.send({
+                    type: 'move',
+                    data: {
+                        position: pos,
+                        rotation: { x: 0, y: 0, z: 0 },
+                        velocity: { x: 5, y: 0, z: 0 },
+                        isMoving: true
+                    }
+                });
+            }
+
+            requestTrade(targetId) {
+                this.send({
+                    type: 'trade_request',
+                    data: {
+                        action: 'initiate',
+                        targetPlayerId: targetId
+                    }
+                });
+            }
+
+            disconnect() {
+                if (this.ws) {
+                    this.ws.close();
+                }
+            }
+        }
+
+        // Global state
+        let clients = [];
+        let scenarioInterval = null;
+        let stats = {
+            totalMessages: 0,
+            totalReceived: 0,
+            totalErrors: 0
+        };
+
+        // UI Functions
+        function createClientWindow(client) {
+            const div = document.createElement('div');
+            div.className = 'client-window';
+            div.id = `client-${client.id}`;
+            div.innerHTML = `
+                <div class="client-header">
+                    <div class="client-title">${client.username}</div>
+                    <div class="client-status">
+                        <span class="status-dot ${client.connected ? 'connected' : ''}"></span>
+                        <span>${client.connected ? 'Connected' : 'Disconnected'}</span>
+                    </div>
+                </div>
+                <div class="client-body">
+                    <div class="client-info">
+                        <div class="info-row">
+                            <span class="info-label">Messages Sent:</span>
+                            <span class="info-value">${client.stats.messagesSent}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Messages Received:</span>
+                            <span class="info-value">${client.stats.messagesReceived}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Position:</span>
+                            <span class="info-value">${client.player ? `${Math.round(client.player.position.x)}, ${Math.round(client.player.position.z)}` : 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="client-chat" id="chat-${client.id}">
+                        ${client.chatLog.map(msg => `
+                            <div class="chat-msg ${msg.type}">
+                                <span class="username">${msg.type}:</span>
+                                <span>${msg.message}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="client-actions">
+                        <button onclick="sendTestChat(${client.id})">Chat</button>
+                        <button onclick="sendTestMove(${client.id})">Move</button>
+                        <button onclick="disconnectClient(${client.id})">Disconnect</button>
+                    </div>
+                </div>
+            `;
+            return div;
+        }
+
+        function updateClientUI(client) {
+            const existingWindow = document.getElementById(`client-${client.id}`);
+            if (existingWindow) {
+                existingWindow.replaceWith(createClientWindow(client));
+            } else {
+                document.getElementById('client-grid').appendChild(createClientWindow(client));
+            }
+        }
+
+        function updateStats() {
+            stats.totalMessages = clients.reduce((sum, c) => sum + c.stats.messagesSent, 0);
+            stats.totalReceived = clients.reduce((sum, c) => sum + c.stats.messagesReceived, 0);
+            stats.totalErrors = clients.reduce((sum, c) => sum + c.stats.errors, 0);
+
+            document.getElementById('stat-clients').textContent = clients.filter(c => c.connected).length;
+            document.getElementById('stat-messages').textContent = stats.totalMessages;
+            document.getElementById('stat-received').textContent = stats.totalReceived;
+            document.getElementById('stat-errors').textContent = stats.totalErrors;
+        }
+
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `
+                <span class="timestamp">${new Date().toLocaleTimeString()}</span>
+                <span>${message}</span>
+            `;
+            logContainer.insertBefore(entry, logContainer.firstChild);
+
+            // Limit log entries
+            while (logContainer.children.length > 100) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Test Functions
+        async function spawnClients() {
+            const numClients = parseInt(document.getElementById('num-clients').value);
+            const serverUrl = document.getElementById('server-url').value;
+
+            log(`Spawning ${numClients} test clients...`, 'info');
+
+            for (let i = 0; i < numClients; i++) {
+                const client = new TestClient(
+                    clients.length,
+                    `TestPlayer${clients.length + 1}`,
+                    serverUrl
+                );
+
+                clients.push(client);
+
+                try {
+                    await client.connect();
+                    updateClientUI(client);
+                    await new Promise(resolve => setTimeout(resolve, 200)); // Stagger connections
+                } catch (error) {
+                    log(`Failed to connect client ${client.username}`, 'error');
+                }
+            }
+
+            log(`Spawned ${numClients} clients successfully`, 'success');
+            updateStats();
+        }
+
+        function disconnectAll() {
+            clients.forEach(client => client.disconnect());
+            clients = [];
+            document.getElementById('client-grid').innerHTML = '';
+            log('All clients disconnected', 'info');
+            updateStats();
+        }
+
+        function disconnectClient(id) {
+            const client = clients.find(c => c.id === id);
+            if (client) {
+                client.disconnect();
+                log(`Client ${client.username} disconnected`, 'info');
+            }
+        }
+
+        function sendTestChat(id) {
+            const client = clients.find(c => c.id === id);
+            if (client && client.connected) {
+                const messages = [
+                    'Hello everyone!',
+                    'How are you?',
+                    'This is a test message',
+                    'Anyone want to trade?',
+                    'Looking for party members!',
+                    'GG!',
+                    'Nice to meet you all',
+                    'Testing multiplayer features'
+                ];
+                const message = messages[Math.floor(Math.random() * messages.length)];
+                client.sendChat(message);
+            }
+        }
+
+        function sendTestMove(id) {
+            const client = clients.find(c => c.id === id);
+            if (client && client.connected) {
+                client.sendMove();
+            }
+        }
+
+        function runScenario() {
+            const scenario = document.getElementById('test-scenario').value;
+            log(`Running scenario: ${scenario}`, 'info');
+
+            if (scenarioInterval) {
+                clearInterval(scenarioInterval);
+            }
+
+            switch (scenario) {
+                case 'basic':
+                    scenarioInterval = setInterval(() => {
+                        const client = clients[Math.floor(Math.random() * clients.length)];
+                        if (client && client.connected) {
+                            sendTestChat(client.id);
+                        }
+                    }, 2000);
+                    break;
+
+                case 'movement':
+                    scenarioInterval = setInterval(() => {
+                        clients.forEach(client => {
+                            if (client.connected) {
+                                sendTestMove(client.id);
+                            }
+                        });
+                    }, 500);
+                    break;
+
+                case 'trade':
+                    scenarioInterval = setInterval(() => {
+                        if (clients.length >= 2) {
+                            const client1 = clients[Math.floor(Math.random() * clients.length)];
+                            const client2 = clients[Math.floor(Math.random() * clients.length)];
+                            if (client1 !== client2 && client1.connected && client2.connected) {
+                                client1.requestTrade(client2.player?.id);
+                            }
+                        }
+                    }, 5000);
+                    break;
+
+                case 'stress':
+                    scenarioInterval = setInterval(() => {
+                        clients.forEach(client => {
+                            if (client.connected) {
+                                sendTestChat(client.id);
+                                sendTestMove(client.id);
+                            }
+                        });
+                    }, 100);
+                    break;
+            }
+        }
+
+        function stopScenario() {
+            if (scenarioInterval) {
+                clearInterval(scenarioInterval);
+                scenarioInterval = null;
+                log('Scenario stopped', 'info');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('spawn-clients').addEventListener('click', spawnClients);
+        document.getElementById('disconnect-all').addEventListener('click', disconnectAll);
+        document.getElementById('run-scenario').addEventListener('click', runScenario);
+        document.getElementById('stop-scenario').addEventListener('click', stopScenario);
+        document.getElementById('test-connection').addEventListener('click', async () => {
+            const serverUrl = document.getElementById('server-url').value;
+            try {
+                const ws = new WebSocket(serverUrl);
+                ws.onopen = () => {
+                    log('Connection test successful!', 'success');
+                    ws.close();
+                };
+                ws.onerror = () => {
+                    log('Connection test failed!', 'error');
+                };
+            } catch (error) {
+                log(`Connection error: ${error.message}`, 'error');
+            }
+        });
+
+        // Initial log
+        log('Test suite initialized', 'success');
+    </script>
+</body>
+</html>

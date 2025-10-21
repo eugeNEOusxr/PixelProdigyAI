@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelVerse - Multiplayer Character Rendering Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #0f0;
+            overflow: hidden;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-bottom: 2px solid #0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #0f0;
+        }
+
+        .status {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #f00;
+            animation: pulse 1s infinite;
+        }
+
+        .status-dot.active {
+            background: #0f0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            height: calc(100vh - 60px);
+        }
+
+        .left-panel, .right-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #0f0;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .main-canvas {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        canvas {
+            border: 2px solid #0f0;
+            box-shadow: 0 0 20px #0f0;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #0f0;
+            background: rgba(0, 255, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0ff;
+            text-transform: uppercase;
+        }
+
+        .control-group {
+            margin: 10px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #0f0;
+        }
+
+        input[type="number"], input[type="range"], select {
+            width: 100%;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #0f0;
+            color: #0f0;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: rgba(0, 255, 0, 0.4);
+            box-shadow: 0 0 10px #0f0;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #f00;
+            color: #f00;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 0, 0, 0.4);
+            box-shadow: 0 0 10px #f00;
+        }
+
+        .btn-warning {
+            background: rgba(255, 255, 0, 0.2);
+            border-color: #ff0;
+            color: #ff0;
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 255, 0, 0.4);
+            box-shadow: 0 0 10px #ff0;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .metric {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0f0;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0ff;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #0f0;
+            margin-top: 5px;
+        }
+
+        .log {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #0f0;
+            padding: 10px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+        }
+
+        .log-info { color: #0f0; }
+        .log-success { color: #0ff; }
+        .log-warning { color: #ff0; }
+        .log-error { color: #f00; }
+
+        .player-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .player-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-name {
+            font-weight: bold;
+            color: #0ff;
+        }
+
+        .player-stats {
+            font-size: 11px;
+            color: #0f0;
+        }
+
+        .test-progress {
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0f0, #0ff);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .equipment-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .equipment-slot {
+            aspect-ratio: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #0f0;
+        }
+
+        .equipment-slot.filled {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #0ff;
+            color: #0ff;
+        }
+
+        .animation-test {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .animation-btn {
+            flex: 1 1 calc(50% - 5px);
+            padding: 5px;
+            font-size: 11px;
+        }
+
+        .fps-counter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #0f0;
+            padding: 10px;
+            z-index: 100;
+        }
+
+        .stress-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0f0;
+            padding: 15px;
+            z-index: 100;
+        }
+
+        .stress-meters {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stress-meter {
+            text-align: center;
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0f0;
+            margin-top: 5px;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: #0f0;
+            transition: width 0.3s, background 0.3s;
+        }
+
+        .meter-fill.warning { background: #ff0; }
+        .meter-fill.danger { background: #f00; }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0f0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">🎮 MULTIPLAYER CHARACTER RENDERING TEST</div>
+        <div class="status">
+            <div class="status-item">
+                <div class="status-dot" id="serverStatus"></div>
+                <span>Server</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="renderStatus"></div>
+                <span>Renderer</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="syncStatus"></div>
+                <span>Sync</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Left Panel: Controls -->
+        <div class="left-panel">
+            <div class="section">
+                <div class="section-title">⚙️ Test Configuration</div>
+                
+                <div class="control-group">
+                    <label>Client Count: <span id="clientCountValue">5</span></label>
+                    <input type="range" id="clientCount" min="1" max="30" value="5">
+                </div>
+
+                <div class="control-group">
+                    <label>Server Port</label>
+                    <input type="number" id="serverPort" value="8081" min="1024" max="65535">
+                </div>
+
+                <button id="connectBtn">🔌 Connect to Server</button>
+                <button id="disconnectBtn" class="btn-danger" disabled>❌ Disconnect</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🎭 Character Tests</div>
+                
+                <button id="spawnClientsBtn" disabled>👥 Spawn Clients</button>
+                <button id="randomizeAppearanceBtn" disabled>🎲 Randomize Appearances</button>
+                <button id="randomizeEquipmentBtn" disabled>⚔️ Randomize Equipment</button>
+                <button id="clearClientsBtn" class="btn-danger" disabled>🗑️ Clear All Clients</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">⚡ Animation Tests</div>
+                
+                <div class="animation-test">
+                    <button class="animation-btn" data-anim="idle">🧍 Idle</button>
+                    <button class="animation-btn" data-anim="walk">🚶 Walk</button>
+                    <button class="animation-btn" data-anim="run">🏃 Run</button>
+                    <button class="animation-btn" data-anim="jump">🦘 Jump</button>
+                    <button class="animation-btn" data-anim="attack">⚔️ Attack</button>
+                    <button class="animation-btn" data-anim="block">🛡️ Block</button>
+                    <button class="animation-btn" data-anim="cast">✨ Cast</button>
+                    <button class="animation-btn" data-anim="hit">💥 Hit</button>
+                    <button class="animation-btn" data-anim="die">💀 Die</button>
+                    <button class="animation-btn" data-anim="emote">😄 Emote</button>
+                </div>
+
+                <button id="randomAnimBtn" class="btn-warning" style="margin-top: 10px;">🎬 Random Animation</button>
+                <button id="syncAnimBtn" class="btn-warning">🔄 Sync All Animations</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🔥 Stress Tests</div>
+                
+                <button id="stressTestBtn">💪 Run Stress Test</button>
+                <button id="bandwidthTestBtn">📊 Bandwidth Test</button>
+                <button id="lagTestBtn" class="btn-warning">⏱️ Simulate Lag (200ms)</button>
+                <button id="disconnectTestBtn" class="btn-warning">⚠️ Random Disconnects</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📊 Performance Metrics</div>
+                
+                <div class="metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="fpsValue">0</div>
+                        <div class="metric-label">FPS</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="latencyValue">0</div>
+                        <div class="metric-label">Latency (ms)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="bandwidthValue">0</div>
+                        <div class="metric-label">KB/s</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="syncRateValue">0</div>
+                        <div class="metric-label">Sync/s</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel: Canvas -->
+        <div class="main-canvas">
+            <canvas id="renderCanvas" width="800" height="600"></canvas>
+            
+            <div class="fps-counter">
+                <div>FPS: <span id="fpsMeter" style="color: #0ff; font-weight: bold;">0</span></div>
+                <div>Draw Calls: <span id="drawCalls" style="color: #0f0;">0</span></div>
+                <div>Vertices: <span id="vertexCount" style="color: #0f0;">0</span></div>
+            </div>
+
+            <div class="stress-indicator" id="stressIndicator" style="display: none;">
+                <div style="text-align: center; font-size: 16px; font-weight: bold; color: #ff0;">
+                    ⚠️ STRESS TEST IN PROGRESS ⚠️
+                </div>
+                <div class="stress-meters">
+                    <div class="stress-meter">
+                        <div>CPU</div>
+                        <div class="meter-bar">
+                            <div class="meter-fill" id="cpuMeter"></div>
+                        </div>
+                        <div id="cpuPercent">0%</div>
+                    </div>
+                    <div class="stress-meter">
+                        <div>GPU</div>
+                        <div class="meter-bar">
+                            <div class="meter-fill" id="gpuMeter"></div>
+                        </div>
+                        <div id="gpuPercent">0%</div>
+                    </div>
+                    <div class="stress-meter">
+                        <div>Network</div>
+                        <div class="meter-bar">
+                            <div class="meter-fill" id="netMeter"></div>
+                        </div>
+                        <div id="netPercent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Info -->
+        <div class="right-panel">
+            <div class="section">
+                <div class="section-title">👥 Connected Players (<span id="playerCount">0</span>)</div>
+                <div class="player-list" id="playerList"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📝 Test Results</div>
+                
+                <div class="test-progress">
+                    <div>Appearance Sync: <span id="appearanceResult">-</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="appearanceProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="test-progress">
+                    <div>Equipment Sync: <span id="equipmentResult">-</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="equipmentProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="test-progress">
+                    <div>Animation Sync: <span id="animationResult">-</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="animationProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="test-progress">
+                    <div>Stress Test: <span id="stressResult">-</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="stressProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📋 Console Log</div>
+                <div class="log" id="consoleLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="multiplayer_character_test.js"></script>
+</body>
+</html>

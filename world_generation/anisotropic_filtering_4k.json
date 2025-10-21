@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "maxAnisotropy": 16,
+  "automatic": true,
+  "qualityLevels": {
+    "ultra": 16,
+    "high": 8,
+    "medium": 4,
+    "low": 2,
+    "disabled": 1
+  },
+  "distanceScaling": {
+    "enabled": true,
+    "maxDistance": 100,
+    "minAnisotropy": 2,
+    "maxAnisotropy": 16
+  },
+  "performanceImpact": {
+    "gpuLoad": "low",
+    "memoryImpact": "none",
+    "fpsImpact": "2-3%"
+  }
+}

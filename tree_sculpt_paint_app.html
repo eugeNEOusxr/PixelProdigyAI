@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Tree Sculpt Lab</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at top, #1a2634 0%, #0b1018 55%, #05070b 100%);
+      color: #e7f6ff;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    canvas { display: block; }
+
+    #overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      padding: 18px 20px;
+      background: rgba(9, 15, 24, 0.78);
+      border-radius: 14px;
+      border: 1px solid rgba(83, 162, 255, 0.35);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      max-width: 320px;
+      font-size: 13px;
+      line-height: 1.55;
+      pointer-events: none;
+    }
+    #overlay h2 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+      color: #7fd4ff;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+    #overlay strong { color: #ffc46b; }
+
+    #radial {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 110px;
+      pointer-events: auto;
+      display: none;
+      z-index: 50;
+    }
+    #radial canvas {
+      width: 220px;
+      height: 220px;
+      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
+    }
+
+    #status {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(8, 18, 30, 0.76);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      border: 1px solid rgba(100, 190, 255, 0.25);
+      color: #aee3ff;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <h2>🌲 Tree Sculpt Lab</h2>
+    <div><strong>Mouse</strong> sculpt, <strong>Shift</strong> invert, <strong>Wheel</strong> radius, <strong>Ctrl+Wheel</strong> strength</div>
+    <div><strong>1</strong> circle, <strong>2</strong> triangle, <strong>3</strong> leaf</div>
+    <div><strong>F</strong> new fine layer, <strong>Tab</strong> cycle layers</div>
+    <div><strong>G</strong> ground brush, <strong>WASD</strong> glide, <strong>Space</strong> orbit toggle</div>
+    <div><strong>P</strong> contour rings, <strong>B</strong> bark ridges</div>
+    <div><strong>R</strong> rebuild normals, <strong>Backspace</strong> clear layer</div>
+  </div>
+
+  <div id="status"></div>
+
+  <div id="radial">
+    <canvas id="radialCanvas" width="220" height="220"></canvas>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js",
+      "three/addons/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/controls/OrbitControls.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x06090f);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.set(5.4, 4.3, 7.6);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.minDistance = 2;
+    controls.maxDistance = 24;
+
+    const statusEl = document.getElementById('status');
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0x4a6073, 0.45));
+
+    const dirLight = new THREE.DirectionalLight(0x9dcfff, 1.6);
+    dirLight.position.set(6, 14, 10);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.set(2048, 2048);
+    dirLight.shadow.bias = -0.0004;
+    scene.add(dirLight);
+
+    const warmFill = new THREE.DirectionalLight(0xff9147, 0.45);
+    warmFill.position.set(-5, 3, -7);
+    scene.add(warmFill);
+
+    const ground = new THREE.Mesh(
+      new THREE.CylinderGeometry(30, 30, 0.4, 48, 1, true),
+      new THREE.MeshStandardMaterial({
+        color: 0x101a24,
+        roughness: 0.95,
+        metalness: 0.05
+      })
+    );
+    ground.position.y = -2.2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Sculpt target: high-density cylinder (tree trunk core)
+    const radiusTop = 0.8;
+    const radiusBottom = 1.0;
+    const height = 6;
+    const radialSegments = 128;
+    const heightSegments = 96;
+    const trunkGeometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, false);
+    trunkGeometry.translate(0, height / 2 - 2, 0);
+
+    const trunkMaterial = new THREE.MeshStandardMaterial({
+      color: 0x6f513a,
+      roughness: 0.82,
+      metalness: 0.05,
+      flatShading: false
+    });
+
+    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+    trunk.castShadow = true;
+    trunk.receiveShadow = true;
+    scene.add(trunk);
+
+    const basePositions = trunk.geometry.attributes.position.array.slice();
+    const vertexCount = trunk.geometry.attributes.position.count;
+
+    const layers = [new Float32Array(basePositions.length)];
+    let activeLayer = 0;
+
+    const tempVec = new THREE.Vector3();
+    const tempVec2 = new THREE.Vector3();
+    const tempVec3 = new THREE.Vector3();
+    const tempMat = new THREE.Matrix3();
+
+    const pointer = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
+
+    let lastHit = null;
+    let isSculpting = false;
+    let brushRadius = 0.35;
+    let brushStrength = 0.15;
+    let brushShape = 'circle';
+    let brushGrounded = false;
+    let brushAnchor = new THREE.Vector3();
+    let brushNormal = new THREE.Vector3(0, 1, 0);
+    let brushTangent = new THREE.Vector3(1, 0, 0);
+    let brushBitangent = new THREE.Vector3(0, 0, 1);
+    let brushAnchorValid = false;
+    let autoOrbit = true;
+
+    const brushIndicator = new THREE.Mesh(
+      new THREE.RingGeometry(0.95, 1, 64),
+      new THREE.MeshBasicMaterial({ color: 0x5dd4ff, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
+    );
+    brushIndicator.visible = false;
+    scene.add(brushIndicator);
+
+    function status(msg) {
+      statusEl.textContent = msg;
+      clearTimeout(status.timeoutId);
+      status.timeoutId = setTimeout(() => statusEl.textContent = '', 2200);
+    }
+
+    function ensureNormals() {
+      trunk.geometry.computeVertexNormals();
+      trunk.geometry.attributes.normal.needsUpdate = true;
+    }
+
+    function recomposeGeometry() {
+      const posAttr = trunk.geometry.attributes.position;
+      const targetArray = posAttr.array;
+      targetArray.set(basePositions);
+
+      for (const layer of layers) {
+        for (let i = 0; i < targetArray.length; i++) {
+          targetArray[i] += layer[i];
+        }
+      }
+
+      posAttr.needsUpdate = true;
+      trunk.geometry.computeBoundingBox();
+      trunk.geometry.computeBoundingSphere();
+      ensureNormals();
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function setBrushFrame(point, normal) {
+      brushAnchor.copy(point);
+      brushNormal.copy(normal).normalize();
+      const up = Math.abs(brushNormal.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+      brushTangent.copy(up).cross(brushNormal).normalize();
+      brushBitangent.copy(brushNormal).cross(brushTangent).normalize();
+
+      brushIndicator.position.copy(brushAnchor);
+      const matrix = new THREE.Matrix4();
+      matrix.lookAt(tempVec.copy(brushAnchor).add(brushNormal), brushAnchor, brushBitangent);
+      brushIndicator.quaternion.setFromRotationMatrix(matrix);
+      brushIndicator.scale.set(brushRadius, brushRadius, brushRadius);
+      brushIndicator.visible = true;
+    }
+
+    function updateBrushFromPointer(event) {
+      pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObject(trunk, false)[0];
+      if (!hit) {
+        brushIndicator.visible = false;
+        lastHit = null;
+        brushAnchorValid = false;
+        return;
+      }
+
+      lastHit = hit;
+      const worldNormal = hit.face.normal.clone().applyMatrix3(tempMat.getNormalMatrix(trunk.matrixWorld)).normalize();
+      const worldPoint = hit.point.clone();
+      setBrushFrame(worldPoint, worldNormal);
+      brushAnchorValid = true;
+    }
+
+    function anchorRaycastFrom(point, normal) {
+      raycaster.set(point.clone().add(normal.clone().multiplyScalar(0.6)), normal.clone().negate());
+      const hit = raycaster.intersectObject(trunk, false)[0];
+      if (hit) {
+        setBrushFrame(hit.point, hit.face.normal.clone().applyMatrix3(tempMat.getNormalMatrix(trunk.matrixWorld)).normalize());
+        brushAnchorValid = true;
+      }
+    }
+
+    window.addEventListener('pointermove', (event) => {
+      if (brushGrounded) return; // when grounded, pointer stops updating anchor
+      updateBrushFromPointer(event);
+      if (isSculpting && brushAnchorValid) {
+        applyBrush(event.shiftKey);
+      }
+    });
+
+    window.addEventListener('pointerdown', (event) => {
+      if (event.button === 0) {
+        updateBrushFromPointer(event);
+        if (brushAnchorValid) {
+          isSculpting = true;
+          applyBrush(event.shiftKey);
+        }
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      isSculpting = false;
+    });
+
+    window.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      if (event.ctrlKey) {
+        brushStrength = clamp(brushStrength + (event.deltaY > 0 ? -0.02 : 0.02), 0.02, 0.5);
+        status(`Strength: ${brushStrength.toFixed(2)}`);
+      } else {
+        brushRadius = clamp(brushRadius + (event.deltaY > 0 ? -0.04 : 0.04), 0.1, 2.0);
+        brushIndicator.scale.set(brushRadius, brushRadius, brushRadius);
+        status(`Radius: ${brushRadius.toFixed(2)}`);
+      }
+    }, { passive: false });
+
+    window.addEventListener('keydown', (event) => {
+      const key = event.key.toLowerCase();
+      if (key === '1') { brushShape = 'circle'; status('Brush: circle'); }
+      if (key === '2') { brushShape = 'triangle'; status('Brush: triangle'); }
+      if (key === '3') { brushShape = 'leaf'; status('Brush: leaf'); }
+      if (key === 'g') {
+        brushGrounded = !brushGrounded;
+        if (brushGrounded && lastHit) {
+          setBrushFrame(lastHit.point, lastHit.face.normal.clone().applyMatrix3(tempMat.getNormalMatrix(trunk.matrixWorld)).normalize());
+          brushAnchorValid = true;
+        }
+        status(brushGrounded ? 'Brush grounded' : 'Brush free');
+      }
+      if (key === 'f') {
+        layers.push(new Float32Array(basePositions.length));
+        activeLayer = layers.length - 1;
+        status(`New fine layer (${activeLayer + 1})`);
+      }
+      if (key === 'tab') {
+        event.preventDefault();
+        activeLayer = (activeLayer + 1) % layers.length;
+        status(`Layer ${activeLayer + 1}/${layers.length}`);
+      }
+      if (key === 'r') {
+        ensureNormals();
+        status('Normals rebuilt');
+      }
+      if (key === 'p') {
+        aiPatternContour();
+        status('AI pattern: contour rings');
+      }
+      if (key === 'b') {
+        aiPatternBark();
+        status('AI pattern: bark ridges');
+      }
+      if (key === ' ') {
+        autoOrbit = !autoOrbit;
+        controls.enabled = !autoOrbit;
+        status(autoOrbit ? 'Auto orbit on' : 'Auto orbit off (manual orbit)');
+      }
+      if (key === 'backspace') {
+        layers[activeLayer].fill(0);
+        recomposeGeometry();
+        status(`Layer ${activeLayer + 1} cleared`);
+      }
+    });
+
+    const keys = {};
+    window.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
+    window.addEventListener('keyup',   (e) => keys[e.key.toLowerCase()] = false);
+
+    // Brush masks
+    function falloff(distance, radius) {
+      const t = clamp(1 - distance / radius, 0, 1);
+      return t * t * (3 - 2 * t);
+    }
+
+    function maskCircle(u, v, radius) {
+      const dist = Math.hypot(u, v);
+      if (dist > radius) return 0;
+      return falloff(dist, radius);
+    }
+
+    function maskTriangle(u, v, radius) {
+      const nv = v / radius;
+      if (nv < -0.35 || nv > 1.05) return 0;
+      const halfWidth = (1 - nv) * radius * 0.9;
+      if (Math.abs(u) > halfWidth) return 0;
+      const dist = Math.max(Math.abs(u) / (halfWidth + 1e-6), nv);
+      return clamp(1 - dist, 0, 1) ** 1.6;
+    }
+
+    function maskLeaf(u, v, radius) {
+      const along = clamp(v / (radius * 1.1), -0.3, 1.1);
+      const width = radius * (0.15 + (1 - along) * 0.95);
+      const leftCurve = (Math.sin(along * Math.PI) * 0.4 + 0.6);
+      const rightCurve = (Math.cos(along * Math.PI * 0.6) * 0.35 + 0.65);
+      const uNorm = u / width;
+      if (along < -0.25 || along > 1.05) return 0;
+      const limit = u < 0 ? leftCurve : rightCurve;
+      if (Math.abs(uNorm) > limit) return 0;
+      const dist = Math.max(Math.abs(uNorm) / limit, along);
+      return clamp(1 - dist, 0, 1) ** 1.8;
+    }
+
+    function brushMask(u, v, radius) {
+      if (brushShape === 'triangle') return maskTriangle(u, v, radius);
+      if (brushShape === 'leaf') return maskLeaf(u, v, radius);
+      return maskCircle(u, v, radius);
+    }
+
+    function applyBrush(invert = false) {
+      if (!brushAnchorValid) return;
+      ensureNormals();
+
+      const posAttr = trunk.geometry.attributes.position;
+      const normAttr = trunk.geometry.attributes.normal;
+      const active = layers[activeLayer];
+
+      tempVec.copy(brushAnchor);
+      trunk.worldToLocal(tempVec);
+      const anchorLocal = tempVec.clone();
+
+      const normalMatrix = new THREE.Matrix3().getNormalMatrix(trunk.matrixWorld);
+
+      const normalLocal = brushNormal.clone();
+      trunk.worldToLocal(tempVec.copy(brushAnchor).add(brushTangent));
+      trunk.worldToLocal(tempVec2.copy(brushAnchor));
+      const tangentLocal = tempVec.sub(tempVec2).normalize();
+
+      trunk.worldToLocal(tempVec.copy(brushAnchor).add(brushBitangent));
+      trunk.worldToLocal(tempVec2.copy(brushAnchor));
+      const bitangentLocal = tempVec.sub(tempVec2).normalize();
+
+      const sign = invert ? -1 : 1;
+      const strength = brushStrength * sign;
+
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        tempVec.set(
+          posAttr.array[idx],
+          posAttr.array[idx + 1],
+          posAttr.array[idx + 2]
+        );
+
+        tempVec.sub(anchorLocal);
+        const u = tempVec.dot(tangentLocal);
+        const v = tempVec.dot(bitangentLocal);
+        const w = tempVec.dot(normalLocal);
+
+        if (Math.abs(w) > brushRadius * 1.6) continue;
+
+        const weight = brushMask(u, v, brushRadius);
+        if (weight <= 0) continue;
+
+        tempVec3.set(
+          normAttr.array[idx],
+          normAttr.array[idx + 1],
+          normAttr.array[idx + 2]
+        ).normalize();
+
+        const delta = strength * weight;
+        active[idx]     += tempVec3.x * delta;
+        active[idx + 1] += tempVec3.y * delta;
+        active[idx + 2] += tempVec3.z * delta;
+      }
+
+      recomposeGeometry();
+    }
+
+    // AI helper patterns
+    if (!Math.frac) Math.frac = (x) => x - Math.floor(x);
+    function hash(n) {
+      const sin = Math.sin(n) * 43758.5453;
+      return sin - Math.floor(sin);
+    }
+
+    function aiPatternContour() {
+      const posAttr = trunk.geometry.attributes.position;
+      const active = layers[activeLayer];
+      const amp = 0.04;
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const y = posAttr.array[idx + 1] + Math.random() * 0.02;
+        const ring = Math.sin((y + 1.5) * 4.2) * amp;
+        const nx = posAttr.array[idx];
+        const nz = posAttr.array[idx + 2];
+        const len = Math.hypot(nx, nz) + 1e-6;
+        active[idx]     += (nx / len) * ring * 0.6;
+        active[idx + 2] += (nz / len) * ring * 0.6;
+        active[idx + 1] += ring * 0.25;
+      }
+      recomposeGeometry();
+    }
+
+    function aiPatternBark() {
+      const posAttr = trunk.geometry.attributes.position;
+      const active = layers[activeLayer];
+      const amp = 0.02;
+      for (let i = 0; i < vertexCount; i++) {
+        const idx = i * 3;
+        const x = posAttr.array[idx];
+        const z = posAttr.array[idx + 2];
+        const y = posAttr.array[idx + 1];
+        const angle = Math.atan2(z, x);
+        const ridgeId = Math.floor((angle + Math.PI) / (Math.PI * 2) * 96);
+        const noise = hash(ridgeId * 13.37 + Math.floor((y + 2) * 11.1));
+        if (noise < 0.52) continue;
+        const push = (noise - 0.52) * amp * 2.2;
+        const len = Math.hypot(x, z) + 1e-6;
+        active[idx]     += (x / len) * push;
+        active[idx + 2] += (z / len) * push;
+      }
+      recomposeGeometry();
+    }
+
+    // Radial menu for brush selection
+    const radial = document.getElementById('radial');
+    const radialCanvas = document.getElementById('radialCanvas');
+    const rctx = radialCanvas.getContext('2d');
+    const radialEntries = [
+      { id: 'circle', label: 'Circle', key: '1' },
+      { id: 'triangle', label: 'Triangle', key: '2' },
+      { id: 'leaf', label: 'Leaf', key: '3' }
+    ];
+
+    function drawRadial() {
+      const w = radialCanvas.width;
+      const h = radialCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const R = 100;
+      const A = (Math.PI * 2) / radialEntries.length;
+      rctx.clearRect(0, 0, w, h);
+
+      radialEntries.forEach((entry, index) => {
+        const a0 = -Math.PI / 2 + index * A;
+        const a1 = a0 + A;
+        rctx.beginPath();
+        rctx.moveTo(cx, cy);
+        rctx.arc(cx, cy, R, a0, a1);
+        rctx.closePath();
+        rctx.fillStyle = brushShape === entry.id ? 'rgba(111, 216, 255, 0.42)' : 'rgba(38, 60, 86, 0.78)';
+        rctx.fill();
+        rctx.strokeStyle = 'rgba(98, 180, 255, 0.85)';
+        rctx.lineWidth = 2;
+        rctx.stroke();
+
+        const aMid = (a0 + a1) / 2;
+        const tx = cx + Math.cos(aMid) * 60;
+        const ty = cy + Math.sin(aMid) * 60;
+        rctx.fillStyle = '#dcefff';
+        rctx.font = '13px "Segoe UI", sans-serif';
+        rctx.textAlign = 'center';
+        rctx.fillText(entry.label, tx, ty - 10);
+        rctx.fillText(`[${entry.key}]`, tx, ty + 8);
+      });
+    }
+
+    function showRadial(x, y) {
+      radial.style.left = `${x - 110}px`;
+      radial.style.top = `${y - 110}px`;
+      radial.style.display = 'block';
+      drawRadial();
+    }
+
+    function hideRadial() {
+      radial.style.display = 'none';
+    }
+
+    radialCanvas.addEventListener('pointerdown', (event) => {
+      const rect = radialCanvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const angle = Math.atan2(y - cy, x - cx) + Math.PI / 2;
+      const normalized = (angle + Math.PI * 2) % (Math.PI * 2);
+      const slice = Math.floor(normalized / ((Math.PI * 2) / radialEntries.length));
+      const entry = radialEntries[(slice + radialEntries.length) % radialEntries.length];
+      brushShape = entry.id;
+      status(`Brush: ${entry.label.toLowerCase()}`);
+      hideRadial();
+    });
+
+    window.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      showRadial(event.clientX, event.clientY);
+    });
+
+    window.addEventListener('pointerdown', (event) => {
+      if (event.button !== 2) hideRadial();
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (autoOrbit) {
+        const t = performance.now() * 0.00006;
+        camera.position.x = Math.cos(t) * 7.5;
+        camera.position.z = Math.sin(t) * 7.5;
+        camera.position.y = 4 + Math.sin(t * 1.7) * 0.8;
+        camera.lookAt(0, 2.7, 0);
+      } else {
+        controls.update();
+      }
+
+      if (brushGrounded && brushAnchorValid) {
+        const move = new THREE.Vector3();
+        if (keys['w']) move.add(brushBitangent);
+        if (keys['s']) move.sub(brushBitangent);
+        if (keys['d']) move.add(brushTangent);
+        if (keys['a']) move.sub(brushTangent);
+        if (move.lengthSq() > 1e-6) {
+          move.normalize().multiplyScalar(0.05);
+          const tentative = brushAnchor.clone().add(move);
+          anchorRaycastFrom(tentative, brushNormal);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    recomposeGeometry();
+    status('Ready – sculpt the trunk!');
+  </script>
+</body>
+</html>

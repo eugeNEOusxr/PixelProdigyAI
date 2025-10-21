@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PixelProdigy AI - Infinite Worlds</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD..."></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; }
+        #hero { text-align: center; padding: 50px; background: #001a4d; color: white; }
+        #map { width: 100%; height: 600px; margin: 20px 0; }
+        .city-card { border: 1px solid #ccc; padding: 20px; margin: 10px; cursor: pointer; }
+        .city-card:hover { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div id="hero">
+        <h1>🌍 PixelProdigy AI</h1>
+        <h2>Build Infinite Worlds • Real Cities • Gaming Realms</h2>
+        <p>Map the Earth. Expand to the Stars.</p>
+    </div>
+    
+    <div id="map"></div>
+    
+    <div id="cities-container"></div>
+    
+    <script>
+        // Initialize map
+        const map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 3,
+            center: { lat: 39.8283, lng: -98.5795 }
+        });
+        
+        // Load real cities
+        fetch('http://localhost:3000/api/cities/real')
+            .then(r => r.json())
+            .then(cities => {
+                cities.forEach(city => {
+                    new google.maps.Marker({
+                        position: { lat: city.lat, lng: city.lng },
+                        map,
+                        title: city.name
+                    });
+                });
+            });
+        
+        // Load SkyRelics cities
+        fetch('http://localhost:3000/api/cities/skyrelics')
+            .then(r => r.json())
+            .then(cities => {
+                const container = document.getElementById('cities-container');
+                cities.forEach(city => {
+                    const card = document.createElement('div');
+                    card.className = 'city-card';
+                    card.innerHTML = `
+                        <h3>${city.name}</h3>
+                        <p>Towers: ${city.towers}</p>
+                        <p>Dungeons: ${city.dungeons}</p>
+                        <p>Quests: ${city.quests}</p>
+                        <button onclick="enterGamingRealm('${city.id}')">Enter</button>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        
+        function enterGamingRealm(cityId) {
+            window.location.href = `/play?city=${cityId}`;
+        }
+    </script>
+</body>
+</html>

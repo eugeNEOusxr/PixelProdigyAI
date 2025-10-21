@@ -1,0 +1,312 @@
+{
+  "worldName": "PixelVerse",
+  "version": "1.0.0",
+  "seed": "PixelProdigy-Genesis-2025",
+  "creator": "Jeremy",
+  
+  "dimensions": {
+    "initialSize": 100000,
+    "chunkSize": 1000,
+    "totalChunks": 10000,
+    "gridSize": { "x": 100, "z": 100 },
+    "heightRange": { "min": -50, "max": 500 }
+  },
+  
+  "rendering": {
+    "terrainResolution": 4,
+    "renderDistance": 5000,
+    "lodLevels": [
+      { "name": "high", "distance": [0, 1000], "polygonReduction": 1.0 },
+      { "name": "medium", "distance": [1000, 3000], "polygonReduction": 0.5 },
+      { "name": "low", "distance": [3000, 5000], "polygonReduction": 0.2 }
+    ]
+  },
+  
+  "biomes": [
+    {
+      "id": "forest",
+      "name": "Emerald Forest",
+      "coverage": 0.30,
+      "colors": {
+        "ground": "#2d5016",
+        "vegetation": "#4a7c2d",
+        "accent": "#6b9f3a"
+      },
+      "vegetation": {
+        "treeDensity": 0.6,
+        "grassDensity": 0.8,
+        "flowerDensity": 0.3
+      },
+      "elevation": { "min": 0, "max": 200 },
+      "moisture": { "min": 0.5, "max": 1.0 }
+    },
+    {
+      "id": "mountain",
+      "name": "Crystal Peaks",
+      "coverage": 0.20,
+      "colors": {
+        "ground": "#5a5a5a",
+        "rock": "#3d3d3d",
+        "snow": "#f0f0f0",
+        "crystal": "#9d4dff"
+      },
+      "vegetation": {
+        "treeDensity": 0.1,
+        "grassDensity": 0.2,
+        "crystalDensity": 0.4
+      },
+      "elevation": { "min": 300, "max": 500 },
+      "moisture": { "min": 0.3, "max": 0.7 }
+    },
+    {
+      "id": "desert",
+      "name": "Sunstone Wastes",
+      "coverage": 0.15,
+      "colors": {
+        "ground": "#d4a574",
+        "sand": "#e4b98a",
+        "rock": "#8b6f47"
+      },
+      "vegetation": {
+        "cactusDensity": 0.1,
+        "deadBushDensity": 0.2,
+        "oasisChance": 0.05
+      },
+      "elevation": { "min": 0, "max": 100 },
+      "moisture": { "min": 0.0, "max": 0.2 }
+    },
+    {
+      "id": "plains",
+      "name": "Golden Plains",
+      "coverage": 0.25,
+      "colors": {
+        "ground": "#7d9b3f",
+        "grass": "#9ab958",
+        "flowers": "#ffcc66"
+      },
+      "vegetation": {
+        "treeDensity": 0.1,
+        "grassDensity": 0.9,
+        "flowerDensity": 0.5
+      },
+      "elevation": { "min": 0, "max": 50 },
+      "moisture": { "min": 0.3, "max": 0.6 }
+    },
+    {
+      "id": "water",
+      "name": "Azure Depths",
+      "coverage": 0.10,
+      "colors": {
+        "shallow": "#4da6ff",
+        "deep": "#1a5c99",
+        "shore": "#c2b280"
+      },
+      "features": {
+        "waveHeight": 0.5,
+        "transparency": 0.7,
+        "reflection": 0.8
+      },
+      "elevation": { "min": -50, "max": -1 },
+      "moisture": { "min": 1.0, "max": 1.0 }
+    }
+  ],
+  
+  "startingCities": [
+    {
+      "id": "genesis-city",
+      "name": "Genesis City",
+      "position": { "x": 50000, "z": 50000 },
+      "size": "large",
+      "population": 15000,
+      "architecture": "futuristic",
+      "style": {
+        "buildings": "white-towers",
+        "roads": "golden-paths",
+        "landmarks": "crystal-spire"
+      },
+      "description": "The gleaming spawn city where all players begin their journey",
+      "isSpawnPoint": true
+    },
+    {
+      "id": "ironforge-valley",
+      "name": "Ironforge Valley",
+      "position": { "x": 30000, "z": 40000 },
+      "size": "medium",
+      "population": 8000,
+      "architecture": "industrial",
+      "style": {
+        "buildings": "brick-factories",
+        "roads": "iron-bridges",
+        "landmarks": "steam-forge"
+      },
+      "description": "Industrial hub where crafters and builders gather"
+    },
+    {
+      "id": "emerald-canopy",
+      "name": "Emerald Canopy",
+      "position": { "x": 70000, "z": 60000 },
+      "size": "medium",
+      "population": 6000,
+      "architecture": "organic",
+      "style": {
+        "buildings": "treehouses",
+        "roads": "vine-bridges",
+        "landmarks": "ancient-oak"
+      },
+      "description": "City in harmony with nature, built among ancient trees"
+    },
+    {
+      "id": "crystal-peaks-city",
+      "name": "Lumina Citadel",
+      "position": { "x": 45000, "z": 70000 },
+      "size": "small",
+      "population": 5000,
+      "architecture": "mystical",
+      "style": {
+        "buildings": "crystal-spires",
+        "roads": "light-paths",
+        "landmarks": "prism-tower"
+      },
+      "description": "Mystical city built among glowing crystal formations"
+    },
+    {
+      "id": "sunstone-oasis",
+      "name": "Sunstone Oasis",
+      "position": { "x": 60000, "z": 30000 },
+      "size": "small",
+      "population": 4000,
+      "architecture": "desert",
+      "style": {
+        "buildings": "sandstone-pyramids",
+        "roads": "palm-paths",
+        "landmarks": "sun-temple"
+      },
+      "description": "Desert paradise built around a life-giving oasis"
+    }
+  ],
+  
+  "resources": {
+    "wood": {
+      "biomes": ["forest", "plains"],
+      "density": 0.3,
+      "respawnTime": 3600,
+      "gatherYield": { "min": 5, "max": 15 }
+    },
+    "stone": {
+      "biomes": ["mountain", "desert"],
+      "density": 0.4,
+      "respawnTime": 7200,
+      "gatherYield": { "min": 3, "max": 10 }
+    },
+    "crystal": {
+      "biomes": ["mountain"],
+      "density": 0.1,
+      "respawnTime": 14400,
+      "gatherYield": { "min": 1, "max": 3 }
+    },
+    "ore": {
+      "biomes": ["mountain", "forest"],
+      "density": 0.15,
+      "respawnTime": 10800,
+      "gatherYield": { "min": 2, "max": 8 }
+    },
+    "fiber": {
+      "biomes": ["plains", "forest"],
+      "density": 0.5,
+      "respawnTime": 1800,
+      "gatherYield": { "min": 10, "max": 20 }
+    }
+  },
+  
+  "worldEvents": {
+    "dayNightCycle": {
+      "enabled": true,
+      "dayLength": 1200,
+      "nightLength": 600,
+      "transitionDuration": 120
+    },
+    "weather": {
+      "enabled": true,
+      "systems": [
+        { "type": "clear", "probability": 0.6, "duration": 600 },
+        { "type": "rain", "probability": 0.2, "duration": 300 },
+        { "type": "storm", "probability": 0.1, "duration": 180 },
+        { "type": "snow", "probability": 0.1, "duration": 400 }
+      ]
+    },
+    "seasons": {
+      "enabled": false,
+      "seasonLength": 604800
+    }
+  },
+  
+  "gameplay": {
+    "maxPlayers": 50,
+    "pvpEnabled": false,
+    "buildingRestrictions": {
+      "minDistanceFromCity": 100,
+      "maxHeightAboveGround": 100,
+      "maxDepthBelowGround": 20
+    },
+    "landClaiming": {
+      "enabled": true,
+      "plotSizes": [
+        { "tier": "free", "size": 1000, "cost": 0 },
+        { "tier": "premium", "size": 10000, "cost": 500 },
+        { "tier": "pro", "size": 100000, "cost": 2000 }
+      ]
+    }
+  },
+  
+  "expansion": {
+    "triggers": [
+      { "userCount": 1000, "unlockArea": "northern-frontier", "sizeIncrease": 0.5 },
+      { "userCount": 10000, "unlockArea": "eastern-territories", "sizeIncrease": 1.0 },
+      { "userCount": 100000, "unlockArea": "southern-isles", "sizeIncrease": 2.0 },
+      { "userCount": 1000000, "unlockArea": "western-continents", "sizeIncrease": 5.0 }
+    ]
+  },
+  
+  "aiPersonalities": {
+    "architect": {
+      "id": 25,
+      "role": "Building generation and city planning",
+      "buildingStyles": ["futuristic", "industrial", "organic", "mystical", "desert"]
+    },
+    "artist": {
+      "id": 1,
+      "role": "Visual design and aesthetics",
+      "responsibilities": ["color palettes", "lighting", "visual effects"]
+    },
+    "designer": {
+      "id": 30,
+      "role": "Player experience and flow",
+      "responsibilities": ["spawn points", "navigation", "comfort zones"]
+    },
+    "engineer": {
+      "id": 20,
+      "role": "Performance optimization",
+      "responsibilities": ["LOD system", "chunk loading", "frame rate"]
+    },
+    "naturalist": {
+      "id": 14,
+      "role": "Ecosystem and wildlife",
+      "responsibilities": ["vegetation", "weather", "day-night cycle"]
+    }
+  },
+  
+  "performance": {
+    "targetFPS": 60,
+    "maxVerticesOnScreen": 5000000,
+    "maxDrawCalls": 1000,
+    "textureMemoryLimit": 2048,
+    "networkBandwidth": 100
+  },
+  
+  "storage": {
+    "format": "VLS",
+    "compression": "GENE",
+    "expectedWorldSize": 500,
+    "databasePath": "schema/vls_world.db"
+  }
+}

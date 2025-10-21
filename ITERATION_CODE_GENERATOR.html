@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔢 Iteration Code Generator - Minimal Input → Full Vertex Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff00;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        h1 {
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        h2 {
+            color: #ffff00;
+            margin: 20px 0 10px 0;
+            font-size: 18px;
+            border-bottom: 1px solid #ffff00;
+            padding-bottom: 5px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            color: #00ffff;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: #000;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        button {
+            background: linear-gradient(135deg, #00ff00, #00cc00);
+            border: none;
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #ffff00, #cccc00);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: #fff;
+        }
+
+        .code-output {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.5;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .preview-canvas {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #00ffff;
+            border-radius: 5px;
+            background: #000;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .stat {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #ffff00;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #00ff00;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .template-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .template-btn {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .template-btn:hover {
+            background: rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .keyword {
+            color: #ff00ff;
+        }
+
+        .string {
+            color: #ffff00;
+        }
+
+        .number {
+            color: #00ffff;
+        }
+
+        .comment {
+            color: #666;
+        }
+
+        .toggle-section {
+            cursor: pointer;
+            user-select: none;
+            padding: 10px;
+            background: rgba(255, 255, 0, 0.1);
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .toggle-section:hover {
+            background: rgba(255, 255, 0, 0.2);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.open {
+            max-height: 2000px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔢 ITERATION CODE GENERATOR</h1>
+    <p style="text-align: center; color: #ffff00; margin-bottom: 20px;">
+        Minimal Human Input → Full Vertex Control Code
+    </p>
+
+    <div class="container">
+        <!-- LEFT PANEL: INPUT -->
+        <div class="panel">
+            <h2>📝 MINIMAL INPUT</h2>
+            
+            <div class="template-buttons">
+                <button class="template-btn" onclick="loadTemplate('joint')">Joint Physics</button>
+                <button class="template-btn" onclick="loadTemplate('ik')">IK Solver</button>
+                <button class="template-btn" onclick="loadTemplate('walk')">Walk Cycle</button>
+                <button class="template-btn" onclick="loadTemplate('bezier')">Bezier Path</button>
+                <button class="template-btn" onclick="loadTemplate('spring')">Spring System</button>
+            </div>
+
+            <div class="input-group">
+                <label>🎯 What to animate?</label>
+                <select id="animationType" onchange="updateInputs()">
+                    <option value="joint">Joint Rotation</option>
+                    <option value="position">Position</option>
+                    <option value="path">Path Following</option>
+                    <option value="cycle">Cyclic Motion</option>
+                    <option value="ik">IK Chain</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>📊 Number of iterations (n)</label>
+                <input type="number" id="iterations" value="10" min="1" max="1000">
+            </div>
+
+            <div class="input-group">
+                <label>⏱️ Time parameter (t range)</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <input type="number" id="tStart" value="0" step="0.1" placeholder="Start">
+                    <input type="number" id="tEnd" value="1" step="0.1" placeholder="End">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>🔢 Value range</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <input type="number" id="valueStart" value="0" step="0.1" placeholder="Start value">
+                    <input type="number" id="valueEnd" value="90" step="0.1" placeholder="End value">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>⚙️ Easing function</label>
+                <select id="easing">
+                    <option value="linear">Linear</option>
+                    <option value="easeInOut">Ease In-Out</option>
+                    <option value="sine">Sine Wave</option>
+                    <option value="cosine">Cosine Wave</option>
+                    <option value="spring">Spring</option>
+                    <option value="elastic">Elastic</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>🎨 Variable names (i, j, k, u, v, ...)</label>
+                <input type="text" id="varNames" value="i, u, theta" placeholder="Comma-separated">
+            </div>
+
+            <div class="input-group">
+                <label>📐 Physics constants (optional)</label>
+                <textarea id="constants" rows="4" placeholder="mass = 5&#10;stiffness = 0.15&#10;damping = 0.85"></textarea>
+            </div>
+
+            <button onclick="generateCode()" style="width: 100%; font-size: 16px;">
+                ⚡ GENERATE CODE
+            </button>
+
+            <button onclick="executeCode()" class="secondary" style="width: 100%; font-size: 16px;">
+                ▶️ RUN & VISUALIZE
+            </button>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Lines Generated</div>
+                    <div class="stat-value" id="lineCount">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Vertices</div>
+                    <div class="stat-value" id="vertexCount">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Ops/Frame</div>
+                    <div class="stat-value" id="opsCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: OUTPUT -->
+        <div class="panel">
+            <h2>💻 GENERATED CODE</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <button onclick="copyCode()">📋 Copy to Clipboard</button>
+                <button onclick="downloadCode()" class="secondary">💾 Download .js</button>
+                <button onclick="insertIntoGame()" class="secondary">🎮 Insert into Game</button>
+            </div>
+
+            <div class="code-output" id="codeOutput">
+// Click "GENERATE CODE" to create iteration code...
+// Your minimal input will expand into full vertex control!
+            </div>
+
+            <h2>🎬 LIVE PREVIEW</h2>
+            <canvas id="preview" class="preview-canvas"></canvas>
+
+            <div class="toggle-section" onclick="toggleSection('telemetry')">
+                📊 ITERATION TELEMETRY (click to expand)
+            </div>
+            <div id="telemetry" class="collapsible-content">
+                <div class="code-output" id="telemetryOutput" style="max-height: 300px;">
+Waiting for code execution...
+                </div>
+            </div>
+
+            <div class="toggle-section" onclick="toggleSection('explanation')">
+                📚 CODE EXPLANATION (click to expand)
+            </div>
+            <div id="explanation" class="collapsible-content">
+                <div class="code-output" id="explanationOutput" style="max-height: 300px;">
+Code explanation will appear here...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let generatedCode = '';
+        let telemetryData = [];
+
+        // ═══════════════════════════════════════════════════════════
+        // TEMPLATE LOADING
+        // ═══════════════════════════════════════════════════════════
+
+        const templates = {
+            joint: {
+                animationType: 'joint',
+                iterations: 60,
+                tStart: 0,
+                tEnd: 1,
+                valueStart: 0,
+                valueEnd: 90,
+                easing: 'spring',
+                varNames: 'i, t, theta, omega, alpha',
+                constants: 'mass = 5\nstiffness = 0.15\ndamping = 0.85'
+            },
+            ik: {
+                animationType: 'ik',
+                iterations: 10,
+                tStart: 0,
+                tEnd: 1,
+                valueStart: 0,
+                valueEnd: 1,
+                easing: 'linear',
+                varNames: 'i, j, target, distance, epsilon',
+                constants: 'upperArm = 0.3\nforearm = 0.25\ntolerance = 0.01'
+            },
+            walk: {
+                animationType: 'cycle',
+                iterations: 120,
+                tStart: 0,
+                tEnd: 6.28,
+                valueStart: -30,
+                valueEnd: 30,
+                easing: 'sine',
+                varNames: 'i, t, phase, hipAngle, kneeAngle',
+                constants: 'frequency = 2\namplitude = 30'
+            },
+            bezier: {
+                animationType: 'path',
+                iterations: 100,
+                tStart: 0,
+                tEnd: 1,
+                valueStart: 0,
+                valueEnd: 1,
+                easing: 'easeInOut',
+                varNames: 'i, u, t, point, vertices',
+                constants: 'p0 = [0,0,0]\np1 = [1,2,0]\np2 = [3,2,0]\np3 = [4,0,0]'
+            },
+            spring: {
+                animationType: 'joint',
+                iterations: 100,
+                tStart: 0,
+                tEnd: 2,
+                valueStart: 0,
+                valueEnd: 1,
+                easing: 'spring',
+                varNames: 'i, t, x, v, a, F',
+                constants: 'k = 0.2\nc = 0.9\nm = 5\ntarget = 1.0'
+            }
+        };
+
+        function loadTemplate(name) {
+            const template = templates[name];
+            if (!template) return;
+
+            document.getElementById('animationType').value = template.animationType;
+            document.getElementById('iterations').value = template.iterations;
+            document.getElementById('tStart').value = template.tStart;
+            document.getElementById('tEnd').value = template.tEnd;
+            document.getElementById('valueStart').value = template.valueStart;
+            document.getElementById('valueEnd').value = template.valueEnd;
+            document.getElementById('easing').value = template.easing;
+            document.getElementById('varNames').value = template.varNames;
+            document.getElementById('constants').value = template.constants;
+
+            console.log(`📋 Loaded template: ${name}`);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // CODE GENERATION ENGINE
+        // ═══════════════════════════════════════════════════════════
+
+        function generateCode() {
+            const type = document.getElementById('animationType').value;
+            const n = parseInt(document.getElementById('iterations').value);
+            const tStart = parseFloat(document.getElementById('tStart').value);
+            const tEnd = parseFloat(document.getElementById('tEnd').value);
+            const vStart = parseFloat(document.getElementById('valueStart').value);
+            const vEnd = parseFloat(document.getElementById('valueEnd').value);
+            const easing = document.getElementById('easing').value;
+            const varNames = document.getElementById('varNames').value;
+            const constants = document.getElementById('constants').value;
+
+            let code = '';
+
+            // ═══ HEADER ═══
+            code += `/**\n`;
+            code += ` * AUTO-GENERATED ITERATION CODE\n`;
+            code += ` * Type: ${type}\n`;
+            code += ` * Iterations: n = ${n}\n`;
+            code += ` * Time: t ∈ [${tStart}, ${tEnd}]\n`;
+            code += ` * Range: [${vStart}, ${vEnd}]\n`;
+            code += ` */\n\n`;
+
+            // ═══ CONSTANTS ═══
+            if (constants.trim()) {
+                code += `// ═══ CONSTANTS ═══\n`;
+                constants.split('\n').forEach(line => {
+                    if (line.trim()) {
+                        code += `const ${line.trim()};\n`;
+                    }
+                });
+                code += `\n`;
+            }
+
+            // ═══ EASING FUNCTION ═══
+            code += generateEasingFunction(easing);
+
+            // ═══ MAIN ITERATION LOOP ═══
+            code += generateMainLoop(type, n, tStart, tEnd, vStart, vEnd, easing, varNames);
+
+            // ═══ HELPER FUNCTIONS ═══
+            code += generateHelpers(type);
+
+            generatedCode = code;
+            displayCode(code);
+            updateStats(code, n);
+            generateExplanation(type, n, easing);
+        }
+
+        function generateEasingFunction(easing) {
+            let code = `// ═══ EASING FUNCTION ═══\n`;
+            code += `function ease(t) {\n`;
+            
+            switch(easing) {
+                case 'linear':
+                    code += `    return t;\n`;
+                    break;
+                case 'easeInOut':
+                    code += `    return t < 0.5\n`;
+                    code += `        ? 4 * t * t * t\n`;
+                    code += `        : 1 - Math.pow(-2 * t + 2, 3) / 2;\n`;
+                    break;
+                case 'sine':
+                    code += `    return Math.sin(t * Math.PI * 2);\n`;
+                    break;
+                case 'cosine':
+                    code += `    return Math.cos(t * Math.PI * 2);\n`;
+                    break;
+                case 'spring':
+                    code += `    // Spring-damper system\n`;
+                    code += `    const k = 0.2, c = 0.9;\n`;
+                    code += `    return t * (1 - c * Math.exp(-k * t));\n`;
+                    break;
+                case 'elastic':
+                    code += `    return Math.sin(13 * Math.PI * t / 2) * Math.pow(2, -10 * t);\n`;
+                    break;
+            }
+            
+            code += `}\n\n`;
+            return code;
+        }
+
+        function generateMainLoop(type, n, tStart, tEnd, vStart, vEnd, easing, varNames) {
+            let code = `// ═══ MAIN ITERATION LOOP ═══\n`;
+            code += `function iterate() {\n`;
+            code += `    const n = ${n};  // Total iterations\n`;
+            code += `    const results = [];\n`;
+            code += `    \n`;
+            code += `    // ═══ LOOP: for (i = 0; i < n; i++) ═══\n`;
+            code += `    for (let i = 0; i < n; i++) {\n`;
+            code += `        // ─── CALCULATE PARAMETER u ∈ [0,1] ───\n`;
+            code += `        const u = i / (n - 1);  // Normalized parameter\n`;
+            code += `        \n`;
+            code += `        // ─── APPLY EASING ───\n`;
+            code += `        const t = ${tStart} + (${tEnd} - ${tStart}) * ease(u);\n`;
+            code += `        \n`;
+
+            switch(type) {
+                case 'joint':
+                    code += generateJointCode(vStart, vEnd);
+                    break;
+                case 'position':
+                    code += generatePositionCode(vStart, vEnd);
+                    break;
+                case 'path':
+                    code += generatePathCode();
+                    break;
+                case 'cycle':
+                    code += generateCycleCode(vStart, vEnd);
+                    break;
+                case 'ik':
+                    code += generateIKCode();
+                    break;
+            }
+
+            code += `        \n`;
+            code += `        results.push({ i, u, t, value });\n`;
+            code += `    }\n`;
+            code += `    \n`;
+            code += `    return results;\n`;
+            code += `}\n\n`;
+            return code;
+        }
+
+        function generateJointCode(vStart, vEnd) {
+            return `        // ─── JOINT PHYSICS ───\n` +
+                   `        const theta = ${vStart} + (${vEnd} - ${vStart}) * ease(u);\n` +
+                   `        const omega = (theta - (results[i-1]?.value || 0)) / 0.016;\n` +
+                   `        const alpha = omega / 0.016;\n` +
+                   `        \n` +
+                   `        // ─── SPRING FORCE ───\n` +
+                   `        const displacement = theta - 0;\n` +
+                   `        const F_spring = -stiffness * displacement;\n` +
+                   `        const F_damping = -damping * omega;\n` +
+                   `        const F_total = F_spring + F_damping;\n` +
+                   `        \n` +
+                   `        const value = theta; // Output angle\n`;
+        }
+
+        function generatePositionCode(vStart, vEnd) {
+            return `        // ─── POSITION INTERPOLATION ───\n` +
+                   `        const x = ${vStart} + (${vEnd} - ${vStart}) * ease(u);\n` +
+                   `        const y = Math.sin(u * Math.PI) * 2;\n` +
+                   `        const z = 0;\n` +
+                   `        \n` +
+                   `        const value = { x, y, z };\n`;
+        }
+
+        function generatePathCode() {
+            return `        // ─── BEZIER CURVE ───\n` +
+                   `        const p0 = [0, 0, 0];\n` +
+                   `        const p1 = [1, 2, 0];\n` +
+                   `        const p2 = [3, 2, 0];\n` +
+                   `        const p3 = [4, 0, 0];\n` +
+                   `        \n` +
+                   `        const b = (1-t)**3 * p0[0] + 3*(1-t)**2*t * p1[0] +\n` +
+                   `                  3*(1-t)*t**2 * p2[0] + t**3 * p3[0];\n` +
+                   `        \n` +
+                   `        const value = b;\n`;
+        }
+
+        function generateCycleCode(vStart, vEnd) {
+            return `        // ─── CYCLIC MOTION ───\n` +
+                   `        const phase = t;  // Phase angle\n` +
+                   `        const amplitude = ${(vEnd - vStart) / 2};\n` +
+                   `        const offset = ${(vEnd + vStart) / 2};\n` +
+                   `        \n` +
+                   `        const value = offset + amplitude * Math.sin(phase);\n`;
+        }
+
+        function generateIKCode() {
+            return `        // ─── IK SOLVING (FABRIK iteration) ───\n` +
+                   `        const target = [u * 4, Math.sin(u * Math.PI), 0];\n` +
+                   `        const distance = Math.sqrt(target[0]**2 + target[1]**2);\n` +
+                   `        const epsilon = tolerance;\n` +
+                   `        \n` +
+                   `        // Backward pass\n` +
+                   `        // (simplified for demo)\n` +
+                   `        const value = distance < epsilon ? 1 : 0;\n`;
+        }
+
+        function generateHelpers(type) {
+            let code = `// ═══ HELPER FUNCTIONS ═══\n`;
+            code += `function applyToMesh(value) {\n`;
+            code += `    // Apply computed value to 3D mesh\n`;
+            
+            switch(type) {
+                case 'joint':
+                    code += `    mesh.rotation.x = value * Math.PI / 180; // Convert to radians\n`;
+                    break;
+                case 'position':
+                    code += `    mesh.position.set(value.x, value.y, value.z);\n`;
+                    break;
+                default:
+                    code += `    mesh.userData.value = value;\n`;
+            }
+            
+            code += `}\n\n`;
+            code += `// ═══ EXECUTE ═══\n`;
+            code += `const results = iterate();\n`;
+            code += `console.log('Generated', results.length, 'iteration values');\n`;
+            return code;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // CODE EXECUTION & VISUALIZATION
+        // ═══════════════════════════════════════════════════════════
+
+        function executeCode() {
+            if (!generatedCode) {
+                alert('⚠️ Generate code first!');
+                return;
+            }
+
+            try {
+                // Clear previous telemetry
+                telemetryData = [];
+                
+                // Execute code with telemetry tracking
+                const wrappedCode = wrapCodeWithTelemetry(generatedCode);
+                eval(wrappedCode);
+                
+                // Visualize results
+                visualizeOnCanvas();
+                displayTelemetry();
+                
+            } catch(e) {
+                console.error('Execution error:', e);
+                alert('❌ Execution error: ' + e.message);
+            }
+        }
+
+        function wrapCodeWithTelemetry(code) {
+            // Add telemetry hooks
+            return code.replace(
+                'results.push({ i, u, t, value });',
+                `results.push({ i, u, t, value });
+                telemetryData.push({ 
+                    i, u: u.toFixed(4), t: t.toFixed(4), 
+                    value: typeof value === 'object' ? JSON.stringify(value) : value.toFixed(4)
+                });`
+            );
+        }
+
+        function visualizeOnCanvas() {
+            const canvas = document.getElementById('preview');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.clientWidth;
+            const h = canvas.height = canvas.clientHeight;
+
+            // Clear
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, w, h);
+
+            // Grid
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < w; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+            }
+            for (let y = 0; y < h; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+
+            // Plot values
+            if (telemetryData.length === 0) return;
+
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            telemetryData.forEach((data, i) => {
+                const x = (i / telemetryData.length) * w;
+                let y;
+                
+                if (typeof data.value === 'string' && data.value.includes('{')) {
+                    // Object value - use y component
+                    try {
+                        const obj = JSON.parse(data.value);
+                        y = h - ((obj.y || 0) + 2) * h / 4;
+                    } catch(e) {
+                        y = h / 2;
+                    }
+                } else {
+                    // Numeric value
+                    const val = parseFloat(data.value);
+                    y = h - ((val / 100) * h * 0.8 + h * 0.1);
+                }
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+
+                // Draw point
+                ctx.fillStyle = '#00ffff';
+                ctx.fillRect(x - 2, y - 2, 4, 4);
+            });
+
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#ffff00';
+            ctx.font = '12px Courier New';
+            ctx.fillText(`n = ${telemetryData.length} iterations`, 10, 20);
+            ctx.fillText(`Δt = ${(1/60).toFixed(6)}s (60 Hz)`, 10, 35);
+        }
+
+        function displayTelemetry() {
+            let html = `<div style="color: #00ff00;">\n`;
+            html += `═══════════════════════════════════════\n`;
+            html += `📊 ITERATION TELEMETRY\n`;
+            html += `═══════════════════════════════════════\n\n`;
+
+            telemetryData.slice(0, 10).forEach(data => {
+                html += `i=${data.i.toString().padStart(3)} `;
+                html += `u=${data.u.padEnd(8)} `;
+                html += `t=${data.t.padEnd(8)} `;
+                html += `value=${data.value}\n`;
+            });
+
+            if (telemetryData.length > 10) {
+                html += `\n... (${telemetryData.length - 10} more iterations)\n`;
+            }
+
+            html += `\n═══════════════════════════════════════\n`;
+            html += `✅ ${telemetryData.length} iterations completed\n`;
+            html += `⚙️ Running at 60 Hz = ${(1/60 * 1000).toFixed(2)}ms/frame\n`;
+            html += `</div>`;
+
+            document.getElementById('telemetryOutput').innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // UI HELPERS
+        // ═══════════════════════════════════════════════════════════
+
+        function displayCode(code) {
+            const highlighted = highlightCode(code);
+            document.getElementById('codeOutput').innerHTML = highlighted;
+        }
+
+        function highlightCode(code) {
+            return code
+                .replace(/\/\/.*/g, '<span class="comment">$&</span>')
+                .replace(/\b(const|let|var|function|return|for|if|else)\b/g, '<span class="keyword">$&</span>')
+                .replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$&</span>')
+                .replace(/'([^']*)'/g, '<span class="string">\'$1\'</span>')
+                .replace(/"([^"]*)"/g, '<span class="string">"$1"</span>');
+        }
+
+        function updateStats(code, n) {
+            const lines = code.split('\n').length;
+            const vertices = n;
+            const opsPerFrame = n * 10; // Rough estimate
+
+            document.getElementById('lineCount').textContent = lines;
+            document.getElementById('vertexCount').textContent = vertices;
+            document.getElementById('opsCount').textContent = opsPerFrame;
+        }
+
+        function generateExplanation(type, n, easing) {
+            let html = `<div style="color: #00ff00; line-height: 1.6;">\n`;
+            html += `<strong style="color: #ffff00;">CODE EXPLANATION:</strong>\n\n`;
+            html += `This code generates ${n} iteration steps for ${type} animation.\n\n`;
+            html += `<strong style="color: #00ffff;">ITERATION FLOW:</strong>\n`;
+            html += `1. for (i=0; i<${n}; i++)  ← Loop counter\n`;
+            html += `2. u = i/(n-1)             ← Normalize to [0,1]\n`;
+            html += `3. t = ease(u)             ← Apply ${easing} easing\n`;
+            html += `4. value = f(t)            ← Calculate result\n`;
+            html += `5. results.push(value)     ← Store\n\n`;
+            html += `<strong style="color: #00ffff;">MEMORY:</strong>\n`;
+            html += `• ${n} × 64 bytes = ${(n * 64 / 1024).toFixed(2)} KB\n`;
+            html += `• ${n} vertices generated\n`;
+            html += `• ~${n * 10} operations total\n\n`;
+            html += `<strong style="color: #00ffff;">REGISTERS USED:</strong>\n`;
+            html += `• i (loop counter)\n`;
+            html += `• u (parameter 0-1)\n`;
+            html += `• t (eased time)\n`;
+            html += `• value (output)\n`;
+            html += `</div>`;
+
+            document.getElementById('explanationOutput').innerHTML = html;
+        }
+
+        function toggleSection(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('open');
+        }
+
+        function copyCode() {
+            navigator.clipboard.writeText(generatedCode);
+            alert('✅ Code copied to clipboard!');
+        }
+
+        function downloadCode() {
+            const blob = new Blob([generatedCode], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'iteration_code.js';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function insertIntoGame() {
+            alert('🎮 To insert into game:\n\n1. Copy the generated code\n2. Open skyrelics_world.html\n3. Paste into <script> section\n4. Call iterate() in animation loop');
+        }
+
+        function updateInputs() {
+            // Update UI based on animation type
+            const type = document.getElementById('animationType').value;
+            console.log('Animation type changed:', type);
+        }
+
+        // Initialize
+        loadTemplate('joint');
+    </script>
+</body>
+</html>

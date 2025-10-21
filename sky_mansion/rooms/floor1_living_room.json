@@ -1,0 +1,405 @@
+{
+  "roomId": "SM_FLOOR1_LIVING_ROOM",
+  "name": "Living Room",
+  "floor": 1,
+  "type": "Entertainment & Social Space",
+  
+  "dimensions": {
+    "length": 12.2,
+    "width": 9.1,
+    "height": 4.2,
+    "area": 111,
+    "unit": "meters"
+  },
+  
+  "design": {
+    "style": "Modern Minimalist",
+    "colorScheme": {
+      "primary": "#FFFFFF",
+      "secondary": "#E8E8E8",
+      "accent": "#000000",
+      "warm": "#D4AF37"
+    },
+    
+    "flooring": {
+      "type": "Polished Concrete",
+      "color": "#C0C0C0",
+      "finish": "High Gloss",
+      "heatedFloor": true
+    },
+    
+    "walls": {
+      "type": "White Glossy Composite",
+      "color": "#FFFFFF",
+      "finish": "Ultra Smooth",
+      "soundproofing": true
+    },
+    
+    "ceiling": {
+      "type": "Recessed Smart Panels",
+      "color": "#FFFFFF",
+      "lighting": "Integrated LED System",
+      "height": 4.2
+    },
+    
+    "windows": {
+      "coverage": "80%",
+      "type": "Floor-to-Ceiling Smart Glass",
+      "orientation": ["North", "East", "West"],
+      "view": "360° Sky & Clouds",
+      "features": ["Tintable", "Privacy Mode", "UV Filter"]
+    }
+  },
+  
+  "lighting": {
+    "natural": {
+      "skylights": 2,
+      "windows": "80% wall coverage",
+      "lightLevel": "Abundant"
+    },
+    
+    "artificial": {
+      "ceilingLights": {
+        "type": "Recessed LED",
+        "count": 12,
+        "dimmable": true,
+        "colorTemp": "2700K-6500K",
+        "smart": true
+      },
+      
+      "accentLighting": {
+        "type": "LED Strips",
+        "locations": ["Floor Perimeter", "Ceiling Coves", "Behind TV"],
+        "rgb": true,
+        "scenes": ["Cozy", "Party", "Cinema", "Aurora Sync", "Romantic"]
+      },
+      
+      "taskLighting": {
+        "floorLamps": 2,
+        "tableLamps": 1,
+        "spotlights": 4
+      }
+    },
+    
+    "automation": {
+      "timeOfDay": "Auto-adjust brightness",
+      "occupancy": "Motion activated",
+      "mood": "Voice-controlled scenes",
+      "auroraSync": "Sync with northern lights"
+    }
+  },
+  
+  "furniture": [
+    {
+      "objectId": "obj_sky_sofa_001",
+      "name": "Modern L-Shaped Sky Sofa",
+      "type": "Sofa",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -2,
+        "rotation": 0
+      },
+      "color": "#FFFFFF",
+      "material": "High Gloss Fabric",
+      "seatingCapacity": 6,
+      "features": ["Floating Frame", "Black Trim", "Built-in USB Charging"]
+    },
+    
+    {
+      "objectId": "obj_coffee_table_001",
+      "name": "Floating Glass Coffee Table",
+      "type": "Table",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 1.5
+      },
+      "color": "Transparent",
+      "material": "Tempered Glass",
+      "dimensions": {
+        "length": 1.5,
+        "width": 0.8,
+        "height": 0.4
+      },
+      "features": ["LED Base Lighting", "Wireless Charging Surface"]
+    },
+    
+    {
+      "objectId": "obj_conversation_pit_001",
+      "name": "Sunken Conversation Pit",
+      "type": "Seating Area",
+      "position": {
+        "x": -3,
+        "y": -0.3,
+        "z": -4
+      },
+      "seatingCapacity": 8,
+      "features": ["Recessed Floor", "Circular Layout", "Built-in Speakers", "Ambient Floor Lighting"]
+    },
+    
+    {
+      "objectId": "obj_side_table_001",
+      "name": "Minimalist Side Table (Left)",
+      "type": "Table",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -2
+      }
+    },
+    
+    {
+      "objectId": "obj_side_table_002",
+      "name": "Minimalist Side Table (Right)",
+      "type": "Table",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -2
+      }
+    },
+    
+    {
+      "objectId": "obj_floor_lamp_001",
+      "name": "Arc Floor Lamp",
+      "type": "Lighting",
+      "position": {
+        "x": -4,
+        "y": 0,
+        "z": 3
+      },
+      "style": "Modern Black",
+      "smart": true
+    },
+    
+    {
+      "objectId": "obj_floor_lamp_002",
+      "name": "Arc Floor Lamp",
+      "type": "Lighting",
+      "position": {
+        "x": 4,
+        "y": 0,
+        "z": 3
+      },
+      "style": "Modern Black",
+      "smart": true
+    },
+    
+    {
+      "objectId": "obj_bookshelf_001",
+      "name": "Floating Wall Shelves",
+      "type": "Storage",
+      "position": {
+        "x": -6,
+        "y": 1.5,
+        "z": 0
+      },
+      "color": "Black",
+      "shelves": 5
+    },
+    
+    {
+      "objectId": "obj_plant_001",
+      "name": "Fiddle Leaf Fig Tree",
+      "type": "Decor",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -5
+      },
+      "height": 2.1,
+      "potColor": "White"
+    }
+  ],
+  
+  "entertainment": {
+    "cinemaSystem": {
+      "objectId": "obj_cinema_system_001",
+      "type": "Holographic Projector",
+      "screenSize": "120 inch equivalent",
+      "resolution": "8K HDR",
+      "position": {
+        "projector": "Ceiling Recessed",
+        "screen": "North Wall"
+      },
+      "features": [
+        "Voice Activated",
+        "Gesture Control",
+        "Auto-Brightness",
+        "3D Capable",
+        "Shared Cinema Mode"
+      ],
+      "soundSystem": {
+        "type": "Dolby Atmos 7.2.4",
+        "speakers": {
+          "front": 3,
+          "surround": 4,
+          "ceiling": 4,
+          "subwoofers": 2
+        },
+        "invisible": true,
+        "inWall": true
+      }
+    },
+    
+    "holographicFireplace": {
+      "objectId": "obj_fireplace_holo_001",
+      "type": "Holographic Fireplace",
+      "position": {
+        "x": 0,
+        "y": 0.5,
+        "z": -6
+      },
+      "features": [
+        "Realistic Flames",
+        "Heat Simulation",
+        "Customizable Colors",
+        "Ambient Crackling Sound"
+      ]
+    },
+    
+    "smartDisplays": {
+      "artFrames": {
+        "count": 3,
+        "type": "Digital Art Frames",
+        "resolution": "4K",
+        "contentSource": "Museum Collections + Personal"
+      }
+    }
+  },
+  
+  "portals": [
+    {
+      "portalId": "portal_001",
+      "location": "East Wall",
+      "friendName": "Sarah (Girlfriend)",
+      "position": {
+        "x": 6,
+        "y": 0,
+        "z": 0
+      },
+      "appearance": "Swirling Pink Energy",
+      "size": "Doorway (2m x 0.9m)",
+      "alwaysOpen": true
+    },
+    
+    {
+      "portalId": "portal_002",
+      "location": "South Wall",
+      "friendName": "Mike",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 4.5
+      },
+      "appearance": "Blue Digital Gateway",
+      "size": "Doorway (2m x 0.9m)",
+      "knockRequired": true
+    }
+  ],
+  
+  "climateControl": {
+    "temperature": {
+      "target": 21,
+      "range": [18, 24],
+      "unit": "celsius",
+      "zones": 2
+    },
+    "airQuality": {
+      "purification": "HEPA + UV",
+      "monitoring": "Real-time CO2, VOC, PM2.5",
+      "freshAirExchange": "Automated"
+    },
+    "humidity": {
+      "target": 45,
+      "range": [40, 60],
+      "unit": "percent"
+    }
+  },
+  
+  "smartFeatures": {
+    "voiceControl": {
+      "assistant": "Aurora",
+      "commands": [
+        "Adjust lighting",
+        "Change temperature",
+        "Play media",
+        "Open/close portals",
+        "Set mood scene",
+        "Show aurora",
+        "Invite friends"
+      ]
+    },
+    
+    "scenePresets": [
+      {
+        "name": "Morning",
+        "lighting": "Bright Natural",
+        "temperature": 20,
+        "windows": "Clear"
+      },
+      {
+        "name": "Movie Night",
+        "lighting": "Dim Ambient",
+        "temperature": 21,
+        "windows": "Tinted",
+        "cinema": "Active"
+      },
+      {
+        "name": "Party Mode",
+        "lighting": "RGB Dynamic",
+        "temperature": 19,
+        "music": "Upbeat",
+        "fireplace": "Active"
+      },
+      {
+        "name": "Aurora Viewing",
+        "lighting": "Off",
+        "windows": "Clear",
+        "ceiling": "Transparent",
+        "auroraSync": "Active"
+      },
+      {
+        "name": "Romantic",
+        "lighting": "Warm Dim",
+        "fireplace": "Active",
+        "temperature": 22,
+        "music": "Soft Jazz"
+      }
+    ]
+  },
+  
+  "features": [
+    "180° Panoramic Windows",
+    "Sunken Conversation Pit",
+    "Holographic Fireplace",
+    "8K Cinema System",
+    "Dolby Atmos Sound",
+    "Friend Portals (2 active)",
+    "Smart Glass Privacy",
+    "Heated Floors",
+    "Air Purification",
+    "Voice Control Everything",
+    "Aurora Viewing Mode",
+    "Shared Cinema Capability"
+  ],
+  
+  "useCases": [
+    "Movie nights with girlfriend (long-distance cinema)",
+    "Friend hangouts via portals",
+    "Northern lights viewing parties",
+    "Streaming content creation",
+    "Social gatherings",
+    "Relaxation & meditation",
+    "Gaming sessions",
+    "Video calls with immersive background"
+  ],
+  
+  "metadata": {
+    "designedBy": "AI Personality #30 (Interior Designer)",
+    "created": "2025-10-16",
+    "status": "Complete",
+    "completion": "100%"
+  }
+}

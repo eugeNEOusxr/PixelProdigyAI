@@ -1,0 +1,1337 @@
+<!--
+INTEGRATED TEST: CAMERA + CHARACTER + INPUT
+
+This page demonstrates the full integration of the camera controller, player movement system, and unified input handler. It allows you to control a 3D character with keyboard, mouse, gamepad, or touch, and the camera will follow and rotate based on player movement and look input.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Integrated Camera-Character Test</title>
+  <style>
+    html, body { height: 100%; margin: 0; overflow: hidden; background: #181c20; }
+    
+    /* Animations for user messages */
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+    
+    #ui {
+      position: absolute; top: 0; left: 0; width: 100vw; z-index: 10;
+      color: #fff; font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px;
+      background: rgba(24,28,32,0.7); padding: 8px 16px; border-radius: 0 0 12px 0;
+      box-shadow: 0 2px 12px #0008;
+    }
+    #canvas3d { width: 100vw; height: 100vh; display: block; background: #222; }
+    #stats {
+      position: absolute; right: 0; top: 0; background: rgba(0,0,0,0.5); color: #fff;
+      font-size: 14px; padding: 8px 16px; border-radius: 0 0 0 12px; z-index: 10;
+      min-width: 220px;
+    }
+    #controls {
+      margin-top: 8px;
+    }
+    .btn {
+      background: #2a7cff; color: #fff; border: none; border-radius: 6px;
+      padding: 6px 16px; margin-right: 8px; font-size: 15px; cursor: pointer;
+      box-shadow: 0 2px 8px #0004; transition: background 0.2s;
+    }
+    .btn:hover { background: #1850a8; }
+    .badge { display: inline-block; background: #222; color: #fff; border-radius: 4px; padding: 2px 8px; margin-right: 4px; font-size: 13px; }
+    #instructions { position: absolute; left: 0; bottom: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 15px; padding: 10px 18px; border-radius: 0 12px 0 0; z-index: 10; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas3d"></canvas>
+  <div id="ui">
+    <b>Integrated Camera-Character Test</b>
+    <span id="modeBadge" class="badge">TPS</span>
+    <span id="fps" class="badge">FPS: 0</span>
+    <div id="controls">
+      <button class="btn" id="lockPointerBtn">Lock Pointer</button>
+      <button class="btn" id="settingsBtn">Settings</button>
+      <button class="btn" id="resetBtn">Reset</button>
+      <button class="btn" id="switchCharBtn">Switch Character</button>
+      <button class="btn" id="inventoryBtn">Inventory (I)</button>
+      <button class="btn" id="attackBtn">Attack (LMB)</button>
+      <button class="btn" id="healBtn">Heal (H)</button>
+      <button class="btn" id="weatherBtn">Weather</button>
+      <button class="btn" id="timeBtn">Set Time</button>
+      <button class="btn" id="audioBtn">Enable Audio</button>
+      <button class="btn" id="musicBtn">Music</button>
+      <button class="btn" id="saveBtn">Quick Save (F5)</button>
+      <button class="btn" id="loadBtn">Quick Load (F9)</button>
+      <button class="btn" id="mapZoomInBtn">Map Zoom+</button>
+      <button class="btn" id="mapZoomOutBtn">Map Zoom-</button>
+      <button class="btn" id="mapRotateBtn">Map Rotate</button>
+      <button class="btn" id="mapFogBtn">Toggle Fog</button>
+      <button class="btn" id="craftBtn">Craft (C)</button>
+      <button class="btn" id="shopBtn">Shop (B)</button>
+      <button class="btn" id="statsBtn">Character (P)</button>
+      <button class="btn" id="worldGenBtn">🌍 Generate World (G)</button>
+      <button class="btn" id="multiplayerBtn">🌐 Multiplayer (M)</button>
+      <button class="btn" id="audioBtn">🎵 Audio (U)</button>
+    </div>
+  </div>
+  <div id="stats"></div>
+  
+  <!-- Mini-Map Canvas -->
+  <canvas id="minimap" style="position: absolute; top: 10px; right: 260px; border: 2px solid #fff; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.8);"></canvas>
+  
+  <!-- Hotbar and Skills UI containers will be created dynamically -->
+  
+  <div id="instructions">
+    <b>Controls:</b> WASD = Move | Mouse = Look | Space = Jump | Shift = Sprint | C = Craft | V = Toggle Camera | I = Inventory | K = Skills | P = Character | G = Generate World | U = Audio | M = Multiplayer | 1-9 = Abilities | E = Interact | LMB = Attack | H = Heal<br>
+    <b>Debug:</b> F9 = Bug Tests | F10 = Export Diagnostics | F11 = Toggle Monitoring | F12 = Integration Tests | Shift+F12 = Benchmark | Ctrl+F12 = Stress Test
+  </div>
+  <script src="world_generation/loading_screen.js"></script>
+  <script src="world_generation/performance_optimizer.js"></script>
+  <script src="world_generation/particle_effects.js"></script>
+  <script src="world_generation/input_handler.js"></script>
+  <script src="world_generation/input_settings.js"></script>
+  <script src="world_generation/security_utils.js"></script>
+  <script src="world_generation/camera_controller.js"></script>
+  <script src="world_generation/player_movement.js"></script>
+  <script src="world_generation/physics_system.js"></script>
+  <script src="world_generation/collision_system.js"></script>
+  <script src="world_generation/object_interaction.js"></script>
+  <script src="world_generation/character_models.js"></script>
+  <script src="world_generation/animation_system.js"></script>
+  <script src="world_generation/inventory_system.js"></script>
+  <script src="world_generation/inventory_ui.js"></script>
+  <script src="world_generation/combat_system.js"></script>
+  <script src="world_generation/combat_ui.js"></script>
+  <script src="world_generation/ai_system.js"></script>
+  <script src="world_generation/dialogue_quest_system.js"></script>
+  <script src="world_generation/graphics_effects_system.js"></script>
+  <script src="world_generation/audio_system.js"></script>
+  <script src="world_generation/save_system.js"></script>
+  <script src="world_generation/minimap_system.js"></script>
+  <script src="world_generation/skills_abilities_system.js"></script>
+  <script src="world_generation/skills_abilities_ui.js"></script>
+  <script src="world_generation/crafting_system.js"></script>
+  <script src="world_generation/crafting_ui.js"></script>
+  <script src="world_generation/economy_system.js"></script>
+  <script src="world_generation/shop_ui.js"></script>
+  <script src="world_generation/level_progression_system.js"></script>
+  <script src="world_generation/level_progression_ui.js"></script>
+  <script src="world_generation/ai_world_generator.js"></script>
+  <script src="world_generation/ai_world_generator_ui.js"></script>
+  <script src="world_generation/simple_multiplayer_client.js"></script>
+  <script src="world_generation/multiplayer_ui.js"></script>
+  <script src="world_generation/enhanced_audio_controller.js"></script>
+  <script src="world_generation/bug_testing_system.js"></script>
+  <script src="world_generation/edge_case_handler.js"></script>
+  <script src="world_generation/integration_test_suite.js"></script>
+  <script>
+    // === 1. Setup 3D Scene (THREE.js assumed) ===
+  let camera, scene, renderer, clock, playerMesh, groundMesh;
+  let cameraController, playerMovement, inputHandler, settingsManager, inputUI;
+  let collisionWorld, collisionMeshes = [];
+  let interactiveDoor, doorMesh;
+  let interactiveItem, itemMesh;
+  let interactiveNPC, npcMesh;
+  let characterStyles = [], characterIndex = 0;
+  let animationController;
+  let playerInventory, playerEquipment, inventoryUI;
+  let playerCombatStats, playerCombat, combatUI;
+  let dummyEnemy, dummyEnemyStats, dummyHealthBar;
+  let aiEnemies = [], aiControllers = [];
+  let questManager, questUI, dialogueUI;
+  let effectsController;
+  let audioSystem;
+  let saveManager;
+  let miniMap;
+  let abilityManager, skillsUI, hotbarUI;
+  let craftingManager, craftingUI;
+  let playerWallet, itemPricing, shopManager, shopUI;
+  let levelProgressionController, levelProgressionUI;
+  let aiWorldGenerator, aiWorldGeneratorUI;
+  let simpleMultiplayerClient, multiplayerUI;
+  let loadingScreen, performanceOptimizer, particleEffects;
+  let enhancedAudioController, bugTestingSystem, edgeCaseHandler, integrationTestSuite;
+  let playTime = 0;
+  let lastCameraMode = 'TPS';
+  let statsDiv = document.getElementById('stats');
+  let modeBadge = document.getElementById('modeBadge');
+  let fpsLabel = document.getElementById('fps');
+  let lastFpsUpdate = 0, frameCount = 0, fps = 0;
+
+    // Load THREE.js dynamically if not present
+    (function loadThree(cb) {
+      if (window.THREE) return cb();
+      let s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js';
+      s.onload = cb;
+      document.head.appendChild(s);
+    })(init);
+
+    function init() {
+      // --- Edge Case Handler (Initialize FIRST) ---
+      edgeCaseHandler = new EdgeCaseHandler();
+      
+      // Check browser compatibility
+      const compatIssues = edgeCaseHandler.checkBrowserCompatibility();
+      if (compatIssues.length > 0) {
+        console.warn('⚠️ Browser compatibility issues detected:', compatIssues);
+        compatIssues.forEach(issue => {
+          if (issue.severity === 'critical') {
+            edgeCaseHandler.showUserMessage(issue.message, 'error', 0);
+          } else if (issue.severity === 'warning') {
+            edgeCaseHandler.showUserMessage(issue.message, 'warning', 8000);
+          }
+        });
+        
+        // Stop init if critical issues
+        const hasCritical = compatIssues.some(i => i.severity === 'critical');
+        if (hasCritical) {
+          console.error('❌ Cannot continue due to critical compatibility issues');
+          return;
+        }
+      }
+      
+      // --- Loading Screen ---
+      loadingScreen = new LoadingScreen();
+      loadingScreen.setProgress(5, 'Initializing scene...');
+      
+      // --- Scene Setup ---
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x181c20);
+      clock = new THREE.Clock();
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      loadingScreen.setProgress(10, 'Setting up camera...');
+
+      // --- Camera ---
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 1.7, 5);
+      loadingScreen.setProgress(15, 'Loading graphics systems...');
+
+      // --- Graphics & Effects System ---
+      effectsController = new EffectsController(scene, renderer, camera);
+      effectsController.setTimeOfDay(12); // Start at noon
+      effectsController.enablePostProcessing();
+      loadingScreen.setProgress(20, 'Initializing audio...');
+
+      // --- Audio System ---
+      audioSystem = new AudioSystem(camera);
+      // Note: Audio will initialize on user interaction (button click)
+      
+      // Handle audio autoplay restrictions
+      edgeCaseHandler.handleAudioAutoplayBlock(audioSystem);
+      
+      // --- Enhanced Audio Controller ---
+      enhancedAudioController = new EnhancedAudioController(audioSystem);
+      console.log('🎵 Enhanced audio controller initialized');
+      loadingScreen.setProgress(25, 'Setting up save system...');
+
+      // --- Save System ---
+      saveManager = new SaveManager(5); // 5 save slots
+      console.log('💾 Save system initialized');
+      loadingScreen.setProgress(30, 'Creating mini-map...');
+
+      // --- Mini-Map System ---
+      const minimapCanvas = document.getElementById('minimap');
+      miniMap = new MiniMap(minimapCanvas, scene, playerMesh, {
+        worldSize: 500,
+        zoom: 2.0,
+        size: 200,
+        rotateWithPlayer: true,
+        showGrid: true,
+        showFogOfWar: true
+      });
+      console.log('🗺️ Mini-map initialized');
+      loadingScreen.setProgress(35, 'Loading abilities...');
+
+      // --- Skills & Abilities System ---
+      abilityManager = new AbilityManager(playerMesh);
+      skillsUI = new SkillsUI(abilityManager);
+      hotbarUI = new HotbarUI(abilityManager);
+      
+      // Give starting skill points for testing
+      abilityManager.awardSkillPoints(10);
+      loadingScreen.setProgress(40, 'Setting up performance optimization...');
+      
+      // --- Performance Optimizer ---
+      performanceOptimizer = new PerformanceOptimizer(scene, renderer, camera);
+      console.log('⚡ Performance optimizer initialized');
+      
+      // --- Particle Effects ---
+      particleEffects = new ParticleEffects(scene);
+      console.log('✨ Particle effects initialized');
+      loadingScreen.setProgress(45, 'Loading world...');
+      
+      // Auto-assign some abilities to hotbar (if hotbar exists)
+      if (abilityManager && abilityManager.hotbar) {
+        try {
+          abilityManager.hotbar.setSlot(0, 'power_strike');
+          abilityManager.hotbar.setSlot(1, 'fireball');
+          abilityManager.hotbar.setSlot(2, 'heal');
+        } catch (e) {
+          console.warn('⚠️ Could not assign hotbar abilities:', e.message);
+        }
+      }
+      
+      console.log('⚡ Skills & Abilities system initialized');
+      loadingScreen.setProgress(50, 'Setting up progression...');
+
+      // --- Level Progression System (MOVED HERE - needed by crafting) ---
+      try {
+        levelProgressionController = new LevelProgressionController();
+        levelProgressionUI = new LevelProgressionUI(levelProgressionController);
+        
+        // Add level-up particle effect
+        levelProgressionController.xpManager.onLevelUp = (newLevel) => {
+          if (particleEffects) {
+            particleEffects.levelUpEffect(playerMesh.position.clone());
+          }
+        };
+        
+        console.log('⭐ Level progression system initialized');
+        console.log(`Current level: ${levelProgressionController.playerStats.level}`);
+      } catch (e) {
+        console.error('❌ Level progression error:', e);
+        edgeCaseHandler.showUserMessage('Level progression unavailable', 'warning', 3000);
+      }
+      loadingScreen.setProgress(55, 'Setting up crafting...');
+
+      // --- Crafting System ---
+      try {
+        craftingManager = new CraftingManager(playerInventory);
+        craftingUI = new CraftingUI(craftingManager, 1); // Level 1 player
+        
+        // Award XP on craft completion
+        craftingManager.onCraft = (recipe) => {
+          const xpGained = levelProgressionController.awardXP('craft_item', {
+            itemTier: recipe.tier || 1,
+            playerLevel: levelProgressionController.playerStats.level
+          });
+          console.log(`⭐ Gained ${xpGained} XP from crafting ${recipe.name}!`);
+        };
+        
+        // Add some starting crafting materials for testing
+        playerInventory.addItem({ id: 'wood', name: 'Wood', icon: '🪵', type: 'material', quantity: 20 });
+        playerInventory.addItem({ id: 'iron_ore', name: 'Iron Ore', icon: '⛏️', type: 'material', quantity: 10 });
+        playerInventory.addItem({ id: 'coal', name: 'Coal', icon: '⚫', type: 'material', quantity: 5 });
+        playerInventory.addItem({ id: 'rope', name: 'Rope', icon: '🧵', type: 'material', quantity: 5 });
+        playerInventory.addItem({ id: 'leather', name: 'Leather', icon: '🧰', type: 'material', quantity: 3 });
+        
+        console.log('🔨 Crafting system initialized');
+      } catch (e) {
+        console.error('❌ Crafting system error:', e);
+        edgeCaseHandler.showUserMessage('Crafting system unavailable', 'warning', 3000);
+      }
+      loadingScreen.setProgress(55, 'Setting up economy...');
+
+      loadingScreen.setProgress(55, 'Setting up economy...');
+
+      // --- Economy & Shop System ---
+      try {
+        playerWallet = new Currency(100, 50, 75); // Start with 100g 50s 75c = 10,125 copper
+        itemPricing = new ItemPricing();
+        shopManager = new ShopManager(playerInventory, playerWallet, itemPricing);
+        shopUI = new ShopUI(shopManager);
+        
+        console.log('💰 Economy system initialized');
+        console.log(`🏪 Starting gold: ${playerWallet.toString()}`);
+      } catch (e) {
+        console.error('❌ Economy system error:', e);
+        edgeCaseHandler.showUserMessage('Economy system unavailable', 'warning', 3000);
+      }
+      loadingScreen.setProgress(65, 'Loading AI world generator...');
+
+      // --- AI World Generator ---
+      try {
+        aiWorldGenerator = new AIWorldGenerator(scene);
+        aiWorldGeneratorUI = new AIWorldGeneratorUI(aiWorldGenerator);
+        
+        console.log('🤖 AI World Generator initialized');
+        console.log('💡 Press G to open world generator');
+      } catch (e) {
+        console.error('❌ World generator error:', e);
+        edgeCaseHandler.showUserMessage('World generator unavailable', 'warning', 3000);
+      }
+      loadingScreen.setProgress(85, 'Setting up multiplayer...');
+
+      // --- Multiplayer System ---
+      try {
+        simpleMultiplayerClient = new SimpleMultiplayerClient(scene, playerMesh);
+        multiplayerUI = new MultiplayerUI(simpleMultiplayerClient);
+        
+        console.log('🌐 Multiplayer system initialized');
+        console.log('💡 Press M to open multiplayer menu');
+      } catch (e) {
+        console.error('❌ Multiplayer error:', e);
+        edgeCaseHandler.showUserMessage('Multiplayer unavailable (offline mode)', 'info', 3000);
+      }
+      loadingScreen.setProgress(95, 'Almost ready...');
+
+      // --- Lighting (now handled by EffectsController, but keep for backward compat) ---
+      // let light = new THREE.DirectionalLight(0xffffff, 1.0);
+      // light.position.set(5, 10, 7);
+      // scene.add(light);
+      // scene.add(new THREE.AmbientLight(0x888888));
+      loadingScreen.setProgress(100, 'Loading complete!');
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // GAME WORLD INITIALIZATION (with error handling)
+  // ═══════════════════════════════════════════════════════════════════════
+  try {
+    console.log('🌍 Initializing game world...');
+    
+    // --- Ground ---
+    let groundGeo = new THREE.PlaneGeometry(100, 100);
+  let groundMat = new THREE.MeshPhongMaterial({ color: 0x2a2e35 });
+  groundMesh = new THREE.Mesh(groundGeo, groundMat);
+  groundMesh.rotation.x = -Math.PI/2;
+  groundMesh.position.y = 0;
+  groundMesh.receiveShadow = true;
+  scene.add(groundMesh);
+  collisionMeshes.push(groundMesh);
+
+  // --- Character Styles ---
+  characterStyles = [
+    CharacterFactory.createStylizedCharacter(),
+    CharacterFactory.createRealisticCharacter(),
+    CharacterFactory.createRobotCharacter()
+  ];
+  characterIndex = 0;
+  playerMesh = characterStyles[characterIndex];
+  playerMesh.position.set(0, 1, 0);
+  playerMesh.castShadow = true;
+  scene.add(playerMesh);
+
+  // --- Animation Controller ---
+  animationController = new AnimationController(playerMesh);
+  animationController.setGroundHeight(0);
+
+  // --- Inventory System ---
+  playerInventory = new Inventory(24);
+  playerEquipment = new Equipment();
+  inventoryUI = new InventoryUI(playerInventory, playerEquipment);
+  
+  // Add some starting items
+  playerInventory.addItem(ItemDatabase.createPotion());
+  playerInventory.addItem(ItemDatabase.createPotion());
+  playerInventory.addItem(ItemDatabase.createSword());
+  playerInventory.addItem(ItemDatabase.createShield());
+  playerInventory.addItem(ItemDatabase.createHelmet());
+  playerInventory.addItem(ItemDatabase.createChestplate());
+  playerInventory.addItem(ItemDatabase.createCoin());
+  playerInventory.addItem(ItemDatabase.createGem());
+
+  // --- Combat System ---
+  playerCombatStats = new CombatStats({
+    maxHealth: 100,
+    maxStamina: 100,
+    maxMana: 100,
+    attack: 10,
+    defense: 5,
+    speed: 5
+  });
+  playerCombat = new CombatController(playerMesh, playerCombatStats);
+  combatUI = new CombatUI(playerCombatStats);
+  
+  // Add particle effect and sound on player damage
+  playerCombatStats.onDamage = (damage, attacker) => {
+    effectsController.createHitSparks(playerMesh.position);
+    if (audioSystem.initialized) {
+      audioSystem.playHurt();
+      audioSystem.playSwordHit(playerMesh.position);
+    }
+  };
+
+  // Update stats based on equipment
+  playerEquipment.onChange = () => {
+    const equipStats = playerEquipment.getTotalStats();
+    playerCombatStats.applyEquipmentStats(equipStats);
+  };
+
+  // --- Create Dummy Enemy ---
+  const enemyGeo = new THREE.CylinderGeometry(0.5, 0.5, 2, 16);
+  const enemyMat = new THREE.MeshPhongMaterial({ color: 0xff4444 });
+  dummyEnemy = new THREE.Mesh(enemyGeo, enemyMat);
+  dummyEnemy.position.set(5, 1, 5);
+  dummyEnemy.name = 'Training Dummy';
+  scene.add(dummyEnemy);
+  
+  dummyEnemyStats = new CombatStats({
+    maxHealth: 50,
+    maxStamina: 50,
+    attack: 5,
+    defense: 2
+  });
+  dummyEnemy.combatStats = dummyEnemyStats;
+  dummyHealthBar = new TargetHealthBar(dummyEnemy, dummyEnemyStats, camera);
+  
+  // Add particle effect and sound on damage
+  dummyEnemyStats.onDamage = (damage, attacker) => {
+    effectsController.createHitSparks(dummyEnemy.position);
+    if (audioSystem.initialized) audioSystem.playSwordHit(dummyEnemy.position);
+    // Add damage particle effect
+    if (particleEffects) {
+      particleEffects.damageEffect(dummyEnemy.position.clone());
+    }
+  };
+  
+  // Add sound on death
+  dummyEnemyStats.onDeath = () => {
+    if (audioSystem.initialized) audioSystem.playEnemyDeath(dummyEnemy.position);
+    // Add explosion particle effect
+    if (particleEffects) {
+      particleEffects.explosion(dummyEnemy.position.clone(), 30, 0xff4444);
+    }
+    console.log('💀 Training Dummy defeated!');
+  };
+  dummyEnemyStats.onDeath = () => {
+    if (audioSystem.initialized) audioSystem.playEnemyDeath(dummyEnemy.position);
+    
+    // Award XP for killing enemy
+    const xpGained = levelProgressionController.awardXP('kill_enemy', {
+      enemyLevel: 1,
+      playerLevel: levelProgressionController.playerStats.level
+    });
+    console.log(`⭐ Gained ${xpGained} XP from enemy kill!`);
+  };
+
+  // Add enemy as target
+  playerCombat.addTarget(dummyEnemy);
+
+  // --- Quest & Dialogue System ---
+  questManager = new QuestManager();
+  dialogueUI = new DialogueUI();
+  questUI = new QuestUI(questManager);
+
+  // Create sample quest
+  const sampleQuest = new Quest({
+    id: 'quest_first_enemy',
+    title: 'First Blood',
+    description: 'Defeat your first enemy',
+    objectives: [
+      { id: 'kill_enemy', description: 'Defeat 1 enemy', target: 1, current: 0, completed: false }
+    ],
+    rewards: {
+      experience: 100,
+      gold: 50,
+      items: [ItemDatabase.createSword()]
+    },
+    onComplete: (player) => {
+      if (audioSystem.initialized) audioSystem.playQuestComplete();
+      setTimeout(() => alert('Quest Complete! You earned a sword!'), 100);
+    }
+  });
+  questManager.addQuest(sampleQuest);
+  questManager.startQuest('quest_first_enemy', { inventory: playerInventory });
+
+  // Add minimap POI markers
+  miniMap.addPOIMarker({ x: 30, z: 30 }, 'Village', '🏠', '#4080ff');
+  miniMap.addPOIMarker({ x: -40, z: 20 }, 'Forest', '🌲', '#228822');
+  miniMap.addPOIMarker({ x: 0, z: -50 }, 'Cave', '⛰️', '#886644');
+  miniMap.addQuestMarker({ x: 20, z: 15 }, 'Quest Area');
+  console.log('🗺️ Added POI markers to minimap');
+
+  // Create NPC dialogue tree
+  const npcDialogue = new DialogueTree({
+    id: 'npc_greeting',
+    startNodeId: 'start',
+    nodes: [
+      {
+        id: 'start',
+        speaker: 'Village Elder',
+        text: 'Greetings, traveler! Welcome to Pixelverse.',
+        responses: [
+          { text: 'Who are you?', nextNodeId: 'who' },
+          { text: 'What is this place?', nextNodeId: 'place' },
+          { text: 'Goodbye.', nextNodeId: null }
+        ]
+      },
+      {
+        id: 'who',
+        speaker: 'Village Elder',
+        text: 'I am the Village Elder. I have watched over these lands for many years.',
+        responses: [
+          { text: 'What is this place?', nextNodeId: 'place' },
+          { text: 'Farewell.', nextNodeId: null }
+        ]
+      },
+      {
+        id: 'place',
+        speaker: 'Village Elder',
+        text: 'This is Pixelverse, a world of adventure and mystery. Many dangers lurk beyond the village.',
+        responses: [
+          { text: 'Tell me more.', nextNodeId: 'more' },
+          { text: 'I must go.', nextNodeId: null }
+        ]
+      },
+      {
+        id: 'more',
+        speaker: 'Village Elder',
+        text: 'Beware the AI enemies that roam these lands. They will attack on sight!',
+        responses: [
+          { text: 'Thank you.', nextNodeId: null }
+        ]
+      }
+    ]
+  });
+
+  // Update NPC to use dialogue system
+  interactiveNPC.onInteract = () => {
+    dialogueUI.open(npcDialogue, { player: playerMesh });
+  };
+
+  // --- AI Enemies ---
+  const createAIEnemy = (position, color = 0xff6666) => {
+    const enemyGeo = new THREE.CylinderGeometry(0.5, 0.5, 2, 16);
+    const enemyMat = new THREE.MeshPhongMaterial({ color: color });
+    const enemyMesh = new THREE.Mesh(enemyGeo, enemyMat);
+    enemyMesh.position.copy(position);
+    enemyMesh.name = 'AI Enemy';
+    scene.add(enemyMesh);
+
+    // Combat stats
+    const enemyStats = new CombatStats({
+      maxHealth: 40,
+      maxStamina: 50,
+      attack: 8,
+      defense: 3,
+      speed: 4
+    });
+    enemyMesh.combatStats = enemyStats;
+    
+    // Add particle effect and sound on damage
+    enemyStats.onDamage = (damage, attacker) => {
+      effectsController.createHitSparks(enemyMesh.position);
+      if (audioSystem.initialized) audioSystem.playSwordHit(enemyMesh.position);
+    };
+
+    // Combat controller
+    const enemyCombat = new CombatController(enemyMesh, enemyStats);
+    enemyCombat.addTarget(playerMesh);
+
+    // Health bar
+    const enemyHealthBar = new TargetHealthBar(enemyMesh, enemyStats, camera);
+
+    // AI controller
+    const pathfinding = new Pathfinding(scene, collisionMeshes);
+    const aiController = new AIController(enemyMesh, playerMesh, pathfinding, enemyCombat);
+
+    // Handle enemy death
+    enemyStats.onDeath = () => {
+      if (audioSystem.initialized) audioSystem.playEnemyDeath(enemyMesh.position);
+      
+      // Award XP for killing AI enemy
+      const xpGained = levelProgressionController.awardXP('kill_enemy', {
+        enemyLevel: aiType === 'aggressive' ? 3 : 2, // Aggressive enemies worth more XP
+        playerLevel: levelProgressionController.playerStats.level
+      });
+      console.log(`⭐ Gained ${xpGained} XP from ${aiType} enemy kill!`);
+      
+      scene.remove(enemyMesh);
+      const index = aiEnemies.indexOf(enemyMesh);
+      if (index !== -1) {
+        aiEnemies.splice(index, 1);
+        aiControllers.splice(index, 1);
+      }
+      // Update quest
+      questManager.updateQuestObjective('quest_first_enemy', 'kill_enemy', 1);
+    };
+
+    playerCombat.addTarget(enemyMesh);
+    
+    aiEnemies.push(enemyMesh);
+    aiControllers.push({ controller: aiController, healthBar: enemyHealthBar });
+
+    return enemyMesh;
+  };
+
+  // Create some AI enemies
+  createAIEnemy(new THREE.Vector3(-5, 1, 8), 0xff6666);
+  createAIEnemy(new THREE.Vector3(8, 1, -3), 0xff4444);
+  createAIEnemy(new THREE.Vector3(-6, 1, -6), 0xcc3333);
+
+  // --- Obstacles (boxes, walls, slopes) ---
+  let boxMat = new THREE.MeshPhongMaterial({ color: 0xffa500 });
+  let wall1 = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 0.5), boxMat);
+  wall1.position.set(3, 1, 0);
+  scene.add(wall1); collisionMeshes.push(wall1);
+  let wall2 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2, 2), boxMat);
+  wall2.position.set(-3, 1, 2);
+  scene.add(wall2); collisionMeshes.push(wall2);
+  let slope = new THREE.Mesh(new THREE.BoxGeometry(3, 0.5, 3), new THREE.MeshPhongMaterial({ color: 0x66ff66 }));
+  slope.position.set(0, 0.25, -4);
+  slope.rotation.x = -Math.PI/8;
+  scene.add(slope); collisionMeshes.push(slope);
+
+  // --- Interactive Door ---
+  let doorGeo = new THREE.BoxGeometry(1, 2, 0.2);
+  let doorMat = new THREE.MeshPhongMaterial({ color: 0x885522 });
+  doorMesh = new THREE.Mesh(doorGeo, doorMat);
+  doorMesh.position.set(0, 1, 6);
+  scene.add(doorMesh);
+  interactiveDoor = new InteractiveDoor(doorMesh, { 
+    openAngle: Math.PI/2, 
+    interactionRadius: 2.2,
+    onOpen: () => {
+      if (audioSystem.initialized) audioSystem.playDoorOpen(doorMesh.position);
+    },
+    onClose: () => {
+      if (audioSystem.initialized) audioSystem.playDoorClose(doorMesh.position);
+    }
+  });
+
+  // --- Interactive Item ---
+  let itemGeo = new THREE.SphereGeometry(0.3, 16, 16);
+  let itemMat = new THREE.MeshPhongMaterial({ color: 0x22ffcc });
+  itemMesh = new THREE.Mesh(itemGeo, itemMat);
+  itemMesh.position.set(-2, 0.3, 4);
+  scene.add(itemMesh);
+  interactiveItem = new InteractiveItem(itemMesh, {
+    prompt: 'Press [E] to Pick Up Item',
+    name: 'Energy Orb',
+    onPickup: (name) => {
+      const potion = ItemDatabase.createPotion();
+      if (playerInventory.addItem(potion)) {
+        if (audioSystem.initialized) audioSystem.playItemPickup();
+        scene.remove(itemMesh);
+        setTimeout(() => alert('Picked up: ' + name), 100);
+      } else {
+        setTimeout(() => alert('Inventory full!'), 100);
+      }
+    }
+  });
+
+  // --- Interactive NPC ---
+  let npcGeo = new THREE.CylinderGeometry(0.4, 0.4, 1.6, 12);
+  let npcMat = new THREE.MeshPhongMaterial({ color: 0xff66cc });
+  npcMesh = new THREE.Mesh(npcGeo, npcMat);
+  npcMesh.position.set(2, 0.8, 7);
+  scene.add(npcMesh);
+  interactiveNPC = new InteractiveNPC(npcMesh, {
+    prompt: 'Press [E] to Talk',
+    dialogue: ['Hi there, traveler!', 'Welcome to Pixelverse.', 'Good luck!']
+  });
+
+  // --- Collision World Setup ---
+  collisionWorld = new CollisionWorld();
+  collisionWorld.addPlane(new THREE.Vector3(0,1,0), 0);
+  collisionWorld.addBox(new THREE.Vector3(2,0, -0.25), new THREE.Vector3(4,2,0.25));
+  collisionWorld.addBox(new THREE.Vector3(-3.25,0,1), new THREE.Vector3(-2.75,2,3));
+  collisionWorld.addBox(new THREE.Vector3(-1.5,0,-5.5), new THREE.Vector3(1.5,0.75,-2.5));
+
+  // --- Input Handler & Settings ---
+  inputHandler = new InputHandler();
+  settingsManager = new InputSettingsManager(inputHandler);
+  inputUI = new InputUI(inputHandler, settingsManager);
+
+  // --- Player Movement ---
+  playerMovement = new PlayerMovement({
+    mesh: playerMesh,
+    physics: new PhysicsSystem(),
+    input: inputHandler,
+    collisionWorld: collisionWorld
+  });
+
+  // --- Camera Controller ---
+  cameraController = new CameraController({
+    camera: camera,
+    target: playerMesh,
+    input: inputHandler,
+    mode: 'TPS',
+    offset: { x: 0, y: 1.5, z: 4 }
+  });
+  cameraController.setCollisionObjects(collisionMeshes);
+
+  // --- UI Buttons ---
+  document.getElementById('lockPointerBtn').onclick = () => inputHandler.requestPointerLock();
+  document.getElementById('settingsBtn').onclick = () => inputUI.show();
+  document.getElementById('resetBtn').onclick = () => { settingsManager.resetToDefaults(); inputUI.show(); };
+  document.getElementById('switchCharBtn').onclick = () => {
+    scene.remove(playerMesh);
+    characterIndex = (characterIndex + 1) % characterStyles.length;
+    playerMesh = characterStyles[characterIndex];
+    playerMesh.position.set(0, 1, 0);
+    playerMesh.castShadow = true;
+    scene.add(playerMesh);
+    playerMovement.character = playerMesh;
+    cameraController.target = playerMesh;
+    animationController.character = playerMesh;
+  };
+  document.getElementById('inventoryBtn').onclick = () => inventoryUI.toggle();
+  document.getElementById('attackBtn').onclick = () => {
+    playerCombat.performAttack('melee_light', performance.now() / 1000, scene);
+    if (audioSystem.initialized) audioSystem.playSwordSwing(playerMesh.position);
+  };
+  document.getElementById('healBtn').onclick = () => {
+    playerCombatStats.heal(20);
+    effectsController.createHealEffect(playerMesh.position);
+    if (audioSystem.initialized) audioSystem.playHeal();
+  };
+  document.getElementById('weatherBtn').onclick = () => {
+    const weathers = ['clear', 'rain', 'snow', 'fog'];
+    const current = effectsController.getWeather();
+    const nextIndex = (weathers.indexOf(current) + 1) % weathers.length;
+    effectsController.setWeather(weathers[nextIndex]);
+    console.log(`Weather changed to: ${weathers[nextIndex]}`);
+  };
+  document.getElementById('timeBtn').onclick = () => {
+    const times = [6, 12, 18, 0]; // Morning, noon, evening, midnight
+    const currentTime = effectsController.getTimeOfDay();
+    let nextTime = times.find(t => t > currentTime);
+    if (!nextTime) nextTime = times[0];
+    effectsController.setTimeOfDay(nextTime);
+    console.log(`Time set to: ${effectsController.getTimeString()}`);
+    
+    // Change music based on time
+    if (audioSystem.initialized) {
+      if (nextTime >= 6 && nextTime < 18) {
+        audioSystem.playMusic('ambient_day');
+      } else {
+        audioSystem.playMusic('ambient_night');
+      }
+    }
+  };
+  document.getElementById('audioBtn').onclick = async () => {
+    if (!audioSystem.initialized) {
+      const success = await audioSystem.initialize();
+      if (success) {
+        document.getElementById('audioBtn').textContent = '🔊 Audio On';
+        document.getElementById('audioBtn').style.background = '#48bb78';
+        audioSystem.playMusic('ambient_day');
+        console.log('🔊 Audio system enabled!');
+      }
+    } else {
+      audioSystem.stopMusic();
+      document.getElementById('audioBtn').textContent = 'Enable Audio';
+      document.getElementById('audioBtn').style.background = '#2a7cff';
+    }
+  };
+  document.getElementById('musicBtn').onclick = () => {
+    if (!audioSystem.initialized) {
+      alert('Please enable audio first!');
+      return;
+    }
+    const tracks = ['ambient_day', 'ambient_night', 'combat', 'menu'];
+    const currentTrack = audioSystem.currentMusic;
+    const currentIndex = tracks.findIndex(t => audioSystem.music.get(t) === currentTrack);
+    const nextIndex = (currentIndex + 1) % tracks.length;
+    audioSystem.playMusic(tracks[nextIndex]);
+    console.log(`Now playing: ${tracks[nextIndex]}`);
+  };
+  
+  // Save/Load buttons
+  document.getElementById('saveBtn').onclick = () => {
+    const gameState = {
+      playerMesh,
+      characterIndex,
+      playerCombatStats,
+      playerInventory,
+      playerEquipment,
+      questManager,
+      effectsController,
+      aiEnemies,
+      audioSystem,
+      cameraController,
+      playTime
+    };
+    
+    const success = saveManager.quickSave(gameState);
+    if (success) {
+      alert('💾 Game Saved!');
+      if (audioSystem.initialized) audioSystem.playUIClick();
+    }
+  };
+  
+  document.getElementById('loadBtn').onclick = () => {
+    const saveData = saveManager.quickLoad();
+    if (saveData) {
+      const gameState = {
+        playerMesh,
+        characterIndex,
+        playerCombatStats,
+        playerInventory,
+        playerEquipment,
+        questManager,
+        questUI,
+        inventoryUI,
+        effectsController,
+        playerMovement,
+        audioSystem,
+        cameraController
+      };
+      
+      GameStateLoader.applyLoadedData(saveData, gameState);
+      playTime = saveData.playTime;
+      alert('📁 Game Loaded!');
+      if (audioSystem.initialized) audioSystem.playUIClick();
+    } else {
+      alert('❌ No save found!');
+    }
+  };
+  
+  // --- Mini-Map Controls ---
+  document.getElementById('mapZoomInBtn').onclick = () => {
+    miniMap.zoomIn();
+    console.log('🔍 Map zoom:', miniMap.zoom.toFixed(1) + 'x');
+    if (audioSystem.initialized) audioSystem.playUIClick();
+  };
+  
+  document.getElementById('mapZoomOutBtn').onclick = () => {
+    miniMap.zoomOut();
+    console.log('🔍 Map zoom:', miniMap.zoom.toFixed(1) + 'x');
+    if (audioSystem.initialized) audioSystem.playUIClick();
+  };
+  
+  document.getElementById('mapRotateBtn').onclick = () => {
+    miniMap.toggleRotation();
+    console.log('🧭 Map rotation:', miniMap.rotateWithPlayer ? 'ON' : 'OFF');
+    if (audioSystem.initialized) audioSystem.playUIClick();
+  };
+  
+  // --- UI Button Handlers (wrapped in try-catch) ---
+  try {
+    const mapFogBtn = document.getElementById('mapFogBtn');
+    if (mapFogBtn) {
+      mapFogBtn.onclick = () => {
+        miniMap.toggleFogOfWar();
+        console.log('🌫️ Fog of War:', miniMap.showFogOfWar ? 'ON' : 'OFF');
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+    }
+  } catch (e) { console.error('mapFogBtn error:', e); }
+  
+  try {
+    const craftBtn = document.getElementById('craftBtn');
+    if (craftBtn) {
+      craftBtn.onclick = () => {
+        craftingUI.toggle('workbench');
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+    }
+  } catch (e) { console.error('craftBtn error:', e); }
+  
+  try {
+    const statsBtn = document.getElementById('statsBtn');
+    if (statsBtn) {
+      statsBtn.onclick = () => {
+        levelProgressionUI.toggleCharacterSheet();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+    }
+  } catch (e) { console.error('statsBtn error:', e); }
+  
+  try {
+    const worldGenBtn = document.getElementById('worldGenBtn');
+    if (worldGenBtn) {
+      worldGenBtn.onclick = () => {
+        aiWorldGeneratorUI.toggle();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+    }
+  } catch (e) { console.error('worldGenBtn error:', e); }
+  
+  try {
+    const multiplayerBtn = document.getElementById('multiplayerBtn');
+    if (multiplayerBtn) {
+      multiplayerBtn.onclick = () => {
+        multiplayerUI.toggle();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+    }
+  } catch (e) { console.error('multiplayerBtn error:', e); }
+  
+  try {
+    const audioBtns = document.querySelectorAll('#audioBtn');
+    audioBtns.forEach(btn => {
+      btn.onclick = () => {
+        enhancedAudioController.toggle();
+        if (audioSystem.initialized) audioSystem.playUIClick();
+      };
+    });
+  } catch (e) { console.error('audioBtn error:', e); }
+  
+  // Original heal button handler (moved above)
+  /*document.getElementById('healBtn').onclick = () => {
+    playerCombatStats.heal(20);
+  };*/
+
+  // --- Camera Mode Toggle ---
+  inputHandler.onAction('toggle_camera', () => {
+    cameraController.toggleMode();
+    lastCameraMode = cameraController.mode;
+    modeBadge.textContent = cameraController.mode;
+  });
+
+  // Hide loading screen after everything is loaded
+  setTimeout(() => {
+    try {
+      console.log('🔄 Attempting to hide loading screen...');
+      loadingScreen.hide();
+      console.log('🎮 Game fully loaded!');
+      
+      // Show welcome particle effect
+      if (particleEffects) {
+        particleEffects.levelUpEffect(new THREE.Vector3(0, 2, 0));
+      }
+    } catch (e) {
+      console.error('❌ Error hiding loading screen:', e);
+      // Force hide the loading screen even if there's an error
+      const loadingEl = document.getElementById('loadingScreen');
+      if (loadingEl) loadingEl.style.display = 'none';
+    }
+    
+    // --- Initialize Bug Testing System ---
+    bugTestingSystem = new BugTestingSystem({
+      renderer,
+      scene,
+      camera,
+      playerCharacter: playerMesh,
+      audioSystem,
+      enhancedAudioController,
+      performanceOptimizer,
+      loadingScreen,
+      particleEffects,
+      worldGenerator: aiWorldGenerator,
+      multiplayerManager: simpleMultiplayerClient,
+      lastFrameTime: Date.now()
+    });
+    console.log('🐛 Bug testing system initialized');
+    
+    // --- Setup Edge Case Monitoring ---
+    // Network monitoring
+    edgeCaseHandler.handleNetworkOffline(
+      () => console.log('🌐 Network restored'),
+      () => console.warn('⚠️ Network offline')
+    );
+    
+    // Memory monitoring (check every 30s, warn at 80% usage)
+    const memoryMonitor = edgeCaseHandler.monitorMemoryUsage(0.8);
+    if (memoryMonitor) {
+      console.log('📊 Memory monitoring active');
+    }
+    
+    // Run initial tests
+    bugTestingSystem.runTests().then(report => {
+      console.log(`✅ Initial tests complete: ${report.summary.passed}/${report.summary.total} passed`);
+    });
+    
+    // --- Initialize Integration Test Suite ---
+    integrationTestSuite = new IntegrationTestSuite({
+      renderer, scene, camera,
+      playerCharacter: playerMesh,
+      cameraController,
+      audioSystem, enhancedAudioController,
+      performanceOptimizer, particleEffects,
+      inventoryManager, craftingManager,
+      abilityManager, skillsUI,
+      worldGenerator: aiWorldGenerator,
+      miniMap,
+      multiplayerManager: simpleMultiplayerClient,
+      inventoryUI, craftingUI, skillsUI,
+      saveManager
+    });
+    console.log('🧪 Integration test suite initialized');
+  }, 500);
+
+  // --- Inventory Toggle (I key) ---
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'i' || e.key === 'I') {
+      inventoryUI.toggle();
+    }
+    if (e.key === 'h' || e.key === 'H') {
+      playerCombatStats.heal(20);
+      // Add heal particle effect
+      if (particleEffects) {
+        particleEffects.healEffect(playerMesh.position.clone());
+      }
+    }
+    // F5 = Quick Save
+    if (e.key === 'F5') {
+      e.preventDefault();
+      document.getElementById('saveBtn').click();
+    }
+    // F9 = Quick Load
+    if (e.key === 'F9') {
+      e.preventDefault();
+      document.getElementById('loadBtn').click();
+    }
+    // K = Toggle Skills UI
+    if (e.key === 'k' || e.key === 'K') {
+      skillsUI.toggle();
+    }
+    // C = Toggle Crafting UI
+    if (e.key === 'c' || e.key === 'C') {
+      craftingUI.toggle('workbench');
+    }
+    // P = Toggle Character Sheet
+    if (e.key === 'p' || e.key === 'P') {
+      levelProgressionUI.toggleCharacterSheet();
+    }
+    // G = Toggle World Generator
+    if (e.key === 'g' || e.key === 'G') {
+      aiWorldGeneratorUI.toggle();
+    }
+    // M = Toggle Multiplayer
+    if (e.key === 'm' || e.key === 'M') {
+      multiplayerUI.toggle();
+    }
+    // U = Toggle Audio Controls
+    if (e.key === 'u' || e.key === 'U') {
+      enhancedAudioController.toggle();
+    }
+    // F9 = Run Bug Tests
+    if (e.key === 'F9') {
+      e.preventDefault();
+      console.log('🧪 Running manual bug tests...');
+      bugTestingSystem.runTests().then(report => {
+        console.log(`Test Results: ${report.summary.passed}/${report.summary.total} passed (${report.summary.passRate}%)`);
+      });
+    }
+    // F10 = Export Diagnostics
+    if (e.key === 'F10') {
+      e.preventDefault();
+      bugTestingSystem.exportDiagnostics();
+    }
+    // F11 = Toggle Bug Monitoring
+    if (e.key === 'F11') {
+      e.preventDefault();
+      if (bugTestingSystem.isRunning) {
+        bugTestingSystem.stopMonitoring();
+        console.log('🔍 Bug monitoring stopped');
+      } else {
+        bugTestingSystem.startMonitoring(10000); // Every 10 seconds
+        console.log('🔍 Bug monitoring started');
+      }
+    }
+    // F12 = Run Integration Tests
+    if (e.key === 'F12') {
+      e.preventDefault();
+      console.log('🧪 Running integration tests...');
+      integrationTestSuite.runAllIntegrationTests().then(report => {
+        console.log(`Integration Tests: ${report.summary.passed}/${report.summary.total} passed (${report.summary.passRate}%)`);
+      });
+    }
+    // Shift+F12 = Run Performance Benchmark
+    if (e.key === 'F12' && e.shiftKey) {
+      e.preventDefault();
+      console.log('🎯 Starting performance benchmark (10s)...');
+      integrationTestSuite.runPerformanceBenchmark(10000).then(metrics => {
+        console.log('📊 Benchmark complete:', metrics);
+      });
+    }
+    // Ctrl+F12 = Run Stress Test
+    if (e.key === 'F12' && e.ctrlKey) {
+      e.preventDefault();
+      console.log('💪 Starting stress test...');
+      integrationTestSuite.runStressTest().then(result => {
+        console.log(`Stress test: ${result.passed ? 'PASSED' : 'FAILED'}`, result.tests);
+      });
+    }
+    // 1-9 = Use Hotbar Abilities
+    if (e.key >= '1' && e.key <= '9') {
+      const slotIndex = parseInt(e.key) - 1;
+      abilityManager.useHotbarSlot(slotIndex);
+      hotbarUI.highlightSlot(slotIndex);
+    }
+  });
+
+  // --- Mouse Attack ---
+  document.addEventListener('mousedown', (e) => {
+    if (e.button === 0 && !inventoryUI.isOpen) { // Left mouse button
+      playerCombat.performAttack('melee_light', performance.now() / 1000, scene);
+    }
+  });
+
+  // --- Responsive Resize ---
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  animate();
+  
+  // Start auto-save (every 5 minutes)
+  saveManager.startAutoSave(gameState);
+  console.log('✅ Auto-save enabled (5 minute intervals)');
+  
+  } catch (gameWorldError) {
+    console.error('❌ Error initializing game world:', gameWorldError);
+    console.error('Stack:', gameWorldError.stack);
+    alert('Error loading game world. Check console for details.');
+    // Try to hide loading screen even if there's an error
+    if (loadingScreen) {
+      setTimeout(() => loadingScreen.hide(), 100);
+    }
+  }
+
+    // === 2. Main Game Loop ===
+    function animate() {
+      requestAnimationFrame(animate);
+      let dt = clock.getDelta();
+      
+      // Track frame time for bug testing
+      if (bugTestingSystem) {
+        bugTestingSystem.gameContext.lastFrameTime = Date.now();
+      }
+
+      // --- Update Play Time ---
+      playTime += dt;
+
+      // --- Update Input ---
+      inputHandler.update && inputHandler.update(dt);
+
+      // --- Update Player Movement ---
+      playerMovement.update(dt, collisionWorld, cameraController.getForward(), cameraController.getRight());
+      
+      // --- Update Animation System ---
+      const velocity = playerMovement.getVelocity ? playerMovement.getVelocity() : { x: 0, y: 0, z: 0 };
+      const speed = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+      const playerState = playerMovement.getState ? playerMovement.getState() : 'Idle';
+      
+      const animContext = {
+        speed: speed,
+        isGrounded: playerState !== 'Jumping',
+        isJumping: playerState === 'Jumping',
+        isCrouching: playerState === 'Crouching',
+        velocity: velocity
+      };
+      
+      const animInfo = animationController.update(dt, animContext);
+
+      // --- Update Combat System ---
+      const currentTime = performance.now() / 1000;
+      playerCombat.update(dt, currentTime);
+      combatUI.update();
+      
+      // Update dummy enemy health bar
+      const distToEnemy = playerMesh.position.distanceTo(dummyEnemy.position);
+      if (distToEnemy < 10 && !dummyEnemyStats.isDead) {
+        dummyHealthBar.show();
+        dummyHealthBar.update();
+      } else {
+        dummyHealthBar.hide();
+      }
+
+      // --- Update AI Enemies ---
+      aiControllers.forEach(({ controller, healthBar }) => {
+        controller.update(dt, currentTime, scene);
+        const dist = playerMesh.position.distanceTo(controller.npc.position);
+        if (dist < 15 && !controller.npc.combatStats.isDead) {
+          healthBar.show();
+          healthBar.update();
+        } else {
+          healthBar.hide();
+        }
+      });
+
+  // --- Interactive Object Updates ---
+  const playerPos = playerMesh.position;
+  const interactPressed = inputHandler.isActionJustPressed ? inputHandler.isActionJustPressed('interact') : false;
+  interactiveDoor.update(playerPos, interactPressed);
+  interactiveItem.update(playerPos, interactPressed);
+  interactiveNPC.update(playerPos, interactPressed);
+
+      // --- Update Camera ---
+      cameraController.update(dt);
+
+      // --- Sync Player Mesh ---
+      let pos = playerMovement.getPosition ? playerMovement.getPosition() : playerMesh.position;
+      playerMesh.position.copy(pos);
+      if (playerMovement.getRotation) playerMesh.rotation.y = playerMovement.getRotation();
+
+      // --- Update Graphics & Effects ---
+      effectsController.update(dt);
+
+      // --- Update Audio System ---
+      if (audioSystem.initialized) {
+        audioSystem.update(dt, velocity, playerMesh.position);
+      }
+
+      // --- Update Mini-Map ---
+      miniMap.update();
+      miniMap.updateNPCMarkers(npcManager.npcArray);
+      miniMap.render();
+
+      // --- Update Ability System ---
+      abilityManager.update(dt);
+      hotbarUI.update();
+
+      // --- Update Crafting System ---
+      craftingManager.update(dt);
+      craftingUI.update();
+
+      // --- Update Level Progression UI ---
+      levelProgressionUI.update();
+
+      // --- Update Multiplayer ---
+      if (simpleMultiplayerClient && simpleMultiplayerClient.connected) {
+        simpleMultiplayerClient.update(dt);
+      }
+
+      // --- Update Particle Effects ---
+      if (particleEffects) {
+        particleEffects.update(dt);
+      }
+
+      // --- Update Performance Optimizer ---
+      if (performanceOptimizer) {
+        performanceOptimizer.update(dt);
+      }
+
+      // --- Render with Effects ---
+      effectsController.render();
+
+      // --- UI Stats ---
+      frameCount++;
+      let now = performance.now();
+      if (now - lastFpsUpdate > 500) {
+        fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
+        fpsLabel.textContent = 'FPS: ' + fps;
+        lastFpsUpdate = now; frameCount = 0;
+      }
+      let prompts = [interactiveDoor.getPrompt(), interactiveItem.getPrompt(), interactiveNPC.getPrompt()].filter(Boolean);
+      const debugInfo = animationController.getDebugInfo();
+      const activeQuests = questManager.getActiveQuests();
+      const questInfo = activeQuests.length > 0 ? activeQuests.map(q => `${q.title}: ${q.getProgress()}`).join('<br>') : 'None';
+      const timeStr = effectsController.getTimeString();
+      const weatherStr = effectsController.getWeather();
+      const audioStatus = audioSystem.initialized ? '🔊 On' : '🔇 Off';
+      const playTimeStr = Math.floor(playTime / 60) + 'm ' + Math.floor(playTime % 60) + 's';
+      statsDiv.innerHTML =
+        `<b>Time:</b> ${timeStr} | <b>Weather:</b> ${weatherStr} | <b>Audio:</b> ${audioStatus} | <b>Play:</b> ${playTimeStr}<br>`+
+        `<b>Player State:</b> ${playerMovement.getState ? playerMovement.getState() : 'N/A'}<br>`+
+        `<b>Position:</b> ${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)}<br>`+
+        `<b>Camera Mode:</b> ${cameraController.mode}<br>`+
+        `<b>Character:</b> ${playerMesh.name || 'Unknown'}<br>`+
+        `<b>Anim State:</b> ${debugInfo.currentState} ${debugInfo.isTransitioning ? '(blending ' + (debugInfo.transitionProgress * 100).toFixed(0) + '%)' : ''}<br>`+
+        `<b>Speed:</b> ${debugInfo.currentSpeed} m/s (target: ${debugInfo.targetSpeed})<br>`+
+        `<b>HP:</b> ${playerCombatStats.health}/${playerCombatStats.maxHealth} | <b>Enemies:</b> ${aiEnemies.length}<br>`+
+        `<b>Quests:</b> ${questInfo}<br>`+
+        `<b>Input:</b> ${inputHandler.getActiveSources ? inputHandler.getActiveSources().join(', ') : ''}<br>`+
+        `<b>Actions:</b> ${Array.from(inputHandler.state.actions || []).filter(([k,v])=>v).map(([k])=>k).join(', ')}<br>`+
+        (prompts.length ? `<div style='color:#ff0;margin-top:8px;'><b>${prompts.join('<br>')}</b></div>` : '');
+
+      // --- End-of-frame cleanup ---
+      inputHandler.resetFrameState && inputHandler.resetFrameState();
+    }
+  </script>
+</body>
+</html>

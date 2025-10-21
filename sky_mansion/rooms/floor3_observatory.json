@@ -1,0 +1,446 @@
+{
+  "roomId": "SM_FLOOR3_OBSERVATORY",
+  "name": "Northern Lights Observatory Dome",
+  "floor": 3,
+  "type": "Aurora Viewing & Stargazing",
+  
+  "dimensions": {
+    "diameter": 9.1,
+    "height": 4.8,
+    "area": 65,
+    "unit": "meters",
+    "shape": "Circular Dome"
+  },
+  
+  "design": {
+    "style": "Futuristic Observatory",
+    "colorScheme": {
+      "primary": "#FFFFFF",
+      "secondary": "#E8E8E8",
+      "accent": "#000000",
+      "glow": "#00FFFF"
+    },
+    
+    "dome": {
+      "type": "Transparent Smart Glass",
+      "coverage": "180° Hemisphere",
+      "transparency": "99.9%",
+      "features": [
+        "Aurora Enhancement AI",
+        "Anti-fogging",
+        "Self-cleaning",
+        "UV filtering",
+        "Temperature regulation",
+        "Snow melt system"
+      ],
+      
+      "retractable": {
+        "sections": 4,
+        "openingTime": "30 seconds",
+        "weatherSensors": "Auto-close on rain",
+        "modes": ["Closed", "Half-Open", "Full Open", "Stargazing"]
+      }
+    },
+    
+    "flooring": {
+      "type": "Polished White Composite",
+      "color": "#F5F5F5",
+      "finish": "Non-slip Matte",
+      "heatedFloor": true
+    },
+    
+    "walls": {
+      "lower": "White Glossy Panels",
+      "upper": "Full Glass Dome",
+      "circumference": "360° glass"
+    }
+  },
+  
+  "auroraSystem": {
+    "objectId": "obj_aurora_system_premium_001",
+    "type": "Northern Lights Enhancement System",
+    "version": "Premium Add-on ($4.99)",
+    
+    "features": {
+      "realTimeData": {
+        "source": "NOAA Space Weather",
+        "updates": "Every 5 minutes",
+        "predictions": "3-hour forecast",
+        "kpIndex": "Real-time monitoring"
+      },
+      
+      "aiEnhancement": {
+        "enabled": true,
+        "function": "Amplify weak auroras",
+        "overlay": "Subtle digital enhancement",
+        "colors": ["Green", "Blue", "Purple", "Pink", "Red"],
+        "intensity": "User adjustable 0-10",
+        "natural": "Looks 100% realistic"
+      },
+      
+      "notifications": {
+        "auroraAlert": "When KP index > 4",
+        "strongAurora": "When KP index > 6",
+        "method": ["Phone", "Smart Watch", "House Announcement"],
+        "quiet": "Gentle notification during sleep"
+      },
+      
+      "simulation": {
+        "enabled": "When no natural aurora",
+        "quality": "Photorealistic",
+        "physics": "Accurate movement",
+        "educational": "Explain aurora science",
+        "romantic": "Optimized for couples"
+      }
+    }
+  },
+  
+  "telescope": {
+    "objectId": "obj_telescope_professional_001",
+    "type": "Professional Retractable Telescope",
+    "specs": {
+      "aperture": "250mm",
+      "focalLength": "1200mm",
+      "mount": "Computerized GoTo",
+      "camera": "Astrophotography capable"
+    },
+    
+    "position": {
+      "default": "Retracted into floor",
+      "active": "Rises on motorized platform",
+      "height": "1.5m when deployed"
+    },
+    
+    "features": [
+      "Auto-tracking celestial objects",
+      "Database of 40,000+ objects",
+      "Voice-controlled targeting",
+      "Live view on displays",
+      "Time-lapse recording",
+      "Connects to phone/tablet"
+    ]
+  },
+  
+  "furniture": [
+    {
+      "objectId": "obj_viewing_pod_001",
+      "name": "Comfort Viewing Pod 1",
+      "type": "Lounge Seating",
+      "position": {
+        "x": -2,
+        "y": 0.2,
+        "z": 0
+      },
+      "description": "Reclined pod seating with 180° view",
+      "capacity": 2,
+      "features": [
+        "Heated seats",
+        "Massage function",
+        "Adjustable recline",
+        "Built-in speakers",
+        "USB charging",
+        "Cup holders"
+      ],
+      "color": "White with Black Trim"
+    },
+    
+    {
+      "objectId": "obj_viewing_pod_002",
+      "name": "Comfort Viewing Pod 2",
+      "type": "Lounge Seating",
+      "position": {
+        "x": 2,
+        "y": 0.2,
+        "z": 0
+      },
+      "capacity": 2,
+      "features": "Same as Pod 1",
+      "color": "White with Black Trim"
+    },
+    
+    {
+      "objectId": "obj_viewing_pod_003",
+      "name": "Comfort Viewing Pod 3",
+      "type": "Lounge Seating",
+      "position": {
+        "x": 0,
+        "y": 0.2,
+        "z": 2.5
+      },
+      "capacity": 2,
+      "features": "Same as Pod 1",
+      "color": "White with Black Trim"
+    },
+    
+    {
+      "objectId": "obj_viewing_pod_004",
+      "name": "Comfort Viewing Pod 4",
+      "type": "Lounge Seating",
+      "position": {
+        "x": 0,
+        "y": 0.2,
+        "z": -2.5
+      },
+      "capacity": 2,
+      "features": "Same as Pod 1",
+      "color": "White with Black Trim"
+    },
+    
+    {
+      "objectId": "obj_center_table_001",
+      "name": "Circular Center Table",
+      "type": "Table",
+      "position": {
+        "x": 0,
+        "y": 0.4,
+        "z": 0
+      },
+      "diameter": 1.2,
+      "color": "White Gloss",
+      "features": ["LED base lighting", "Wireless charging surface"]
+    },
+    
+    {
+      "objectId": "obj_mini_bar_001",
+      "name": "Mini Bar Station",
+      "type": "Bar",
+      "position": {
+        "x": -3.5,
+        "y": 0,
+        "z": -3
+      },
+      "features": [
+        "Mini refrigerator",
+        "Wine cooler",
+        "Coffee maker",
+        "Hot water dispenser",
+        "Glass storage",
+        "LED accent lighting"
+      ],
+      "color": "White with Black Countertop"
+    },
+    
+    {
+      "objectId": "obj_storage_bench_001",
+      "name": "Storage Bench",
+      "type": "Storage/Seating",
+      "position": {
+        "x": 3.5,
+        "y": 0,
+        "z": -3
+      },
+      "length": 2,
+      "storage": "Blankets, pillows, telescope accessories",
+      "color": "White with Grey Cushion"
+    }
+  ],
+  
+  "displays": {
+    "starMapProjector": {
+      "objectId": "obj_star_map_projector_001",
+      "type": "Ceiling-Mounted Projector",
+      "position": "Center of dome",
+      "features": [
+        "Real-time star positions",
+        "Constellation overlays",
+        "Planet tracking",
+        "Aurora information",
+        "Educational mode",
+        "Romantic constellations"
+      ]
+    },
+    
+    "infoDisplays": {
+      "count": 2,
+      "type": "Transparent OLED Panels",
+      "locations": ["Near entry", "By telescope"],
+      "information": [
+        "Current aurora conditions",
+        "Weather forecast",
+        "Best viewing times",
+        "Celestial events tonight",
+        "Aurora science facts"
+      ]
+    }
+  },
+  
+  "lighting": {
+    "standard": {
+      "type": "Recessed LED",
+      "count": 8,
+      "location": "Floor perimeter",
+      "brightness": "Dimmable 0-100%",
+      "color": "Red (astronomy mode) / Warm White (social mode)"
+    },
+    
+    "ambient": {
+      "type": "RGB LED Strips",
+      "location": "Under viewing pods, around bar",
+      "colors": "Full spectrum",
+      "syncWithAurora": true,
+      "scenes": [
+        "Stargazing (Red/Dim)",
+        "Aurora Viewing (Off)",
+        "Social (Warm Amber)",
+        "Party (RGB Dynamic)",
+        "Romantic (Soft Blue)"
+      ]
+    },
+    
+    "automaticDimming": {
+      "enabled": true,
+      "triggers": ["Aurora detected", "Stargazing mode", "Time of day"],
+      "preserveNightVision": true
+    }
+  },
+  
+  "audioSystem": {
+    "speakers": {
+      "type": "360° Surround",
+      "count": 8,
+      "position": "Recessed in dome perimeter",
+      "quality": "Premium Hi-Fi"
+    },
+    
+    "soundscapes": [
+      "Ambient space music",
+      "Arctic wind (subtle)",
+      "Classical astronomy themes",
+      "Nature sounds",
+      "Educational aurora narration",
+      "Guided meditation",
+      "Silence"
+    ],
+    
+    "voiceControl": true,
+    "streaming": "Bluetooth, WiFi, Spotify, etc."
+  },
+  
+  "climateControl": {
+    "heating": {
+      "floor": "Radiant heated floor",
+      "dome": "Heated glass (prevents condensation)",
+      "target": 20
+    },
+    
+    "ventilation": {
+      "fresh_air": "Filtered intake",
+      "dehumidifier": "Prevents fogging",
+      "airflow": "Gentle circulation"
+    },
+    
+    "weatherProtection": {
+      "snowMelt": "Automatic dome heating",
+      "rainSensors": "Auto-close retractable sections",
+      "windSensors": "Close if wind > 50 km/h"
+    }
+  },
+  
+  "smartFeatures": {
+    "auroraMode": {
+      "trigger": "Auto or manual",
+      "actions": [
+        "Lights off or dim red",
+        "Open dome fully",
+        "Activate aurora enhancement",
+        "Display info on screens",
+        "Play ambient soundscape",
+        "Notify guests (optional)"
+      ]
+    },
+    
+    "stargazingMode": {
+      "trigger": "Voice command or auto at night",
+      "actions": [
+        "Deploy telescope",
+        "Red lighting only",
+        "Star map projection",
+        "Dim all displays",
+        "Target celestial object (voice)"
+      ]
+    },
+    
+    "socialMode": {
+      "trigger": "When guests present",
+      "actions": [
+        "Warm ambient lighting",
+        "Social music playlist",
+        "Bar area lit",
+        "Comfortable viewing",
+        "Educational aurora info"
+      ]
+    },
+    
+    "photographyMode": {
+      "trigger": "For astrophotography",
+      "actions": [
+        "All lights off",
+        "Telescope deployed",
+        "Camera connected",
+        "Time-lapse setup",
+        "Tracking activated"
+      ]
+    }
+  },
+  
+  "specialFeatures": [
+    "99.9% transparent dome for unobstructed views",
+    "AI-enhanced northern lights visualization",
+    "Real-time space weather monitoring",
+    "Retractable professional telescope",
+    "8-person capacity (4 viewing pods)",
+    "360° views of sky and clouds",
+    "Heated floor and glass (winter comfort)",
+    "Mini bar for beverages",
+    "Star map projection system",
+    "Automatic weather sensors",
+    "Voice-controlled everything",
+    "Photography and time-lapse capable",
+    "Educational and romantic modes",
+    "Connects to house AI (Aurora)",
+    "Streaming camera for sharing views"
+  ],
+  
+  "useCases": [
+    "Northern lights viewing (primary purpose)",
+    "Stargazing and astronomy",
+    "Romantic date nights under the aurora",
+    "Friends gathering for celestial events",
+    "Astrophotography sessions",
+    "Meditation under the stars",
+    "Educational astronomy nights",
+    "New Year's Eve sky celebration",
+    "Meteor shower watching parties",
+    "Streaming aurora to viewers worldwide",
+    "Proposal location (girlfriend under northern lights)",
+    "Morning sunrise viewing"
+  ],
+  
+  "accessControl": {
+    "stairs": "Spiral staircase from floor 2",
+    "elevator": "Optional for accessibility",
+    "security": "Owner and invited guests only",
+    "guestLimit": 8
+  },
+  
+  "maintenance": {
+    "domeCleanin": "Self-cleaning nano-coating",
+    "snowRemoval": "Automatic heating system",
+    "weatherChecks": "AI monitors conditions 24/7",
+    "telescopeCare": "Auto-retracts when not in use"
+  },
+  
+  "metadata": {
+    "designedBy": [
+      "AI Personality #37 (Entertainment Venue Architect)",
+      "AI Personality #23 (VFX Specialist)",
+      "AI Personality #142 (Environmental Monitor)"
+    ],
+    "premiumAddOn": true,
+    "cost": 4.99,
+    "created": "2025-10-16",
+    "status": "Complete",
+    "completion": "100%",
+    "ownerNotes": "This is the crown jewel of my Sky Mansion. Worth every penny of the $4.99 upgrade."
+  }
+}

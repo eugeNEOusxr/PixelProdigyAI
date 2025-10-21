@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy - Vertex Pipeline Builder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff00;
+            overflow: hidden;
+        }
+        
+        #app-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            height: 100vh;
+        }
+        
+        /* LEFT PANEL - VERTEX CREATION */
+        #vertex-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 3px solid #00ff00;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .panel-title {
+            color: #00ffff;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+        
+        .step-section {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .step-header {
+            color: #ffff00;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+        
+        button:hover {
+            background: #00ffff;
+            transform: scale(1.02);
+        }
+        
+        button.active {
+            background: #ffff00;
+            color: #000;
+        }
+        
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            background: #000;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 5px 0;
+        }
+        
+        label {
+            display: block;
+            color: #00ff00;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        /* CENTER PANEL - 3D VIEW */
+        #render-panel {
+            background: #0a0a15;
+            position: relative;
+        }
+        
+        /* RIGHT PANEL - PIPELINE INFO */
+        #pipeline-panel {
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 3px solid #00ff00;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .pipeline-stage {
+            background: rgba(0, 255, 0, 0.05);
+            border-left: 3px solid #00ff00;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+        
+        .stage-title {
+            color: #ffff00;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stage-data {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        #vertex-formula {
+            background: rgba(255, 255, 0, 0.1);
+            border: 2px solid #ffff00;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        
+        .formula-title {
+            color: #ffff00;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .formula-step {
+            color: #00ff00;
+            font-size: 11px;
+            padding: 3px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        #controls-overlay {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 100;
+        }
+        
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        
+        .preset-btn {
+            padding: 8px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- LEFT: VERTEX CREATION STEPS -->
+        <div id="vertex-panel">
+            <div class="panel-title">🔷 VERTEX PIPELINE BUILDER</div>
+            
+            <!-- STEP 1: BASIC SHAPE -->
+            <div class="step-section">
+                <div class="step-header">STEP 1: Choose Base Shape</div>
+                <button onclick="createShape('cube')">CUBE (8 vertices)</button>
+                <button onclick="createShape('pyramid')">PYRAMID (5 vertices)</button>
+                <button onclick="createShape('plane')">PLANE (4 vertices)</button>
+                <button onclick="createShape('triangle')">TRIANGLE (3 vertices)</button>
+                <button onclick="createShape('sphere')">SPHERE (subdivided)</button>
+                <button onclick="createShape('cylinder')">CYLINDER (rings)</button>
+            </div>
+            
+            <!-- STEP 2: VERTEX MANIPULATION -->
+            <div class="step-section">
+                <div class="step-header">STEP 2: Transform Vertices</div>
+                <button onclick="transformVertices('scale')">SCALE</button>
+                <button onclick="transformVertices('rotate')">ROTATE</button>
+                <button onclick="transformVertices('translate')">TRANSLATE</button>
+                <button onclick="transformVertices('noise')">ADD NOISE</button>
+                
+                <label>Transform Amount:</label>
+                <input type="number" id="transform-amount" value="1.0" step="0.1" min="0.1" max="5">
+            </div>
+            
+            <!-- STEP 3: SUBDIVISION -->
+            <div class="step-section">
+                <div class="step-header">STEP 3: Subdivide (Add Detail)</div>
+                <button onclick="subdivide(1)">SUBDIVIDE x1</button>
+                <button onclick="subdivide(2)">SUBDIVIDE x2</button>
+                <button onclick="subdivide(3)">SUBDIVIDE x3</button>
+                <div style="font-size: 10px; color: #ffff00; margin-top: 10px;">
+                    Each subdivision multiplies vertices by ~4x
+                </div>
+            </div>
+            
+            <!-- STEP 4: MATERIAL & SHADERS -->
+            <div class="step-section">
+                <div class="step-header">STEP 4: Apply Material</div>
+                <button onclick="setMaterial('basic')">BASIC</button>
+                <button onclick="setMaterial('phong')">PHONG (lighting)</button>
+                <button onclick="setMaterial('standard')">STANDARD (PBR)</button>
+                <button onclick="setMaterial('shader')">CUSTOM SHADER</button>
+            </div>
+            
+            <!-- STEP 5: VERTEX COLORS -->
+            <div class="step-section">
+                <div class="step-header">STEP 5: Vertex Colors</div>
+                <button onclick="applyVertexColors('gradient')">GRADIENT</button>
+                <button onclick="applyVertexColors('random')">RANDOM</button>
+                <button onclick="applyVertexColors('height')">BY HEIGHT</button>
+                <button onclick="applyVertexColors('position')">BY POSITION</button>
+            </div>
+            
+            <!-- STEP 6: EXPORT -->
+            <div class="step-section">
+                <div class="step-header">STEP 6: Export Pipeline</div>
+                <button onclick="exportJSON()">📄 EXPORT JSON</button>
+                <button onclick="exportVLS()">🔤 EXPORT VLS</button>
+                <button onclick="copyCode()">📋 COPY CODE</button>
+            </div>
+            
+            <!-- RESET -->
+            <button onclick="reset()" style="background: #ff0000; color: #fff; margin-top: 20px;">
+                🔄 RESET ALL
+            </button>
+        </div>
+        
+        <!-- CENTER: 3D RENDER VIEW -->
+        <div id="render-panel">
+            <div id="controls-overlay">
+                <div style="color: #00ffff; font-weight: bold; margin-bottom: 10px;">QUICK PRESETS</div>
+                <div class="preset-grid">
+                    <button class="preset-btn" onclick="loadPreset('tree')">🌲 TREE</button>
+                    <button class="preset-btn" onclick="loadPreset('character')">🚶 CHARACTER</button>
+                    <button class="preset-btn" onclick="loadPreset('building')">🏢 BUILDING</button>
+                    <button class="preset-btn" onclick="loadPreset('terrain')">⛰️ TERRAIN</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RIGHT: PIPELINE VISUALIZATION -->
+        <div id="pipeline-panel">
+            <div class="panel-title">📊 VERTEX PIPELINE DATA</div>
+            
+            <!-- FORMULA -->
+            <div id="vertex-formula">
+                <div class="formula-title">VERTEX CREATION FORMULA:</div>
+                <div class="formula-step">1. Define positions: Float32Array(x,y,z...)</div>
+                <div class="formula-step">2. Create indices: Uint32Array(i1,i2,i3...)</div>
+                <div class="formula-step">3. Calculate normals: crossProduct(edges)</div>
+                <div class="formula-step">4. Add attributes: colors, uvs, etc.</div>
+                <div class="formula-step">5. Build geometry: BufferGeometry()</div>
+                <div class="formula-step">6. Apply material: Material + Shaders</div>
+                <div class="formula-step">7. Create mesh: Mesh(geometry, material)</div>
+                <div class="formula-step">8. Add to scene: scene.add(mesh)</div>
+            </div>
+            
+            <!-- STAGE 1: RAW VERTICES -->
+            <div class="pipeline-stage">
+                <div class="stage-title">STAGE 1: Raw Vertex Array</div>
+                <div class="stage-data" id="stage-vertices">
+No vertices yet. Create a shape!
+                </div>
+            </div>
+            
+            <!-- STAGE 2: INDICES -->
+            <div class="pipeline-stage">
+                <div class="stage-title">STAGE 2: Triangle Indices</div>
+                <div class="stage-data" id="stage-indices">
+No indices yet.
+                </div>
+            </div>
+            
+            <!-- STAGE 3: NORMALS -->
+            <div class="pipeline-stage">
+                <div class="stage-title">STAGE 3: Vertex Normals</div>
+                <div class="stage-data" id="stage-normals">
+No normals yet.
+                </div>
+            </div>
+            
+            <!-- STAGE 4: COLORS -->
+            <div class="pipeline-stage">
+                <div class="stage-title">STAGE 4: Vertex Colors</div>
+                <div class="stage-data" id="stage-colors">
+No colors yet.
+                </div>
+            </div>
+            
+            <!-- STAGE 5: STATS -->
+            <div class="pipeline-stage">
+                <div class="stage-title">STAGE 5: Final Stats</div>
+                <div class="stage-data" id="stage-stats">
+Vertices: 0
+Triangles: 0
+Draw Calls: 0
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+    
+    <script>
+        // ===== GLOBAL STATE =====
+        let scene, camera, renderer, currentMesh;
+        let vertexData = {
+            vertices: [],
+            indices: [],
+            normals: [],
+            colors: [],
+            uvs: []
+        };
+        
+        // ===== INITIALIZE THREE.JS =====
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a15);
+            
+            camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(3, 3, 3);
+            camera.lookAt(0, 0, 0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            const renderPanel = document.getElementById('render-panel');
+            renderer.setSize(renderPanel.clientWidth, renderPanel.clientHeight);
+            renderPanel.appendChild(renderer.domElement);
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Grid helper
+            const gridHelper = new THREE.GridHelper(10, 10, 0x00ff00, 0x003300);
+            scene.add(gridHelper);
+            
+            // Axes helper
+            const axesHelper = new THREE.AxesHelper(5);
+            scene.add(axesHelper);
+            
+            animate();
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (currentMesh) {
+                currentMesh.rotation.y += 0.005;
+                currentMesh.rotation.x += 0.002;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        // ===== SHAPE CREATION FUNCTIONS =====
+        function createShape(type) {
+            console.log('🔷 Creating shape:', type);
+            
+            // Clear previous mesh
+            if (currentMesh) {
+                scene.remove(currentMesh);
+            }
+            
+            let vertices = [];
+            let indices = [];
+            
+            switch(type) {
+                case 'cube':
+                    vertices = [
+                        // Front face
+                        -1, -1,  1,  1, -1,  1,  1,  1,  1, -1,  1,  1,
+                        // Back face
+                        -1, -1, -1, -1,  1, -1,  1,  1, -1,  1, -1, -1,
+                    ];
+                    indices = [
+                        0,1,2, 0,2,3,  // front
+                        4,5,6, 4,6,7,  // back
+                        0,4,7, 0,7,1,  // bottom
+                        2,6,5, 2,5,3,  // top
+                        0,3,5, 0,5,4,  // left
+                        1,7,6, 1,6,2   // right
+                    ];
+                    break;
+                    
+                case 'pyramid':
+                    vertices = [
+                        // Base
+                        -1, 0, -1,   1, 0, -1,   1, 0,  1,  -1, 0,  1,
+                        // Tip
+                        0, 2, 0
+                    ];
+                    indices = [
+                        0,1,2, 0,2,3,  // base
+                        0,4,1,         // front
+                        1,4,2,         // right
+                        2,4,3,         // back
+                        3,4,0          // left
+                    ];
+                    break;
+                    
+                case 'plane':
+                    vertices = [
+                        -1, 0, -1,   1, 0, -1,   1, 0,  1,  -1, 0,  1
+                    ];
+                    indices = [0, 1, 2, 0, 2, 3];
+                    break;
+                    
+                case 'triangle':
+                    vertices = [
+                        0, 1, 0,  -1, -1, 0,  1, -1, 0
+                    ];
+                    indices = [0, 1, 2];
+                    break;
+                    
+                case 'sphere':
+                    const sphereData = createSphere(1, 16, 16);
+                    vertices = sphereData.vertices;
+                    indices = sphereData.indices;
+                    break;
+                    
+                case 'cylinder':
+                    const cylData = createCylinder(1, 2, 16);
+                    vertices = cylData.vertices;
+                    indices = cylData.indices;
+                    break;
+            }
+            
+            vertexData.vertices = vertices;
+            vertexData.indices = indices;
+            
+            buildMeshFromData();
+            updatePipelineDisplay();
+        }
+        
+        function createSphere(radius, widthSegments, heightSegments) {
+            const vertices = [];
+            const indices = [];
+            
+            for (let y = 0; y <= heightSegments; y++) {
+                const v = y / heightSegments;
+                const phi = v * Math.PI;
+                
+                for (let x = 0; x <= widthSegments; x++) {
+                    const u = x / widthSegments;
+                    const theta = u * Math.PI * 2;
+                    
+                    const px = -radius * Math.cos(theta) * Math.sin(phi);
+                    const py = radius * Math.cos(phi);
+                    const pz = radius * Math.sin(theta) * Math.sin(phi);
+                    
+                    vertices.push(px, py, pz);
+                }
+            }
+            
+            // Create indices
+            for (let y = 0; y < heightSegments; y++) {
+                for (let x = 0; x < widthSegments; x++) {
+                    const a = y * (widthSegments + 1) + x;
+                    const b = a + widthSegments + 1;
+                    
+                    indices.push(a, b, a + 1);
+                    indices.push(b, b + 1, a + 1);
+                }
+            }
+            
+            return { vertices, indices };
+        }
+        
+        function createCylinder(radius, height, segments) {
+            const vertices = [];
+            const indices = [];
+            
+            // Bottom cap center
+            vertices.push(0, 0, 0);
+            // Top cap center
+            vertices.push(0, height, 0);
+            
+            // Side vertices
+            for (let i = 0; i <= segments; i++) {
+                const theta = (i / segments) * Math.PI * 2;
+                const x = radius * Math.cos(theta);
+                const z = radius * Math.sin(theta);
+                
+                vertices.push(x, 0, z);      // bottom
+                vertices.push(x, height, z); // top
+            }
+            
+            // Indices for caps and sides
+            for (let i = 0; i < segments; i++) {
+                const bottomIdx = 2 + i * 2;
+                const topIdx = bottomIdx + 1;
+                const nextBottomIdx = bottomIdx + 2;
+                const nextTopIdx = topIdx + 2;
+                
+                // Bottom cap
+                indices.push(0, nextBottomIdx, bottomIdx);
+                // Top cap
+                indices.push(1, topIdx, nextTopIdx);
+                // Sides
+                indices.push(bottomIdx, nextBottomIdx, topIdx);
+                indices.push(topIdx, nextBottomIdx, nextTopIdx);
+            }
+            
+            return { vertices, indices };
+        }
+        
+        // ===== TRANSFORM FUNCTIONS =====
+        function transformVertices(type) {
+            const amount = parseFloat(document.getElementById('transform-amount').value);
+            const verts = vertexData.vertices;
+            
+            console.log('🔧 Transforming:', type, 'amount:', amount);
+            
+            switch(type) {
+                case 'scale':
+                    for (let i = 0; i < verts.length; i++) {
+                        verts[i] *= amount;
+                    }
+                    break;
+                    
+                case 'rotate':
+                    const angle = amount * Math.PI / 180;
+                    for (let i = 0; i < verts.length; i += 3) {
+                        const x = verts[i];
+                        const y = verts[i + 1];
+                        verts[i] = x * Math.cos(angle) - y * Math.sin(angle);
+                        verts[i + 1] = x * Math.sin(angle) + y * Math.cos(angle);
+                    }
+                    break;
+                    
+                case 'translate':
+                    for (let i = 1; i < verts.length; i += 3) {
+                        verts[i] += amount;
+                    }
+                    break;
+                    
+                case 'noise':
+                    for (let i = 0; i < verts.length; i++) {
+                        verts[i] += (Math.random() - 0.5) * amount * 0.5;
+                    }
+                    break;
+            }
+            
+            buildMeshFromData();
+            updatePipelineDisplay();
+        }
+        
+        // ===== SUBDIVISION =====
+        function subdivide(levels) {
+            console.log('📐 Subdividing:', levels, 'levels');
+            
+            for (let level = 0; level < levels; level++) {
+                const newVertices = [...vertexData.vertices];
+                const newIndices = [];
+                const edgeMap = new Map();
+                
+                function getEdgeVertex(v1, v2) {
+                    const key = v1 < v2 ? `${v1}_${v2}` : `${v2}_${v1}`;
+                    
+                    if (edgeMap.has(key)) {
+                        return edgeMap.get(key);
+                    }
+                    
+                    // Create midpoint
+                    const x = (vertexData.vertices[v1 * 3] + vertexData.vertices[v2 * 3]) / 2;
+                    const y = (vertexData.vertices[v1 * 3 + 1] + vertexData.vertices[v2 * 3 + 1]) / 2;
+                    const z = (vertexData.vertices[v1 * 3 + 2] + vertexData.vertices[v2 * 3 + 2]) / 2;
+                    
+                    const newIdx = newVertices.length / 3;
+                    newVertices.push(x, y, z);
+                    edgeMap.set(key, newIdx);
+                    
+                    return newIdx;
+                }
+                
+                // Subdivide each triangle
+                for (let i = 0; i < vertexData.indices.length; i += 3) {
+                    const v0 = vertexData.indices[i];
+                    const v1 = vertexData.indices[i + 1];
+                    const v2 = vertexData.indices[i + 2];
+                    
+                    const m01 = getEdgeVertex(v0, v1);
+                    const m12 = getEdgeVertex(v1, v2);
+                    const m20 = getEdgeVertex(v2, v0);
+                    
+                    // Create 4 new triangles
+                    newIndices.push(v0, m01, m20);
+                    newIndices.push(v1, m12, m01);
+                    newIndices.push(v2, m20, m12);
+                    newIndices.push(m01, m12, m20);
+                }
+                
+                vertexData.vertices = newVertices;
+                vertexData.indices = newIndices;
+            }
+            
+            buildMeshFromData();
+            updatePipelineDisplay();
+        }
+        
+        // ===== MATERIALS =====
+        function setMaterial(type) {
+            console.log('🎨 Setting material:', type);
+            
+            if (!currentMesh) return;
+            
+            let material;
+            
+            switch(type) {
+                case 'basic':
+                    material = new THREE.MeshBasicMaterial({ 
+                        color: 0x00ff00,
+                        wireframe: false
+                    });
+                    break;
+                    
+                case 'phong':
+                    material = new THREE.MeshPhongMaterial({ 
+                        color: 0x00ff00,
+                        shininess: 30
+                    });
+                    break;
+                    
+                case 'standard':
+                    material = new THREE.MeshStandardMaterial({ 
+                        color: 0x00ff00,
+                        metalness: 0.3,
+                        roughness: 0.7
+                    });
+                    break;
+                    
+                case 'shader':
+                    material = new THREE.ShaderMaterial({
+                        vertexShader: `
+                            varying vec3 vPosition;
+                            void main() {
+                                vPosition = position;
+                                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                            }
+                        `,
+                        fragmentShader: `
+                            varying vec3 vPosition;
+                            void main() {
+                                vec3 color = vec3(0.0, 1.0, 0.0) * (vPosition.y + 1.0) / 2.0;
+                                gl_FragColor = vec4(color, 1.0);
+                            }
+                        `
+                    });
+                    break;
+            }
+            
+            currentMesh.material = material;
+            updatePipelineDisplay();
+        }
+        
+        // ===== VERTEX COLORS =====
+        function applyVertexColors(type) {
+            console.log('🌈 Applying vertex colors:', type);
+            
+            const colors = [];
+            const verts = vertexData.vertices;
+            
+            for (let i = 0; i < verts.length; i += 3) {
+                const x = verts[i];
+                const y = verts[i + 1];
+                const z = verts[i + 2];
+                
+                let r, g, b;
+                
+                switch(type) {
+                    case 'gradient':
+                        r = (x + 1) / 2;
+                        g = (y + 1) / 2;
+                        b = (z + 1) / 2;
+                        break;
+                        
+                    case 'random':
+                        r = Math.random();
+                        g = Math.random();
+                        b = Math.random();
+                        break;
+                        
+                    case 'height':
+                        const h = (y + 2) / 4;
+                        r = h;
+                        g = 1.0 - h;
+                        b = 0.5;
+                        break;
+                        
+                    case 'position':
+                        const dist = Math.sqrt(x*x + y*y + z*z);
+                        r = dist / 3;
+                        g = 1.0 - dist / 3;
+                        b = 0.5;
+                        break;
+                }
+                
+                colors.push(r, g, b);
+            }
+            
+            vertexData.colors = colors;
+            buildMeshFromData();
+            updatePipelineDisplay();
+        }
+        
+        // ===== BUILD MESH =====
+        function buildMeshFromData() {
+            if (currentMesh) {
+                scene.remove(currentMesh);
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            
+            // Set attributes
+            geometry.setAttribute('position', new THREE.BufferAttribute(
+                new Float32Array(vertexData.vertices), 3
+            ));
+            
+            if (vertexData.indices.length > 0) {
+                geometry.setIndex(vertexData.indices);
+            }
+            
+            if (vertexData.colors.length > 0) {
+                geometry.setAttribute('color', new THREE.BufferAttribute(
+                    new Float32Array(vertexData.colors), 3
+                ));
+            }
+            
+            geometry.computeVertexNormals();
+            
+            // Extract computed normals
+            const normals = geometry.attributes.normal.array;
+            vertexData.normals = Array.from(normals);
+            
+            const material = new THREE.MeshStandardMaterial({
+                vertexColors: vertexData.colors.length > 0,
+                color: vertexData.colors.length > 0 ? 0xffffff : 0x00ff00,
+                metalness: 0.3,
+                roughness: 0.7,
+                side: THREE.DoubleSide
+            });
+            
+            currentMesh = new THREE.Mesh(geometry, material);
+            scene.add(currentMesh);
+            
+            console.log('✅ Mesh built!', {
+                vertices: vertexData.vertices.length / 3,
+                triangles: vertexData.indices.length / 3
+            });
+        }
+        
+        // ===== UPDATE DISPLAY =====
+        function updatePipelineDisplay() {
+            // Vertices
+            const vertexCount = vertexData.vertices.length / 3;
+            let vertexText = `Total Vertices: ${vertexCount}\n\n`;
+            vertexText += vertexData.vertices.slice(0, 30).map((v, i) => {
+                if (i % 3 === 0) return `\nv${Math.floor(i/3)}: `;
+                return v.toFixed(2) + (i % 3 === 2 ? '' : ', ');
+            }).join('');
+            if (vertexData.vertices.length > 30) vertexText += '\n...';
+            document.getElementById('stage-vertices').textContent = vertexText;
+            
+            // Indices
+            const indexCount = vertexData.indices.length;
+            let indexText = `Total Indices: ${indexCount}\nTriangles: ${indexCount / 3}\n\n`;
+            indexText += vertexData.indices.slice(0, 30).map((idx, i) => {
+                if (i % 3 === 0) return `\nt${Math.floor(i/3)}: `;
+                return idx + (i % 3 === 2 ? '' : ', ');
+            }).join('');
+            if (vertexData.indices.length > 30) indexText += '\n...';
+            document.getElementById('stage-indices').textContent = indexText;
+            
+            // Normals
+            const normalCount = vertexData.normals.length / 3;
+            let normalText = `Total Normals: ${normalCount}\n\n`;
+            normalText += vertexData.normals.slice(0, 30).map((n, i) => {
+                if (i % 3 === 0) return `\nn${Math.floor(i/3)}: `;
+                return n.toFixed(2) + (i % 3 === 2 ? '' : ', ');
+            }).join('');
+            if (vertexData.normals.length > 30) normalText += '\n...';
+            document.getElementById('stage-normals').textContent = normalText;
+            
+            // Colors
+            if (vertexData.colors.length > 0) {
+                const colorCount = vertexData.colors.length / 3;
+                let colorText = `Total Colors: ${colorCount}\n\n`;
+                colorText += vertexData.colors.slice(0, 30).map((c, i) => {
+                    if (i % 3 === 0) return `\nc${Math.floor(i/3)}: `;
+                    return c.toFixed(2) + (i % 3 === 2 ? '' : ', ');
+                }).join('');
+                if (vertexData.colors.length > 30) colorText += '\n...';
+                document.getElementById('stage-colors').textContent = colorText;
+            } else {
+                document.getElementById('stage-colors').textContent = 'No vertex colors applied.';
+            }
+            
+            // Stats
+            const statsText = `Vertices: ${vertexCount.toLocaleString()}
+Triangles: ${(indexCount / 3).toLocaleString()}
+Draw Calls: 1
+Memory: ~${((vertexData.vertices.length * 4) / 1024).toFixed(2)} KB`;
+            document.getElementById('stage-stats').textContent = statsText;
+        }
+        
+        // ===== EXPORT FUNCTIONS =====
+        function exportJSON() {
+            const data = {
+                vertices: vertexData.vertices,
+                indices: vertexData.indices,
+                normals: vertexData.normals,
+                colors: vertexData.colors
+            };
+            const json = JSON.stringify(data, null, 2);
+            downloadFile('vertex_data.json', json);
+            console.log('📄 Exported JSON');
+        }
+        
+        function exportVLS() {
+            // Convert to VLS format (simplified)
+            let vls = '// VLS Vertex Language\n';
+            for (let i = 0; i < vertexData.vertices.length; i += 3) {
+                const x = vertexData.vertices[i];
+                const y = vertexData.vertices[i + 1];
+                const z = vertexData.vertices[i + 2];
+                vls += `+V(${x.toFixed(2)},${y.toFixed(2)},${z.toFixed(2)})\n`;
+            }
+            downloadFile('vertex_data.vls', vls);
+            console.log('🔤 Exported VLS');
+        }
+        
+        function copyCode() {
+            const code = `
+// Generated Vertex Pipeline Code
+const geometry = new THREE.BufferGeometry();
+
+// Vertices
+const vertices = new Float32Array([${vertexData.vertices.join(', ')}]);
+geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+// Indices
+const indices = new Uint32Array([${vertexData.indices.join(', ')}]);
+geometry.setIndex(indices);
+
+${vertexData.colors.length > 0 ? `
+// Colors
+const colors = new Float32Array([${vertexData.colors.join(', ')}]);
+geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+` : ''}
+
+// Compute normals
+geometry.computeVertexNormals();
+
+// Create mesh
+const material = new THREE.MeshStandardMaterial({ 
+    ${vertexData.colors.length > 0 ? 'vertexColors: true,' : 'color: 0x00ff00,'}
+    metalness: 0.3,
+    roughness: 0.7
+});
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+            `;
+            
+            navigator.clipboard.writeText(code);
+            alert('✅ Code copied to clipboard!');
+            console.log('📋 Code copied');
+        }
+        
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // ===== PRESETS =====
+        function loadPreset(type) {
+            console.log('🎯 Loading preset:', type);
+            reset();
+            
+            switch(type) {
+                case 'tree':
+                    createShape('cylinder');
+                    setTimeout(() => transformVertices('scale'), 100);
+                    setTimeout(() => subdivide(2), 200);
+                    setTimeout(() => applyVertexColors('height'), 300);
+                    break;
+                    
+                case 'character':
+                    createShape('cube');
+                    setTimeout(() => subdivide(1), 100);
+                    setTimeout(() => transformVertices('noise'), 200);
+                    setTimeout(() => applyVertexColors('position'), 300);
+                    break;
+                    
+                case 'building':
+                    createShape('cube');
+                    setTimeout(() => {
+                        document.getElementById('transform-amount').value = '2';
+                        transformVertices('scale');
+                    }, 100);
+                    setTimeout(() => applyVertexColors('gradient'), 200);
+                    break;
+                    
+                case 'terrain':
+                    createShape('plane');
+                    setTimeout(() => subdivide(3), 100);
+                    setTimeout(() => {
+                        document.getElementById('transform-amount').value = '0.5';
+                        transformVertices('noise');
+                    }, 200);
+                    setTimeout(() => applyVertexColors('height'), 300);
+                    break;
+            }
+        }
+        
+        function reset() {
+            if (currentMesh) {
+                scene.remove(currentMesh);
+                currentMesh = null;
+            }
+            
+            vertexData = {
+                vertices: [],
+                indices: [],
+                normals: [],
+                colors: [],
+                uvs: []
+            };
+            
+            updatePipelineDisplay();
+            console.log('🔄 Reset complete');
+        }
+        
+        // ===== INIT =====
+        window.addEventListener('load', () => {
+            initThreeJS();
+            console.log('🚀 PixelProdigy Vertex Pipeline Builder Ready!');
+            console.log('👈 Use the left panel to build objects step-by-step');
+            console.log('👉 Watch the pipeline data update on the right');
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const renderPanel = document.getElementById('render-panel');
+            camera.aspect = renderPanel.clientWidth / renderPanel.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(renderPanel.clientWidth, renderPanel.clientHeight);
+        });
+    </script>
+</body>
+</html>

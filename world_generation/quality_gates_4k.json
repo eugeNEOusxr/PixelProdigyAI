@@ -1,0 +1,52 @@
+{
+  "pre_build": [
+    {
+      "check": "use_case_validation",
+      "required": true
+    },
+    {
+      "check": "budget_approval",
+      "required": true
+    },
+    {
+      "check": "performance_impact",
+      "required": true
+    }
+  ],
+  "during_build": [
+    {
+      "check": "vertex_budget",
+      "max": 262144
+    },
+    {
+      "check": "triangle_budget",
+      "max": 174762
+    },
+    {
+      "check": "memory_budget",
+      "max": 4294967296
+    },
+    {
+      "check": "build_time",
+      "max": 2700
+    }
+  ],
+  "post_build": [
+    {
+      "check": "mesh_integrity",
+      "threshold": 0.99
+    },
+    {
+      "check": "normal_consistency",
+      "threshold": 0.98
+    },
+    {
+      "check": "uv_coverage",
+      "threshold": 1
+    },
+    {
+      "check": "compression_ratio",
+      "min": 80
+    }
+  ]
+}

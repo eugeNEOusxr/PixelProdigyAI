@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigyCSS - The Future of Design Interfaces</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000000;
+      color: #ffffff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 3D Matrix Grid Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(0deg, transparent 24%, rgba(0, 255, 255, 0.05) 25%, rgba(0, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, 0.05) 75%, rgba(0, 255, 255, 0.05) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(0, 255, 255, 0.05) 25%, rgba(0, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, 0.05) 75%, rgba(0, 255, 255, 0.05) 76%, transparent 77%, transparent);
+      background-size: 50px 50px;
+      perspective: 500px;
+      transform-style: preserve-3d;
+      animation: gridMove 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes gridMove {
+      0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+      100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+    }
+
+    /* Energy Pulse Overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+      animation: energyPulse 4s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes energyPulse {
+      0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+    }
+
+    /* Main Container */
+    #mainContainer {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 320px;
+      grid-template-rows: 60px 1fr 50px;
+      height: 100vh;
+      gap: 0;
+    }
+
+    /* Header */
+    #header {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(0, 20, 40, 0.95) 0%, rgba(10, 30, 50, 0.95) 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      box-shadow: 0 4px 30px rgba(0, 255, 255, 0.2);
+    }
+
+    #header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00FFFF 0%, #0ea5e9 50%, #FFD700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+      animation: shimmerFlow 3s linear infinite;
+      background-size: 200% 100%;
+    }
+
+    @keyframes shimmerFlow {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    .header-btn {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(14, 165, 233, 0.2) 100%);
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      border-radius: 6px;
+      color: #00FFFF;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 12px;
+    }
+
+    .header-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.4) 0%, rgba(14, 165, 233, 0.4) 100%);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      transform: translateY(-2px);
+    }
+
+    /* Left Panel - CSS Controls */
+    #leftPanel {
+      background: rgba(10, 15, 25, 0.95);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(0, 255, 255, 0.2);
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px;
+    }
+
+    /* Right Panel - Live Preview Controls */
+    #rightPanel {
+      background: rgba(10, 15, 25, 0.95);
+      backdrop-filter: blur(20px);
+      border-left: 1px solid rgba(0, 255, 255, 0.2);
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    /* Center Canvas */
+    #centerCanvas {
+      background: rgba(5, 10, 20, 0.8);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #previewElement {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Collapsible Panel System */
+    .css-panel {
+      background: rgba(20, 30, 45, 0.6);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .css-panel:hover {
+      border-color: rgba(0, 255, 255, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
+    }
+
+    .panel-header {
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .panel-header:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(14, 165, 233, 0.2) 100%);
+    }
+
+    .panel-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #00FFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-toggle {
+      width: 20px;
+      height: 20px;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .panel-toggle::before,
+    .panel-toggle::after {
+      content: '';
+      position: absolute;
+      background: #00FFFF;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .panel-toggle::before {
+      width: 12px;
+      height: 2px;
+      top: 9px;
+      left: 4px;
+    }
+
+    .panel-toggle::after {
+      width: 2px;
+      height: 12px;
+      top: 4px;
+      left: 9px;
+    }
+
+    .css-panel.expanded .panel-toggle {
+      transform: rotate(45deg);
+    }
+
+    .panel-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .css-panel.expanded .panel-content {
+      max-height: 2000px;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    /* CSS Control Grid */
+    .css-control-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    /* Button Grid System */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .grid-btn {
+      padding: 12px 8px;
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 6px;
+      color: #00FFFF;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .grid-btn:hover::before {
+      left: 100%;
+    }
+
+    .grid-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(14, 165, 233, 0.3) 100%);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .grid-btn.active {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.5) 0%, rgba(14, 165, 233, 0.5) 100%);
+      border-color: #00FFFF;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    }
+
+    /* Input Controls */
+    .control-row {
+      margin-bottom: 12px;
+    }
+
+    .control-row label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #7dd3fc;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-row input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: rgba(30, 40, 60, 0.8);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .control-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, #00FFFF 0%, #0ea5e9 100%);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+      transition: all 0.3s ease;
+    }
+
+    .control-row input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 1);
+    }
+
+    .control-row input[type="number"],
+    .control-row input[type="text"],
+    .control-row select {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(20, 30, 45, 0.8);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 12px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .control-row input[type="number"]:focus,
+    .control-row input[type="text"]:focus,
+    .control-row select:focus {
+      border-color: #00FFFF;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .control-row input[type="color"] {
+      width: 100%;
+      height: 40px;
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    /* Holographic Wheel Control */
+    .holographic-wheel {
+      width: 200px;
+      height: 200px;
+      margin: 20px auto;
+      position: relative;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: wheelRotate 20s linear infinite;
+    }
+
+    @keyframes wheelRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .holographic-wheel:hover {
+      border-color: #00FFFF;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
+      animation-play-state: paused;
+    }
+
+    .wheel-center {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #00FFFF 0%, #0ea5e9 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+      animation: wheelRotate 20s linear infinite reverse;
+    }
+
+    .wheel-option {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 255, 255, 0.2);
+      border: 1px solid rgba(0, 255, 255, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      animation: wheelRotate 20s linear infinite reverse;
+    }
+
+    .wheel-option:hover {
+      background: rgba(0, 255, 255, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+      transform: scale(1.2);
+    }
+
+    /* Footer */
+    #footer {
+      grid-column: 1 / -1;
+      background: rgba(10, 15, 25, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .footer-section {
+      display: flex;
+      gap: 20px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 15, 25, 0.5);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(14, 165, 233, 0.3) 100%);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.6) 0%, rgba(14, 165, 233, 0.6) 100%);
+    }
+
+    /* Bloom Button Effect */
+    .btn-bloom {
+      padding: 14px 24px;
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(14, 165, 233, 0.3) 100%);
+      border: 2px solid rgba(0, 255, 255, 0.5);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-bloom::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: bloomSweep 2s linear infinite;
+    }
+
+    @keyframes bloomSweep {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .btn-bloom:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.6) 0%, rgba(14, 165, 233, 0.6) 100%);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 60px rgba(0, 255, 255, 0.4);
+      transform: translateY(-3px);
+    }
+
+    /* Code Output Panel */
+    .code-output {
+      background: rgba(10, 15, 25, 0.95);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #00FFFF;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .code-output pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div id="mainContainer">
+    <!-- Header -->
+    <div id="header">
+      <h1>⚡ PixelProdigyCSS</h1>
+      <div class="header-controls">
+        <button class="header-btn" onclick="exportCSS()">📤 Export CSS</button>
+        <button class="header-btn" onclick="exportHTML()">📄 Export HTML</button>
+        <button class="header-btn" onclick="saveProject()">💾 Save Project</button>
+        <button class="header-btn" onclick="loadProject()">📂 Load Project</button>
+      </div>
+    </div>
+
+    <!-- Left Panel: CSS Controls -->
+    <div id="leftPanel">
+      <!-- Layout Panel -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>📐 Layout & Position</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="btn-grid">
+              <button class="grid-btn" onclick="applyCSS('display', 'block')">Block</button>
+              <button class="grid-btn" onclick="applyCSS('display', 'flex')">Flex</button>
+              <button class="grid-btn" onclick="applyCSS('display', 'grid')">Grid</button>
+              <button class="grid-btn" onclick="applyCSS('position', 'relative')">Relative</button>
+              <button class="grid-btn" onclick="applyCSS('position', 'absolute')">Absolute</button>
+              <button class="grid-btn" onclick="applyCSS('position', 'fixed')">Fixed</button>
+            </div>
+
+            <div class="control-row">
+              <label>Width</label>
+              <input type="range" id="widthRange" min="50" max="800" value="300" oninput="updateCSS('width', this.value + 'px')">
+              <input type="number" id="widthValue" value="300" oninput="updateCSS('width', this.value + 'px')">
+            </div>
+
+            <div class="control-row">
+              <label>Height</label>
+              <input type="range" id="heightRange" min="50" max="800" value="300" oninput="updateCSS('height', this.value + 'px')">
+              <input type="number" id="heightValue" value="300" oninput="updateCSS('height', this.value + 'px')">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colors & Gradients Panel -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>🎨 Colors & Gradients</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="control-row">
+              <label>Background Color</label>
+              <input type="color" id="bgColor" value="#667eea" oninput="updateCSS('background', this.value)">
+            </div>
+
+            <div class="control-row">
+              <label>Text Color</label>
+              <input type="color" id="textColor" value="#ffffff" oninput="updateCSS('color', this.value)">
+            </div>
+
+            <div class="btn-grid">
+              <button class="grid-btn" onclick="applyGradient('linear', '#667eea', '#764ba2')">Linear</button>
+              <button class="grid-btn" onclick="applyGradient('radial', '#667eea', '#764ba2')">Radial</button>
+              <button class="grid-btn" onclick="applyGradient('conic', '#667eea', '#764ba2')">Conic</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transform & 3D Panel -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>🔄 Transform & 3D</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="holographic-wheel" id="transformWheel">
+              <div class="wheel-center">🎯</div>
+              <div class="wheel-option" style="top: 10px; left: 75px;" onclick="applyTransform('rotateX', 45)">↻X</div>
+              <div class="wheel-option" style="top: 75px; left: 140px;" onclick="applyTransform('rotateY', 45)">↻Y</div>
+              <div class="wheel-option" style="bottom: 10px; left: 75px;" onclick="applyTransform('rotateZ', 45)">↻Z</div>
+              <div class="wheel-option" style="top: 75px; left: 10px;" onclick="applyTransform('scale', 1.5)">⤢</div>
+            </div>
+
+            <div class="control-row">
+              <label>Rotate X</label>
+              <input type="range" min="0" max="360" value="0" oninput="applyTransform('rotateX', this.value)">
+            </div>
+
+            <div class="control-row">
+              <label>Rotate Y</label>
+              <input type="range" min="0" max="360" value="0" oninput="applyTransform('rotateY', this.value)">
+            </div>
+
+            <div class="control-row">
+              <label>Rotate Z</label>
+              <input type="range" min="0" max="360" value="0" oninput="applyTransform('rotateZ', this.value)">
+            </div>
+
+            <div class="control-row">
+              <label>Scale</label>
+              <input type="range" min="0.1" max="3" step="0.1" value="1" oninput="applyTransform('scale', this.value)">
+            </div>
+
+            <div class="control-row">
+              <label>Perspective</label>
+              <input type="range" min="0" max="2000" value="1000" oninput="updateCSS('perspective', this.value + 'px')">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Border & Shadow Panel -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>🔲 Border & Shadow</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="control-row">
+              <label>Border Width</label>
+              <input type="range" min="0" max="20" value="0" oninput="updateCSS('borderWidth', this.value + 'px')">
+            </div>
+
+            <div class="control-row">
+              <label>Border Color</label>
+              <input type="color" value="#00FFFF" oninput="updateCSS('borderColor', this.value)">
+            </div>
+
+            <div class="control-row">
+              <label>Border Radius</label>
+              <input type="range" min="0" max="200" value="12" oninput="updateCSS('borderRadius', this.value + 'px')">
+            </div>
+
+            <div class="control-row">
+              <label>Box Shadow Blur</label>
+              <input type="range" min="0" max="100" value="20" oninput="updateBoxShadow()">
+            </div>
+
+            <div class="btn-grid">
+              <button class="grid-btn" onclick="applyShadowPreset('soft')">Soft</button>
+              <button class="grid-btn" onclick="applyShadowPreset('hard')">Hard</button>
+              <button class="grid-btn" onclick="applyShadowPreset('glow')">Glow</button>
+              <button class="grid-btn" onclick="applyShadowPreset('neon')">Neon</button>
+              <button class="grid-btn" onclick="applyShadowPreset('3d')">3D</button>
+              <button class="grid-btn" onclick="applyShadowPreset('none')">None</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typography Panel -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>✍️ Typography</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="control-row">
+              <label>Font Size</label>
+              <input type="range" min="12" max="72" value="24" oninput="updateCSS('fontSize', this.value + 'px')">
+            </div>
+
+            <div class="control-row">
+              <label>Font Weight</label>
+              <select onchange="updateCSS('fontWeight', this.value)">
+                <option value="300">Light</option>
+                <option value="400">Normal</option>
+                <option value="600">Semi-Bold</option>
+                <option value="700" selected>Bold</option>
+                <option value="900">Black</option>
+              </select>
+            </div>
+
+            <div class="control-row">
+              <label>Text Align</label>
+              <div class="btn-grid">
+                <button class="grid-btn" onclick="applyCSS('textAlign', 'left')">Left</button>
+                <button class="grid-btn active" onclick="applyCSS('textAlign', 'center')">Center</button>
+                <button class="grid-btn" onclick="applyCSS('textAlign', 'right')">Right</button>
+              </div>
+            </div>
+
+            <div class="control-row">
+              <label>Text Shadow</label>
+              <input type="range" min="0" max="50" value="10" oninput="updateTextShadow(this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animation Panel -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>⚡ Animation & Effects</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="btn-grid">
+              <button class="grid-btn" onclick="applyAnimation('pulse')">Pulse</button>
+              <button class="grid-btn" onclick="applyAnimation('spin')">Spin</button>
+              <button class="grid-btn" onclick="applyAnimation('bounce')">Bounce</button>
+              <button class="grid-btn" onclick="applyAnimation('shake')">Shake</button>
+              <button class="grid-btn" onclick="applyAnimation('glow')">Glow</button>
+              <button class="grid-btn" onclick="applyAnimation('float')">Float</button>
+            </div>
+
+            <div class="control-row">
+              <label>Animation Speed</label>
+              <input type="range" min="0.5" max="5" step="0.5" value="2" oninput="updateAnimationSpeed(this.value)">
+            </div>
+
+            <div class="control-row">
+              <label>Blur Effect</label>
+              <input type="range" min="0" max="20" value="0" oninput="updateCSS('filter', 'blur(' + this.value + 'px)')">
+            </div>
+
+            <div class="control-row">
+              <label>Opacity</label>
+              <input type="range" min="0" max="1" step="0.1" value="1" oninput="updateCSS('opacity', this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Canvas -->
+    <div id="centerCanvas">
+      <div id="previewElement">
+        Preview
+      </div>
+    </div>
+
+    <!-- Right Panel: Code Output & Presets -->
+    <div id="rightPanel">
+      <!-- Preset Templates -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>🎭 Preset Templates</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <button class="btn-bloom" style="width: 100%; margin-bottom: 8px;" onclick="loadPreset('glassmorphism')">Glassmorphism</button>
+            <button class="btn-bloom" style="width: 100%; margin-bottom: 8px;" onclick="loadPreset('neumorphism')">Neumorphism</button>
+            <button class="btn-bloom" style="width: 100%; margin-bottom: 8px;" onclick="loadPreset('neon')">Neon Card</button>
+            <button class="btn-bloom" style="width: 100%; margin-bottom: 8px;" onclick="loadPreset('holographic')">Holographic</button>
+            <button class="btn-bloom" style="width: 100%; margin-bottom: 8px;" onclick="loadPreset('3d-cube')">3D Cube</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live CSS Code -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>💻 Generated CSS</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="code-output" id="cssOutput">
+              <pre>/* CSS will appear here */</pre>
+            </div>
+            <button class="btn-bloom" style="width: 100%; margin-top: 12px;" onclick="copyCSSToClipboard()">📋 Copy CSS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live HTML Code -->
+      <div class="css-panel expanded">
+        <div class="panel-header" onclick="toggleCSSPanel(this)">
+          <h3>📄 Generated HTML</h3>
+          <div class="panel-toggle"></div>
+        </div>
+        <div class="panel-content">
+          <div class="panel-body">
+            <div class="code-output" id="htmlOutput">
+              <pre>&lt;div class="preview-element"&gt;Preview&lt;/div&gt;</pre>
+            </div>
+            <button class="btn-bloom" style="width: 100%; margin-top: 12px;" onclick="copyHTMLToClipboard()">📋 Copy HTML</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer">
+      <div class="footer-section">
+        <span>PixelProdigyCSS v1.0.0 © 2025</span>
+      </div>
+      <div class="footer-section">
+        <span>Created by Jeremy/EugeNEOusXR</span>
+        <span>Patent Pending</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Current CSS State
+    let currentCSS = {
+      width: '300px',
+      height: '300px',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      borderRadius: '12px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '24px',
+      fontWeight: '700',
+      color: '#ffffff',
+      textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+      transform: 'scale(1)',
+      transition: 'all 0.3s ease'
+    };
+
+    let currentTransform = {
+      rotateX: 0,
+      rotateY: 0,
+      rotateZ: 0,
+      scale: 1
+    };
+
+    // Toggle Panel
+    function toggleCSSPanel(header) {
+      const panel = header.parentElement;
+      panel.classList.toggle('expanded');
+    }
+
+    // Apply CSS Property
+    function applyCSS(property, value) {
+      currentCSS[property] = value;
+      updatePreview();
+      updateCSSOutput();
+    }
+
+    // Update CSS Property
+    function updateCSS(property, value) {
+      currentCSS[property] = value;
+      updatePreview();
+      updateCSSOutput();
+    }
+
+    // Apply Transform
+    function applyTransform(type, value) {
+      currentTransform[type] = value;
+      const transformString = `rotateX(${currentTransform.rotateX}deg) rotateY(${currentTransform.rotateY}deg) rotateZ(${currentTransform.rotateZ}deg) scale(${currentTransform.scale})`;
+      currentCSS.transform = transformString;
+      updatePreview();
+      updateCSSOutput();
+    }
+
+    // Apply Gradient
+    function applyGradient(type, color1, color2) {
+      let gradient;
+      if (type === 'linear') {
+        gradient = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+      } else if (type === 'radial') {
+        gradient = `radial-gradient(circle, ${color1} 0%, ${color2} 100%)`;
+      } else if (type === 'conic') {
+        gradient = `conic-gradient(${color1}, ${color2})`;
+      }
+      currentCSS.background = gradient;
+      updatePreview();
+      updateCSSOutput();
+    }
+
+    // Apply Shadow Preset
+    function applyShadowPreset(preset) {
+      const presets = {
+        soft: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        hard: '10px 10px 0px rgba(0, 0, 0, 0.8)',
+        glow: '0 0 30px rgba(0, 255, 255, 0.8)',
+        neon: '0 0 40px rgba(0, 255, 255, 1), 0 0 80px rgba(0, 255, 255, 0.5)',
+        '3d': '10px 10px 20px rgba(0, 0, 0, 0.3), -10px -10px 20px rgba(255, 255, 255, 0.1)',
+        none: 'none'
+      };
+      currentCSS.boxShadow = presets[preset];
+      updatePreview();
+      updateCSSOutput();
+    }
+
+    // Update Text Shadow
+    function updateTextShadow(blur) {
+      currentCSS.textShadow = `0 2px ${blur}px rgba(0, 0, 0, 0.5)`;
+      updatePreview();
+      updateCSSOutput();
+    }
+
+    // Apply Animation
+    function applyAnimation(animation) {
+      const animations = {
+        pulse: 'pulse 2s ease-in-out infinite',
+        spin: 'spin 2s linear infinite',
+        bounce: 'bounce 1s ease-in-out infinite',
+        shake: 'shake 0.5s ease-in-out infinite',
+        glow: 'glow 2s ease-in-out infinite',
+        float: 'float 3s ease-in-out infinite'
+      };
+      currentCSS.animation = animations[animation];
+      updatePreview();
+      updateCSSOutput();
+      
+      // Add animation keyframes if not already present
+      if (!document.getElementById('animationStyles')) {
+        const style = document.createElement('style');
+        style.id = 'animationStyles';
+        style.innerHTML = `
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+          }
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+          }
+          @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 255, 1); }
+          }
+          @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+
+    // Update Animation Speed
+    function updateAnimationSpeed(speed) {
+      if (currentCSS.animation) {
+        const animName = currentCSS.animation.split(' ')[0];
+        currentCSS.animation = `${animName} ${speed}s ease-in-out infinite`;
+        updatePreview();
+        updateCSSOutput();
+      }
+    }
+
+    // Update Preview
+    function updatePreview() {
+      const preview = document.getElementById('previewElement');
+      Object.assign(preview.style, currentCSS);
+    }
+
+    // Update CSS Output
+    function updateCSSOutput() {
+      const output = document.getElementById('cssOutput');
+      let cssText = '.preview-element {\n';
+      for (let prop in currentCSS) {
+        const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+        cssText += `  ${cssProp}: ${currentCSS[prop]};\n`;
+      }
+      cssText += '}';
+      output.innerHTML = `<pre>${cssText}</pre>`;
+    }
+
+    // Load Preset
+    function loadPreset(preset) {
+      const presets = {
+        glassmorphism: {
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+        },
+        neumorphism: {
+          background: '#e0e5ec',
+          borderRadius: '20px',
+          boxShadow: '9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.5)',
+          color: '#333333'
+        },
+        neon: {
+          background: '#000000',
+          border: '2px solid #00FFFF',
+          borderRadius: '12px',
+          boxShadow: '0 0 30px #00FFFF, 0 0 60px #00FFFF, inset 0 0 30px rgba(0, 255, 255, 0.2)',
+          color: '#00FFFF'
+        },
+        holographic: {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px rgba(102, 126, 234, 0.6)',
+          animation: 'holographicShift 3s ease-in-out infinite'
+        },
+        '3d-cube': {
+          width: '200px',
+          height: '200px',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          transform: 'rotateX(45deg) rotateY(45deg)',
+          boxShadow: '20px 20px 40px rgba(0, 0, 0, 0.4)',
+          transformStyle: 'preserve-3d'
+        }
+      };
+
+      Object.assign(currentCSS, presets[preset]);
+      updatePreview();
+      updateCSSOutput();
+    }
+
+    // Copy CSS to Clipboard
+    function copyCSSToClipboard() {
+      const cssText = document.getElementById('cssOutput').innerText;
+      navigator.clipboard.writeText(cssText).then(() => {
+        alert('CSS copied to clipboard!');
+      });
+    }
+
+    // Copy HTML to Clipboard
+    function copyHTMLToClipboard() {
+      const htmlText = document.getElementById('htmlOutput').innerText;
+      navigator.clipboard.writeText(htmlText).then(() => {
+        alert('HTML copied to clipboard!');
+      });
+    }
+
+    // Export Functions
+    function exportCSS() {
+      const cssText = document.getElementById('cssOutput').innerText;
+      const blob = new Blob([cssText], { type: 'text/css' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pixelprodigy-styles.css';
+      a.click();
+    }
+
+    function exportHTML() {
+      const htmlText = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigyCSS Export</title>
+  <style>
+${document.getElementById('cssOutput').innerText}
+  </style>
+</head>
+<body>
+  <div class="preview-element">Preview</div>
+</body>
+</html>`;
+      const blob = new Blob([htmlText], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pixelprodigy-export.html';
+      a.click();
+    }
+
+    function saveProject() {
+      const project = JSON.stringify(currentCSS, null, 2);
+      const blob = new Blob([project], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pixelprodigy-project.json';
+      a.click();
+    }
+
+    function loadProject() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          currentCSS = JSON.parse(event.target.result);
+          updatePreview();
+          updateCSSOutput();
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    // Initialize
+    updateCSSOutput();
+  </script>
+</body>
+</html>

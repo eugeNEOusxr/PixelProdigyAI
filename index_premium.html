@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy - Professional 3D Studio in Your Browser</title>
+    <meta name="description" content="Transform your browser into a professional 3D studio. Zero downloads, instant access, AI-powered creativity. Sculpt, fragment, bind, and animate in real-time.">
+    
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <style>
+        /* ===================================
+           PREMIUM VISUAL SYSTEM
+           Golden Trim • Black Layers • Shadows • Animations
+           =================================== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: #000000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* ===================================
+           LAYERED BLACK BACKGROUND SYSTEM
+           =================================== */
+        
+        .layer-black-1 {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
+            z-index: -3;
+        }
+        
+        .layer-black-2 {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, transparent 50%, #1a1a1a 100%);
+            opacity: 0.5;
+            z-index: -2;
+            animation: slowPulse 10s ease-in-out infinite;
+        }
+        
+        .layer-black-3 {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at top left, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom right, rgba(255, 165, 0, 0.03) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        @keyframes slowPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* ===================================
+           GOLDEN ANIMATED BORDERS
+           =================================== */
+        
+        @keyframes goldenBorderRotate {
+            0% {
+                border-image-source: linear-gradient(0deg, #FFD700, #FFA500, #FFD700);
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.3),
+                            0 0 40px rgba(255, 215, 0, 0.2),
+                            inset 0 0 20px rgba(255, 215, 0, 0.1);
+            }
+            25% {
+                border-image-source: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.4),
+                            0 0 50px rgba(255, 215, 0, 0.25),
+                            inset 0 0 25px rgba(255, 215, 0, 0.15);
+            }
+            50% {
+                border-image-source: linear-gradient(180deg, #FFD700, #FFA500, #FFD700);
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
+                            0 0 60px rgba(255, 215, 0, 0.3),
+                            inset 0 0 30px rgba(255, 215, 0, 0.2);
+            }
+            75% {
+                border-image-source: linear-gradient(270deg, #FFD700, #FFA500, #FFD700);
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.4),
+                            0 0 50px rgba(255, 215, 0, 0.25),
+                            inset 0 0 25px rgba(255, 215, 0, 0.15);
+            }
+            100% {
+                border-image-source: linear-gradient(360deg, #FFD700, #FFA500, #FFD700);
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.3),
+                            0 0 40px rgba(255, 215, 0, 0.2),
+                            inset 0 0 20px rgba(255, 215, 0, 0.1);
+            }
+        }
+        
+        .golden-trim {
+            border: 4px solid #FFD700;
+            border-image-slice: 1;
+            animation: goldenBorderRotate 4s linear infinite;
+            position: relative;
+        }
+        
+        /* Golden corner accents */
+        .golden-trim::before,
+        .golden-trim::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #FFD700;
+            animation: cornerGlow 2s ease-in-out infinite alternate;
+        }
+        
+        .golden-trim::before {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .golden-trim::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        @keyframes cornerGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+            100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+        }
+        
+        /* ===================================
+           GOLDEN PARTICLES CANVAS
+           =================================== */
+        
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* ===================================
+           HERO SECTION WITH 3D EFFECTS
+           =================================== */
+        
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            perspective: 1000px;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            transform-style: preserve-3d;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+        
+        .hero-badge.golden-trim {
+            border-width: 2px;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 25px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: #cccccc;
+            margin-bottom: 20px;
+            font-weight: 300;
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+        }
+        
+        .hero-tagline {
+            font-size: 1.3rem;
+            color: #FFD700;
+            margin-bottom: 50px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            animation: fadeInUp 1s ease-out 0.4s backwards;
+        }
+        
+        /* ===================================
+           PREMIUM BUTTONS WITH 3D EFFECTS
+           =================================== */
+        
+        .cta-buttons {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.6s backwards;
+        }
+        
+        .btn {
+            padding: 18px 45px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4),
+                        0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 60px rgba(255, 215, 0, 0.6),
+                        0 0 40px rgba(255, 215, 0, 0.5);
+        }
+        
+        .btn-secondary {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7),
+                        0 0 40px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* ===================================
+           GLASS CARD SYSTEM WITH DEPTH
+           =================================== */
+        
+        .features-section {
+            position: relative;
+            padding: 100px 20px;
+            z-index: 1;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #FFD700 0%, #fff 50%, #FFD700 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700);
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: -1;
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-card:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(5deg) scale(1.05) translateZ(20px);
+            box-shadow: 0 25px 80px rgba(255, 215, 0, 0.5),
+                        0 0 60px rgba(255, 215, 0, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .feature-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+        
+        .feature-description {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #cccccc;
+        }
+        
+        /* ===================================
+           STATS SECTION WITH GOLDEN GLOW
+           =================================== */
+        
+        .stats-section {
+            position: relative;
+            padding: 100px 20px;
+            z-index: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            transition: all 0.4s ease;
+        }
+        
+        .stat-card.golden-trim {
+            border-width: 2px;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.1);
+            background: rgba(26, 26, 26, 0.9);
+        }
+        
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            animation: numberPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes numberPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            color: #cccccc;
+            font-weight: 600;
+        }
+        
+        /* ===================================
+           AUTHENTICATION SECTION
+           =================================== */
+        
+        .auth-section {
+            position: relative;
+            padding: 80px 20px;
+            text-align: center;
+            z-index: 1;
+        }
+        
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 50px 40px;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px;
+        }
+        
+        .auth-container.golden-trim {
+            border-width: 3px;
+        }
+        
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+        
+        .auth-subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+            margin-bottom: 40px;
+        }
+        
+        #google-signin-btn {
+            margin: 0 auto 30px;
+        }
+        
+        .guest-link {
+            color: #FFD700;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .guest-link:hover {
+            color: #FFA500;
+            transform: scale(1.1);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* ===================================
+           FOOTER
+           =================================== */
+        
+        footer {
+            position: relative;
+            padding: 60px 20px 40px;
+            text-align: center;
+            background: rgba(10, 10, 10, 0.9);
+            border-top: 2px solid #FFD700;
+            box-shadow: 0 -10px 40px rgba(255, 215, 0, 0.2);
+            z-index: 1;
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: #cccccc;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .footer-copyright {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* ===================================
+           RESPONSIVE DESIGN
+           =================================== */
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .hero-tagline {
+                font-size: 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .stat-number {
+                font-size: 3rem;
+            }
+        }
+        
+        /* ===================================
+           SMOOTH SCROLL
+           =================================== */
+        
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Layered Black Background System -->
+    <div class="layer-black-1"></div>
+    <div class="layer-black-2"></div>
+    <div class="layer-black-3"></div>
+    
+    <!-- Golden Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge golden-trim">
+                ✨ Zero Downloads • Instant Access • AI-Powered
+            </div>
+            
+            <h1 class="hero-title">PixelProdigy</h1>
+            
+            <p class="hero-subtitle">
+                Professional 3D Studio in Your Browser
+            </p>
+            
+            <p class="hero-tagline">
+                SCULPT • FRAGMENT • BIND • ANIMATE • CREATE
+            </p>
+            
+            <div class="cta-buttons">
+                <a href="#auth" class="btn btn-primary">
+                    🚀 Launch Studio
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    ✨ Explore Features
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <h2 class="section-title">Powerful Features at Your Fingertips</h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">🎨</span>
+                <h3 class="feature-title">Selection Tools</h3>
+                <p class="feature-description">
+                    Box, circle, lasso, and paint selection modes. Keyboard shortcuts (B/C/L/P) for rapid workflow.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">✏️</span>
+                <h3 class="feature-title">Sculpting Brushes</h3>
+                <p class="feature-description">
+                    Professional sculpting with raise, lower, smooth, grab, pinch, and inflate brushes. Radius and strength control.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🔗</span>
+                <h3 class="feature-title">Binding System</h3>
+                <p class="feature-description">
+                    Connect objects with rigid, elastic, chain, or weld bindings. Create complex mechanical systems.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">💥</span>
+                <h3 class="feature-title">Fragmentation</h3>
+                <p class="feature-description">
+                    Shatter objects using Voronoi, voxel, radial, or slice algorithms. Scatter and animate fragments.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">✨</span>
+                <h3 class="feature-title">Particle Effects</h3>
+                <p class="feature-description">
+                    Emit smoke, sparks, embers, debris, or fire. Point, area, and trail emitters with full control.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🤖</span>
+                <h3 class="feature-title">AI Suggestions</h3>
+                <p class="feature-description">
+                    Get intelligent recommendations for materials, compositions, and optimizations powered by AI.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🧊</span>
+                <h3 class="feature-title">Physics Simulation</h3>
+                <p class="feature-description">
+                    Real-time physics with gravity, collisions, and constraints. Cannon.js integration for realism.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🎭</span>
+                <h3 class="feature-title">Materials & Lighting</h3>
+                <p class="feature-description">
+                    PBR materials, procedural textures, and dynamic lighting. Studio-quality rendering in browser.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">📐</span>
+                <h3 class="feature-title">Primitive Objects</h3>
+                <p class="feature-description">
+                    Cube, sphere, cylinder, cone, torus, plane. Instant spawning with physics-ready colliders.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">📚</span>
+                <h3 class="feature-title">Layer System</h3>
+                <p class="feature-description">
+                    Organize objects across 10 layers. Toggle visibility, lock editing, and manage complex scenes.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">📷</span>
+                <h3 class="feature-title">Camera Controls</h3>
+                <p class="feature-description">
+                    Orbit, pan, zoom with mouse or keyboard. WASD possession mode for first-person exploration.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🔧</span>
+                <h3 class="feature-title">Transform Tools</h3>
+                <p class="feature-description">
+                    Grab (G), rotate (R), scale (S) with axis constraints. Precision editing for professional work.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <h2 class="section-title">Built for Performance</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card golden-trim">
+                <div class="stat-number">6,950</div>
+                <div class="stat-label">Lines of Code</div>
+            </div>
+            
+            <div class="stat-card golden-trim">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Complete Systems</div>
+            </div>
+            
+            <div class="stat-card golden-trim">
+                <div class="stat-number">0 MB</div>
+                <div class="stat-label">Download Size</div>
+            </div>
+            
+            <div class="stat-card golden-trim">
+                <div class="stat-number">60 FPS</div>
+                <div class="stat-label">Performance</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Authentication Section -->
+    <section id="auth" class="auth-section">
+        <div class="auth-container golden-trim">
+            <h2 class="auth-title">Ready to Create?</h2>
+            <p class="auth-subtitle">Sign in with Google or continue as guest</p>
+            
+            <!-- Google Sign-In Button -->
+            <div id="google-signin-btn"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            
+            <a href="#" class="guest-link" onclick="launchAsGuest(); return false;">
+                👤 Continue as Guest →
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-logo">PixelProdigy</div>
+        
+        <div class="footer-links">
+            <a href="#features">Features</a>
+            <a href="https://github.com/yourusername/PixelProdigyAI" target="_blank">GitHub</a>
+            <a href="mailto:contact@pixelprodigy.com">Contact</a>
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+        </div>
+        
+        <div class="footer-copyright">
+            © 2025 PixelProdigy. All rights reserved. Built with ❤️ and Three.js
+        </div>
+    </footer>
+    
+    <script>
+        // ===================================
+        // GOLDEN PARTICLES ANIMATION
+        // ===================================
+        
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        const particles = [];
+        const particleCount = 100;
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.alpha = Math.random() * 0.5 + 0.2;
+                this.color = Math.random() > 0.5 ? 'rgba(255, 215, 0, ' : 'rgba(255, 165, 0, ';
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color + this.alpha + ')';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Glow effect
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color + '0.8)';
+            }
+        }
+        
+        // Create particles
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        // Animation loop
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            // Draw connections between nearby particles
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        ctx.strokeStyle = 'rgba(255, 215, 0, ' + (1 - distance / 100) * 0.2 + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        animateParticles();
+        
+        // ===================================
+        // GOOGLE OAUTH INTEGRATION
+        // ===================================
+        
+        function handleCredentialResponse(response) {
+            const userInfo = parseJwt(response.credential);
+            
+            // Store user session
+            localStorage.setItem('pixelprodigy_user', JSON.stringify({
+                email: userInfo.email,
+                name: userInfo.name,
+                picture: userInfo.picture,
+                loginTime: new Date().toISOString(),
+                isGuest: false
+            }));
+            
+            console.log('✅ User logged in:', userInfo.name);
+            
+            // Redirect to main app
+            launchStudio();
+        }
+        
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+        
+        function launchAsGuest() {
+            // Create guest session
+            localStorage.setItem('pixelprodigy_user', JSON.stringify({
+                email: 'guest@pixelprodigy.local',
+                name: 'Guest User',
+                picture: null,
+                loginTime: new Date().toISOString(),
+                isGuest: true
+            }));
+            
+            console.log('👤 Launched as guest');
+            
+            // Redirect to main app
+            launchStudio();
+        }
+        
+        function launchStudio() {
+            // Check if user is authenticated
+            const user = localStorage.getItem('pixelprodigy_user');
+            
+            if (user) {
+                // Redirect to main app
+                window.location.href = 'pixelprodigy3d.html';
+            } else {
+                alert('⚠️ Please sign in or continue as guest first');
+            }
+        }
+        
+        // ===================================
+        // SMOOTH SCROLL FOR NAVIGATION
+        // ===================================
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

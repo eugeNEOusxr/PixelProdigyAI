@@ -1,0 +1,36 @@
+
+groups:
+  - name: pixelverse_alerts
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          
+      - alert: HighMemoryUsage
+        expr: memory_usage_percent > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage detected"
+          
+      - alert: LowFPS
+        expr: avg_fps < 45
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Average FPS below target"
+          
+      - alert: HighErrorRate
+        expr: error_rate > 0.01
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error rate exceeds 1%"

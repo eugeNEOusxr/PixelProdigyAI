@@ -1,0 +1,10 @@
+# 1970 CHEVELLE SS 454 - PREMIUM TIER (GENE)
+
+CAR > body > blob forward 495cm muscular aerodynamic
+CAR > hood > surface scoops repeat 2 chrome
+CAR > engine > v8 454cubic-inch big-block powerful
+CAR > transmission > turbo-400 3speed heavy-duty
+CAR > wheels > rally chrome 15inch repeat 4 performance
+CAR > interior > seats bucket vinyl dashboard woodgrain
+CAR > exterior > grille ss-emblem chrome lights repeat 8
+CAR > paint > cranberry-red metallic stripes repeat 2

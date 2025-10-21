@@ -1,0 +1,46 @@
+{
+  "maxTextureSize": 4096,
+  "supportedFormats": [
+    "BC7",
+    "BC5",
+    "BC4",
+    "RGBA8",
+    "RGB8"
+  ],
+  "mipMapping": {
+    "enabled": true,
+    "autoGenerate": true,
+    "levels": 12
+  },
+  "compression": {
+    "bc7": {
+      "quality": "high",
+      "alphaCutoff": 0.5
+    },
+    "bc5": {
+      "quality": "high"
+    },
+    "bc4": {
+      "quality": "medium"
+    }
+  },
+  "filtering": {
+    "minFilter": "LINEAR_MIPMAP_LINEAR",
+    "magFilter": "LINEAR",
+    "anisotropic": 16
+  },
+  "wrapping": {
+    "wrapS": "REPEAT",
+    "wrapT": "REPEAT"
+  },
+  "streaming": {
+    "enabled": true,
+    "chunkSize": 512,
+    "priority": "distance-based",
+    "preloadDistance": 50
+  },
+  "cache": {
+    "maxSize": 1610612736,
+    "evictionPolicy": "LRU"
+  }
+}

@@ -1,0 +1,425 @@
+{
+  "common_game_problems": [
+    {
+      "id": "prob_001",
+      "name": "Z-Fighting",
+      "category": "rendering",
+      "description": "Two surfaces occupying same 3D space causing flickering",
+      "symptoms": ["flickering_polygons", "depth_buffer_conflict", "visual_artifacts"],
+      "severity": "medium",
+      "detection_method": "proximity_check",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "offset_surfaces",
+          "implementation": "Add 0.001 unit offset between overlapping surfaces",
+          "effectiveness": 0.95,
+          "performance_cost": "negligible"
+        },
+        {
+          "approach": "merge_geometry",
+          "implementation": "Combine overlapping faces into single mesh",
+          "effectiveness": 1.0,
+          "performance_cost": "low"
+        }
+      ]
+    },
+    {
+      "id": "prob_002",
+      "name": "Vertex Explosion",
+      "category": "performance",
+      "description": "Excessive polygon count causing frame drops",
+      "symptoms": ["low_fps", "high_memory", "gpu_bottleneck"],
+      "severity": "high",
+      "detection_method": "vertex_count_threshold",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "lod_system",
+          "implementation": "Generate LOD levels: 100%, 50%, 25%, 10% vertex density",
+          "effectiveness": 0.9,
+          "performance_cost": "memory_tradeoff"
+        },
+        {
+          "approach": "occlusion_culling",
+          "implementation": "Don't render objects blocked by other objects",
+          "effectiveness": 0.85,
+          "performance_cost": "cpu_overhead"
+        },
+        {
+          "approach": "mesh_simplification",
+          "implementation": "Reduce vertex count while preserving silhouette",
+          "effectiveness": 0.8,
+          "performance_cost": "preprocessing"
+        }
+      ]
+    },
+    {
+      "id": "prob_003",
+      "name": "Texture Bleeding",
+      "category": "texturing",
+      "description": "Adjacent UV islands causing color leakage at edges",
+      "symptoms": ["color_artifacts", "seam_visible", "mipmap_issues"],
+      "severity": "medium",
+      "detection_method": "uv_analysis",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "uv_padding",
+          "implementation": "Add 2-4 pixel padding between UV islands",
+          "effectiveness": 0.95,
+          "performance_cost": "texture_memory"
+        },
+        {
+          "approach": "dilate_texture",
+          "implementation": "Extend edge pixels outward to prevent bleeding",
+          "effectiveness": 0.9,
+          "performance_cost": "preprocessing"
+        }
+      ]
+    },
+    {
+      "id": "prob_004",
+      "name": "Normal Map Inversion",
+      "category": "lighting",
+      "description": "Inverted normals causing lighting to appear inside-out",
+      "symptoms": ["inverted_lighting", "wrong_shadows", "concave_appearance"],
+      "severity": "high",
+      "detection_method": "normal_vector_check",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "flip_green_channel",
+          "implementation": "Invert G channel of normal map (OpenGL vs DirectX)",
+          "effectiveness": 1.0,
+          "performance_cost": "negligible"
+        },
+        {
+          "approach": "recalculate_normals",
+          "implementation": "Regenerate normals from geometry",
+          "effectiveness": 0.95,
+          "performance_cost": "preprocessing"
+        }
+      ]
+    },
+    {
+      "id": "prob_005",
+      "name": "UV Unwrap Distortion",
+      "category": "texturing",
+      "description": "Stretched or compressed textures from poor UV layout",
+      "symptoms": ["texture_stretch", "pixel_density_variation", "seam_misalignment"],
+      "severity": "medium",
+      "detection_method": "texel_density_analysis",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "conformal_unwrap",
+          "implementation": "Use angle-preserving UV projection",
+          "effectiveness": 0.85,
+          "performance_cost": "preprocessing"
+        },
+        {
+          "approach": "triplanar_mapping",
+          "implementation": "Project texture from 3 axes, blend at edges",
+          "effectiveness": 0.9,
+          "performance_cost": "shader_complexity"
+        }
+      ]
+    },
+    {
+      "id": "prob_006",
+      "name": "Mesh Interpenetration",
+      "category": "collision",
+      "description": "Objects clipping through each other",
+      "symptoms": ["geometry_overlap", "physics_glitches", "visual_artifacts"],
+      "severity": "high",
+      "detection_method": "collision_detection",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "collision_mesh",
+          "implementation": "Generate simplified collision hull",
+          "effectiveness": 0.9,
+          "performance_cost": "memory"
+        },
+        {
+          "approach": "separation_constraint",
+          "implementation": "Physics solver prevents overlap",
+          "effectiveness": 0.95,
+          "performance_cost": "cpu_overhead"
+        }
+      ]
+    },
+    {
+      "id": "prob_007",
+      "name": "Shader Compilation Failure",
+      "category": "rendering",
+      "description": "GPU shader won't compile due to syntax or hardware limits",
+      "symptoms": ["pink_material", "rendering_error", "console_warnings"],
+      "severity": "critical",
+      "detection_method": "shader_validation",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "fallback_shader",
+          "implementation": "Use simpler shader as backup",
+          "effectiveness": 1.0,
+          "performance_cost": "reduced_quality"
+        },
+        {
+          "approach": "shader_variants",
+          "implementation": "Compile multiple complexity levels",
+          "effectiveness": 0.95,
+          "performance_cost": "compilation_time"
+        }
+      ]
+    },
+    {
+      "id": "prob_008",
+      "name": "Animation Popping",
+      "category": "animation",
+      "description": "Jarring transitions between animation states",
+      "symptoms": ["sudden_movement", "discontinuous_motion", "visual_jerk"],
+      "severity": "medium",
+      "detection_method": "frame_delta_analysis",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "blend_tree",
+          "implementation": "Smooth transition over 0.2-0.5 seconds",
+          "effectiveness": 0.95,
+          "performance_cost": "cpu_overhead"
+        },
+        {
+          "approach": "ik_correction",
+          "implementation": "Inverse kinematics to smooth transitions",
+          "effectiveness": 0.9,
+          "performance_cost": "cpu_overhead"
+        }
+      ]
+    },
+    {
+      "id": "prob_009",
+      "name": "Memory Leak",
+      "category": "optimization",
+      "description": "Objects not properly released causing memory buildup",
+      "symptoms": ["increasing_memory", "eventual_crash", "slowdown_over_time"],
+      "severity": "critical",
+      "detection_method": "memory_profiling",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "object_pooling",
+          "implementation": "Reuse objects instead of creating new ones",
+          "effectiveness": 0.95,
+          "performance_cost": "code_complexity"
+        },
+        {
+          "approach": "explicit_cleanup",
+          "implementation": "Manual dispose() calls on unused objects",
+          "effectiveness": 1.0,
+          "performance_cost": "developer_attention"
+        }
+      ]
+    },
+    {
+      "id": "prob_010",
+      "name": "Draw Call Overhead",
+      "category": "performance",
+      "description": "Too many individual render commands per frame",
+      "symptoms": ["cpu_bottleneck", "low_fps_high_end_gpu", "driver_overhead"],
+      "severity": "high",
+      "detection_method": "profiler_analysis",
+      "meta_ai_consultation": true,
+      "solutions": [
+        {
+          "approach": "mesh_batching",
+          "implementation": "Combine multiple meshes into single draw call",
+          "effectiveness": 0.9,
+          "performance_cost": "memory"
+        },
+        {
+          "approach": "instancing",
+          "implementation": "Render identical objects in one call",
+          "effectiveness": 0.95,
+          "performance_cost": "shader_complexity"
+        }
+      ]
+    }
+  ],
+  "vls_progressive_building": {
+    "levels": [
+      {
+        "level": 0,
+        "name": "Microscopic Foundation",
+        "description": "Basic VLS vertex structure, placeholder geometry",
+        "vertex_range": [8, 64],
+        "detail_multiplier": 0.01,
+        "render_quality": "wireframe",
+        "shader_complexity": "minimal",
+        "target_resolution": "512x512",
+        "purpose": "Direction validation, fast iteration"
+      },
+      {
+        "level": 1,
+        "name": "Low Poly Base",
+        "description": "Silhouette-accurate, basic forms",
+        "vertex_range": [64, 512],
+        "detail_multiplier": 0.1,
+        "render_quality": "flat_shaded",
+        "shader_complexity": "basic_lighting",
+        "target_resolution": "1024x1024",
+        "purpose": "Shape refinement, proportions"
+      },
+      {
+        "level": 2,
+        "name": "Medium Detail",
+        "description": "Major features defined, surface details emerging",
+        "vertex_range": [512, 4096],
+        "detail_multiplier": 0.4,
+        "render_quality": "smooth_shaded",
+        "shader_complexity": "pbr_basic",
+        "target_resolution": "2048x2048",
+        "purpose": "Feature definition, material setup"
+      },
+      {
+        "level": 3,
+        "name": "High Detail",
+        "description": "Fine details, texture maps, normal mapping",
+        "vertex_range": [4096, 32768],
+        "detail_multiplier": 0.8,
+        "render_quality": "textured_pbr",
+        "shader_complexity": "pbr_advanced",
+        "target_resolution": "4096x4096",
+        "purpose": "Visual polish, close-up quality"
+      },
+      {
+        "level": 4,
+        "name": "Cinematic 4K",
+        "description": "Maximum detail, displacement, subsurface scattering",
+        "vertex_range": [32768, 262144],
+        "detail_multiplier": 1.0,
+        "render_quality": "cinematic",
+        "shader_complexity": "ultra",
+        "target_resolution": "8192x8192",
+        "purpose": "Promotional renders, cinematics, hero assets"
+      }
+    ],
+    "render_effects_4k": {
+      "lighting": {
+        "global_illumination": true,
+        "ray_traced_shadows": true,
+        "volumetric_fog": true,
+        "light_bloom": true,
+        "lens_flare": true,
+        "god_rays": true
+      },
+      "materials": {
+        "pbr_metallic_roughness": true,
+        "subsurface_scattering": true,
+        "clearcoat": true,
+        "anisotropic_reflection": true,
+        "translucency": true,
+        "emissive_materials": true
+      },
+      "post_processing": {
+        "motion_blur": true,
+        "depth_of_field": true,
+        "chromatic_aberration": true,
+        "film_grain": true,
+        "color_grading": true,
+        "ambient_occlusion": "rtao",
+        "screen_space_reflections": true,
+        "temporal_anti_aliasing": "taa"
+      },
+      "particles": {
+        "gpu_particles": true,
+        "particle_lighting": true,
+        "soft_particles": true,
+        "particle_collisions": true
+      }
+    }
+  },
+  "error_mitigation_strategies": {
+    "proactive": [
+      {
+        "stage": "pre_build",
+        "checks": [
+          "Validate vertex budget against target hardware",
+          "Check UV coverage and overlap",
+          "Verify normal orientation",
+          "Detect potential z-fighting scenarios",
+          "Analyze texel density consistency"
+        ]
+      },
+      {
+        "stage": "during_build",
+        "checks": [
+          "Real-time vertex count monitoring",
+          "Progressive quality gates at each detail level",
+          "Automated mesh validation",
+          "Performance profiling per object",
+          "Memory usage tracking"
+        ]
+      },
+      {
+        "stage": "post_build",
+        "checks": [
+          "Shader compilation validation",
+          "LOD generation verification",
+          "Collision mesh integrity",
+          "Texture compression quality",
+          "VLS compression ratio validation"
+        ]
+      }
+    ],
+    "reactive": [
+      {
+        "trigger": "error_detected",
+        "actions": [
+          "Log error with full context",
+          "Consult Meta-AI for solution",
+          "Apply automatic fix if available",
+          "Rollback to previous stable state if critical",
+          "Notify personality AI for learning"
+        ]
+      },
+      {
+        "trigger": "performance_degradation",
+        "actions": [
+          "Drop to lower LOD level",
+          "Reduce shader complexity",
+          "Enable aggressive culling",
+          "Pause non-critical builds",
+          "Request Meta-AI optimization strategy"
+        ]
+      }
+    ]
+  },
+  "meta_ai_intervention_protocol": {
+    "consultation_triggers": [
+      "Unknown error encountered",
+      "Performance below threshold (30 FPS)",
+      "Memory usage > 80%",
+      "Vertex count explosion (>100K per object)",
+      "Shader compilation failure",
+      "Personality deviation > 40%"
+    ],
+    "consultation_format": {
+      "request": {
+        "personality_id": "string",
+        "problem_id": "string",
+        "context": "object",
+        "attempted_solutions": "array",
+        "urgency": "low|medium|high|critical"
+      },
+      "response": {
+        "recommended_solution": "string",
+        "implementation_steps": "array",
+        "expected_effectiveness": "float",
+        "side_effects": "array",
+        "alternative_approaches": "array"
+      }
+    }
+  }
+}

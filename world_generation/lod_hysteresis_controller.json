@@ -1,0 +1,51 @@
+{
+  "enabled": true,
+  "buffer": 0.15,
+  "minTimeBetweenChanges": 2000,
+  "antiThrashing": {
+    "enabled": true,
+    "detectionWindow": 10000,
+    "maxChanges": 3,
+    "penaltyDelay": 5000
+  },
+  "zoneTransitions": [
+    {
+      "from": "4K",
+      "to": "1080p",
+      "threshold": 12,
+      "hysteresis": 2
+    },
+    {
+      "from": "1080p",
+      "to": "720p",
+      "threshold": 55,
+      "hysteresis": 5
+    },
+    {
+      "from": "720p",
+      "to": "360p",
+      "threshold": 215,
+      "hysteresis": 15
+    },
+    {
+      "from": "360p",
+      "to": "culled",
+      "threshold": 525,
+      "hysteresis": 25
+    }
+  ],
+  "qualityLock": {
+    "enabled": true,
+    "lockDuration": 5000,
+    "conditions": [
+      "combat",
+      "cutscene",
+      "loading"
+    ]
+  },
+  "smoothing": {
+    "enabled": true,
+    "method": "exponential-moving-average",
+    "alpha": 0.3
+  }
+}

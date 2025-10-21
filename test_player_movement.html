@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏃 Player Movement Test - PixelVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #stats-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            min-width: 350px;
+            pointer-events: none;
+        }
+        
+        #stats-panel h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 2px solid #00ff88;
+            padding-bottom: 5px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-label {
+            color: #aaa;
+        }
+        
+        .stat-value {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .state-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        
+        .state-idle { background: #666; }
+        .state-walking { background: #4facfe; }
+        .state-running { background: #43e97b; }
+        .state-sprinting { background: #fa709a; }
+        .state-jumping { background: #ffd32a; color: #000; }
+        .state-falling { background: #ff6b6b; }
+        .state-crouching { background: #9b59b6; }
+        .state-sliding { background: #e74c3c; }
+        
+        #controls-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 12px;
+            pointer-events: none;
+        }
+        
+        #controls-panel h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        #controls-panel .control-group {
+            margin: 8px 0;
+        }
+        
+        #controls-panel kbd {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-right: 8px;
+            display: inline-block;
+            min-width: 25px;
+            text-align: center;
+        }
+        
+        #mode-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        #speed-meter {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            width: 200px;
+            pointer-events: none;
+        }
+        
+        .meter-label {
+            color: white;
+            font-size: 12px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .meter-bar {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #43e97b 0%, #fa709a 100%);
+            transition: width 0.1s;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #jump-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.3s;
+        }
+        
+        #jump-indicator.active {
+            opacity: 1;
+            transform: translate(-50%, -80%);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="stats-panel">
+            <h3>🏃 Movement Stats</h3>
+            <div class="stat-row">
+                <span class="stat-label">State:</span>
+                <span class="stat-value"><span id="stat-state" class="state-indicator state-idle">IDLE</span></span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Speed:</span>
+                <span class="stat-value"><span id="stat-speed">0.00</span> m/s</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Velocity:</span>
+                <span class="stat-value" id="stat-velocity">0, 0, 0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Position:</span>
+                <span class="stat-value" id="stat-position">0, 0, 0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Grounded:</span>
+                <span class="stat-value" id="stat-grounded">❌</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Crouching:</span>
+                <span class="stat-value" id="stat-crouching">❌</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Sliding:</span>
+                <span class="stat-value" id="stat-sliding">❌</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Height:</span>
+                <span class="stat-value"><span id="stat-height">2.00</span> m</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">FPS:</span>
+                <span class="stat-value" id="stat-fps">60</span>
+            </div>
+        </div>
+        
+        <div id="mode-indicator">
+            📹 Third Person View
+        </div>
+        
+        <div id="speed-meter">
+            <div class="meter-label">Speed</div>
+            <div class="meter-bar">
+                <div class="meter-fill" id="speed-fill" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div id="controls-panel">
+            <h3>🎮 Controls</h3>
+            <div class="control-group">
+                <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move
+            </div>
+            <div class="control-group">
+                <kbd>Space</kbd> Jump (hold longer = higher!)
+            </div>
+            <div class="control-group">
+                <kbd>Shift</kbd> Sprint
+            </div>
+            <div class="control-group">
+                <kbd>C</kbd> Crouch
+            </div>
+            <div class="control-group">
+                <kbd>Shift + C</kbd> Slide (while sprinting)
+            </div>
+            <div class="control-group">
+                <kbd>V</kbd> Toggle Camera
+            </div>
+            <div class="control-group">
+                <kbd>Mouse</kbd> Look Around
+            </div>
+            <div class="control-group">
+                <kbd>Scroll</kbd> Zoom
+            </div>
+        </div>
+        
+        <div id="jump-indicator">🦘</div>
+        
+        <div class="loading" id="loading">
+            <div>🏃 Loading Movement System...</div>
+            <div class="spinner"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="world_generation/camera_controller.js"></script>
+    <script src="world_generation/player_movement.js"></script>
+    <script src="world_generation/physics_system.js"></script>
+    
+    <script>
+        console.log('🏃 Player Movement Test Starting...');
+        
+        let scene, camera, renderer, cameraController, playerMovement, physics;
+        let character, ground, obstacles = [];
+        let clock = new THREE.Clock();
+        let fps = 0, frameCount = 0, lastTime = 0;
+        
+        // Input state
+        const input = {
+            keys: {
+                w: false,
+                a: false,
+                s: false,
+                d: false,
+                shift: false,
+                space: false,
+                c: false
+            }
+        };
+        
+        /**
+         * Initialize scene
+         */
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb);
+            scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                60,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            
+            // Renderer
+            const canvas = document.getElementById('game-canvas');
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            sunLight.position.set(50, 100, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            scene.add(sunLight);
+            
+            // Ground
+            const groundGeometry = new THREE.PlaneGeometry(200, 200, 20, 20);
+            const groundMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4a7c59,
+                roughness: 0.8
+            });
+            ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(200, 40, 0x000000, 0x666666);
+            scene.add(gridHelper);
+            
+            // Character
+            const characterGeometry = new THREE.CapsuleGeometry(0.5, 1.5, 8, 16);
+            const characterMaterial = new THREE.MeshStandardMaterial({
+                color: 0x00aaff,
+                roughness: 0.5,
+                metalness: 0.3
+            });
+            character = new THREE.Mesh(characterGeometry, characterMaterial);
+            character.position.set(0, 1.25, 0);
+            character.castShadow = true;
+            character.receiveShadow = true;
+            scene.add(character);
+            
+            // Obstacles
+            createObstacles();
+            
+            // Initialize systems
+            cameraController = new CameraController(camera);
+            cameraController.setTarget(character);
+            cameraController.setCollisionObjects(obstacles);
+            
+            playerMovement = new PlayerMovement(character);
+            physics = new PhysicsSystem();
+            
+            console.log('✅ All systems initialized');
+            
+            // Setup input
+            setupInput();
+            
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+            
+            // Start animation
+            animate();
+        }
+        
+        /**
+         * Create obstacles
+         */
+        function createObstacles() {
+            const materials = [
+                new THREE.MeshStandardMaterial({ color: 0xff6b6b, roughness: 0.7 }),
+                new THREE.MeshStandardMaterial({ color: 0x4ecdc4, roughness: 0.7 }),
+                new THREE.MeshStandardMaterial({ color: 0xffe66d, roughness: 0.7 }),
+                new THREE.MeshStandardMaterial({ color: 0x95e1d3, roughness: 0.7 })
+            ];
+            
+            // Boxes
+            for (let i = 0; i < 15; i++) {
+                const size = Math.random() * 2 + 1;
+                const geometry = new THREE.BoxGeometry(size, size, size);
+                const material = materials[Math.floor(Math.random() * materials.length)];
+                const box = new THREE.Mesh(geometry, material);
+                
+                box.position.x = (Math.random() - 0.5) * 50;
+                box.position.y = size / 2;
+                box.position.z = (Math.random() - 0.5) * 50;
+                
+                box.castShadow = true;
+                box.receiveShadow = true;
+                
+                scene.add(box);
+                obstacles.push(box);
+            }
+            
+            // Add ground to obstacles for collision
+            obstacles.push(ground);
+        }
+        
+        /**
+         * Setup input
+         */
+        function setupInput() {
+            document.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+                if (key === 'w') input.keys.w = true;
+                if (key === 'a') input.keys.a = true;
+                if (key === 's') input.keys.s = true;
+                if (key === 'd') input.keys.d = true;
+                if (key === 'shift') input.keys.shift = true;
+                if (key === ' ') input.keys.space = true;
+                if (key === 'c') input.keys.c = true;
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                const key = e.key.toLowerCase();
+                if (key === 'w') input.keys.w = false;
+                if (key === 'a') input.keys.a = false;
+                if (key === 's') input.keys.s = false;
+                if (key === 'd') input.keys.d = false;
+                if (key === 'shift') input.keys.shift = false;
+                if (key === ' ') input.keys.space = false;
+                if (key === 'c') input.keys.c = false;
+            });
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        /**
+         * Update UI
+         */
+        function updateUI() {
+            const movementInfo = playerMovement.getInfo();
+            const cameraInfo = cameraController.getInfo();
+            
+            // State with color coding
+            const stateEl = document.getElementById('stat-state');
+            stateEl.textContent = movementInfo.state.toUpperCase();
+            stateEl.className = 'state-indicator state-' + movementInfo.state;
+            
+            // Stats
+            document.getElementById('stat-speed').textContent = movementInfo.speed;
+            document.getElementById('stat-velocity').textContent = 
+                `${movementInfo.velocity.x}, ${movementInfo.velocity.y}, ${movementInfo.velocity.z}`;
+            document.getElementById('stat-position').textContent =
+                `${character.position.x.toFixed(2)}, ${character.position.y.toFixed(2)}, ${character.position.z.toFixed(2)}`;
+            document.getElementById('stat-grounded').textContent = movementInfo.isGrounded ? '✅' : '❌';
+            document.getElementById('stat-crouching').textContent = movementInfo.isCrouching ? '✅' : '❌';
+            document.getElementById('stat-sliding').textContent = movementInfo.isSliding ? '✅' : '❌';
+            document.getElementById('stat-height').textContent = movementInfo.height;
+            document.getElementById('stat-fps').textContent = Math.round(fps);
+            
+            // Speed meter (max speed = 10 m/s)
+            const speedPercent = (parseFloat(movementInfo.speed) / 10) * 100;
+            document.getElementById('speed-fill').style.width = Math.min(speedPercent, 100) + '%';
+            
+            // Jump indicator
+            const jumpIndicator = document.getElementById('jump-indicator');
+            if (movementInfo.state === 'jumping') {
+                jumpIndicator.classList.add('active');
+            } else {
+                jumpIndicator.classList.remove('active');
+            }
+        }
+        
+        /**
+         * Calculate FPS
+         */
+        function calculateFPS(currentTime) {
+            frameCount++;
+            if (currentTime >= lastTime + 1000) {
+                fps = frameCount;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+        }
+        
+        /**
+         * Animation loop
+         */
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const deltaTime = clock.getDelta();
+            const currentTime = performance.now();
+            
+            // Update input
+            const moveForward = (input.keys.w ? 1 : 0) - (input.keys.s ? 1 : 0);
+            const moveRight = (input.keys.d ? 1 : 0) - (input.keys.a ? 1 : 0);
+            
+            playerMovement.setInput(
+                moveForward,
+                moveRight,
+                input.keys.space,
+                input.keys.shift,
+                input.keys.c
+            );
+            
+            // Update movement
+            const cameraForward = cameraController.getForward();
+            const cameraRight = cameraController.getRight();
+            playerMovement.update(deltaTime, obstacles, cameraForward, cameraRight);
+            
+            // Update camera
+            cameraController.update(deltaTime);
+            
+            // Update UI
+            updateUI();
+            calculateFPS(currentTime);
+            
+            // Render
+            renderer.render(scene, camera);
+        }
+        
+        // Start
+        init();
+        console.log('✅ Player Movement Test Ready!');
+    </script>
+</body>
+</html>

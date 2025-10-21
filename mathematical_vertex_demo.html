@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧮 Mathematical Vertex Generation - Fibonacci Hair Demo</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00ff00;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border: 3px solid #00ff00;
+            border-radius: 10px;
+            font-size: 13px;
+            max-width: 400px;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        
+        #info h2 {
+            margin: 0 0 15px 0;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            font-size: 18px;
+        }
+        
+        #info .formula {
+            background: rgba(0, 50, 50, 0.5);
+            padding: 10px;
+            border-left: 3px solid #00ffff;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+        
+        #info .highlight {
+            color: #ffff00;
+            font-weight: bold;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffff00;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border: 3px solid #ffff00;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+        }
+        
+        #controls h3 {
+            margin: 0 0 15px 0;
+            text-align: center;
+        }
+        
+        #controls button {
+            background: #333;
+            color: #ffff00;
+            border: 2px solid #ffff00;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        #controls button:hover {
+            background: #555;
+            box-shadow: 0 0 15px #ffff00;
+            transform: translateY(-2px);
+        }
+        
+        #controls .pattern-btn {
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+        
+        #controls .pattern-btn:hover {
+            box-shadow: 0 0 15px #00ff00;
+        }
+        
+        #stats {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #ff00ff;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border: 3px solid #ff00ff;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+        
+        #comparison {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #ff6600;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border: 3px solid #ff6600;
+            border-radius: 10px;
+            font-size: 11px;
+            z-index: 100;
+            max-width: 300px;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>🧮 MATHEMATICAL VERTEX GENERATION</h2>
+        <p><strong>Using Nature's Mathematics:</strong></p>
+        <div class="formula">
+            π = <span class="highlight">3.14159265...</span><br>
+            φ (golden ratio) = <span class="highlight">1.61803398...</span><br>
+            Golden angle = <span class="highlight">137.507764°</span>
+        </div>
+        <p><strong>Fibonacci Sphere Formula:</strong></p>
+        <div class="formula">
+            θ = π × (3 - √5) × i<br>
+            φ = arccos(1 - 2(i+0.5)/n)<br>
+            <br>
+            x = r·sin(φ)·cos(θ)<br>
+            y = r·cos(φ)<br>
+            z = r·sin(φ)·sin(θ)
+        </div>
+        <p><strong>Found in Nature:</strong><br>
+        🌻 Sunflower seeds<br>
+        🌲 Pinecones<br>
+        🍍 Pineapples<br>
+        🐚 Nautilus shells</p>
+    </div>
+    
+    <div id="controls">
+        <h3>🎮 DISTRIBUTION PATTERNS</h3>
+        <button onclick="switchPattern('fibonacci')" class="pattern-btn">📐 Fibonacci Sphere</button>
+        <button onclick="switchPattern('spiral')" class="pattern-btn">🌀 Spiral Helix</button>
+        <button onclick="switchPattern('golden')" class="pattern-btn">🐚 Golden Nautilus</button>
+        <button onclick="switchPattern('sunflower')" class="pattern-btn">🌻 Sunflower Seeds</button>
+        <button onclick="switchPattern('phyllotaxis')" class="pattern-btn">🌿 Phyllotaxis</button>
+        <hr style="border-color: #ffff00; margin: 15px 0;">
+        <button onclick="toggleRotation()">🔄 Toggle Rotation</button>
+        <button onclick="addMoreHair()">➕ Add 100 Hairs</button>
+        <button onclick="removeHair()">➖ Remove 100 Hairs</button>
+        <button onclick="changeColor()">🎨 Change Color</button>
+    </div>
+    
+    <div id="stats">
+        <div id="statsContent">Loading...</div>
+    </div>
+    
+    <div id="comparison">
+        <h4 style="margin: 0 0 10px 0; color: #ffaa00;">RANDOM vs MATHEMATICAL</h4>
+        <strong style="color: #ff6666;">❌ Random:</strong><br>
+        • Clumpy distribution<br>
+        • Bare spots<br>
+        • Looks artificial<br>
+        • Not reproducible<br>
+        <br>
+        <strong style="color: #66ff66;">✅ Mathematical:</strong><br>
+        • Perfect distribution<br>
+        • Zero clumping<br>
+        • Natural look<br>
+        • Reproducible<br>
+        • Scalable (10-10k)
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="vsl_character_generator.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a1a);
+        scene.fog = new THREE.Fog(0x0a0a1a, 5, 20);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1.6, 1.5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        mainLight.position.set(3, 5, 3);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+
+        const fillLight = new THREE.PointLight(0x6666ff, 0.5);
+        fillLight.position.set(-3, 2, -3);
+        scene.add(fillLight);
+
+        const rimLight = new THREE.PointLight(0xffaa00, 0.3);
+        rimLight.position.set(0, 3, -3);
+        scene.add(rimLight);
+
+        // Ground
+        const groundGeo = new THREE.PlaneGeometry(10, 10);
+        const groundMat = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1a2e, 
+            roughness: 0.9 
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Create VSL Character Generator
+        const vslGen = new VSLCharacterGenerator(scene);
+
+        // Global state
+        let currentCharacter = null;
+        let currentPattern = 'fibonacci';
+        let hairCount = 500;
+        let isRotating = true;
+        let hairColors = [0x442211, 0x663311, 0x331100, 0x886644, 0x221100];
+        let colorIndex = 0;
+
+        // Create initial character
+        function createCharacter() {
+            // Remove old character
+            if (currentCharacter) {
+                currentCharacter.meshes.forEach(mesh => {
+                    scene.remove(mesh);
+                });
+            }
+
+            // Create new character with mathematical hair
+            currentCharacter = vslGen.createCharacter({
+                name: 'Math_Hair_Demo',
+                position: {x: 0, y: 0, z: 0},
+                
+                // Mathematical hair generation
+                hairCount: hairCount,
+                hairPattern: currentPattern,
+                useMathematicalVertices: true,
+                hairColor: hairColors[colorIndex]
+            });
+
+            updateStats();
+        }
+
+        // Pattern switching
+        window.switchPattern = function(pattern) {
+            currentPattern = pattern;
+            console.log(`🔄 Switching to ${pattern} pattern`);
+            createCharacter();
+        };
+
+        // Toggle rotation
+        window.toggleRotation = function() {
+            isRotating = !isRotating;
+            console.log(`🔄 Rotation: ${isRotating ? 'ON' : 'OFF'}`);
+        };
+
+        // Add more hair
+        window.addMoreHair = function() {
+            hairCount += 100;
+            if (hairCount > 2000) hairCount = 2000;
+            console.log(`➕ Hair count: ${hairCount}`);
+            createCharacter();
+        };
+
+        // Remove hair
+        window.removeHair = function() {
+            hairCount -= 100;
+            if (hairCount < 100) hairCount = 100;
+            console.log(`➖ Hair count: ${hairCount}`);
+            createCharacter();
+        };
+
+        // Change color
+        window.changeColor = function() {
+            colorIndex = (colorIndex + 1) % hairColors.length;
+            console.log(`🎨 Color changed`);
+            createCharacter();
+        };
+
+        // Stats update
+        function updateStats() {
+            const π = Math.PI;
+            const φ = (1 + Math.sqrt(5)) / 2;
+            const goldenAngle = π * (3 - Math.sqrt(5));
+            
+            const stats = `
+                <strong>CURRENT CONFIGURATION:</strong><br>
+                <span style="color: #ffff00;">Pattern:</span> ${currentPattern}<br>
+                <span style="color: #ffff00;">Hair Count:</span> ${hairCount} follicles<br>
+                <span style="color: #ffff00;">Meshes:</span> ${currentCharacter.meshes.length} total<br>
+                <br>
+                <strong>MATHEMATICAL CONSTANTS:</strong><br>
+                <span style="color: #00ffff;">π:</span> ${π.toFixed(10)}<br>
+                <span style="color: #00ffff;">φ:</span> ${φ.toFixed(10)}<br>
+                <span style="color: #00ffff;">Golden Angle:</span> ${(goldenAngle * 180 / π).toFixed(3)}°
+            `;
+            document.getElementById('statsContent').innerHTML = stats;
+        }
+
+        // Camera controls (mouse drag)
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        
+        renderer.domElement.addEventListener('mousedown', () => {
+            isDragging = true;
+        });
+        
+        renderer.domElement.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        renderer.domElement.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+                
+                camera.position.x += deltaX * 0.01;
+                camera.position.y -= deltaY * 0.01;
+                camera.lookAt(0, 1.5, 0);
+            }
+            
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+        
+        // Zoom with mouse wheel
+        renderer.domElement.addEventListener('wheel', (e) => {
+            camera.position.z += e.deltaY * 0.001;
+            camera.position.z = Math.max(0.5, Math.min(camera.position.z, 5));
+        });
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.016;
+            
+            // Rotate character
+            if (currentCharacter && isRotating) {
+                currentCharacter.skin.rotation.y += 0.005;
+            }
+            
+            // Gentle camera orbit
+            if (!isDragging) {
+                camera.position.x = Math.sin(time * 0.1) * 2;
+                camera.position.z = Math.cos(time * 0.1) * 2 + 1.5;
+                camera.lookAt(0, 1.5, 0);
+            }
+            
+            // Animate lights
+            fillLight.intensity = 0.5 + Math.sin(time) * 0.2;
+            rimLight.intensity = 0.3 + Math.cos(time * 0.5) * 0.1;
+            
+            renderer.render(scene, camera);
+        }
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Initialize
+        createCharacter();
+        animate();
+        
+        console.log('🧮 MATHEMATICAL VERTEX GENERATION DEMO LOADED');
+        console.log('🌻 Using Fibonacci sphere for perfect hair distribution');
+        console.log('📐 Formula: θ = π(3-√5)·i, φ = arccos(1-2(i+0.5)/n)');
+        console.log('✨ Zero clumping, perfectly even spacing!');
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{
+  "tier": "PRO",
+  "object_id": "legendary_celestial_dragon_sword_001",
+  "name": "Vyrathis, Fang of the Celestial Dragon",
+  "category": "weapon",
+  "sub_category": "sword",
+  "rarity": "legendary",
+  "price_usd": 49.99,
+  "price_mpt": 25000,
+  "subscription_required": "pro",
+  "gene_code": "# LEGENDARY: Sword of the Celestial Dragon\n\nSWORD > blade > curved forward 95cm damascus-pattern forged-steel sharp\nSWORD > blade > fuller groove forward 70cm blood-channel deep engraved\nSWORD > blade > edge razor-sharp double-beveled honed perfect deadly\nSWORD > blade > runes engraved glowing celestial-script ancient magical\nSWORD > blade > veins energy-channels pulsing blue-light ethereal\nSWORD > blade > tip pierce-point armor-penetrating sharp lethal\n\nSWORD > guard > dragon-wings spread 25cm curved protective ornate\nSWORD > guard > scales detailed textured metallic embossed decorative\nSWORD > guard > eyes gemstone ruby glowing animated magical\nSWORD > guard > teeth sharp menacing decorative silver-inlay\n\nSWORD > handle > grip wrapped dragon-leather textured ergonomic balanced\nSWORD > handle > wire gold-thread spiral decorative functional binding\nSWORD > handle > indents finger-grooves anatomical comfortable precise\nSWORD > handle > core steel tang full-length balanced heavy-duty\n\nSWORD > pommel > dragon-head sculpted detailed steel polished ornate\nSWORD > pommel > eyes sapphire glowing animated magical intelligent\nSWORD > pommel > mouth open fangs showing fierce intimidating\nSWORD > pommel > weight balanced counterweight perfect optimal\n\nSWORD > material > base steel forged damascus-pattern flowing beautiful\nSWORD > material > roughness 0.3 semi-polished battle-ready functional\nSWORD > material > metalness 1.0 pure-metal reflective shining\nSWORD > material > normal-map detailed scratches wear authentic realistic\nSWORD > material > emission blue-glow magical pulsing animated ethereal\n\nSWORD > particles > trail blue-energy flowing ethereal magical lasting\nSWORD > particles > sparks impact-reactive dynamic realistic physics\nSWORD > particles > aura celestial-light radius 50cm pulsing intimidating\nSWORD > particles > runes glowing-symbols animated scrolling ancient\n\nSWORD > audio > swing whoosh-sound pitch-varied speed-reactive dynamic\nSWORD > audio > impact clang-sound metallic resonant powerful dramatic\nSWORD > audio > magic hum-sound ethereal continuous ambient mystical\nSWORD > audio > special dragon-roar legendary activation-only epic\n\nSWORD > stats > damage 450-520 slashing critical-chance 35% powerful\nSWORD > stats > attack-speed 1.2 balanced versatile effective\nSWORD > stats > weight 3.5kg heavy two-hand-capable realistic\nSWORD > stats > durability 500 legendary self-repairing magical\nSWORD > stats > enchantments dragon-breath fire-damage celestial-ward",
+  "vls_code": "SWORD:A95^12B25C8.DRAG-WING*2.RUNES+GLOW~.PART:TRAIL+SPARK+AURA.AUD:ROAR",
+  "polygon_count": 75000,
+  "vertex_count": 85000,
+  "features": [
+    "Animated particle effects (flames, energy trail)",
+    "Dynamic audio (swing, impact, activation sounds)",
+    "Glowing runes with scrolling animation",
+    "Dragon-themed ornate guard and pommel",
+    "PBR materials with emission maps",
+    "Game stats integrated (damage, speed, durability)",
+    "Lore and backstory included",
+    "Pre-rigged for Unity/Unreal",
+    "Commercial license included"
+  ],
+  "game_stats": {
+    "damage": {
+      "min": 450,
+      "max": 520,
+      "type": "slashing"
+    },
+    "critical_chance": 0.35,
+    "attack_speed": 1.2,
+    "weight": 3.5,
+    "durability": 500,
+    "enchantments": [
+      "dragon_breath",
+      "fire_damage",
+      "celestial_ward"
+    ],
+    "special_ability": "Dragon Fury - Summons celestial dragon for 10s"
+  },
+  "lore": {
+    "origin": "Forged in dragon-fire, cooled in celestial tears",
+    "previous_owners": [
+      "Kael the Dragonheart",
+      "Lyra Starforge",
+      "Theron the Eternal"
+    ],
+    "power_source": "Channels the essence of Vyrathis the Celestial Dragon",
+    "legend": "Said to have slain 1,000 demons in the War of Broken Stars"
+  }
+}

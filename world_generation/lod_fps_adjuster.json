@@ -1,0 +1,63 @@
+{
+  "enabled": true,
+  "targetFPS": 60,
+  "measureInterval": 100,
+  "sampleSize": 30,
+  "thresholds": {
+    "excellent": {
+      "min": 60,
+      "action": "upgrade",
+      "qualityDelta": 1
+    },
+    "good": {
+      "min": 55,
+      "action": "maintain",
+      "qualityDelta": 0
+    },
+    "acceptable": {
+      "min": 45,
+      "action": "maintain",
+      "qualityDelta": 0
+    },
+    "poor": {
+      "min": 30,
+      "action": "downgrade",
+      "qualityDelta": -1
+    },
+    "critical": {
+      "min": 0,
+      "action": "emergency",
+      "qualityDelta": -2
+    }
+  },
+  "qualityLevels": [
+    "360p",
+    "720p",
+    "1080p",
+    "4K"
+  ],
+  "adjustmentDelay": 3000,
+  "smoothing": {
+    "enabled": true,
+    "alpha": 0.2
+  },
+  "bottleneckDetection": {
+    "enabled": true,
+    "cpuThreshold": 0.9,
+    "gpuThreshold": 0.95,
+    "actions": {
+      "cpu_bound": [
+        "reduce_draw_calls",
+        "increase_culling"
+      ],
+      "gpu_bound": [
+        "reduce_quality",
+        "reduce_effects"
+      ],
+      "memory_bound": [
+        "unload_assets",
+        "reduce_cache"
+      ]
+    }
+  }
+}

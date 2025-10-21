@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigy GitHub Social Card Generator</title>
+  
+  <!-- html2canvas for PNG export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1a1a1a;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      color: #FFD700;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    .instructions {
+      color: #888;
+      margin-bottom: 30px;
+      max-width: 800px;
+    }
+
+    /* GitHub Social Card - 1280x640px (recommended) */
+    .social-card {
+      width: 1280px;
+      height: 640px;
+      background: linear-gradient(135deg, #000000 0%, #1a0a0a 50%, #0a0a1a 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    /* 40pt Safe Zone Border (visible guide) */
+    .safe-zone {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      right: 40px;
+      bottom: 40px;
+      border: 2px dashed rgba(255, 215, 0, 0.3);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* Background Particles */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(255, 215, 0, 0.6);
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(100px, -50px); }
+      50% { transform: translate(-50px, 100px); }
+      75% { transform: translate(50px, 50px); }
+    }
+
+    /* Golden Border Animation */
+    .border-glow {
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(255, 215, 0, 0.5);
+      z-index: 2;
+      animation: borderPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes borderPulse {
+      0%, 100% { 
+        box-shadow: 
+          inset 0 0 30px rgba(255, 215, 0, 0.3),
+          0 0 30px rgba(255, 215, 0, 0.3);
+      }
+      50% { 
+        box-shadow: 
+          inset 0 0 50px rgba(255, 215, 0, 0.6),
+          0 0 50px rgba(255, 215, 0, 0.6);
+      }
+    }
+
+    /* Content Container (respects 40pt safe zone) */
+    .content {
+      position: absolute;
+      top: 80px;
+      left: 80px;
+      right: 80px;
+      bottom: 80px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Logo */
+    .logo {
+      font-size: 72px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF69B4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      text-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.3); }
+    }
+
+    /* Tagline */
+    .tagline {
+      font-size: 32px;
+      color: #FFD700;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 10px rgba(255, 215, 0, 0.6);
+    }
+
+    /* Description */
+    .description {
+      font-size: 22px;
+      color: #CCCCCC;
+      margin-bottom: 30px;
+      max-width: 900px;
+      line-height: 1.5;
+    }
+
+    /* Features Row */
+    .features {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .feature-badge {
+      background: rgba(255, 215, 0, 0.15);
+      border: 2px solid #FFD700;
+      border-radius: 20px;
+      padding: 12px 30px;
+      color: #FFD700;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+      white-space: nowrap;
+    }
+
+    /* Tech Stack */
+    .tech-stack {
+      display: flex;
+      gap: 25px;
+      justify-content: center;
+      align-items: center;
+      color: #888;
+      font-size: 16px;
+    }
+
+    .tech-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tech-icon {
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 215, 0, 0.3);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    /* Corner Accent */
+    .corner-accent {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      z-index: 5;
+    }
+
+    .corner-accent.top-left {
+      top: 0;
+      left: 0;
+      border-top: 4px solid rgba(255, 215, 0, 0.4);
+      border-left: 4px solid rgba(255, 215, 0, 0.4);
+    }
+
+    .corner-accent.bottom-right {
+      bottom: 0;
+      right: 0;
+      border-bottom: 4px solid rgba(255, 215, 0, 0.4);
+      border-right: 4px solid rgba(255, 215, 0, 0.4);
+    }
+
+    /* Controls */
+    .controls {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      background: #FFD700;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    }
+
+    .btn:hover {
+      background: #FFA500;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+    }
+
+    .info {
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* Safe Zone Toggle */
+    .safe-zone.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 GitHub Social Card Generator</h1>
+    <p class="instructions">
+      1280x640px with 40pt safe zone border<br>
+      Screenshot this card for your GitHub repository settings
+    </p>
+
+    <!-- Social Card Canvas -->
+    <div class="social-card" id="socialCard">
+      <!-- Safe Zone Guide (40pt border) -->
+      <div class="safe-zone" id="safeZone"></div>
+
+      <!-- Golden Border Glow -->
+      <div class="border-glow"></div>
+
+      <!-- Corner Accents -->
+      <div class="corner-accent top-left"></div>
+      <div class="corner-accent bottom-right"></div>
+
+      <!-- Background Particles -->
+      <div class="particles" id="particles"></div>
+
+      <!-- Main Content (inside safe zone) -->
+      <div class="content">
+        <div class="logo">PixelProdigy<span style="color: #FF69B4;">AI</span></div>
+        
+        <div class="tagline">3D Sculpting in Your Browser</div>
+        
+        <div class="description">
+          Zero downloads • Mobile touch controls • 10-layer security • WebGL powered
+        </div>
+
+        <div class="features">
+          <div class="feature-badge">🔗 Binding System</div>
+          <div class="feature-badge">💥 Fragmentation</div>
+          <div class="feature-badge">✨ Particles</div>
+          <div class="feature-badge">📱 Touch Ready</div>
+        </div>
+
+        <div class="tech-stack">
+          <div class="tech-item">
+            <div class="tech-icon">▲</div>
+            <span>Three.js</span>
+          </div>
+          <div class="tech-item">
+            <div class="tech-icon">⚡</div>
+            <span>WebGL</span>
+          </div>
+          <div class="tech-item">
+            <div class="tech-icon">🔒</div>
+            <span>10-Layer Security</span>
+          </div>
+          <div class="tech-item">
+            <div class="tech-icon">🌐</div>
+            <span>eugeneous.dev</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn" onclick="toggleSafeZone()">Toggle Safe Zone</button>
+      <button class="btn" onclick="downloadCard()">Download PNG</button>
+      <button class="btn" onclick="copyToClipboard()">Copy Image</button>
+    </div>
+
+    <div class="info">
+      💡 For GitHub: Go to Settings → Social preview → Upload image (1280x640px recommended)<br>
+      The 40pt border ensures text won't be cropped on mobile/Twitter/Discord embeds
+    </div>
+  </div>
+
+  <script>
+    // Generate floating particles
+    function generateParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 50;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    // Toggle safe zone visibility
+    function toggleSafeZone() {
+      const safeZone = document.getElementById('safeZone');
+      safeZone.classList.toggle('hidden');
+    }
+
+    // Download card as PNG using html2canvas
+    async function downloadCard() {
+      const socialCard = document.getElementById('socialCard');
+      const safeZone = document.getElementById('safeZone');
+      
+      // Hide safe zone before capture
+      const wasVisible = !safeZone.classList.contains('hidden');
+      if (wasVisible) {
+        safeZone.classList.add('hidden');
+      }
+      
+      try {
+        console.log('📸 Capturing card...');
+        
+        // Use html2canvas to capture the exact card
+        const canvas = await html2canvas(socialCard, {
+          width: 1280,
+          height: 640,
+          scale: 2, // 2x for better quality
+          backgroundColor: '#000000',
+          logging: false,
+          useCORS: true,
+          allowTaint: false
+        });
+        
+        // Convert to PNG blob
+        canvas.toBlob(function(blob) {
+          // Create download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = 'github_social_card.png';
+          link.href = url;
+          link.click();
+          
+          // Cleanup
+          URL.revokeObjectURL(url);
+          
+          console.log('✅ Downloaded: github_social_card.png');
+          console.log('📐 Size: 1280x640px');
+          alert('✅ Downloaded!\n\nFile: github_social_card.png\nSize: 1280x640px\n\nUpload to:\nGitHub → Settings → Social preview');
+        }, 'image/png');
+        
+      } catch (error) {
+        console.error('❌ Export failed:', error);
+        alert('❌ Export failed!\n\nTry manual screenshot:\n1. Hide safe zone\n2. Right-click card\n3. Save image as PNG');
+      } finally {
+        // Restore safe zone visibility
+        if (wasVisible) {
+          safeZone.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Copy to clipboard
+    async function copyToClipboard() {
+      const socialCard = document.getElementById('socialCard');
+      const safeZone = document.getElementById('safeZone');
+      
+      // Hide safe zone before capture
+      const wasVisible = !safeZone.classList.contains('hidden');
+      if (wasVisible) {
+        safeZone.classList.add('hidden');
+      }
+      
+      try {
+        console.log('📋 Copying to clipboard...');
+        
+        // Use html2canvas to capture the card
+        const canvas = await html2canvas(socialCard, {
+          width: 1280,
+          height: 640,
+          scale: 2,
+          backgroundColor: '#000000',
+          logging: false,
+          useCORS: true,
+          allowTaint: false
+        });
+        
+        // Convert canvas to blob and copy
+        canvas.toBlob(async function(blob) {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+            
+            console.log('✅ Copied to clipboard!');
+            alert('✅ Copied to clipboard!\n\nPaste in:\nGitHub → Settings → Social preview\n\nOr paste directly in Discord/Slack for preview');
+          } catch (err) {
+            console.error('Clipboard API failed:', err);
+            alert('⚠️ Clipboard access denied!\n\nUse "Download PNG" button instead\nOr manually screenshot (Ctrl+Shift+S)');
+          }
+        }, 'image/png');
+        
+      } catch (error) {
+        console.error('❌ Copy failed:', error);
+        alert('❌ Copy failed!\n\nUse "Download PNG" button instead');
+      } finally {
+        // Restore safe zone visibility
+        if (wasVisible) {
+          safeZone.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Initialize
+    generateParticles();
+    console.log('✨ GitHub Social Card Ready');
+    console.log('📐 Dimensions: 1280x640px');
+    console.log('🛡️ Safe Zone: 40pt border on all sides');
+    console.log('📱 Content area: 1200x560px (safe for all platforms)');
+  </script>
+</body>
+</html>

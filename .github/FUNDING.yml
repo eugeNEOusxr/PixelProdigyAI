@@ -1,0 +1,15 @@
+# These are supported funding model platforms
+
+# GitHub Sponsors - Enable after 1,000+ stars
+# github: [eugeneous]
+
+# Custom links - Direct to YOUR Stripe subscriptions (BEST for SaaS!)
+custom: [
+  'https://eugeneous.dev/pricing',                    # Main pricing page with Stripe tiers
+  'https://buy.stripe.com/pixelprodigy-creator',      # Direct: Creator Tier ($9.99/mo)
+  'https://buy.stripe.com/pixelprodigy-pro',          # Direct: Pro Tier ($29.99/mo)
+  'https://buy.stripe.com/pixelprodigy-studio'        # Direct: Studio Tier ($99.99/mo)
+]
+
+# Optional tip jar - Only add if users request it
+# ko_fi: eugeneous

@@ -1,0 +1,539 @@
+{
+  "roomId": "SM_FLOOR3_ROOFTOP_DECK",
+  "name": "Rooftop Deck",
+  "floor": 3,
+  "type": "Outdoor Entertainment & Relaxation",
+  
+  "dimensions": {
+    "length": 15.2,
+    "width": 12.2,
+    "height": "Open Sky",
+    "area": 185,
+    "unit": "meters"
+  },
+  
+  "design": {
+    "style": "Modern Sky Lounge",
+    "flooring": {
+      "type": "Weather-Resistant Composite Decking",
+      "color": "#E8E8E8",
+      "finish": "Non-slip Textured",
+      "heatedFloor": true,
+      "lighting": "Integrated LED strips"
+    },
+    
+    "railing": {
+      "type": "Frameless Glass",
+      "height": 1.1,
+      "transparency": "Crystal clear",
+      "safety": "Tempered safety glass"
+    },
+    
+    "perimeter": {
+      "edge": "Infinity design (no visible boundary)",
+      "view": "360° sky, clouds, and distant ground",
+      "feeling": "Floating in the sky"
+    }
+  },
+  
+  "zones": {
+    "infinityHotTub": {
+      "objectId": "obj_hot_tub_infinity_001",
+      "type": "Infinity Edge Hot Tub",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -4
+      },
+      "size": "3m x 2m",
+      "capacity": 6,
+      "features": [
+        "Infinity edge on north side (aurora view)",
+        "Heated year-round",
+        "Jet massage system (20 jets)",
+        "LED color-changing lights",
+        "Built-in speakers",
+        "Temperature control (36-40°C)",
+        "Saltwater system",
+        "Cover (retractable)",
+        "Snow melt around perimeter"
+      ],
+      "premiumAddOn": true,
+      "cost": 2.99,
+      "views": "Northern lights while soaking"
+    },
+    
+    "firePitLounge": {
+      "objectId": "obj_fire_pit_modern_001",
+      "type": "Modern Fire Pit",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "shape": "Circular",
+      "diameter": 1.5,
+      "fuel": "Propane (clean burning)",
+      "flames": "Adjustable height",
+      "heat": "Radiant warmth 3m radius",
+      "features": [
+        "Glass wind guard",
+        "Remote control",
+        "Auto-ignition",
+        "Safety shutoff",
+        "Black metal finish"
+      ],
+      
+      "seating": {
+        "arrangement": "Circular around fire pit",
+        "furniture": [
+          {
+            "objectId": "obj_outdoor_sofa_001",
+            "type": "Weather-Resistant Sofa",
+            "seating": 3,
+            "color": "Grey with white cushions"
+          },
+          {
+            "objectId": "obj_outdoor_loveseat_001",
+            "type": "Weather-Resistant Loveseat",
+            "seating": 2,
+            "color": "Grey with white cushions"
+          },
+          {
+            "objectId": "obj_outdoor_chair_001",
+            "type": "Lounge Chair",
+            "count": 4,
+            "color": "Grey with white cushions"
+          }
+        ],
+        "totalSeating": 11
+      }
+    },
+    
+    "outdoorKitchen": {
+      "objectId": "obj_outdoor_kitchen_001",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -3
+      },
+      "size": "4m x 2m",
+      "components": [
+        {
+          "item": "Built-in Gas Grill",
+          "size": "Large (6 burners)",
+          "brand": "Professional grade"
+        },
+        {
+          "item": "Refrigerator",
+          "type": "Outdoor-rated stainless",
+          "size": "Full height"
+        },
+        {
+          "item": "Sink",
+          "type": "Undermount stainless",
+          "water": "Hot and cold"
+        },
+        {
+          "item": "Storage Cabinets",
+          "material": "Weather-resistant",
+          "color": "White gloss"
+        },
+        {
+          "item": "Countertop",
+          "material": "Black granite",
+          "finish": "Polished"
+        },
+        {
+          "item": "Pizza Oven",
+          "type": "Wood-fired",
+          "portable": false
+        }
+      ]
+    },
+    
+    "barArea": {
+      "objectId": "obj_outdoor_bar_001",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": 2
+      },
+      "size": "3m x 1m",
+      "features": [
+        "Built-in ice maker",
+        "Wine cooler",
+        "Liquor storage",
+        "Glass hanging rack",
+        "LED under-counter lighting",
+        "6 bar stools"
+      ],
+      "barStools": {
+        "objectId": "obj_bar_stool_outdoor_001",
+        "count": 6,
+        "color": "Black with white cushions",
+        "swivel": true,
+        "weatherResistant": true
+      }
+    },
+    
+    "landingPad": {
+      "objectId": "obj_landing_pad_001",
+      "type": "Aircraft Landing Pad",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 4
+      },
+      "size": "8m diameter",
+      "premiumAddOn": true,
+      "cost": 9.99,
+      "features": [
+        "LED perimeter lighting",
+        "Illuminated 'H' marker",
+        "Weather sensors",
+        "Auto-guidance system",
+        "Vehicle charging station",
+        "Retractable safety netting"
+      ],
+      "compatibleVehicles": [
+        "Helicopter",
+        "VTOL aircraft",
+        "Jetpack",
+        "Drone (large)",
+        "Flying car (future)"
+      ],
+      "lighting": {
+        "type": "LED guidance lights",
+        "pattern": "FAA-compliant",
+        "colors": ["White", "Green (approach)", "Red (occupied)"],
+        "visibility": "10km+"
+      }
+    },
+    
+    "loungeArea": {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -5
+      },
+      "furniture": [
+        {
+          "objectId": "obj_daybed_outdoor_001",
+          "type": "Oversized Daybed",
+          "size": "2m x 2m",
+          "canopy": "Retractable shade",
+          "cushions": "Weather-resistant white",
+          "count": 2
+        },
+        {
+          "objectId": "obj_lounge_chair_001",
+          "type": "Adjustable Lounge Chair",
+          "count": 4,
+          "color": "Grey",
+          "features": ["Recline", "Cup holder", "Folding"]
+        },
+        {
+          "objectId": "obj_side_table_outdoor_001",
+          "type": "Side Table",
+          "count": 4,
+          "material": "Weather-resistant teak",
+          "color": "Natural"
+        }
+      ]
+    }
+  },
+  
+  "lighting": {
+    "ambientLighting": {
+      "type": "LED Strips",
+      "locations": [
+        "Floor perimeter",
+        "Under railing",
+        "Kitchen cabinets",
+        "Bar counter",
+        "Around hot tub"
+      ],
+      "color": "RGB (full spectrum)",
+      "dimmable": true,
+      "weatherproof": true
+    },
+    
+    "overheadLighting": {
+      "type": "String Lights",
+      "pattern": "Criss-cross overhead",
+      "bulbs": "Edison-style LED",
+      "dimmable": true,
+      "createAmbiance": "Evening gatherings"
+    },
+    
+    "accentLighting": {
+      "firePit": "Dancing flame light",
+      "hotTub": "Underwater RGB LEDs",
+      "landingPad": "Guidance lights",
+      "bar": "Under-counter glow"
+    },
+    
+    "scenes": [
+      {
+        "name": "Aurora Viewing",
+        "allLights": "Off",
+        "onlyFirePit": "Gentle flame"
+      },
+      {
+        "name": "Party Mode",
+        "stringLights": "Bright",
+        "ambientLEDs": "Dynamic RGB",
+        "music": "Upbeat"
+      },
+      {
+        "name": "Romantic Evening",
+        "stringLights": "Dim warm",
+        "firePit": "Active",
+        "hotTub": "Soft blue glow"
+      },
+      {
+        "name": "Sunrise Yoga",
+        "allLights": "Off",
+        "natural": "Dawn light only"
+      }
+    ]
+  },
+  
+  "heating": {
+    "floorHeating": "Radiant heated decking",
+    "firePit": "Propane, 50,000 BTU",
+    "hotTub": "Maintains 38°C",
+    "heatedRailing": "Prevents ice buildup",
+    "windbreak": "Retractable glass panels (3 sides)",
+    "comfortRange": "-10°C to 30°C outdoor use"
+  },
+  
+  "audioSystem": {
+    "speakers": {
+      "type": "Weather-resistant outdoor speakers",
+      "count": 8,
+      "placement": "Strategic around deck",
+      "quality": "Premium stereo"
+    },
+    
+    "zones": {
+      "fullDeck": "All speakers synchronized",
+      "hotTubArea": "Localized sound",
+      "kitchenBar": "Separate zone",
+      "firepit": "Central zone"
+    },
+    
+    "features": [
+      "Bluetooth streaming",
+      "Voice control",
+      "Party mode (all zones)",
+      "Quiet mode (lower volume)",
+      "Aurora soundscape sync"
+    ]
+  },
+  
+  "views": {
+    "north": "Prime northern lights viewing",
+    "east": "Sunrise over Greenland ice",
+    "south": "Distant ground and coastline",
+    "west": "Sunset and twilight",
+    "up": "Stars, aurora, and aircraft",
+    "feeling": "Floating 10,000 feet in the sky"
+  },
+  
+  "weatherProtection": {
+    "retractableCanopy": {
+      "coverage": "50% of deck (over seating areas)",
+      "material": "Weather-resistant fabric",
+      "waterproof": true,
+      "retraction": "Motorized, 60 seconds",
+      "sensors": "Auto-deploy on rain"
+    },
+    
+    "windbreaks": {
+      "type": "Retractable glass panels",
+      "sides": 3,
+      "height": 2.5,
+      "transparent": true,
+      "deployment": "Auto on high wind"
+    },
+    
+    "snowMelt": {
+      "system": "Heated floor + perimeter",
+      "capacity": "Light to moderate snowfall",
+      "drainage": "Automatic water removal"
+    },
+    
+    "rainDrainage": {
+      "slope": "Gentle 1° toward drains",
+      "drains": 6,
+      "capacity": "Heavy rainfall"
+    }
+  },
+  
+  "smartFeatures": {
+    "weatherMonitoring": {
+      "sensors": ["Temperature", "Wind Speed", "Precipitation", "UV Index"],
+      "automation": [
+        "Close canopy on rain",
+        "Deploy windbreaks if wind > 40 km/h",
+        "Adjust heating based on temp",
+        "Alert if severe weather approaching"
+      ]
+    },
+    
+    "voiceControl": {
+      "assistant": "Aurora (house AI)",
+      "commands": [
+        "Turn on fire pit",
+        "Heat hot tub",
+        "Play music",
+        "Adjust lighting",
+        "Close canopy",
+        "Set party mode"
+      ]
+    },
+    
+    "scenes": {
+      "morningCoffee": {
+        "time": "6-9 AM",
+        "heating": "On",
+        "music": "Gentle morning playlist",
+        "lighting": "Natural only"
+      },
+      
+      "afternoonRelax": {
+        "hotTub": "Heat to 38°C",
+        "music": "Chill ambient",
+        "canopy": "Deploy if sunny",
+        "lighting": "Ambient low"
+      },
+      
+      "eveningEntertain": {
+        "firePit": "On",
+        "stringLights": "Warm glow",
+        "bar": "Fully lit",
+        "music": "Social playlist"
+      },
+      
+      "nightAurora": {
+        "allLights": "Off",
+        "firePit": "Low flame",
+        "hotTub": "Dim blue",
+        "music": "Ambient soundscape"
+      }
+    }
+  },
+  
+  "plantLife": {
+    "note": "Limited due to extreme altitude and climate",
+    "options": [
+      {
+        "name": "Hardy Grasses",
+        "location": "Planters near kitchen",
+        "count": 4,
+        "type": "Ornamental grasses",
+        "maintenance": "Low"
+      },
+      {
+        "name": "Evergreen Shrubs",
+        "location": "Corner planters",
+        "count": 6,
+        "type": "Miniature pines",
+        "maintenance": "Seasonal"
+      }
+    ],
+    "planters": {
+      "count": 10,
+      "material": "White fiberglass",
+      "drainage": "Built-in",
+      "heatedSoil": "For plant survival"
+    }
+  },
+  
+  "safety": {
+    "railing": {
+      "height": 1.1,
+      "glassThickness": "15mm tempered",
+      "windRating": "150 km/h"
+    },
+    
+    "emergencyFeatures": [
+      "Fire extinguishers (3 locations)",
+      "First aid kit",
+      "Emergency shelter (weatherproof box)",
+      "Emergency radio",
+      "Thermal blankets"
+    ],
+    
+    "monitoring": {
+      "cameras": 4,
+      "coverage": "Full deck 360°",
+      "nightVision": true,
+      "aiBased": "Detects unusual activity"
+    }
+  },
+  
+  "capacity": {
+    "comfortable": 20,
+    "maximum": 30,
+    "hotTub": 6,
+    "firePitSeating": 11,
+    "barSeating": 6,
+    "lounging": 8
+  },
+  
+  "specialFeatures": [
+    "360° sky views from 10,000 feet",
+    "Infinity edge hot tub (aurora viewing)",
+    "Helicopter landing pad with guidance system",
+    "Full outdoor kitchen with pizza oven",
+    "Modern fire pit with 11-person seating",
+    "Outdoor bar with 6 stools",
+    "Heated flooring (year-round use)",
+    "Retractable canopy (weather protection)",
+    "8-zone audio system",
+    "RGB LED lighting throughout",
+    "Windbreak glass panels",
+    "Snow melt system",
+    "185 sq meter entertainment space",
+    "Sunrise and aurora viewing optimized"
+  ],
+  
+  "useCases": [
+    "Northern lights viewing parties",
+    "Summer BBQ gatherings",
+    "Romantic hot tub under the stars",
+    "Helicopter arrivals and departures",
+    "Morning yoga and meditation",
+    "Sunset cocktail hour",
+    "New Year's Eve sky celebration",
+    "Intimate dinners under string lights",
+    "Swimming pool replacement (hot tub)",
+    "Wedding proposal spot (girlfriend)",
+    "Streaming outdoor content",
+    "Friend hangouts via portal + rooftop access"
+  ],
+  
+  "maintenance": {
+    "daily": "Auto snow melt, deck cleaning",
+    "weekly": "Hot tub water quality check",
+    "monthly": "Furniture inspection",
+    "seasonal": "Winterization check, spring refresh"
+  },
+  
+  "metadata": {
+    "designedBy": [
+      "AI Personality #37 (Entertainment Venue Architect)",
+      "AI Personality #39 (Hospitality Designer)",
+      "AI Personality #29 (Landscape Architect)"
+    ],
+    "premiumAddOnsIncluded": ["Infinity Hot Tub ($2.99)", "Landing Pad ($9.99)"],
+    "totalAddOnValue": 12.98,
+    "created": "2025-10-16",
+    "status": "Complete",
+    "completion": "100%",
+    "ownerNotes": "Ultimate entertainment space. Perfect for everything from morning coffee to midnight aurora parties."
+  }
+}

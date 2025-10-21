@@ -1,0 +1,38 @@
+{
+  "enabled": true,
+  "lookahead": 2,
+  "trackingInterval": 50,
+  "velocityTracking": {
+    "enabled": true,
+    "historySize": 10,
+    "acceleration": true
+  },
+  "pathPrediction": {
+    "enabled": true,
+    "method": "linear-extrapolation",
+    "confidence": 0.8
+  },
+  "behaviorLearning": {
+    "enabled": true,
+    "patterns": [
+      "combat",
+      "exploration",
+      "building",
+      "trading"
+    ],
+    "adaptivePreloading": true
+  },
+  "preloading": {
+    "enabled": true,
+    "strategy": "predicted-path",
+    "radius": 100,
+    "priority": "distance-weighted"
+  },
+  "cameraTracking": {
+    "position": true,
+    "rotation": true,
+    "fov": true,
+    "velocity": true,
+    "acceleration": true
+  }
+}

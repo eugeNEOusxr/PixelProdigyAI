@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelVerse - Character Creation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .creation-container {
+            display: flex;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Left Panel - Character Preview */
+        .preview-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .preview-canvas-container {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #previewCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .preview-placeholder {
+            position: absolute;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .preview-placeholder .character-silhouette {
+            font-size: 200px;
+            opacity: 0.3;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+
+        .character-stats {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+
+        .stat-name {
+            color: #aaa;
+        }
+
+        .stat-value {
+            color: #4ecca3;
+            font-weight: bold;
+        }
+
+        /* Right Panel - Customization Options */
+        .customization-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+
+        .customization-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .customization-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .customization-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #4ecca3;
+            border-bottom: 2px solid rgba(78, 204, 163, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4ecca3;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Race & Class Selection */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .selection-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .selection-card:hover {
+            border-color: rgba(78, 204, 163, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .selection-card.selected {
+            border-color: #4ecca3;
+            background: rgba(78, 204, 163, 0.2);
+        }
+
+        .selection-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .selection-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .selection-description {
+            font-size: 0.8em;
+            color: #aaa;
+            line-height: 1.4;
+        }
+
+        /* Appearance Customization */
+        .appearance-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .appearance-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .appearance-option:hover {
+            border-color: #4ecca3;
+            transform: scale(1.1);
+        }
+
+        .appearance-option.selected {
+            border-color: #4ecca3;
+            border-width: 3px;
+            box-shadow: 0 0 15px rgba(78, 204, 163, 0.5);
+        }
+
+        /* Color Picker */
+        .color-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #fff;
+            border-width: 3px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Attribute Points */
+        .attributes-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .attribute-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .attribute-name {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .attribute-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .attribute-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(78, 204, 163, 0.3);
+            border: 1px solid #4ecca3;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .attribute-btn:hover:not(:disabled) {
+            background: rgba(78, 204, 163, 0.5);
+            transform: scale(1.1);
+        }
+
+        .attribute-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .attribute-value {
+            min-width: 40px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4ecca3;
+        }
+
+        .points-remaining {
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 196, 0, 0.2);
+            border-radius: 8px;
+            font-size: 1.1em;
+            color: #ffc400;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-random {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+        }
+
+        .btn-random:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            margin-left: 5px;
+            color: #aaa;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85em;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .creation-container {
+                flex-direction: column;
+            }
+
+            .preview-panel {
+                height: 40vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="creation-container">
+        <!-- Left Panel - Character Preview -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <h1>🌌 Character Creation</h1>
+                <p style="color: #aaa;">Forge Your Legend in the PixelVerse</p>
+            </div>
+
+            <div class="preview-canvas-container">
+                <canvas id="previewCanvas"></canvas>
+                <div class="preview-placeholder">
+                    <div class="character-silhouette">👤</div>
+                    <p style="margin-top: 20px; color: #aaa;">Your character will appear here</p>
+                </div>
+            </div>
+
+            <div class="character-stats">
+                <div class="stat-row">
+                    <span class="stat-name">Name:</span>
+                    <span class="stat-value" id="statName">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Race:</span>
+                    <span class="stat-value" id="statRace">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Class:</span>
+                    <span class="stat-value" id="statClass">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Starting Level:</span>
+                    <span class="stat-value">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Starting Gold:</span>
+                    <span class="stat-value">100</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Customization Options -->
+        <div class="customization-panel">
+            <!-- Character Name -->
+            <div class="section">
+                <h2 class="section-title">📝 Character Name</h2>
+                <div class="input-group">
+                    <label class="input-label">Enter your character's name:</label>
+                    <input type="text" id="characterName" placeholder="Enter name..." maxlength="20">
+                </div>
+            </div>
+
+            <!-- Race Selection -->
+            <div class="section">
+                <h2 class="section-title">🧬 Choose Your Race</h2>
+                <div class="selection-grid" id="raceSelection">
+                    <div class="selection-card" data-race="human">
+                        <div class="selection-icon">👨</div>
+                        <div class="selection-name">Human</div>
+                        <div class="selection-description">Versatile and adaptable. +2 to all attributes.</div>
+                    </div>
+                    <div class="selection-card" data-race="elf">
+                        <div class="selection-icon">🧝</div>
+                        <div class="selection-name">Elf</div>
+                        <div class="selection-description">Graceful and wise. +4 Agility, +4 Intelligence.</div>
+                    </div>
+                    <div class="selection-card" data-race="dwarf">
+                        <div class="selection-icon">🧔</div>
+                        <div class="selection-name">Dwarf</div>
+                        <div class="selection-description">Sturdy and resilient. +4 Strength, +4 Vitality.</div>
+                    </div>
+                    <div class="selection-card" data-race="orc">
+                        <div class="selection-icon">👹</div>
+                        <div class="selection-name">Orc</div>
+                        <div class="selection-description">Fierce and powerful. +6 Strength, +2 Vitality.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Class Selection -->
+            <div class="section">
+                <h2 class="section-title">⚔️ Choose Your Class</h2>
+                <div class="selection-grid" id="classSelection">
+                    <div class="selection-card" data-class="warrior">
+                        <div class="selection-icon">🛡️</div>
+                        <div class="selection-name">Warrior</div>
+                        <div class="selection-description">Master of melee combat. High HP and physical damage.</div>
+                    </div>
+                    <div class="selection-card" data-class="mage">
+                        <div class="selection-icon">🔮</div>
+                        <div class="selection-name">Mage</div>
+                        <div class="selection-description">Wields powerful magic. High spell damage and mana.</div>
+                    </div>
+                    <div class="selection-card" data-class="rogue">
+                        <div class="selection-icon">🗡️</div>
+                        <div class="selection-name">Rogue</div>
+                        <div class="selection-description">Swift and deadly. High critical chance and evasion.</div>
+                    </div>
+                    <div class="selection-card" data-class="cleric">
+                        <div class="selection-icon">✨</div>
+                        <div class="selection-name">Cleric</div>
+                        <div class="selection-description">Divine healer. Can heal and buff allies.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appearance Customization -->
+            <div class="section">
+                <h2 class="section-title">🎨 Appearance</h2>
+                
+                <div class="input-group">
+                    <label class="input-label">Hair Style:</label>
+                    <div class="appearance-options" id="hairStyles">
+                        <div class="appearance-option" data-hair="1">💇</div>
+                        <div class="appearance-option" data-hair="2">💇‍♂️</div>
+                        <div class="appearance-option" data-hair="3">💇‍♀️</div>
+                        <div class="appearance-option" data-hair="4">🦱</div>
+                        <div class="appearance-option" data-hair="5">🦲</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Hair Color:</label>
+                    <div class="color-picker" id="hairColors">
+                        <div class="color-option" data-color="black" style="background: #1a1a1a;"></div>
+                        <div class="color-option" data-color="brown" style="background: #654321;"></div>
+                        <div class="color-option" data-color="blonde" style="background: #f0e68c;"></div>
+                        <div class="color-option" data-color="red" style="background: #cd5c5c;"></div>
+                        <div class="color-option" data-color="white" style="background: #f5f5f5;"></div>
+                        <div class="color-option" data-color="blue" style="background: #4169e1;"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Skin Tone:</label>
+                    <div class="color-picker" id="skinTones">
+                        <div class="color-option" data-skin="light" style="background: #ffdfc4;"></div>
+                        <div class="color-option" data-skin="medium" style="background: #f0c48c;"></div>
+                        <div class="color-option" data-skin="tan" style="background: #c68642;"></div>
+                        <div class="color-option" data-skin="dark" style="background: #8d5524;"></div>
+                        <div class="color-option" data-skin="pale" style="background: #ffe4e1;"></div>
+                        <div class="color-option" data-skin="green" style="background: #90ee90;"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Face Type:</label>
+                    <div class="appearance-options" id="faceTypes">
+                        <div class="appearance-option" data-face="1">😊</div>
+                        <div class="appearance-option" data-face="2">😎</div>
+                        <div class="appearance-option" data-face="3">🤨</div>
+                        <div class="appearance-option" data-face="4">😈</div>
+                        <div class="appearance-option" data-face="5">🥰</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attribute Points -->
+            <div class="section">
+                <h2 class="section-title">📊 Attribute Points 
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">Distribute 20 points among your attributes. Race and class bonuses apply automatically.</span>
+                    </span>
+                </h2>
+                
+                <div class="attributes-grid" id="attributesGrid">
+                    <div class="attribute-row">
+                        <span class="attribute-name">💪 Strength</span>
+                        <div class="attribute-controls">
+                            <button class="attribute-btn" data-attr="strength" data-action="decrease">-</button>
+                            <span class="attribute-value" id="attrStrength">10</span>
+                            <button class="attribute-btn" data-attr="strength" data-action="increase">+</button>
+                        </div>
+                    </div>
+                    <div class="attribute-row">
+                        <span class="attribute-name">🏃 Agility</span>
+                        <div class="attribute-controls">
+                            <button class="attribute-btn" data-attr="agility" data-action="decrease">-</button>
+                            <span class="attribute-value" id="attrAgility">10</span>
+                            <button class="attribute-btn" data-attr="agility" data-action="increase">+</button>
+                        </div>
+                    </div>
+                    <div class="attribute-row">
+                        <span class="attribute-name">❤️ Vitality</span>
+                        <div class="attribute-controls">
+                            <button class="attribute-btn" data-attr="vitality" data-action="decrease">-</button>
+                            <span class="attribute-value" id="attrVitality">10</span>
+                            <button class="attribute-btn" data-attr="vitality" data-action="increase">+</button>
+                        </div>
+                    </div>
+                    <div class="attribute-row">
+                        <span class="attribute-name">🧠 Intelligence</span>
+                        <div class="attribute-controls">
+                            <button class="attribute-btn" data-attr="intelligence" data-action="decrease">-</button>
+                            <span class="attribute-value" id="attrIntelligence">10</span>
+                            <button class="attribute-btn" data-attr="intelligence" data-action="increase">+</button>
+                        </div>
+                    </div>
+                    <div class="attribute-row">
+                        <span class="attribute-name">🔮 Wisdom</span>
+                        <div class="attribute-controls">
+                            <button class="attribute-btn" data-attr="wisdom" data-action="decrease">-</button>
+                            <span class="attribute-value" id="attrWisdom">10</span>
+                            <button class="attribute-btn" data-attr="wisdom" data-action="increase">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="points-remaining">
+                    Points Remaining: <span id="pointsRemaining">20</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-random" onclick="randomizeCharacter()">🎲 Randomize</button>
+                <button class="btn btn-secondary" onclick="resetCharacter()">↺ Reset</button>
+                <button class="btn btn-primary" id="createBtn" onclick="createCharacter()" disabled>✓ Create Character</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="character_creation.js"></script>
+</body>
+</html>

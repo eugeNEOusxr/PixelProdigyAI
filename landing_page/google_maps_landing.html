@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy AI - Build 3D Worlds from Real Cities</title>
+    <meta name="description" content="47,000 procedurally generated 3D objects with 80x compression. Transform real cities into gaming realms with AI personality styling.">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --dark: #1a1a2e;
+            --light: #ffffff;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 60px 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 900;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            line-height: 1.1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #f093fb, #f5576c, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 5s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            color: white;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Map Section */
+        .map-section {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Obfuscation overlay - makes it look like a fantasy game map */
+        #map::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: overlay;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: rgba(102, 126, 234, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        footer p {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #map {
+                height: 400px;
+            }
+
+            .stats {
+                gap: 30px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Info Window Styling */
+        .info-window {
+            padding: 10px;
+            max-width: 250px;
+        }
+
+        .info-window h3 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .info-window p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .info-window .skyrelics {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Build <span class="gradient-text">3D Worlds</span><br>in Fantasy Realms</h1>
+            <p>47,000 procedurally generated objects compressed 80x with AI personality styling. Explore 15 unique fantasy realms inspired by real-world cultures.</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">47,000</span>
+                    <span class="stat-label">3D Objects</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">80x</span>
+                    <span class="stat-label">Compression</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15</span>
+                    <span class="stat-label">Fantasy Realms</span>
+                </div>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="#map" class="btn btn-primary">Explore Realms 🗺️</a>
+                <a href="http://localhost:3000/3d_browser.html" class="btn btn-secondary">Browse Objects 🎨</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section" id="map-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Discover <span class="gradient-text">15 Fantasy Realms</span></h2>
+                <p>🏰 <strong>Pure Fantasy World:</strong> Click markers to explore unique realms inspired by global cultures. From Skyreach Citadel to Sunstone Oasis, each realm has its own story, architecture, and SkyRelics dungeons. This is a fictional universe - no real geography exposed.</p>
+            </div>
+            
+            <div id="map"></div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Powered by <span class="gradient-text">AI Personalities</span></h2>
+                <p>Six specialized AI creators generate infinite variations with unique styles</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>AI-Powered Creation</h3>
+                    <p>6 specialized AI personalities (Interior Designer, Vehicle Designer, Organic Naturalist, and more) generate objects with unique styles and precision levels from 50-100%.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🗜️</div>
+                    <h3>Massive Compression</h3>
+                    <p>VLS (Vertex Language System) compresses 3D models 80-4800x smaller than traditional formats. A 1970 Chevelle goes from 2.3MB to 60KB.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Fantasy World Building</h3>
+                    <p>15 unique fantasy realms inspired by global cultures. From misty fortress cities to neon tech spires, each realm blends imagination with cultural inspiration. Build, explore, and create in a safe, fictional universe.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Create?</h2>
+            <p>Join 50+ creators building the future of 3D gaming</p>
+            <div class="cta-buttons">
+                <a href="http://localhost:3000/3d_browser.html" class="btn btn-primary">Start Creating Free</a>
+                <a href="#map" class="btn btn-secondary">Explore More Cities</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 PixelProdigy AI. Created by <strong>Jeremy</strong></p>
+            <p>Built with 💜 by AI Personalities:</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">
+                🎨 #1 Visionary Artist • 👔 #30 Interior Designer • 🚗 #20 Vehicle Designer<br>
+                🌿 #14 Organic Naturalist • 🔧 #33 Industrial Designer • 🏠 #25 Residential Architect<br>
+                💰 #67 Financial Advisor • 🎓 #82 Career Coach • 📊 #53 Medical Professional • 👗 #21 Costume Designer
+            </p>
+        </div>
+    </footer>
+
+    <!-- Google Maps Script -->
+    <script>
+        // FANTASY REALMS - Fully obfuscated world inspired by real cultures
+        // These are fictional cities in the SkyRelics universe
+        const fantasyRealms = [
+            // Northern Continent Realms
+            { 
+                name: "Skyreach Citadel", 
+                region: "Northern Continent",
+                lore: "A towering metropolis of steel and glass where sky bridges connect floating districts",
+                inspiredBy: "Metropolitan skylines",
+                lat: 41.2 + (Math.random() * 4),
+                lng: -75.0 + (Math.random() * 4),
+                skyrelics: { towers: 15, dungeons: 8, quests: 45 }
+            },
+            { 
+                name: "Sunfire Coast", 
+                region: "Western Shores",
+                lore: "A glittering coastal realm where golden beaches meet neon-lit entertainment districts",
+                inspiredBy: "Pacific coastal culture",
+                lat: 34.5 + (Math.random() * 4),
+                lng: -119.0 + (Math.random() * 4),
+                skyrelics: { towers: 16, dungeons: 10, quests: 52 }
+            },
+            { 
+                name: "Frostwatch Peaks", 
+                region: "Northern Highlands",
+                lore: "An advanced city carved into frozen mountains, powered by geothermal energy",
+                inspiredBy: "Northern innovations",
+                lat: 44.0 + (Math.random() * 4),
+                lng: -80.0 + (Math.random() * 4),
+                skyrelics: { towers: 13, dungeons: 8, quests: 48 }
+            },
+            
+            // Eastern Continent Realms
+            { 
+                name: "Neon Spire", 
+                region: "Eastern Continent",
+                lore: "Where ancient tradition meets cutting-edge technology in a vertical megacity",
+                inspiredBy: "Eastern technological hubs",
+                lat: 35.5 + (Math.random() * 4),
+                lng: 140.0 + (Math.random() * 4),
+                skyrelics: { towers: 20, dungeons: 12, quests: 60 }
+            },
+            { 
+                name: "Jade Gardens", 
+                region: "Eastern Peninsula",
+                lore: "A harmonious blend of nature and architecture, where gardens float between towers",
+                inspiredBy: "Eastern peninsula culture",
+                lat: 22.5 + (Math.random() * 4),
+                lng: 114.5 + (Math.random() * 4),
+                skyrelics: { towers: 19, dungeons: 11, quests: 58 }
+            },
+            { 
+                name: "Lotus Bay", 
+                region: "Equatorial Islands",
+                lore: "A tropical trading hub where sky ships dock at crystal spires",
+                inspiredBy: "Equatorial trade centers",
+                lat: 1.5 + (Math.random() * 4),
+                lng: 104.0 + (Math.random() * 4),
+                skyrelics: { towers: 22, dungeons: 13, quests: 65 }
+            },
+            { 
+                name: "Crimson Summit", 
+                region: "Peninsula of Fire",
+                lore: "A mountainous realm of red stone temples and modern tech centers",
+                inspiredBy: "Eastern spiritual centers",
+                lat: 37.8 + (Math.random() * 4),
+                lng: 127.5 + (Math.random() * 4),
+                skyrelics: { towers: 21, dungeons: 12, quests: 62 }
+            },
+            
+            // Western Isles Realms
+            { 
+                name: "Fogwatch Keep", 
+                region: "Western Isles",
+                lore: "An ancient fortress city shrouded in eternal mist, now a hub of mystical trade",
+                inspiredBy: "Misty island fortresses",
+                lat: 51.5 + (Math.random() * 4),
+                lng: -0.5 + (Math.random() * 4),
+                skyrelics: { towers: 18, dungeons: 10, quests: 55 }
+            },
+            { 
+                name: "Lumière Citadel", 
+                region: "Central Kingdoms",
+                lore: "The City of Light, where art and magic illuminate grand boulevards",
+                inspiredBy: "Classical artistic centers",
+                lat: 49.0 + (Math.random() * 4),
+                lng: 2.5 + (Math.random() * 4),
+                skyrelics: { towers: 12, dungeons: 7, quests: 40 }
+            },
+            { 
+                name: "Ironforge District", 
+                region: "Central Heartland",
+                lore: "An industrial marvel rebuilt as a green tech paradise",
+                inspiredBy: "Industrial revolution heritage",
+                lat: 52.8 + (Math.random() * 4),
+                lng: 13.5 + (Math.random() * 4),
+                skyrelics: { towers: 15, dungeons: 9, quests: 53 }
+            },
+            
+            // Southern Realms
+            { 
+                name: "Azure Harbor", 
+                region: "Southern Seas",
+                lore: "A stunning port city where sails catch both wind and solar power",
+                inspiredBy: "Southern hemisphere ports",
+                lat: -33.5 + (Math.random() * 4),
+                lng: 151.5 + (Math.random() * 4),
+                skyrelics: { towers: 14, dungeons: 9, quests: 50 }
+            },
+            { 
+                name: "Monsoon Metropolis", 
+                region: "Tropical Coast",
+                lore: "A sprawling coastal city adapted to thrive in seasonal rains",
+                inspiredBy: "Tropical coastal cultures",
+                lat: 19.5 + (Math.random() * 4),
+                lng: 73.0 + (Math.random() * 4),
+                skyrelics: { towers: 17, dungeons: 10, quests: 55 }
+            },
+            { 
+                name: "Emerald Canopy", 
+                region: "Southern Rainforest",
+                lore: "A city built in harmony with ancient rainforests, towers wrapped in living vines",
+                inspiredBy: "Rainforest biodiversity",
+                lat: -23.3 + (Math.random() * 4),
+                lng: -46.5 + (Math.random() * 4),
+                skyrelics: { towers: 16, dungeons: 9, quests: 51 }
+            },
+            { 
+                name: "Sunstone Oasis", 
+                region: "Desert Kingdoms",
+                lore: "A golden city rising from the sands, powered by eternal sunlight",
+                inspiredBy: "Desert innovations",
+                lat: 25.5 + (Math.random() * 4),
+                lng: 55.5 + (Math.random() * 4),
+                skyrelics: { towers: 25, dungeons: 15, quests: 70 }
+            },
+            { 
+                name: "Volcano's Crown", 
+                region: "Highland Plateaus",
+                lore: "Built atop ancient volcanic peaks, a city of fire and stone",
+                inspiredBy: "Highland civilizations",
+                lat: 19.7 + (Math.random() * 4),
+                lng: -99.3 + (Math.random() * 4),
+                skyrelics: { towers: 14, dungeons: 8, quests: 47 }
+            }
+        ];
+        
+        // Use fantasyRealms as cities for compatibility
+        const cities = fantasyRealms;
+
+        let map;
+        let markers = [];
+        let infoWindows = [];
+
+        // Initialize Google Map
+        function initMap() {
+            // OBFUSCATED THEME - Hide real geography, show stylized game world
+            const obfuscatedTheme = [
+                // Hide all labels - no city names, roads, etc
+                { elementType: "labels", stylers: [{ visibility: "off" }] },
+                
+                // Simplify land to single color
+                { 
+                    featureType: "landscape",
+                    elementType: "geometry",
+                    stylers: [{ color: "#1a1a2e" }, { lightness: -20 }]
+                },
+                
+                // Make water abstract
+                {
+                    featureType: "water",
+                    elementType: "geometry",
+                    stylers: [{ color: "#0f0f1e" }, { visibility: "simplified" }]
+                },
+                
+                // Hide all roads
+                {
+                    featureType: "road",
+                    stylers: [{ visibility: "off" }]
+                },
+                
+                // Hide administrative boundaries
+                {
+                    featureType: "administrative",
+                    stylers: [{ visibility: "off" }]
+                },
+                
+                // Hide POIs (points of interest)
+                {
+                    featureType: "poi",
+                    stylers: [{ visibility: "off" }]
+                },
+                
+                // Hide transit
+                {
+                    featureType: "transit",
+                    stylers: [{ visibility: "off" }]
+                },
+                
+                // Simplify everything else
+                { elementType: "geometry", stylers: [{ color: "#1a1a2e" }] }
+            ];
+
+            // Create map with obfuscation
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 2,
+                center: { lat: 20, lng: 0 },
+                styles: obfuscatedTheme,
+                gestureHandling: 'greedy',
+                mapTypeControl: false,
+                streetViewControl: false,
+                zoomControl: true,
+                // Restrict zoom to prevent detailed viewing
+                minZoom: 2,
+                maxZoom: 8,  // Prevents street-level detail
+                disableDefaultUI: true
+            });
+
+            // Add markers for each city
+            cities.forEach((city, index) => {
+                const marker = new google.maps.Marker({
+                    position: { lat: city.lat, lng: city.lng },
+                    map: map,
+                    title: city.name,
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#667eea',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                    }
+                });
+
+                // Create info window content - PURE FANTASY
+                const infoContent = `
+                    <div class="info-window">
+                        <h3>⚔️ ${city.name}</h3>
+                        <p><strong>Region:</strong> ${city.region}</p>
+                        <p style="font-style: italic; color: #888; margin: 10px 0;">"${city.lore}"</p>
+                        <div class="skyrelics">
+                            <strong>🎮 SkyRelics Statistics:</strong><br>
+                            🏰 ${city.skyrelics.towers} Sky Towers<br>
+                            ⚔️ ${city.skyrelics.dungeons} Legendary Dungeons<br>
+                            ⭐ ${city.skyrelics.quests} Active Quests<br>
+                            <br>
+                            <small style="opacity: 0.7;">🛡️ Fantasy realm inspired by ${city.inspiredBy}</small>
+                        </div>
+                    </div>
+                `;
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: infoContent
+                });
+
+                // Click handler
+                marker.addListener('click', () => {
+                    // Close all other info windows
+                    infoWindows.forEach(iw => iw.close());
+                    
+                    // Open this info window
+                    infoWindow.open(map, marker);
+                    
+                    // Zoom to city
+                    map.setZoom(10);
+                    map.setCenter(marker.getPosition());
+                });
+
+                // Hover effect
+                marker.addListener('mouseover', () => {
+                    marker.setIcon({
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 15,
+                        fillColor: '#f093fb',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 3
+                    });
+                });
+
+                marker.addListener('mouseout', () => {
+                    marker.setIcon({
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#667eea',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                    });
+                });
+
+                markers.push(marker);
+                infoWindows.push(infoWindow);
+            });
+
+            console.log('✅ Google Maps initialized with', cities.length, 'cities');
+        }
+
+        // Load Google Maps API
+        function loadGoogleMaps() {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB1AjUbdygnUr7NkOC2kceSoauNLAbIdAU&callback=initMap`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            // API key added - let's load the map!
+            const hasApiKey = true;
+            
+            if (hasApiKey) {
+                loadGoogleMaps();
+            } else {
+                // Show demo message
+                const mapDiv = document.getElementById('map');
+                mapDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 40px;">
+                        <div>
+                            <h2 style="font-size: 2rem; margin-bottom: 20px;">🗺️ Google Maps Ready</h2>
+                            <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9;">Add your Google Maps API key to see 15 cities with SkyRelics gaming overlays</p>
+                            <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto; text-align: left; font-family: monospace; font-size: 0.9rem;">
+                                <p><strong>1.</strong> Get API key: <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" style="color: #f093fb;">Google Maps Platform</a></p>
+                                <p style="margin-top: 10px;"><strong>2.</strong> Replace <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">YOUR_API_KEY_HERE</code> in the script</p>
+                                <p style="margin-top: 10px;"><strong>3.</strong> Set <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">hasApiKey = true</code></p>
+                            </div>
+                            <p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.7;">All 15 cities are configured and ready to display!</p>
+                        </div>
+                    </div>
+                `;
+                console.log('⚠️ Google Maps API key required. See instructions in map area.');
+                console.log('📍 Cities configured:', cities.length);
+            }
+        });
+    </script>
+</body>
+</html>

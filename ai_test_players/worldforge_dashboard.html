@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorldForge AI - Real-Time Problem-Solving Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            overflow: hidden;
+        }
+
+        #dashboard {
+            display: grid;
+            grid-template-rows: 60px 1fr 200px;
+            height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+            border-bottom: 2px solid #00ff00;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .system-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #00aa00;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Main Grid */
+        #mainGrid {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Left Panel - AI Players */
+        #aiPlayersPanel {
+            background: #111;
+            border-right: 2px solid #00ff00;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .ai-player-card {
+            background: #1a1a1a;
+            border: 1px solid #00aa00;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .ai-player-card:hover {
+            border-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .ai-player-card.building {
+            border-color: #ffff00;
+            animation: pulse 2s infinite;
+        }
+
+        .ai-player-card.error {
+            border-color: #ff0000;
+            animation: flash 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(255, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 255, 0, 0.8); }
+        }
+
+        @keyframes flash {
+            0%, 100% { background: #1a1a1a; }
+            50% { background: #3a0000; }
+        }
+
+        .player-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .player-stats {
+            font-size: 10px;
+            color: #00aa00;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #222;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00aa00);
+            transition: width 0.5s;
+        }
+
+        /* Center Panel - 3D Viewport */
+        #viewportPanel {
+            background: #000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #vls-canvas {
+            flex: 1;
+            width: 100%;
+            border: none;
+        }
+
+        .viewport-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+
+        .vls-level-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px 30px;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .vls-level {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .vls-level:hover {
+            transform: scale(1.1);
+        }
+
+        .vls-level.active {
+            color: #ffff00;
+        }
+
+        .vls-level-icon {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00aa00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+
+        .vls-level.active .vls-level-icon {
+            border-color: #ffff00;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+        }
+
+        .vls-level-name {
+            font-size: 9px;
+        }
+
+        /* Right Panel - Problem Log */
+        #problemPanel {
+            background: #111;
+            border-left: 2px solid #00ff00;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        .problem-log {
+            flex: 1;
+            overflow-y: auto;
+            background: #000;
+            border: 1px solid #00aa00;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 11px;
+        }
+
+        .log-entry {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid #00aa00;
+            background: #0a0a0a;
+        }
+
+        .log-entry.error {
+            border-left-color: #ff0000;
+            color: #ff6666;
+        }
+
+        .log-entry.solution {
+            border-left-color: #00ff00;
+            color: #66ff66;
+        }
+
+        .log-entry.meta-ai {
+            border-left-color: #ffff00;
+            color: #ffff66;
+        }
+
+        .log-time {
+            color: #666;
+            font-size: 9px;
+        }
+
+        /* Bottom Panel - Performance Metrics */
+        #metricsPanel {
+            background: #111;
+            border-top: 2px solid #00ff00;
+            padding: 15px 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: #1a1a1a;
+            border: 1px solid #00aa00;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-title {
+            font-size: 11px;
+            color: #00aa00;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .metric-chart {
+            height: 60px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            background: linear-gradient(180deg, #00ff00, #00aa00);
+            border-radius: 2px 2px 0 0;
+        }
+
+        /* Controls */
+        .controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00aa00;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard">
+        <!-- Header -->
+        <header>
+            <div class="logo">🤖 WORLDFORGE AI - PROBLEM-SOLVING DASHBOARD</div>
+            <div class="system-stats">
+                <div class="stat-box">
+                    <div class="stat-label">FPS</div>
+                    <div class="stat-value" id="fps">60</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">MEMORY</div>
+                    <div class="stat-value" id="memory">24%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">VERTICES</div>
+                    <div class="stat-value" id="vertices">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">ERRORS</div>
+                    <div class="stat-value" id="errors">0</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div id="mainGrid">
+            <!-- Left: AI Players -->
+            <div id="aiPlayersPanel">
+                <div class="panel-title">🤖 AI PLAYERS (20)</div>
+                <div id="playerList"></div>
+            </div>
+
+            <!-- Center: 3D Viewport -->
+            <div id="viewportPanel">
+                <canvas id="vls-canvas"></canvas>
+                
+                <div class="viewport-overlay">
+                    <div><strong>Selected Object:</strong> <span id="selectedObject">None</span></div>
+                    <div><strong>VLS Level:</strong> <span id="currentVLSLevel">0 - Microscopic</span></div>
+                    <div><strong>Vertices:</strong> <span id="objectVertices">0</span></div>
+                    <div><strong>Quality:</strong> <span id="renderQuality">Wireframe</span></div>
+                </div>
+
+                <div class="vls-level-indicator">
+                    <div class="vls-level active" data-level="0">
+                        <div class="vls-level-icon">0</div>
+                        <div class="vls-level-name">Micro</div>
+                    </div>
+                    <div class="vls-level" data-level="1">
+                        <div class="vls-level-icon">1</div>
+                        <div class="vls-level-name">Low</div>
+                    </div>
+                    <div class="vls-level" data-level="2">
+                        <div class="vls-level-icon">2</div>
+                        <div class="vls-level-name">Medium</div>
+                    </div>
+                    <div class="vls-level" data-level="3">
+                        <div class="vls-level-icon">3</div>
+                        <div class="vls-level-name">High</div>
+                    </div>
+                    <div class="vls-level" data-level="4">
+                        <div class="vls-level-icon">4</div>
+                        <div class="vls-level-name">4K</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Problem Log -->
+            <div id="problemPanel">
+                <div class="panel-title">⚠️ PROBLEM-SOLVING LOG</div>
+                <div class="controls">
+                    <button onclick="clearLog()">Clear Log</button>
+                    <button onclick="exportLog()">Export</button>
+                </div>
+                <div class="problem-log" id="problemLog"></div>
+            </div>
+        </div>
+
+        <!-- Bottom: Metrics -->
+        <div id="metricsPanel">
+            <div class="metric-card">
+                <div class="metric-title">Objects Built</div>
+                <div class="metric-value" id="objectsBuilt">0</div>
+                <div class="metric-chart" id="objectsChart"></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Problems Detected</div>
+                <div class="metric-value" id="problemsDetected">0</div>
+                <div class="metric-chart" id="problemsChart"></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Solutions Applied</div>
+                <div class="metric-value" id="solutionsApplied">0</div>
+                <div class="metric-chart" id="solutionsChart"></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Meta-AI Consultations</div>
+                <div class="metric-value" id="metaAIConsultations">0</div>
+                <div class="metric-chart" id="metaAIChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Dashboard
+        class WorldForgeDashboard {
+            constructor() {
+                this.players = [];
+                this.logs = [];
+                this.metrics = {
+                    objectsBuilt: 0,
+                    problemsDetected: 0,
+                    solutionsApplied: 0,
+                    metaAIConsultations: 0
+                };
+                
+                this.canvas = document.getElementById('vls-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resizeCanvas();
+                
+                window.addEventListener('resize', () => this.resizeCanvas());
+                
+                this.initializeMockData();
+                this.startSimulation();
+                this.startRenderLoop();
+            }
+
+            resizeCanvas() {
+                this.canvas.width = this.canvas.offsetWidth;
+                this.canvas.height = this.canvas.offsetHeight;
+            }
+
+            initializeMockData() {
+                // Create 20 AI players
+                const personalities = [
+                    'Aria the Architect', 'Blaze the Chaotic', 'Coral the Ocean Sage',
+                    'Dex the Speed Demon', 'Echo the Minimalist', 'Flora the Gardener',
+                    'Gizmo the Inventor', 'Hex the Mystic', 'Ice the Crystallographer',
+                    'Junk the Salvager', 'Karma the Philosopher', 'Luna the Dreamweaver',
+                    'Metro the Urbanist', 'Nova the Futurist', 'Opus the Composer',
+                    'Prism the Colorist', 'Quantum the Physicist', 'Root the Ancient',
+                    'Storm the Elemental', 'Void the Existentialist'
+                ];
+
+                personalities.forEach((name, i) => {
+                    this.players.push({
+                        id: `ai_${String(i + 1).padStart(3, '0')}`,
+                        name: name,
+                        objectsBuilt: 0,
+                        errorsEncountered: 0,
+                        errorsFixed: 0,
+                        currentVLSLevel: 0,
+                        status: 'idle',
+                        progress: 0
+                    });
+                });
+
+                this.renderPlayers();
+            }
+
+            renderPlayers() {
+                const list = document.getElementById('playerList');
+                list.innerHTML = '';
+
+                this.players.forEach(player => {
+                    const card = document.createElement('div');
+                    card.className = `ai-player-card ${player.status}`;
+                    card.innerHTML = `
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-stats">
+                            <span>🏗️ ${player.objectsBuilt}</span>
+                            <span>⚠️ ${player.errorsEncountered}</span>
+                            <span>✅ ${player.errorsFixed}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${player.progress}%"></div>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            }
+
+            addLog(message, type = 'info') {
+                const time = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.innerHTML = `
+                    <div class="log-time">[${time}]</div>
+                    <div>${message}</div>
+                `;
+                
+                const log = document.getElementById('problemLog');
+                log.insertBefore(entry, log.firstChild);
+                
+                this.logs.push({ time, message, type });
+                
+                // Keep only last 100 logs
+                while (log.children.length > 100) {
+                    log.removeChild(log.lastChild);
+                }
+            }
+
+            startSimulation() {
+                setInterval(() => {
+                    // Random events
+                    const rand = Math.random();
+                    
+                    if (rand < 0.3) {
+                        // Building event
+                        const player = this.players[Math.floor(Math.random() * this.players.length)];
+                        player.status = 'building';
+                        player.progress = Math.min(100, player.progress + 10);
+                        
+                        if (player.progress >= 100) {
+                            player.objectsBuilt++;
+                            player.progress = 0;
+                            player.status = 'idle';
+                            player.currentVLSLevel = Math.min(4, player.currentVLSLevel + 1);
+                            this.metrics.objectsBuilt++;
+                            this.addLog(`✅ ${player.name} completed object at VLS Level ${player.currentVLSLevel}`, 'solution');
+                        }
+                    }
+                    
+                    if (rand > 0.7 && rand < 0.85) {
+                        // Error event
+                        const player = this.players[Math.floor(Math.random() * this.players.length)];
+                        const problems = ['Z-Fighting', 'Vertex Explosion', 'Texture Bleeding', 'Normal Map Inversion'];
+                        const problem = problems[Math.floor(Math.random() * problems.length)];
+                        
+                        player.status = 'error';
+                        player.errorsEncountered++;
+                        this.metrics.problemsDetected++;
+                        
+                        this.addLog(`⚠️ ${player.name} encountered: ${problem}`, 'error');
+                        
+                        setTimeout(() => {
+                            player.status = 'idle';
+                            player.errorsFixed++;
+                            this.metrics.solutionsApplied++;
+                            this.addLog(`🔧 ${player.name} fixed: ${problem}`, 'solution');
+                        }, 2000);
+                    }
+                    
+                    if (rand > 0.9) {
+                        // Meta-AI consultation
+                        const player = this.players[Math.floor(Math.random() * this.players.length)];
+                        this.metrics.metaAIConsultations++;
+                        this.addLog(`🧠 ${player.name} consulting Meta-AI for optimization`, 'meta-ai');
+                    }
+                    
+                    this.updateUI();
+                }, 2000);
+            }
+
+            updateUI() {
+                // Update header stats
+                document.getElementById('fps').textContent = Math.floor(50 + Math.random() * 20);
+                document.getElementById('memory').textContent = Math.floor(20 + Math.random() * 30) + '%';
+                document.getElementById('vertices').textContent = (this.metrics.objectsBuilt * 15000).toLocaleString();
+                document.getElementById('errors').textContent = this.metrics.problemsDetected;
+
+                // Update metrics
+                document.getElementById('objectsBuilt').textContent = this.metrics.objectsBuilt;
+                document.getElementById('problemsDetected').textContent = this.metrics.problemsDetected;
+                document.getElementById('solutionsApplied').textContent = this.metrics.solutionsApplied;
+                document.getElementById('metaAIConsultations').textContent = this.metrics.metaAIConsultations;
+
+                this.renderPlayers();
+            }
+
+            startRenderLoop() {
+                const render = () => {
+                    this.renderViewport();
+                    requestAnimationFrame(render);
+                };
+                render();
+            }
+
+            renderViewport() {
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+
+                // Clear
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, w, h);
+
+                // Draw grid
+                ctx.strokeStyle = 'rgba(0, 255, 0, 0.1)';
+                ctx.lineWidth = 1;
+                
+                for (let i = 0; i < w; i += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, h);
+                    ctx.stroke();
+                }
+                
+                for (let i = 0; i < h; i += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(w, i);
+                    ctx.stroke();
+                }
+
+                // Draw rotating cube (simulated 3D object)
+                const time = Date.now() / 1000;
+                const cx = w / 2;
+                const cy = h / 2;
+                const size = 100;
+
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 2;
+
+                // Simple wireframe cube
+                const rot = time * 0.5;
+                const vertices = [
+                    [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+                    [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+                ];
+
+                const rotated = vertices.map(v => {
+                    const [x, y, z] = v;
+                    const rx = x * Math.cos(rot) - z * Math.sin(rot);
+                    const rz = x * Math.sin(rot) + z * Math.cos(rot);
+                    const ry = y * Math.cos(rot * 0.7) - rz * Math.sin(rot * 0.7);
+                    const rz2 = y * Math.sin(rot * 0.7) + rz * Math.cos(rot * 0.7);
+                    return [cx + rx * size, cy + ry * size];
+                });
+
+                // Draw edges
+                const edges = [
+                    [0, 1], [1, 2], [2, 3], [3, 0],
+                    [4, 5], [5, 6], [6, 7], [7, 4],
+                    [0, 4], [1, 5], [2, 6], [3, 7]
+                ];
+
+                edges.forEach(([a, b]) => {
+                    ctx.beginPath();
+                    ctx.moveTo(rotated[a][0], rotated[a][1]);
+                    ctx.lineTo(rotated[b][0], rotated[b][1]);
+                    ctx.stroke();
+                });
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('problemLog').innerHTML = '';
+        }
+
+        function exportLog() {
+            alert('Log export feature - would save to file');
+        }
+
+        // Initialize dashboard
+        const dashboard = new WorldForgeDashboard();
+    </script>
+</body>
+</html>

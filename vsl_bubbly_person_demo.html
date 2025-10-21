@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VSL Bubbly Person - Live Demo</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #0ff;
+            overflow: hidden;
+        }
+        
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        #vsl-panel {
+            width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            border-right: 2px solid #0ff;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        #canvas-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        h1 {
+            color: #0ff;
+            text-align: center;
+            margin: 0 0 20px 0;
+            text-shadow: 0 0 10px #0ff;
+        }
+        
+        #vsl-input {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #0ff 0%, #0af 100%);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        #motion-presets {
+            margin: 20px 0;
+        }
+        
+        .preset-button {
+            background: rgba(0, 255, 0, 0.2);
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .preset-button:hover {
+            background: rgba(0, 255, 0, 0.4);
+            transform: scale(1.05);
+        }
+        
+        #word-library {
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .word-item {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 5px 10px;
+            margin: 3px 0;
+            border-left: 3px solid #0ff;
+            font-size: 12px;
+        }
+        
+        #controls-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border: 2px solid #0ff;
+            border-radius: 5px;
+        }
+        
+        .control-line {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        #console-output {
+            background: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            padding: 10px;
+            margin: 10px 0;
+            height: 150px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="vsl-panel">
+            <h1>🎮 VSL CONTROL</h1>
+            
+            <textarea id="vsl-input" placeholder="Type VSL commands here...">head.sway
+spine.breathe
+left_arm.wave
+right_arm.wave.counterclockwise
+left_leg.bend.slight
+right_leg.extend</textarea>
+            
+            <button class="button" onclick="executeVSL()">▶ EXECUTE VSL</button>
+            <button class="button" onclick="clearMotions()">⏹ STOP ALL</button>
+            
+            <div id="motion-presets">
+                <div><strong>QUICK PRESETS:</strong></div>
+                <button class="preset-button" onclick="loadPreset('wave')">👋 Wave</button>
+                <button class="preset-button" onclick="loadPreset('dance')">💃 Dance</button>
+                <button class="preset-button" onclick="loadPreset('stretch')">🤸 Stretch</button>
+                <button class="preset-button" onclick="loadPreset('curl')">🌀 Curl Up</button>
+                <button class="preset-button" onclick="loadPreset('spin')">🌪️ Spin</button>
+            </div>
+            
+            <div id="word-library">
+                <div><strong>MOTION WORDS:</strong></div>
+                <div class="word-item">curl, twist, spin, rotate</div>
+                <div class="word-item">straight, extend, retract</div>
+                <div class="word-item">wave, ripple, pulse, flow</div>
+                <div class="word-item">spiral, coil, bend, fold</div>
+                <div class="word-item">breathe, sway, wiggle</div>
+                <div class="word-item">clockwise, counterclockwise</div>
+            </div>
+            
+            <div id="console-output"></div>
+        </div>
+        
+        <div id="canvas-container">
+            <div id="controls-overlay">
+                <div><strong>🎮 CONTROLS</strong></div>
+                <div class="control-line">🖱️ Left Drag: Rotate</div>
+                <div class="control-line">🖱️ Right Drag: Pan</div>
+                <div class="control-line">🖱️ Scroll: Zoom</div>
+                <div class="control-line">⌨️ Space: Pause</div>
+                <div class="control-line">⌨️ R: Reset View</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Three.js setup
+        let scene, camera, renderer;
+        let bubblyPerson = null;
+        let time = 0;
+        let isPaused = false;
+        let activeControllers = new Map();
+        
+        // VSL Motion definitions
+        const VSL_MOTIONS = {
+            'curl': { type: 'spiral', direction: 'inward', speed: 0.5 },
+            'twist': { type: 'rotation', direction: 'variable', speed: 0.3 },
+            'spin': { type: 'rotation', direction: 'continuous', speed: 1.0 },
+            'clockwise': { type: 'rotation', direction: 1, speed: 0.5 },
+            'counterclockwise': { type: 'rotation', direction: -1, speed: 0.5 },
+            'straight': { type: 'linear', direction: 'forward', speed: 1.0 },
+            'extend': { type: 'linear', direction: 'outward', speed: 0.5 },
+            'retract': { type: 'linear', direction: 'inward', speed: 0.5 },
+            'wave': { type: 'sine', direction: 'oscillate', frequency: 2.0 },
+            'ripple': { type: 'sine', direction: 'radial', frequency: 3.0 },
+            'pulse': { type: 'sine', direction: 'scale', frequency: 1.0 },
+            'spiral': { type: 'helix', direction: 'combined', speed: 0.5 },
+            'breathe': { type: 'sine', direction: 'scale', frequency: 0.25 },
+            'sway': { type: 'pendulum', direction: 'oscillate', frequency: 0.5 },
+            'flow': { type: 'perlin', direction: 'smooth', speed: 0.2 },
+            'wiggle': { type: 'noise', direction: 'random', frequency: 5.0 },
+            'bend': { type: 'arc', direction: 'curve', speed: 0.4 },
+            'slight': { type: 'modifier', intensity: 0.3 },
+            'full': { type: 'modifier', intensity: 1.0 },
+            'gentle': { type: 'modifier', intensity: 0.5 }
+        };
+        
+        class TriangleDirectionController {
+            constructor(name, words) {
+                this.name = name;
+                this.words = words;
+                this.vertices = { v1: {x:0,y:0,z:0}, v2: {x:0,y:0,z:0}, v3: {x:0,y:0,z:0} };
+                this.direction = {x:0, y:0, z:0};
+                this.twist = {x:0, y:0, z:0};
+                this.intensity = 1.0;
+                this.motions = [];
+                
+                this.calculateFromWords(words);
+            }
+            
+            calculateFromWords(words) {
+                words.forEach((word, index) => {
+                    const motion = VSL_MOTIONS[word.toLowerCase()];
+                    if (motion) {
+                        this.motions.push(motion);
+                        
+                        if (motion.type === 'modifier') {
+                            this.intensity = motion.intensity;
+                        }
+                    }
+                    
+                    // Calculate vertices from letters
+                    const charCodes = word.split('').map(c => c.charCodeAt(0));
+                    
+                    if (index === 0 && charCodes[0]) {
+                        this.vertices.v1.x = (charCodes[0] % 360) / 360;
+                        this.vertices.v1.y = (charCodes[0] % 180) / 180;
+                        this.vertices.v1.z = (charCodes[0] % 90) / 90;
+                    }
+                    
+                    if (charCodes[1]) {
+                        this.vertices.v2.x = this.vertices.v1.x + (charCodes[1] % 100) / 100;
+                        this.vertices.v2.y = this.vertices.v1.y + (charCodes[1] % 100) / 100;
+                        this.vertices.v2.z = this.vertices.v1.z + (charCodes[1] % 100) / 100;
+                    }
+                    
+                    if (charCodes[2]) {
+                        const angle = (charCodes[2] % 360) * Math.PI / 180;
+                        this.vertices.v3.x = Math.cos(angle);
+                        this.vertices.v3.y = Math.sin(angle);
+                        this.vertices.v3.z = (charCodes[2] % 100) / 50 - 1;
+                    }
+                });
+                
+                this.direction.x = this.vertices.v2.x - this.vertices.v1.x;
+                this.direction.y = this.vertices.v2.y - this.vertices.v1.y;
+                this.direction.z = this.vertices.v2.z - this.vertices.v1.z;
+            }
+            
+            applyMotion(targetObject, time) {
+                this.motions.forEach(motion => {
+                    switch(motion.type) {
+                        case 'sine':
+                            const wave = Math.sin(time * motion.frequency) * 0.3 * this.intensity;
+                            if (motion.direction === 'scale') {
+                                const scale = 1.0 + wave;
+                                targetObject.scale.set(scale, scale, scale);
+                            } else if (motion.direction === 'oscillate') {
+                                targetObject.rotation.z = wave;
+                            }
+                            break;
+                            
+                        case 'rotation':
+                            if (motion.direction === 'continuous') {
+                                targetObject.rotation.y += motion.speed * 0.01 * this.intensity;
+                            } else if (typeof motion.direction === 'number') {
+                                targetObject.rotation.y += motion.direction * motion.speed * 0.01 * this.intensity;
+                            }
+                            break;
+                            
+                        case 'spiral':
+                            targetObject.rotation.y += motion.speed * 0.01 * this.intensity;
+                            const spiralWave = Math.sin(time * 0.5) * 0.1 * this.intensity;
+                            targetObject.position.y += spiralWave;
+                            break;
+                            
+                        case 'pendulum':
+                            const sway = Math.sin(time * motion.frequency) * 0.2 * this.intensity;
+                            targetObject.rotation.z = sway;
+                            break;
+                            
+                        case 'linear':
+                            if (motion.direction === 'outward') {
+                                const extend = Math.sin(time * motion.speed) * 0.1 * this.intensity;
+                                targetObject.scale.set(1 + extend, 1, 1);
+                            }
+                            break;
+                            
+                        case 'arc':
+                            const bend = Math.sin(time * motion.speed) * 0.5 * this.intensity;
+                            targetObject.rotation.x = bend;
+                            break;
+                    }
+                });
+            }
+        }
+        
+        class BubblyPerson {
+            constructor(scene) {
+                this.scene = scene;
+                this.bodyParts = new Map();
+                this.controllers = new Map();
+                this.bridges = [];
+                
+                this.createBody();
+            }
+            
+            createBody() {
+                const skeleton = [
+                    { name: 'head', pos: [0, 1.70, 0], size: 0.18, color: 0xffccaa },
+                    { name: 'neck', pos: [0, 1.55, 0], size: 0.08, color: 0xffccaa },
+                    { name: 'spine_upper', pos: [0, 1.45, 0], size: 0.12, color: 0xffaa88 },
+                    { name: 'spine_mid', pos: [0, 1.30, 0], size: 0.12, color: 0xffaa88 },
+                    { name: 'spine_lower', pos: [0, 1.15, 0], size: 0.12, color: 0xffaa88 },
+                    { name: 'pelvis', pos: [0, 1.0, 0], size: 0.15, color: 0xffaa88 },
+                    
+                    // Left arm
+                    { name: 'left_shoulder', pos: [-0.20, 1.45, 0], size: 0.10, color: 0xffaa88 },
+                    { name: 'left_elbow', pos: [-0.35, 1.20, 0], size: 0.08, color: 0xffaa88 },
+                    { name: 'left_wrist', pos: [-0.50, 0.95, 0], size: 0.06, color: 0xffaa88 },
+                    { name: 'left_hand', pos: [-0.55, 0.85, 0], size: 0.08, color: 0xffccaa },
+                    
+                    // Right arm
+                    { name: 'right_shoulder', pos: [0.20, 1.45, 0], size: 0.10, color: 0xffaa88 },
+                    { name: 'right_elbow', pos: [0.35, 1.20, 0], size: 0.08, color: 0xffaa88 },
+                    { name: 'right_wrist', pos: [0.50, 0.95, 0], size: 0.06, color: 0xffaa88 },
+                    { name: 'right_hand', pos: [0.55, 0.85, 0], size: 0.08, color: 0xffccaa },
+                    
+                    // Left leg
+                    { name: 'left_hip', pos: [-0.10, 1.0, 0], size: 0.10, color: 0xff8866 },
+                    { name: 'left_knee', pos: [-0.10, 0.55, 0], size: 0.09, color: 0xff8866 },
+                    { name: 'left_ankle', pos: [-0.10, 0.10, 0], size: 0.07, color: 0xff8866 },
+                    { name: 'left_foot', pos: [-0.10, 0.05, 0.10], size: 0.10, color: 0xffccaa },
+                    
+                    // Right leg
+                    { name: 'right_hip', pos: [0.10, 1.0, 0], size: 0.10, color: 0xff8866 },
+                    { name: 'right_knee', pos: [0.10, 0.55, 0], size: 0.09, color: 0xff8866 },
+                    { name: 'right_ankle', pos: [0.10, 0.10, 0], size: 0.07, color: 0xff8866 },
+                    { name: 'right_foot', pos: [0.10, 0.05, 0.10], size: 0.10, color: 0xffccaa }
+                ];
+                
+                skeleton.forEach(joint => {
+                    const geometry = new THREE.SphereGeometry(joint.size, 32, 32);
+                    const material = new THREE.MeshStandardMaterial({
+                        color: joint.color,
+                        emissive: joint.color,
+                        emissiveIntensity: 0.2,
+                        metalness: 0.1,
+                        roughness: 0.4,
+                        transparent: true,
+                        opacity: 0.95
+                    });
+                    
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(joint.pos[0], joint.pos[1], joint.pos[2]);
+                    sphere.userData.originalPos = { x: joint.pos[0], y: joint.pos[1], z: joint.pos[2] };
+                    sphere.castShadow = true;
+                    sphere.receiveShadow = true;
+                    
+                    this.scene.add(sphere);
+                    this.bodyParts.set(joint.name, sphere);
+                });
+                
+                // Create bridges (meta-ball connections)
+                const connections = [
+                    ['head', 'neck'], ['neck', 'spine_upper'], ['spine_upper', 'spine_mid'],
+                    ['spine_mid', 'spine_lower'], ['spine_lower', 'pelvis'],
+                    ['spine_upper', 'left_shoulder'], ['left_shoulder', 'left_elbow'],
+                    ['left_elbow', 'left_wrist'], ['left_wrist', 'left_hand'],
+                    ['spine_upper', 'right_shoulder'], ['right_shoulder', 'right_elbow'],
+                    ['right_elbow', 'right_wrist'], ['right_wrist', 'right_hand'],
+                    ['pelvis', 'left_hip'], ['left_hip', 'left_knee'],
+                    ['left_knee', 'left_ankle'], ['left_ankle', 'left_foot'],
+                    ['pelvis', 'right_hip'], ['right_hip', 'right_knee'],
+                    ['right_knee', 'right_ankle'], ['right_ankle', 'right_foot']
+                ];
+                
+                connections.forEach(([p1, p2]) => this.createBridge(p1, p2));
+            }
+            
+            createBridge(part1, part2) {
+                const s1 = this.bodyParts.get(part1);
+                const s2 = this.bodyParts.get(part2);
+                if (!s1 || !s2) return;
+                
+                const distance = s1.position.distanceTo(s2.position);
+                const geometry = new THREE.CylinderGeometry(
+                    s1.geometry.parameters.radius * 0.7,
+                    s2.geometry.parameters.radius * 0.7,
+                    distance, 16
+                );
+                
+                const material = s1.material.clone();
+                const bridge = new THREE.Mesh(geometry, material);
+                bridge.userData = { part1, part2, s1, s2 };
+                
+                this.scene.add(bridge);
+                this.bridges.push(bridge);
+            }
+            
+            updateBridges() {
+                this.bridges.forEach(bridge => {
+                    const s1 = bridge.userData.s1;
+                    const s2 = bridge.userData.s2;
+                    
+                    const distance = s1.position.distanceTo(s2.position);
+                    bridge.scale.y = distance / bridge.geometry.parameters.height;
+                    
+                    bridge.position.copy(s1.position).lerp(s2.position, 0.5);
+                    
+                    const direction = new THREE.Vector3().subVectors(s2.position, s1.position).normalize();
+                    bridge.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
+                });
+            }
+            
+            attachController(bodyPart, words) {
+                const controller = new TriangleDirectionController(bodyPart, words);
+                this.controllers.set(bodyPart, controller);
+                logConsole(`✓ Attached "${words.join('.')}" to ${bodyPart}`);
+                return controller;
+            }
+            
+            update(time) {
+                this.controllers.forEach((controller, partName) => {
+                    const part = this.bodyParts.get(partName);
+                    if (part) {
+                        controller.applyMotion(part, time);
+                    }
+                });
+                
+                this.updateBridges();
+            }
+        }
+        
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+            scene.fog = new THREE.Fog(0x1a1a2e, 5, 15);
+            
+            camera = new THREE.PerspectiveCamera(75, 
+                window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.5, 3);
+            camera.lookAt(0, 1.2, 0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            const canvasContainer = document.getElementById('canvas-container');
+            renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+            renderer.shadowMap.enabled = true;
+            canvasContainer.appendChild(renderer.domElement);
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            const spotLight = new THREE.SpotLight(0x00ffff, 0.5);
+            spotLight.position.set(-5, 5, 0);
+            scene.add(spotLight);
+            
+            // Ground
+            const groundGeometry = new THREE.PlaneGeometry(20, 20);
+            const groundMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x0f1419,
+                roughness: 0.8
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00ffff, 0x00ffff);
+            gridHelper.material.opacity = 0.2;
+            gridHelper.material.transparent = true;
+            scene.add(gridHelper);
+            
+            setupControls();
+            
+            // Create bubbly person
+            bubblyPerson = new BubblyPerson(scene);
+            logConsole('✓ Bubbly person created!');
+            
+            animate();
+        }
+        
+        function setupControls() {
+            let isDragging = false;
+            let previousMouse = { x: 0, y: 0 };
+            let isRightClick = false;
+            
+            renderer.domElement.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                isRightClick = e.button === 2;
+                previousMouse = { x: e.clientX, y: e.clientY };
+            });
+            
+            renderer.domElement.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - previousMouse.x;
+                const deltaY = e.clientY - previousMouse.y;
+                
+                if (isRightClick) {
+                    camera.position.x -= deltaX * 0.01;
+                    camera.position.y += deltaY * 0.01;
+                } else {
+                    const angle = Math.atan2(camera.position.z, camera.position.x);
+                    const radius = Math.sqrt(camera.position.x ** 2 + camera.position.z ** 2);
+                    const newAngle = angle - deltaX * 0.01;
+                    camera.position.x = radius * Math.cos(newAngle);
+                    camera.position.z = radius * Math.sin(newAngle);
+                    camera.position.y -= deltaY * 0.01;
+                    camera.lookAt(0, 1.2, 0);
+                }
+                
+                previousMouse = { x: e.clientX, y: e.clientY };
+            });
+            
+            renderer.domElement.addEventListener('mouseup', () => isDragging = false);
+            renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+            
+            renderer.domElement.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomSpeed = 0.1;
+                camera.position.multiplyScalar(1 + (e.deltaY > 0 ? zoomSpeed : -zoomSpeed));
+            });
+            
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    isPaused = !isPaused;
+                    logConsole(isPaused ? '⏸ Paused' : '▶ Playing');
+                } else if (e.code === 'KeyR') {
+                    camera.position.set(0, 1.5, 3);
+                    camera.lookAt(0, 1.2, 0);
+                    logConsole('🔄 View reset');
+                }
+            });
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (!isPaused) {
+                time += 0.016;
+                if (bubblyPerson) {
+                    bubblyPerson.update(time);
+                }
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function executeVSL() {
+            const vslText = document.getElementById('vsl-input').value;
+            const lines = vslText.split('\n').filter(l => l.trim());
+            
+            activeControllers.clear();
+            bubblyPerson.controllers.clear();
+            
+            logConsole('═══ EXECUTING VSL ═══');
+            
+            lines.forEach(line => {
+                const parts = line.trim().split('.');
+                if (parts.length < 2) return;
+                
+                const bodyPart = parts[0];
+                const words = parts.slice(1);
+                
+                bubblyPerson.attachController(bodyPart, words);
+            });
+            
+            logConsole(`✓ ${lines.length} controllers attached`);
+        }
+        
+        function clearMotions() {
+            activeControllers.clear();
+            bubblyPerson.controllers.clear();
+            
+            // Reset all body parts
+            bubblyPerson.bodyParts.forEach((part, name) => {
+                part.rotation.set(0, 0, 0);
+                part.scale.set(1, 1, 1);
+                if (part.userData.originalPos) {
+                    part.position.copy(part.userData.originalPos);
+                }
+            });
+            
+            logConsole('⏹ All motions cleared');
+        }
+        
+        function loadPreset(presetName) {
+            const presets = {
+                'wave': `right_arm.extend.up\nright_hand.wave`,
+                'dance': `head.sway.gentle\nspine.breathe\nleft_arm.wave\nright_arm.wave.counterclockwise\nleft_leg.bend\nright_leg.extend`,
+                'stretch': `left_arm.extend.full\nright_arm.extend.full\nspine.extend`,
+                'curl': `left_arm.curl\nright_arm.curl\nspine.bend\nleft_leg.curl\nright_leg.curl`,
+                'spin': `head.spin\nspine.twist\nleft_arm.extend\nright_arm.extend`
+            };
+            
+            if (presets[presetName]) {
+                document.getElementById('vsl-input').value = presets[presetName];
+                executeVSL();
+            }
+        }
+        
+        function logConsole(message) {
+            const consoleOutput = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            consoleOutput.innerHTML += `[${timestamp}] ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        // Initialize
+        initThreeJS();
+        logConsole('🚀 VSL System initialized');
+        logConsole('💡 Type commands in left panel and click EXECUTE');
+        
+        // Auto-execute default
+        setTimeout(() => executeVSL(), 500);
+    </script>
+</body>
+</html>

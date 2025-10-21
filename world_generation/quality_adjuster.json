@@ -1,0 +1,38 @@
+{
+  "enabled": true,
+  "mode": "automatic",
+  "updateInterval": 3000,
+  "strategy": "multi-metric",
+  "weights": {
+    "fps": 0.4,
+    "frameTime": 0.3,
+    "memory": 0.2,
+    "temperature": 0.1
+  },
+  "thresholds": {
+    "upgrade": {
+      "fps": 65,
+      "frameTime": 14,
+      "memory": 0.6,
+      "temperature": 65,
+      "duration": 10000
+    },
+    "downgrade": {
+      "fps": 45,
+      "frameTime": 22,
+      "memory": 0.85,
+      "temperature": 85,
+      "duration": 3000
+    }
+  },
+  "transitions": {
+    "smooth": true,
+    "duration": 1000,
+    "method": "fade"
+  },
+  "limits": {
+    "minQuality": "low",
+    "maxQuality": "ultra",
+    "manualOverride": true
+  }
+}

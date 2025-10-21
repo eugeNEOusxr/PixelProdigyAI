@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigy 3D Library - Immersive Reading Experience</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    #canvas3d {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* Book Reading Interface */
+    .book-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 1200px;
+      height: 70%;
+      background: rgba(255, 248, 240, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+      display: flex;
+      perspective: 1500px;
+      transition: all 0.5s ease;
+    }
+
+    .book-page {
+      flex: 1;
+      padding: 60px;
+      color: #2c2c2c;
+      overflow-y: auto;
+      position: relative;
+      background: linear-gradient(to right, #fffef9 0%, #fff8f0 100%);
+      box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .book-page.left {
+      border-right: 2px solid rgba(139, 69, 19, 0.2);
+    }
+
+    .book-page.right {
+      border-left: 2px solid rgba(139, 69, 19, 0.2);
+    }
+
+    .page-content {
+      font-size: 18px;
+      line-height: 1.8;
+      text-align: justify;
+      font-family: 'Garamond', 'Georgia', serif;
+    }
+
+    .page-content h1 {
+      font-size: 36px;
+      margin-bottom: 30px;
+      color: #8b4513;
+      text-align: center;
+    }
+
+    .page-content h2 {
+      font-size: 24px;
+      margin: 30px 0 15px;
+      color: #654321;
+    }
+
+    .page-content p {
+      margin-bottom: 20px;
+    }
+
+    .page-number {
+      position: absolute;
+      bottom: 30px;
+      font-size: 14px;
+      color: #8b4513;
+    }
+
+    .page-number.left {
+      left: 60px;
+    }
+
+    .page-number.right {
+      right: 60px;
+    }
+
+    /* Environment Selector */
+    .environment-selector {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+    }
+
+    .environment-selector h3 {
+      color: #ffd700;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .env-button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .env-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .env-button.active {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #000;
+    }
+
+    /* Library Catalog */
+    .library-catalog {
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+      width: 300px;
+    }
+
+    .library-catalog h3 {
+      color: #ffd700;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .book-item {
+      padding: 15px;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-left: 4px solid #667eea;
+    }
+
+    .book-item:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .book-item.reading {
+      border-left-color: #ffd700;
+      background: rgba(255, 215, 0, 0.2);
+    }
+
+    .book-title {
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+
+    .book-author {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .book-genre {
+      font-size: 11px;
+      color: #667eea;
+      margin-top: 5px;
+    }
+
+    /* Navigation Controls */
+    .nav-controls {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-btn {
+      padding: 15px 30px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #ffd700;
+      border-radius: 10px;
+      color: #ffd700;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: #ffd700;
+      color: #000;
+      transform: scale(1.1);
+    }
+
+    /* Reading Mode Toggle */
+    .reading-mode {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 15px 30px;
+      border-radius: 10px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .mode-btn {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .mode-btn.active {
+      background: #ffd700;
+      color: #000;
+    }
+
+    /* Scrollbar styling */
+    .book-page::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .book-page::-webkit-scrollbar-track {
+      background: rgba(139, 69, 19, 0.1);
+    }
+
+    .book-page::-webkit-scrollbar-thumb {
+      background: rgba(139, 69, 19, 0.3);
+      border-radius: 4px;
+    }
+
+    .library-catalog::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .library-catalog::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .library-catalog::-webkit-scrollbar-thumb {
+      background: rgba(255, 215, 0, 0.3);
+      border-radius: 3px;
+    }
+
+    /* Loading Animation */
+    .loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      color: #ffd700;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      border: 4px solid rgba(255, 215, 0, 0.3);
+      border-top: 4px solid #ffd700;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- 3D Environment Canvas -->
+  <canvas id="canvas3d"></canvas>
+
+  <!-- Library Catalog -->
+  <div class="library-catalog">
+    <h3>📚 PixelProdigy Library</h3>
+    <div id="bookList"></div>
+  </div>
+
+  <!-- Environment Selector -->
+  <div class="environment-selector">
+    <h3>🌍 Reading Environment</h3>
+    <button class="env-button active" onclick="changeEnvironment('cozy')">🔥 Cozy Fireplace</button>
+    <button class="env-button" onclick="changeEnvironment('space')">🌌 Deep Space</button>
+    <button class="env-button" onclick="changeEnvironment('forest')">🌲 Enchanted Forest</button>
+    <button class="env-button" onclick="changeEnvironment('library')">📖 Grand Library</button>
+    <button class="env-button" onclick="changeEnvironment('ocean')">🌊 Underwater</button>
+    <button class="env-button" onclick="changeEnvironment('mountain')">⛰️ Mountain Peak</button>
+  </div>
+
+  <!-- Reading Mode -->
+  <div class="reading-mode">
+    <button class="mode-btn active" onclick="setReadingMode('dual')">Two Pages</button>
+    <button class="mode-btn" onclick="setReadingMode('single')">Single Page</button>
+    <button class="mode-btn" onclick="setReadingMode('scroll')">Scroll Mode</button>
+  </div>
+
+  <!-- Book Container -->
+  <div class="book-container" id="bookContainer">
+    <div class="book-page left">
+      <div class="page-content" id="leftPage"></div>
+      <div class="page-number left" id="leftPageNum"></div>
+    </div>
+    <div class="book-page right">
+      <div class="page-content" id="rightPage"></div>
+      <div class="page-number right" id="rightPageNum"></div>
+    </div>
+  </div>
+
+  <!-- Navigation Controls -->
+  <div class="nav-controls">
+    <button class="nav-btn" onclick="previousPage()">⬅️ Previous</button>
+    <button class="nav-btn" onclick="nextPage()">Next ➡️</button>
+  </div>
+
+  <script>
+    // Three.js Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+
+    // Global Variables
+    let currentEnvironment = 'cozy';
+    let currentPage = 0;
+    let currentBook = null;
+    let readingMode = 'dual';
+    let environmentObjects = [];
+
+    // Sample Book Library
+    const library = [
+      {
+        id: 1,
+        title: "The Art of 3D Creation",
+        author: "PixelProdigy AI",
+        genre: "Technical",
+        content: generateSampleContent("3D Creation", 20),
+        edition: "First Edition - 2025"
+      },
+      {
+        id: 2,
+        title: "Digital Sculpting Masterclass",
+        author: "Virtual Masters",
+        genre: "Education",
+        content: generateSampleContent("Digital Sculpting", 30),
+        edition: "Deluxe Edition"
+      },
+      {
+        id: 3,
+        title: "The Metaverse Chronicles",
+        author: "Future Vision",
+        genre: "Sci-Fi",
+        content: generateSampleContent("Metaverse", 25),
+        edition: "Collector's Edition"
+      },
+      {
+        id: 4,
+        title: "NFT Revolution",
+        author: "Crypto Creators",
+        genre: "Business",
+        content: generateSampleContent("NFT", 15),
+        edition: "Updated 2025"
+      },
+      {
+        id: 5,
+        title: "AI Art Generation",
+        author: "Neural Networks Inc",
+        genre: "Technology",
+        content: generateSampleContent("AI Art", 22),
+        edition: "Premium Edition"
+      }
+    ];
+
+    function generateSampleContent(topic, pages) {
+      const content = [];
+      for (let i = 0; i < pages; i++) {
+        content.push({
+          heading: `Chapter ${i + 1}: ${topic} - Part ${i + 1}`,
+          text: `This is a comprehensive exploration of ${topic} in the context of modern digital creation. 
+          
+          In this section, we delve deep into the fundamental principles that make ${topic} such a revolutionary concept in today's creative landscape. The techniques and methodologies discussed here represent years of research and practical application.
+
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+          The integration of ${topic} into modern workflows has transformed how creators approach their craft. By understanding these core concepts, you'll be equipped to push the boundaries of what's possible in digital creation.`
+        });
+      }
+      return content;
+    }
+
+    // Populate Book List
+    function populateLibrary() {
+      const bookList = document.getElementById('bookList');
+      bookList.innerHTML = library.map(book => `
+        <div class="book-item" onclick="loadBook(${book.id})">
+          <div class="book-title">${book.title}</div>
+          <div class="book-author">by ${book.author}</div>
+          <div class="book-genre">${book.genre} • ${book.edition}</div>
+        </div>
+      `).join('');
+    }
+
+    // Load Book
+    function loadBook(bookId) {
+      currentBook = library.find(b => b.id === bookId);
+      currentPage = 0;
+      updatePages();
+      
+      // Update active state
+      document.querySelectorAll('.book-item').forEach((item, index) => {
+        item.classList.toggle('reading', library[index].id === bookId);
+      });
+    }
+
+    // Update Pages
+    function updatePages() {
+      if (!currentBook) return;
+
+      const leftPage = document.getElementById('leftPage');
+      const rightPage = document.getElementById('rightPage');
+      const leftPageNum = document.getElementById('leftPageNum');
+      const rightPageNum = document.getElementById('rightPageNum');
+
+      if (readingMode === 'dual') {
+        // Two-page spread
+        const leftContent = currentBook.content[currentPage] || { heading: '', text: '' };
+        const rightContent = currentBook.content[currentPage + 1] || { heading: '', text: '' };
+
+        leftPage.innerHTML = `<h2>${leftContent.heading}</h2><p>${leftContent.text}</p>`;
+        rightPage.innerHTML = `<h2>${rightContent.heading}</h2><p>${rightContent.text}</p>`;
+        leftPageNum.textContent = currentPage + 1;
+        rightPageNum.textContent = currentPage + 2;
+      } else if (readingMode === 'single') {
+        // Single page
+        const content = currentBook.content[currentPage] || { heading: '', text: '' };
+        leftPage.innerHTML = `<h2>${content.heading}</h2><p>${content.text}</p>`;
+        rightPage.innerHTML = '';
+        leftPageNum.textContent = currentPage + 1;
+        rightPageNum.textContent = '';
+      }
+    }
+
+    // Navigation
+    function nextPage() {
+      if (!currentBook) return;
+      const increment = readingMode === 'dual' ? 2 : 1;
+      if (currentPage + increment < currentBook.content.length) {
+        currentPage += increment;
+        updatePages();
+      }
+    }
+
+    function previousPage() {
+      if (!currentBook) return;
+      const decrement = readingMode === 'dual' ? 2 : 1;
+      if (currentPage - decrement >= 0) {
+        currentPage -= decrement;
+        updatePages();
+      }
+    }
+
+    // Reading Mode
+    function setReadingMode(mode) {
+      readingMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      const container = document.getElementById('bookContainer');
+      if (mode === 'single') {
+        container.querySelector('.right').style.display = 'none';
+        container.querySelector('.left').style.flex = '1';
+      } else {
+        container.querySelector('.right').style.display = 'flex';
+        container.querySelector('.left').style.flex = '1';
+      }
+      
+      updatePages();
+    }
+
+    // Environment Creation Functions
+    function createCozyEnvironment() {
+      clearEnvironment();
+      
+      // Warm ambient light
+      const ambientLight = new THREE.AmbientLight(0xff9966, 0.5);
+      scene.add(ambientLight);
+      environmentObjects.push(ambientLight);
+
+      // Fireplace light
+      const fireLight = new THREE.PointLight(0xff6600, 2, 100);
+      fireLight.position.set(-10, 0, -20);
+      scene.add(fireLight);
+      environmentObjects.push(fireLight);
+
+      // Animated fire particles
+      const fireParticles = new THREE.Group();
+      for (let i = 0; i < 50; i++) {
+        const particle = new THREE.Mesh(
+          new THREE.SphereGeometry(0.1, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.8 })
+        );
+        particle.position.set(
+          -10 + Math.random() * 2,
+          Math.random() * 5,
+          -20 + Math.random() * 2
+        );
+        particle.userData = {
+          velocity: Math.random() * 0.1,
+          life: Math.random()
+        };
+        fireParticles.add(particle);
+      }
+      scene.add(fireParticles);
+      environmentObjects.push(fireParticles);
+
+      // Floor
+      const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(100, 100),
+        new THREE.MeshStandardMaterial({ color: 0x3d2817, roughness: 0.8 })
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = -5;
+      scene.add(floor);
+      environmentObjects.push(floor);
+
+      scene.fog = new THREE.Fog(0x1a1a1a, 10, 50);
+    }
+
+    function createSpaceEnvironment() {
+      clearEnvironment();
+      
+      // Dark ambient
+      const ambientLight = new THREE.AmbientLight(0x4444ff, 0.3);
+      scene.add(ambientLight);
+      environmentObjects.push(ambientLight);
+
+      // Stars
+      const starsGeometry = new THREE.BufferGeometry();
+      const starPositions = [];
+      for (let i = 0; i < 1000; i++) {
+        starPositions.push(
+          (Math.random() - 0.5) * 200,
+          (Math.random() - 0.5) * 200,
+          (Math.random() - 0.5) * 200
+        );
+      }
+      starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+      const stars = new THREE.Points(
+        starsGeometry,
+        new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 })
+      );
+      scene.add(stars);
+      environmentObjects.push(stars);
+
+      // Nebula clouds
+      for (let i = 0; i < 5; i++) {
+        const cloud = new THREE.Mesh(
+          new THREE.SphereGeometry(10, 16, 16),
+          new THREE.MeshBasicMaterial({
+            color: [0xff00ff, 0x00ffff, 0xff0088][i % 3],
+            transparent: true,
+            opacity: 0.1
+          })
+        );
+        cloud.position.set(
+          (Math.random() - 0.5) * 50,
+          (Math.random() - 0.5) * 50,
+          -30 + (Math.random() - 0.5) * 20
+        );
+        scene.add(cloud);
+        environmentObjects.push(cloud);
+      }
+
+      scene.fog = new THREE.Fog(0x000011, 30, 100);
+    }
+
+    function createForestEnvironment() {
+      clearEnvironment();
+      
+      // Green ambient
+      const ambientLight = new THREE.AmbientLight(0x88ff88, 0.4);
+      scene.add(ambientLight);
+      environmentObjects.push(ambientLight);
+
+      // Sunlight through trees
+      const sunLight = new THREE.DirectionalLight(0xffffaa, 0.8);
+      sunLight.position.set(10, 20, 10);
+      scene.add(sunLight);
+      environmentObjects.push(sunLight);
+
+      // Trees
+      for (let i = 0; i < 20; i++) {
+        const trunk = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.5, 0.7, 10, 8),
+          new THREE.MeshStandardMaterial({ color: 0x4d3319 })
+        );
+        const foliage = new THREE.Mesh(
+          new THREE.SphereGeometry(3, 8, 8),
+          new THREE.MeshStandardMaterial({ color: 0x228b22 })
+        );
+        trunk.position.set(
+          (Math.random() - 0.5) * 40,
+          0,
+          -15 + (Math.random() - 0.5) * 30
+        );
+        foliage.position.copy(trunk.position);
+        foliage.position.y = 8;
+        scene.add(trunk);
+        scene.add(foliage);
+        environmentObjects.push(trunk, foliage);
+      }
+
+      // Ground
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(100, 100),
+        new THREE.MeshStandardMaterial({ color: 0x1a5f1a, roughness: 1 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -5;
+      scene.add(ground);
+      environmentObjects.push(ground);
+
+      scene.fog = new THREE.Fog(0x88ff88, 20, 60);
+    }
+
+    function createLibraryEnvironment() {
+      clearEnvironment();
+      
+      // Warm library lighting
+      const ambientLight = new THREE.AmbientLight(0xffeedd, 0.6);
+      scene.add(ambientLight);
+      environmentObjects.push(ambientLight);
+
+      // Desk lamp
+      const lampLight = new THREE.SpotLight(0xffffee, 1, 50, Math.PI / 6);
+      lampLight.position.set(0, 10, 5);
+      scene.add(lampLight);
+      environmentObjects.push(lampLight);
+
+      // Bookshelves
+      for (let i = 0; i < 10; i++) {
+        const shelf = new THREE.Mesh(
+          new THREE.BoxGeometry(8, 12, 1),
+          new THREE.MeshStandardMaterial({ color: 0x8b4513 })
+        );
+        const angle = (i / 10) * Math.PI * 2;
+        shelf.position.set(
+          Math.cos(angle) * 20,
+          0,
+          Math.sin(angle) * 20
+        );
+        shelf.lookAt(0, 0, 0);
+        scene.add(shelf);
+        environmentObjects.push(shelf);
+      }
+
+      scene.fog = new THREE.Fog(0x2a1810, 25, 50);
+    }
+
+    function createOceanEnvironment() {
+      clearEnvironment();
+      
+      // Blue ambient
+      const ambientLight = new THREE.AmbientLight(0x0088ff, 0.5);
+      scene.add(ambientLight);
+      environmentObjects.push(ambientLight);
+
+      // Caustic light effect
+      const causticLight = new THREE.PointLight(0x00ccff, 1.5, 50);
+      causticLight.position.set(0, 15, 0);
+      scene.add(causticLight);
+      environmentObjects.push(causticLight);
+
+      // Bubbles
+      for (let i = 0; i < 30; i++) {
+        const bubble = new THREE.Mesh(
+          new THREE.SphereGeometry(0.3, 16, 16),
+          new THREE.MeshPhysicalMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.3,
+            metalness: 0.1,
+            roughness: 0.1
+          })
+        );
+        bubble.position.set(
+          (Math.random() - 0.5) * 30,
+          (Math.random() - 0.5) * 20,
+          (Math.random() - 0.5) * 30
+        );
+        bubble.userData = { floatSpeed: 0.02 + Math.random() * 0.05 };
+        scene.add(bubble);
+        environmentObjects.push(bubble);
+      }
+
+      scene.fog = new THREE.Fog(0x001144, 15, 45);
+    }
+
+    function createMountainEnvironment() {
+      clearEnvironment();
+      
+      // Bright daylight
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      environmentObjects.push(ambientLight);
+
+      const sunLight = new THREE.DirectionalLight(0xffffee, 1);
+      sunLight.position.set(20, 30, 10);
+      scene.add(sunLight);
+      environmentObjects.push(sunLight);
+
+      // Mountain peaks
+      for (let i = 0; i < 8; i++) {
+        const peak = new THREE.Mesh(
+          new THREE.ConeGeometry(5, 20, 4),
+          new THREE.MeshStandardMaterial({ color: 0x888888 })
+        );
+        const angle = (i / 8) * Math.PI * 2;
+        peak.position.set(
+          Math.cos(angle) * 30,
+          -5,
+          Math.sin(angle) * 30
+        );
+        scene.add(peak);
+        environmentObjects.push(peak);
+      }
+
+      // Clouds
+      for (let i = 0; i < 10; i++) {
+        const cloud = new THREE.Mesh(
+          new THREE.SphereGeometry(3, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })
+        );
+        cloud.position.set(
+          (Math.random() - 0.5) * 50,
+          10 + Math.random() * 10,
+          -20 + (Math.random() - 0.5) * 40
+        );
+        scene.add(cloud);
+        environmentObjects.push(cloud);
+      }
+
+      scene.fog = new THREE.Fog(0xaaccff, 30, 80);
+    }
+
+    function clearEnvironment() {
+      environmentObjects.forEach(obj => {
+        scene.remove(obj);
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) obj.material.dispose();
+      });
+      environmentObjects = [];
+      scene.fog = null;
+    }
+
+    function changeEnvironment(env) {
+      currentEnvironment = env;
+      
+      // Update button states
+      document.querySelectorAll('.env-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Create new environment
+      switch(env) {
+        case 'cozy': createCozyEnvironment(); break;
+        case 'space': createSpaceEnvironment(); break;
+        case 'forest': createForestEnvironment(); break;
+        case 'library': createLibraryEnvironment(); break;
+        case 'ocean': createOceanEnvironment(); break;
+        case 'mountain': createMountainEnvironment(); break;
+      }
+    }
+
+    // Camera Position
+    camera.position.set(0, 0, 15);
+
+    // Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Animate environment elements
+      environmentObjects.forEach(obj => {
+        if (obj.userData.floatSpeed) {
+          obj.position.y += obj.userData.floatSpeed;
+          if (obj.position.y > 20) obj.position.y = -10;
+        }
+        if (obj.userData.velocity) {
+          obj.position.y += obj.userData.velocity;
+          obj.userData.life += 0.01;
+          if (obj.userData.life > 1) {
+            obj.position.y = 0;
+            obj.userData.life = 0;
+          }
+        }
+        if (obj.type === 'Points') {
+          obj.rotation.y += 0.0002;
+        }
+      });
+
+      renderer.render(scene, camera);
+    }
+
+    // Handle Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextPage();
+      if (e.key === 'ArrowLeft') previousPage();
+    });
+
+    // Initialize
+    populateLibrary();
+    loadBook(1);
+    createCozyEnvironment();
+    animate();
+  </script>
+</body>
+</html>

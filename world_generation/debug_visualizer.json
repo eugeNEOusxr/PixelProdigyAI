@@ -1,0 +1,62 @@
+{
+  "enabled": true,
+  "hotkey": "F3",
+  "overlay": {
+    "enabled": true,
+    "position": "top-left",
+    "opacity": 0.8,
+    "fontSize": 14
+  },
+  "visualizations": {
+    "fps_graph": {
+      "enabled": true,
+      "color": "green"
+    },
+    "frame_time_graph": {
+      "enabled": true,
+      "color": "blue"
+    },
+    "memory_graph": {
+      "enabled": true,
+      "color": "red"
+    },
+    "draw_calls": {
+      "enabled": true
+    },
+    "vertex_count": {
+      "enabled": true
+    },
+    "lod_visualization": {
+      "enabled": true,
+      "color": "rainbow"
+    },
+    "frustum_culling": {
+      "enabled": true,
+      "color": "yellow"
+    },
+    "shadow_cascades": {
+      "enabled": true,
+      "color": "purple"
+    },
+    "texture_mips": {
+      "enabled": true,
+      "color": "rainbow"
+    },
+    "overdraw": {
+      "enabled": true,
+      "color": "heat"
+    }
+  },
+  "profiler": {
+    "enabled": true,
+    "breakdown": [
+      "shadows",
+      "geometry",
+      "lighting",
+      "post_process",
+      "ui"
+    ],
+    "gpuTiming": true,
+    "cpuTiming": true
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "name": "adaptive_quality_pipeline",
+  "version": "1.0",
+  "passes": [
+    {
+      "name": "shadow_pass",
+      "enabled": "adaptive",
+      "renderTarget": "shadow_map",
+      "clearColor": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "clearDepth": 1,
+      "viewport": "full",
+      "quality": {
+        "ultra": {
+          "resolution": 2048,
+          "cascades": 4
+        },
+        "high": {
+          "resolution": 1024,
+          "cascades": 3
+        },
+        "medium": {
+          "resolution": 512,
+          "cascades": 2
+        },
+        "low": {
+          "resolution": 0,
+          "cascades": 0
+        }
+      }
+    },
+    {
+      "name": "geometry_pass",
+      "enabled": true,
+      "renderTarget": "scene",
+      "clearColor": [
+        0.1,
+        0.1,
+        0.15,
+        1
+      ],
+      "clearDepth": 1,
+      "viewport": "full",
+      "culling": "frustum",
+      "lodSystem": "dynamic",
+      "quality": {
+        "ultra": {
+          "drawDistance": 500,
+          "objectDetail": 1
+        },
+        "high": {
+          "drawDistance": 400,
+          "objectDetail": 0.9
+        },
+        "medium": {
+          "drawDistance": 300,
+          "objectDetail": 0.7
+        },
+        "low": {
+          "drawDistance": 200,
+          "objectDetail": 0.5
+        }
+      }
+    },
+    {
+      "name": "lighting_pass",
+      "enabled": true,
+      "renderTarget": "scene",
+      "blend": true,
+      "quality": {
+        "ultra": {
+          "lights": 8,
+          "shadows": true,
+          "ao": true
+        },
+        "high": {
+          "lights": 4,
+          "shadows": true,
+          "ao": false
+        },
+        "medium": {
+          "lights": 2,
+          "shadows": false,
+          "ao": false
+        },
+        "low": {
+          "lights": 1,
+          "shadows": false,
+          "ao": false
+        }
+      }
+    },
+    {
+      "name": "post_process_pass",
+      "enabled": "adaptive",
+      "renderTarget": "backbuffer",
+      "effects": {
+        "ultra": [
+          "hdr",
+          "bloom",
+          "taa",
+          "dof",
+          "motion_blur"
+        ],
+        "high": [
+          "hdr",
+          "bloom",
+          "fxaa"
+        ],
+        "medium": [
+          "hdr",
+          "fxaa"
+        ],
+        "low": []
+      }
+    },
+    {
+      "name": "ui_pass",
+      "enabled": true,
+      "renderTarget": "backbuffer",
+      "blend": true,
+      "viewport": "full",
+      "quality": "native"
+    }
+  ],
+  "optimization": {
+    "earlyZ": true,
+    "occlusionCulling": true,
+    "instancing": true,
+    "batching": true
+  }
+}

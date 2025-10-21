@@ -1,0 +1,44 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore environment files
+.env
+.env.local
+.env.production
+
+# Ignore API keys (if stored in separate file)
+config.js
+secrets.js
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore build artifacts
+dist/
+build/
+.cache/
+
+# Ignore logs
+*.log
+npm-debug.log*
+
+# Ignore Vercel
+.vercel
+
+# Large files and directories
+google-cloud-cli-*.tar.gz
+google-cloud-sdk/
+*.db
+
+# Generated content
+object_generator/
+world_system/
+scraped_images/
+generated_objects/

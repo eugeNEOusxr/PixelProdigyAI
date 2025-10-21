@@ -1,0 +1,297 @@
+{
+  "seed_object_templates": [
+    {
+      "id": "seed_tower_001",
+      "name": "Tower Seed",
+      "category": "structure",
+      "base_type": "tower",
+      "growth_phases": [
+        {
+          "phase": 0,
+          "name": "foundation",
+          "duration_minutes": 5,
+          "vertex_count": 24,
+          "geometry": "simple_cube",
+          "size_multiplier": 0.1,
+          "detail_level": "placeholder"
+        },
+        {
+          "phase": 1,
+          "name": "framework",
+          "duration_minutes": 10,
+          "vertex_count": 96,
+          "geometry": "basic_tower_outline",
+          "size_multiplier": 0.3,
+          "detail_level": "low"
+        },
+        {
+          "phase": 2,
+          "name": "walls",
+          "duration_minutes": 15,
+          "vertex_count": 384,
+          "geometry": "tower_with_walls",
+          "size_multiplier": 0.6,
+          "detail_level": "medium"
+        },
+        {
+          "phase": 3,
+          "name": "details",
+          "duration_minutes": 20,
+          "vertex_count": 1536,
+          "geometry": "detailed_tower",
+          "size_multiplier": 0.85,
+          "detail_level": "high"
+        },
+        {
+          "phase": 4,
+          "name": "mature",
+          "duration_minutes": 30,
+          "vertex_count": 6144,
+          "geometry": "complete_tower",
+          "size_multiplier": 1.0,
+          "detail_level": "complete"
+        }
+      ],
+      "personality_modifiers": {
+        "perfectionist_builder": { "phase_duration_multiplier": 1.5, "vertex_multiplier": 1.2 },
+        "chaos_artist": { "phase_duration_multiplier": 0.5, "vertex_multiplier": 2.0 },
+        "rapid_prototyper": { "phase_duration_multiplier": 0.3, "vertex_multiplier": 0.8 },
+        "zen_simplifier": { "phase_duration_multiplier": 1.2, "vertex_multiplier": 0.5 }
+      }
+    },
+    {
+      "id": "seed_tree_001",
+      "name": "Tree Seed",
+      "category": "nature",
+      "base_type": "tree",
+      "growth_phases": [
+        {
+          "phase": 0,
+          "name": "sprout",
+          "duration_minutes": 2,
+          "vertex_count": 12,
+          "geometry": "tiny_sprout",
+          "size_multiplier": 0.05,
+          "detail_level": "minimal"
+        },
+        {
+          "phase": 1,
+          "name": "sapling",
+          "duration_minutes": 5,
+          "vertex_count": 48,
+          "geometry": "young_tree",
+          "size_multiplier": 0.2,
+          "detail_level": "low"
+        },
+        {
+          "phase": 2,
+          "name": "young_tree",
+          "duration_minutes": 10,
+          "vertex_count": 192,
+          "geometry": "branching_tree",
+          "size_multiplier": 0.5,
+          "detail_level": "medium"
+        },
+        {
+          "phase": 3,
+          "name": "mature_tree",
+          "duration_minutes": 15,
+          "vertex_count": 768,
+          "geometry": "full_canopy",
+          "size_multiplier": 0.8,
+          "detail_level": "high"
+        },
+        {
+          "phase": 4,
+          "name": "ancient_tree",
+          "duration_minutes": 25,
+          "vertex_count": 3072,
+          "geometry": "detailed_ancient",
+          "size_multiplier": 1.0,
+          "detail_level": "extreme"
+        }
+      ],
+      "personality_modifiers": {
+        "organic_grower": { "phase_duration_multiplier": 0.8, "vertex_multiplier": 1.3 },
+        "nature_harmonist": { "phase_duration_multiplier": 1.0, "vertex_multiplier": 1.1 }
+      }
+    },
+    {
+      "id": "seed_crystal_001",
+      "name": "Crystal Seed",
+      "category": "mineral",
+      "base_type": "crystal",
+      "growth_phases": [
+        {
+          "phase": 0,
+          "name": "crystal_point",
+          "duration_minutes": 3,
+          "vertex_count": 8,
+          "geometry": "simple_pyramid",
+          "size_multiplier": 0.1,
+          "detail_level": "minimal"
+        },
+        {
+          "phase": 1,
+          "name": "cluster_start",
+          "duration_minutes": 7,
+          "vertex_count": 32,
+          "geometry": "multi_point",
+          "size_multiplier": 0.3,
+          "detail_level": "low"
+        },
+        {
+          "phase": 2,
+          "name": "formation",
+          "duration_minutes": 12,
+          "vertex_count": 128,
+          "geometry": "crystal_cluster",
+          "size_multiplier": 0.6,
+          "detail_level": "medium"
+        },
+        {
+          "phase": 3,
+          "name": "geode",
+          "duration_minutes": 18,
+          "vertex_count": 512,
+          "geometry": "detailed_geode",
+          "size_multiplier": 0.85,
+          "detail_level": "high"
+        },
+        {
+          "phase": 4,
+          "name": "crystal_cave",
+          "duration_minutes": 28,
+          "vertex_count": 2048,
+          "geometry": "massive_formation",
+          "size_multiplier": 1.0,
+          "detail_level": "extreme"
+        }
+      ],
+      "personality_modifiers": {
+        "symmetry_obsessed": { "phase_duration_multiplier": 1.3, "vertex_multiplier": 1.5 },
+        "mathematical_purist": { "phase_duration_multiplier": 1.4, "vertex_multiplier": 1.2 }
+      }
+    },
+    {
+      "id": "seed_machine_001",
+      "name": "Machine Seed",
+      "category": "mechanical",
+      "base_type": "contraption",
+      "growth_phases": [
+        {
+          "phase": 0,
+          "name": "gear",
+          "duration_minutes": 4,
+          "vertex_count": 16,
+          "geometry": "single_gear",
+          "size_multiplier": 0.1,
+          "detail_level": "minimal"
+        },
+        {
+          "phase": 1,
+          "name": "mechanism",
+          "duration_minutes": 8,
+          "vertex_count": 64,
+          "geometry": "gear_assembly",
+          "size_multiplier": 0.25,
+          "detail_level": "low"
+        },
+        {
+          "phase": 2,
+          "name": "machine",
+          "duration_minutes": 14,
+          "vertex_count": 256,
+          "geometry": "basic_machine",
+          "size_multiplier": 0.55,
+          "detail_level": "medium"
+        },
+        {
+          "phase": 3,
+          "name": "complex_machine",
+          "duration_minutes": 22,
+          "vertex_count": 1024,
+          "geometry": "intricate_machine",
+          "size_multiplier": 0.8,
+          "detail_level": "high"
+        },
+        {
+          "phase": 4,
+          "name": "clockwork_marvel",
+          "duration_minutes": 35,
+          "vertex_count": 4096,
+          "geometry": "masterwork_machine",
+          "size_multiplier": 1.0,
+          "detail_level": "extreme"
+        }
+      ],
+      "personality_modifiers": {
+        "mechanical_genius": { "phase_duration_multiplier": 0.9, "vertex_multiplier": 1.6 },
+        "sci_fi_pioneer": { "phase_duration_multiplier": 0.8, "vertex_multiplier": 1.4 }
+      }
+    },
+    {
+      "id": "seed_ruin_001",
+      "name": "Ruin Seed",
+      "category": "ancient",
+      "base_type": "ruins",
+      "growth_phases": [
+        {
+          "phase": 0,
+          "name": "rubble",
+          "duration_minutes": 3,
+          "vertex_count": 20,
+          "geometry": "stone_pile",
+          "size_multiplier": 0.15,
+          "detail_level": "minimal"
+        },
+        {
+          "phase": 1,
+          "name": "foundation_ruins",
+          "duration_minutes": 9,
+          "vertex_count": 80,
+          "geometry": "broken_foundation",
+          "size_multiplier": 0.35,
+          "detail_level": "low"
+        },
+        {
+          "phase": 2,
+          "name": "partial_structure",
+          "duration_minutes": 16,
+          "vertex_count": 320,
+          "geometry": "ruined_walls",
+          "size_multiplier": 0.6,
+          "detail_level": "medium"
+        },
+        {
+          "phase": 3,
+          "name": "archaeological_site",
+          "duration_minutes": 24,
+          "vertex_count": 1280,
+          "geometry": "excavated_ruins",
+          "size_multiplier": 0.85,
+          "detail_level": "high"
+        },
+        {
+          "phase": 4,
+          "name": "restored_monument",
+          "duration_minutes": 40,
+          "vertex_count": 5120,
+          "geometry": "detailed_restoration",
+          "size_multiplier": 1.0,
+          "detail_level": "extreme"
+        }
+      ],
+      "personality_modifiers": {
+        "tradition_keeper": { "phase_duration_multiplier": 1.6, "vertex_multiplier": 1.3 },
+        "resourceful_recycler": { "phase_duration_multiplier": 0.7, "vertex_multiplier": 0.9 }
+      }
+    }
+  ],
+  "cron_schedule": {
+    "growth_check_interval_seconds": 60,
+    "batch_update_size": 100,
+    "max_concurrent_growths": 50,
+    "meta_ai_evaluation_interval_minutes": 5
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "myplace-yourplace",
+  "version": "1.0.0",
+  "description": "PixelProdigy AI - MyPlace YourPlace Metaverse Landing Page",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "test": "echo 'Open http://localhost:8000 in your browser'"
+  },
+  "keywords": ["metaverse", "pixelprodigy", "myplace", "yourplace", "ai"],
+  "author": "Eugene (@eugeneousxr)",
+  "license": "MIT"
+}

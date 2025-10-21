@@ -1,0 +1,10 @@
+{
+  "maxSize": 2147483648,
+  "evictionPolicy": "LRU",
+  "preloadRadius": 100,
+  "unloadRadius": 500,
+  "compressionEnabled": true,
+  "compressionRatio": 80,
+  "persistToDisk": true,
+  "diskCachePath": "./cache/geometry_4k"
+}

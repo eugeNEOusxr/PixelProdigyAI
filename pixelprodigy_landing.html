@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy AI - Create 3D Worlds with AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           HERO SECTION
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.1;
+        }
+
+        .hero-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(118, 75, 162, 0.8)); }
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: #b0b0b0;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           FEATURES SECTION
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        .features {
+            padding: 100px 20px;
+            background: #0f0f0f;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .feature-card p {
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           SHOWCASE GALLERY
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        .showcase {
+            padding: 100px 20px;
+            background: #0a0a0a;
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .showcase-item {
+            position: relative;
+            aspect-ratio: 16/9;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .showcase-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+        }
+
+        .showcase-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .showcase-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .showcase-item:hover .showcase-overlay {
+            transform: translateY(0);
+        }
+
+        .showcase-overlay h4 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .showcase-overlay p {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           STATS SECTION
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        .stats {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            background: #050505;
+            border-top: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        footer p {
+            color: #666;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════════════════════════════════ */
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         HERO SECTION
+    ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <section class="hero">
+        <div class="hero-background"></div>
+        <div class="hero-grid"></div>
+        
+        <div class="hero-content">
+            <h1>PixelProdigy AI</h1>
+            <p>
+                Create stunning 3D worlds, characters, and games with the power of AI.<br>
+                No coding required. Just imagination.
+            </p>
+            
+            <div class="cta-buttons">
+                <a href="pixelprodigy_studio.html" class="btn btn-primary">🎨 Launch Studio</a>
+                <a href="skyrelics_world.html" class="btn btn-secondary">🎮 Try Demo World</a>
+                <a href="#features" class="btn btn-secondary">📖 Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         FEATURES SECTION
+    ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <section id="features" class="features">
+        <h2 class="section-title">Powerful Features</h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI-Powered Creation</h3>
+                <p>
+                    Describe what you want in natural language. Our AI generates 3D objects,
+                    characters, and entire scenes instantly.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>Visual Studio Editor</h3>
+                <p>
+                    Intuitive drag-and-drop interface with professional-grade tools.
+                    Transform controls, material editor, and real-time rendering.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Massive Worlds</h3>
+                <p>
+                    Create worlds up to 100km² with procedural generation. Add cities,
+                    forests, mountains, and oceans with one click.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👾</div>
+                <h3>Game Building</h3>
+                <p>
+                    Built-in combat system, inventory, quests, and NPCs. Turn your 3D world
+                    into a playable game in minutes.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3>100K Object Library</h3>
+                <p>
+                    Access 99,640 pre-made objects across 1,000+ categories. Buildings,
+                    vehicles, nature, furniture, and more.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>Export Anywhere</h3>
+                <p>
+                    Export to FBX, GLTF, OBJ for Unity, Unreal, Blender. Or publish
+                    directly to web with one click.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         STATS SECTION
+    ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>99,640</h3>
+                <p>3D Objects</p>
+            </div>
+
+            <div class="stat-item">
+                <h3>100km²</h3>
+                <p>Max World Size</p>
+            </div>
+
+            <div class="stat-item">
+                <h3>4K</h3>
+                <p>HD Rendering</p>
+            </div>
+
+            <div class="stat-item">
+                <h3>∞</h3>
+                <p>Possibilities</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SHOWCASE GALLERY
+    ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <section class="showcase">
+        <h2 class="section-title">Created with PixelProdigy</h2>
+        
+        <div class="showcase-grid">
+            <div class="showcase-item" onclick="window.location.href='skyrelics_world.html'">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect fill='%23667eea' width='800' height='450'/%3E%3Ctext x='400' y='225' font-family='Arial' font-size='48' fill='white' text-anchor='middle' dominant-baseline='middle'%3ESkyRelics World%3C/text%3E%3C/svg%3E" alt="SkyRelics World">
+                <div class="showcase-overlay">
+                    <h4>SkyRelics World</h4>
+                    <p>Fantasy RPG world with neighborhood, college, and park</p>
+                </div>
+            </div>
+
+            <div class="showcase-item">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect fill='%23764ba2' width='800' height='450'/%3E%3Ctext x='400' y='225' font-family='Arial' font-size='48' fill='white' text-anchor='middle' dominant-baseline='middle'%3EBakersfield City%3C/text%3E%3C/svg%3E" alt="Bakersfield City">
+                <div class="showcase-overlay">
+                    <h4>Bakersfield City</h4>
+                    <p>Photorealistic 4K city rendering with 10,000+ buildings</p>
+                </div>
+            </div>
+
+            <div class="showcase-item">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect fill='%23f093fb' width='800' height='450'/%3E%3Ctext x='400' y='225' font-family='Arial' font-size='48' fill='white' text-anchor='middle' dominant-baseline='middle'%3ECharacter Studio%3C/text%3E%3C/svg%3E" alt="Character Creator">
+                <div class="showcase-overlay">
+                    <h4>Character Creator</h4>
+                    <p>Anime, Marvel, DC, DBZ characters with full customization</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════════════════════════════════ -->
+    
+    <footer>
+        <p>&copy; 2025 PixelProdigy AI. Created by Eugeneous. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Animate stats on scroll
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .stat-item, .showcase-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

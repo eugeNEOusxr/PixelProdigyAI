@@ -1,0 +1,448 @@
+{
+  "roomId": "SM_FLOOR2_MASTER_BEDROOM",
+  "name": "Master Bedroom",
+  "floor": 2,
+  "type": "Private Sleeping Quarters",
+  
+  "dimensions": {
+    "length": 9.1,
+    "width": 7.6,
+    "height": 3.6,
+    "area": 69.2,
+    "unit": "meters"
+  },
+  
+  "design": {
+    "style": "Modern Zen Minimalist",
+    "colorScheme": {
+      "primary": "#FFFFFF",
+      "secondary": "#F5F5F5",
+      "accent": "#000000",
+      "warm": "#E8D5C4"
+    },
+    
+    "flooring": {
+      "type": "Light Oak Hardwood",
+      "color": "#D4C4A8",
+      "finish": "Matte",
+      "heatedFloor": true,
+      "soundproofing": true
+    },
+    
+    "walls": {
+      "type": "White Glossy Composite",
+      "color": "#FFFFFF",
+      "finish": "Smooth",
+      "featureWall": {
+        "location": "Behind Bed",
+        "material": "Textured 3D Panels",
+        "color": "#E8E8E8"
+      }
+    },
+    
+    "ceiling": {
+      "type": "Skylight Integration",
+      "color": "#FFFFFF",
+      "features": ["Retractable Smart Glass", "Aurora Viewing", "Star Gazing"],
+      "height": 3.6
+    }
+  },
+  
+  "lighting": {
+    "natural": {
+      "skylight": {
+        "size": "2m x 3m",
+        "position": "Directly above bed",
+        "features": ["Tintable", "Blackout Mode", "Aurora Enhancement"]
+      },
+      "windows": {
+        "count": 3,
+        "type": "Floor-to-ceiling",
+        "orientation": "North & East",
+        "view": "Sky & Aurora"
+      }
+    },
+    
+    "artificial": {
+      "ceilingLights": {
+        "type": "Recessed LED",
+        "count": 8,
+        "dimmable": true,
+        "colorTemp": "2200K-4000K (Warm)",
+        "smart": true
+      },
+      
+      "bedLighting": {
+        "type": "Integrated in Floating Frame",
+        "position": "Under bed platform",
+        "color": "Warm White",
+        "dimmable": true
+      },
+      
+      "nightstandLamps": {
+        "count": 2,
+        "type": "Touch-Control Modern",
+        "color": "Matte Black",
+        "brightness": "Variable",
+        "usbPorts": true
+      },
+      
+      "accentLighting": {
+        "type": "LED Strips",
+        "locations": ["Behind Headboard", "Closet Interior", "Floor Perimeter"],
+        "color": "Warm Amber",
+        "dimmable": true
+      }
+    },
+    
+    "scenes": [
+      {
+        "name": "Wake Up",
+        "brightness": "Gradual 0-80%",
+        "colorTemp": "4000K",
+        "skylightTint": "Clear",
+        "duration": "30 minutes"
+      },
+      {
+        "name": "Bedtime",
+        "brightness": "20%",
+        "colorTemp": "2200K",
+        "skylightTint": "Darkened",
+        "auroraMode": "Optional"
+      },
+      {
+        "name": "Aurora Night",
+        "brightness": "0%",
+        "skylightTint": "Clear + Enhanced",
+        "windows": "Clear",
+        "mode": "Perfect northern lights viewing"
+      },
+      {
+        "name": "Romantic",
+        "brightness": "30%",
+        "colorTemp": "2200K",
+        "accentLighting": "Warm Glow",
+        "skylightTint": "Stargazing Mode"
+      }
+    ]
+  },
+  
+  "furniture": [
+    {
+      "objectId": "obj_bed_king_floating_001",
+      "name": "King Bed with Floating Frame",
+      "type": "Bed",
+      "size": "King (2m x 2m)",
+      "position": {
+        "x": 0,
+        "y": 0.3,
+        "z": 0
+      },
+      "features": [
+        "Floating Platform (appears suspended)",
+        "Integrated LED underlighting",
+        "Memory foam mattress",
+        "Smart climate control (heating/cooling)",
+        "Built-in USB & wireless charging",
+        "Adjustable firmness"
+      ],
+      "materials": {
+        "frame": "Black Aluminum",
+        "platform": "White Composite",
+        "mattress": "Premium Memory Foam",
+        "bedding": "Egyptian Cotton White"
+      }
+    },
+    
+    {
+      "objectId": "obj_nightstand_floating_001",
+      "name": "Floating Nightstand (Left)",
+      "type": "Nightstand",
+      "position": {
+        "x": -1.5,
+        "y": 0.5,
+        "z": 0
+      },
+      "color": "White with Black Edge",
+      "features": ["Wireless Charging", "Touch Lamp", "Single Drawer"]
+    },
+    
+    {
+      "objectId": "obj_nightstand_floating_002",
+      "name": "Floating Nightstand (Right)",
+      "type": "Nightstand",
+      "position": {
+        "x": 1.5,
+        "y": 0.5,
+        "z": 0
+      },
+      "color": "White with Black Edge",
+      "features": ["Wireless Charging", "Touch Lamp", "Single Drawer"]
+    },
+    
+    {
+      "objectId": "obj_dresser_modern_001",
+      "name": "6-Drawer Modern Dresser",
+      "type": "Storage",
+      "position": {
+        "x": -3.5,
+        "y": 0,
+        "z": -3
+      },
+      "color": "White Gloss",
+      "hardware": "Matte Black Handles",
+      "drawers": 6
+    },
+    
+    {
+      "objectId": "obj_bench_bedroom_001",
+      "name": "Upholstered Bench",
+      "type": "Seating",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 1.5
+      },
+      "color": "Light Grey Fabric",
+      "length": 1.8,
+      "storage": true
+    },
+    
+    {
+      "objectId": "obj_mirror_full_length_001",
+      "name": "Full-Length Smart Mirror",
+      "type": "Mirror/Tech",
+      "position": {
+        "x": 3.5,
+        "y": 0,
+        "z": -2
+      },
+      "size": "2m tall",
+      "features": [
+        "Display integration",
+        "Outfit suggestions",
+        "Health metrics",
+        "Weather display",
+        "Calendar sync"
+      ]
+    },
+    
+    {
+      "objectId": "obj_chair_reading_001",
+      "name": "Modern Reading Chair",
+      "type": "Chair",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": 2.5
+      },
+      "color": "Light Grey",
+      "style": "Accent Chair",
+      "ottoman": true
+    },
+    
+    {
+      "objectId": "obj_plant_bedroom_001",
+      "name": "Snake Plant",
+      "type": "Decor",
+      "position": {
+        "x": -3.5,
+        "y": 0,
+        "z": 3
+      },
+      "height": 0.9,
+      "potColor": "White Ceramic"
+    },
+    
+    {
+      "objectId": "obj_plant_bedroom_002",
+      "name": "Peace Lily",
+      "type": "Decor",
+      "position": {
+        "x": 3.5,
+        "y": 0,
+        "z": 3
+      },
+      "height": 0.7,
+      "potColor": "White Ceramic"
+    }
+  ],
+  
+  "walkInCloset": {
+    "objectId": "obj_closet_walkin_001",
+    "location": "Adjacent Room",
+    "dimensions": {
+      "length": 6.1,
+      "width": 4.6,
+      "height": 3.6
+    },
+    "features": [
+      "LED lighting (motion-activated)",
+      "Custom built-in shelving",
+      "Hanging rods (double height)",
+      "Shoe storage (50+ pairs)",
+      "Accessory drawers",
+      "Full-length 3-way mirror",
+      "Smart organization system",
+      "Climate control (prevents mildew)"
+    ],
+    "materials": {
+      "shelving": "White Gloss",
+      "hardware": "Matte Black",
+      "flooring": "Same as bedroom"
+    }
+  },
+  
+  "balcony": {
+    "objectId": "obj_balcony_private_001",
+    "access": "Glass sliding door",
+    "dimensions": {
+      "length": 4,
+      "width": 2,
+      "unit": "meters"
+    },
+    "features": [
+      "Infinity edge design",
+      "Frameless glass railing",
+      "Aurora viewing platform",
+      "Heated floor",
+      "Privacy screen (retractable)"
+    ],
+    "furniture": [
+      {
+        "name": "Outdoor Lounge Chairs",
+        "count": 2,
+        "color": "White with Grey Cushions"
+      },
+      {
+        "name": "Small Side Table",
+        "count": 1,
+        "color": "Black Metal"
+      }
+    ]
+  },
+  
+  "technology": {
+    "smartGlassControls": {
+      "skylight": "Voice/App/Auto",
+      "windows": "Voice/App/Auto",
+      "privacyMode": "Instant tinting",
+      "blackoutMode": "Complete darkness",
+      "auroraEnhancement": "AI-optimized viewing"
+    },
+    
+    "climateControl": {
+      "temperature": {
+        "target": 19,
+        "sleepMode": 18,
+        "unit": "celsius"
+      },
+      "mattressClimateControl": {
+        "leftSide": "Independent",
+        "rightSide": "Independent",
+        "heating": true,
+        "cooling": true
+      },
+      "airQuality": "Premium HEPA filtration",
+      "whiteNoise": "Optional built-in speakers"
+    },
+    
+    "smartFeatures": {
+      "wakeUpRoutine": {
+        "gradualLighting": "30 minutes before alarm",
+        "temperatureAdjust": "Warm up room",
+        "openSkylight": "Let in natural light",
+        "playMusic": "Gentle morning playlist"
+      },
+      
+      "sleepRoutine": {
+        "automate": "Based on bedtime",
+        "dimLights": "Gradual over 30 minutes",
+        "lowerTemp": "Sleep-optimal 18°C",
+        "activateBlackout": "If not aurora viewing",
+        "whiteNoise": "Optional ocean/rain"
+      },
+      
+      "auroraAlert": {
+        "notification": "When aurora is visible",
+        "autoOpen": "Skylight if sleeping",
+        "gentle": "Vibration wristband option"
+      }
+    }
+  },
+  
+  "soundSystem": {
+    "type": "In-ceiling Speakers",
+    "count": 4,
+    "quality": "Hi-Fi Stereo",
+    "uses": [
+      "Morning music",
+      "White noise for sleep",
+      "Guided meditation",
+      "Ambient sounds",
+      "Aurora soundscape (optional)"
+    ],
+    "smart": true,
+    "voiceControlled": true
+  },
+  
+  "ambiance": {
+    "scents": {
+      "diffuser": "Smart Essential Oil Diffuser",
+      "options": ["Lavender", "Eucalyptus", "Vanilla", "Cedar", "Ocean"],
+      "schedule": "Evening relaxation scent"
+    },
+    
+    "soundscapes": [
+      "Rain on roof",
+      "Ocean waves",
+      "Forest ambiance",
+      "Crackling fire",
+      "Arctic wind (subtle)",
+      "Silence"
+    ]
+  },
+  
+  "features": [
+    "King bed with floating frame",
+    "Skylight directly above bed (aurora viewing)",
+    "Smart glass for total blackout",
+    "Climate-controlled mattress (dual zone)",
+    "Walk-in closet (6m x 4.6m)",
+    "Private balcony with infinity edge",
+    "Full-length smart mirror",
+    "Integrated lighting scenes",
+    "Aurora alert system",
+    "Heated floors",
+    "Premium air filtration",
+    "Built-in sound system",
+    "Automatic wake/sleep routines"
+  ],
+  
+  "useCases": [
+    "Peaceful sleep with northern lights above",
+    "Morning wake-up with natural light",
+    "Romantic evenings with girlfriend (cinema in living room, sleep here)",
+    "Aurora viewing from bed",
+    "Meditation and relaxation",
+    "Getting ready with smart mirror",
+    "Private reading in accent chair",
+    "Balcony aurora watching"
+  ],
+  
+  "privacyFeatures": {
+    "smartGlass": "Instant privacy tinting",
+    "soundproofing": "Premium acoustic insulation",
+    "doNotDisturb": "Blocks all notifications",
+    "portalBlock": "No portals allowed in bedroom",
+    "secureAccess": "Biometric entry only"
+  },
+  
+  "metadata": {
+    "designedBy": "AI Personality #30 (Interior Designer)",
+    "created": "2025-10-16",
+    "status": "Complete",
+    "completion": "100%",
+    "ownerNotes": "My sanctuary for sleep and aurora viewing"
+  }
+}

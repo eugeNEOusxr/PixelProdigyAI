@@ -1,0 +1,85 @@
+{
+  "enabled": true,
+  "order": [
+    "hdr_tonemap",
+    "bloom",
+    "ambient_occlusion",
+    "depth_of_field",
+    "motion_blur",
+    "antialiasing",
+    "color_grading",
+    "vignette",
+    "grain"
+  ],
+  "effects": {
+    "hdr_tonemap": {
+      "enabled": true,
+      "operator": "aces",
+      "exposure": 1,
+      "quality": [
+        "ultra",
+        "high",
+        "medium"
+      ]
+    },
+    "bloom": {
+      "enabled": "adaptive",
+      "threshold": 1,
+      "intensity": 0.3,
+      "radius": 0.5,
+      "quality": [
+        "ultra",
+        "high"
+      ]
+    },
+    "ambient_occlusion": {
+      "enabled": "adaptive",
+      "method": "hbao",
+      "radius": 1,
+      "intensity": 1,
+      "quality": [
+        "ultra"
+      ]
+    },
+    "depth_of_field": {
+      "enabled": "adaptive",
+      "focusDistance": 10,
+      "aperture": 2.8,
+      "quality": [
+        "ultra"
+      ]
+    },
+    "motion_blur": {
+      "enabled": "adaptive",
+      "samples": 8,
+      "intensity": 0.5,
+      "quality": [
+        "ultra"
+      ]
+    },
+    "antialiasing": {
+      "enabled": true,
+      "method": "adaptive",
+      "quality": {
+        "ultra": "taa",
+        "high": "fxaa",
+        "medium": "fxaa",
+        "low": "none"
+      }
+    },
+    "color_grading": {
+      "enabled": true,
+      "lut": "default",
+      "intensity": 1
+    },
+    "vignette": {
+      "enabled": true,
+      "intensity": 0.3,
+      "smoothness": 0.5
+    },
+    "grain": {
+      "enabled": false,
+      "intensity": 0.1
+    }
+  }
+}

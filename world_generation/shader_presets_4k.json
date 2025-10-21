@@ -1,0 +1,44 @@
+{
+  "pbr_standard": {
+    "vertex": "shaders_4k/pbr_vertex.glsl",
+    "fragment": "shaders_4k/pbr_fragment.glsl",
+    "features": [
+      "pbr",
+      "normal_mapping",
+      "parallax",
+      "ibl",
+      "hdr"
+    ],
+    "quality": "ultra"
+  },
+  "pbr_skin": {
+    "vertex": "shaders_4k/pbr_vertex.glsl",
+    "fragment": "shaders_4k/pbr_fragment.glsl",
+    "features": [
+      "pbr",
+      "normal_mapping",
+      "sss",
+      "ibl",
+      "hdr"
+    ],
+    "quality": "ultra",
+    "sssEnabled": true
+  },
+  "pbr_fast": {
+    "vertex": "shaders_4k/pbr_vertex.glsl",
+    "fragment": "shaders_4k/pbr_fragment_fast.glsl",
+    "features": [
+      "pbr",
+      "normal_mapping"
+    ],
+    "quality": "high"
+  },
+  "unlit_4k": {
+    "vertex": "shaders_4k/unlit_vertex.glsl",
+    "fragment": "shaders_4k/unlit_fragment.glsl",
+    "features": [
+      "texture_4k"
+    ],
+    "quality": "performance"
+  }
+}

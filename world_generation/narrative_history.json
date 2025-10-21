@@ -1,0 +1,34 @@
+{
+  "narrativeHistory": [
+    {
+      "type": "combat",
+      "winner": "hero_001",
+      "loser": "villain_001",
+      "narrative": "Aria the Brave unleashed a relentless assault, overwhelming Malachar the Corruptor with raw power. The final blow was a devastating critical strike that echoed across the battlefield. A 7-hit combo left no room for Malachar the Corruptor to recover. Aria the Brave survived by a thread, battered but unbroken.",
+      "timestamp": 1760627474901
+    },
+    {
+      "type": "transformation",
+      "characterId": "hero_001",
+      "fromAlignment": "hero",
+      "toAlignment": "villain",
+      "narrative": "Aria the Brave's noble intentions have been corrupted by power and betrayal. Betrayed by those she swore to protect. The world will tremble at Aria the Brave's transformation.",
+      "timestamp": 1760627474901
+    }
+  ],
+  "worldEvents": [
+    {
+      "type": "city_destroyed",
+      "data": {
+        "cityName": "Genesis City"
+      },
+      "timestamp": 1760627474902,
+      "consequences": [
+        "Refugees flee from Genesis City, seeking shelter elsewhere.",
+        "The economy collapses in regions dependent on Genesis City."
+      ]
+    }
+  ],
+  "characterMemories": [],
+  "timestamp": 1760627474902
+}

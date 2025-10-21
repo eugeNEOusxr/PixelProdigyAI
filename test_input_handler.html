@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Input Handler Test - PixelVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #main-container {
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #00ff88;
+            margin-bottom: 30px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .panel h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00ff88;
+            padding-bottom: 10px;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        
+        .status-label {
+            color: #aaa;
+        }
+        
+        .status-value {
+            color: white;
+            font-weight: bold;
+        }
+        
+        .status-value.active {
+            color: #00ff88;
+        }
+        
+        .status-value.inactive {
+            color: #ff4444;
+        }
+        
+        .joystick-visual {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            position: relative;
+            margin: 10px auto;
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .joystick-stick {
+            width: 30px;
+            height: 30px;
+            background: #00ff88;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s;
+        }
+        
+        .action-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .action-badge {
+            padding: 5px 12px;
+            background: #00ff88;
+            color: black;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background: #00ff88;
+            color: black;
+        }
+        
+        .btn-secondary {
+            background: #4facfe;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ff4444;
+            color: white;
+        }
+        
+        .device-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .device-indicator.active {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .device-indicator.inactive {
+            background: #666;
+        }
+        
+        #instructions {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+            border: 2px solid #00ff88;
+        }
+        
+        #instructions h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        .instruction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        
+        kbd {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 0 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <h1>🎮 Input Handler Test</h1>
+        
+        <div class="grid">
+            <!-- Device Status Panel -->
+            <div class="panel">
+                <h3>📱 Device Status</h3>
+                <div class="status-row">
+                    <span class="status-label">
+                        <span class="device-indicator" id="keyboard-indicator"></span>
+                        Keyboard
+                    </span>
+                    <span class="status-value" id="keyboard-status">Inactive</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">
+                        <span class="device-indicator" id="mouse-indicator"></span>
+                        Mouse
+                    </span>
+                    <span class="status-value" id="mouse-status">Unlocked</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">
+                        <span class="device-indicator" id="gamepad-indicator"></span>
+                        Gamepad
+                    </span>
+                    <span class="status-value" id="gamepad-status">Not Connected</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">
+                        <span class="device-indicator" id="touch-indicator"></span>
+                        Touch
+                    </span>
+                    <span class="status-value" id="touch-status">Inactive</span>
+                </div>
+            </div>
+            
+            <!-- Movement Panel -->
+            <div class="panel">
+                <h3>🕹️ Movement Input</h3>
+                <div class="joystick-visual">
+                    <div class="joystick-stick" id="joystick-stick"></div>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">X Axis:</span>
+                    <span class="status-value" id="move-x">0.00</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Y Axis:</span>
+                    <span class="status-value" id="move-y">0.00</span>
+                </div>
+            </div>
+            
+            <!-- Look Input Panel -->
+            <div class="panel">
+                <h3>👁️ Camera Look</h3>
+                <div class="status-row">
+                    <span class="status-label">Delta X:</span>
+                    <span class="status-value" id="look-x">0.00</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Delta Y:</span>
+                    <span class="status-value" id="look-y">0.00</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Scroll:</span>
+                    <span class="status-value" id="scroll-delta">0.00</span>
+                </div>
+            </div>
+            
+            <!-- Active Actions Panel -->
+            <div class="panel">
+                <h3>⚡ Active Actions</h3>
+                <div class="action-list" id="action-list">
+                    <span style="color: #666;">No active actions</span>
+                </div>
+            </div>
+            
+            <!-- Settings Panel -->
+            <div class="panel">
+                <h3>⚙️ Settings</h3>
+                <div class="status-row">
+                    <span class="status-label">Mouse Sensitivity:</span>
+                    <span class="status-value" id="sensitivity-value">1.0</span>
+                </div>
+                <input type="range" id="sensitivity-slider" min="0.1" max="5.0" step="0.1" value="1.0" style="width: 100%; margin: 10px 0;">
+                <div class="status-row">
+                    <span class="status-label">Invert Y:</span>
+                    <span class="status-value">
+                        <label>
+                            <input type="checkbox" id="invert-y-checkbox"> Enabled
+                        </label>
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Gamepad Panel -->
+            <div class="panel">
+                <h3>🎮 Gamepad Info</h3>
+                <div class="status-row">
+                    <span class="status-label">Left Stick:</span>
+                    <span class="status-value" id="gamepad-left">0.00, 0.00</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Right Stick:</span>
+                    <span class="status-value" id="gamepad-right">0.00, 0.00</span>
+                </div>
+                <button class="btn-secondary" id="vibrate-btn" style="width: 100%; margin-top: 10px;">
+                    🎮 Test Vibration
+                </button>
+            </div>
+        </div>
+        
+        <!-- Control Buttons -->
+        <div class="button-group">
+            <button class="btn-primary" id="settings-btn">⚙️ Open Settings UI</button>
+            <button class="btn-secondary" id="lock-pointer-btn">🔒 Lock Pointer</button>
+            <button class="btn-danger" id="reset-btn">🔄 Reset Settings</button>
+        </div>
+        
+        <!-- Instructions -->
+        <div id="instructions">
+            <h3>📋 Test All Input Methods</h3>
+            <div class="instruction-grid">
+                <div>
+                    <strong>Keyboard:</strong><br>
+                    <kbd>WASD</kbd> or <kbd>Arrows</kbd> to move
+                </div>
+                <div>
+                    <strong>Mouse:</strong><br>
+                    Move to look, <kbd>Scroll</kbd> to zoom
+                </div>
+                <div>
+                    <strong>Gamepad:</strong><br>
+                    Left stick moves, right stick looks
+                </div>
+                <div>
+                    <strong>Touch:</strong><br>
+                    Left side = joystick, right = camera
+                </div>
+                <div>
+                    <strong>Actions:</strong><br>
+                    <kbd>Space</kbd>, <kbd>Shift</kbd>, <kbd>C</kbd>, <kbd>E</kbd>
+                </div>
+                <div>
+                    <strong>Settings:</strong><br>
+                    Click "Open Settings UI" for keybindings
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="world_generation/input_handler.js"></script>
+    <script src="world_generation/input_settings.js"></script>
+    
+    <script>
+        console.log('🎮 Input Handler Test Starting...');
+        
+        let inputHandler, settingsManager, inputUI;
+        
+        /**
+         * Initialize
+         */
+        function init() {
+            // Create input handler
+            inputHandler = new InputHandler();
+            
+            // Create settings manager
+            settingsManager = new InputSettingsManager(inputHandler);
+            
+            // Create settings UI
+            inputUI = new InputUI(inputHandler, settingsManager);
+            
+            // Setup UI controls
+            setupControls();
+            
+            // Start update loop
+            update();
+            
+            console.log('✅ Input Handler Test Ready!');
+        }
+        
+        /**
+         * Setup UI controls
+         */
+        function setupControls() {
+            // Settings button
+            document.getElementById('settings-btn').onclick = () => {
+                inputUI.toggle();
+            };
+            
+            // Lock pointer button
+            document.getElementById('lock-pointer-btn').onclick = () => {
+                document.body.requestPointerLock();
+            };
+            
+            // Reset button
+            document.getElementById('reset-btn').onclick = () => {
+                if (confirm('Reset all input settings to defaults?')) {
+                    settingsManager.resetToDefaults();
+                    alert('Settings reset!');
+                    location.reload();
+                }
+            };
+            
+            // Sensitivity slider
+            const sensitivitySlider = document.getElementById('sensitivity-slider');
+            const sensitivityValue = document.getElementById('sensitivity-value');
+            sensitivitySlider.oninput = () => {
+                const value = parseFloat(sensitivitySlider.value);
+                inputHandler.setMouseSensitivity(value);
+                sensitivityValue.textContent = value.toFixed(1);
+            };
+            
+            // Invert Y checkbox
+            const invertYCheckbox = document.getElementById('invert-y-checkbox');
+            invertYCheckbox.onchange = () => {
+                inputHandler.config.mouse.invertY = invertYCheckbox.checked;
+                settingsManager.save();
+            };
+            
+            // Vibrate button
+            document.getElementById('vibrate-btn').onclick = () => {
+                inputHandler.vibrateGamepad(500, 0.5, 1.0);
+            };
+        }
+        
+        /**
+         * Update loop
+         */
+        function update() {
+            requestAnimationFrame(update);
+            
+            // Get input info
+            const info = inputHandler.getInfo();
+            const movement = inputHandler.getMovement();
+            const look = inputHandler.getLookDelta();
+            
+            // Update device status
+            updateDeviceStatus(info);
+            
+            // Update movement
+            updateMovement(movement);
+            
+            // Update look
+            updateLook(look);
+            
+            // Update gamepad
+            updateGamepad();
+            
+            // Update active actions
+            updateActions(info.actions);
+            
+            // Reset frame state
+            inputHandler.resetFrameState();
+        }
+        
+        /**
+         * Update device status indicators
+         */
+        function updateDeviceStatus(info) {
+            // Keyboard
+            const keyboardIndicator = document.getElementById('keyboard-indicator');
+            const keyboardStatus = document.getElementById('keyboard-status');
+            if (info.keyboard) {
+                keyboardIndicator.className = 'device-indicator active';
+                keyboardStatus.textContent = 'Active';
+                keyboardStatus.className = 'status-value active';
+            } else {
+                keyboardIndicator.className = 'device-indicator inactive';
+                keyboardStatus.textContent = 'Inactive';
+                keyboardStatus.className = 'status-value inactive';
+            }
+            
+            // Mouse
+            const mouseIndicator = document.getElementById('mouse-indicator');
+            const mouseStatus = document.getElementById('mouse-status');
+            if (info.mouse) {
+                mouseIndicator.className = 'device-indicator active';
+                mouseStatus.textContent = 'Locked';
+                mouseStatus.className = 'status-value active';
+            } else {
+                mouseIndicator.className = 'device-indicator inactive';
+                mouseStatus.textContent = 'Unlocked';
+                mouseStatus.className = 'status-value inactive';
+            }
+            
+            // Gamepad
+            const gamepadIndicator = document.getElementById('gamepad-indicator');
+            const gamepadStatus = document.getElementById('gamepad-status');
+            if (info.gamepad) {
+                gamepadIndicator.className = 'device-indicator active';
+                gamepadStatus.textContent = 'Connected';
+                gamepadStatus.className = 'status-value active';
+            } else {
+                gamepadIndicator.className = 'device-indicator inactive';
+                gamepadStatus.textContent = 'Not Connected';
+                gamepadStatus.className = 'status-value inactive';
+            }
+            
+            // Touch
+            const touchIndicator = document.getElementById('touch-indicator');
+            const touchStatus = document.getElementById('touch-status');
+            if (info.touch) {
+                touchIndicator.className = 'device-indicator active';
+                touchStatus.textContent = 'Active';
+                touchStatus.className = 'status-value active';
+            } else {
+                touchIndicator.className = 'device-indicator inactive';
+                touchStatus.textContent = 'Inactive';
+                touchStatus.className = 'status-value inactive';
+            }
+        }
+        
+        /**
+         * Update movement display
+         */
+        function updateMovement(movement) {
+            document.getElementById('move-x').textContent = movement.x.toFixed(2);
+            document.getElementById('move-y').textContent = movement.y.toFixed(2);
+            
+            // Update joystick visual
+            const stick = document.getElementById('joystick-stick');
+            const offsetX = movement.x * 60; // 60px max radius
+            const offsetY = -movement.y * 60;
+            stick.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
+        }
+        
+        /**
+         * Update look display
+         */
+        function updateLook(look) {
+            document.getElementById('look-x').textContent = look.x.toFixed(2);
+            document.getElementById('look-y').textContent = look.y.toFixed(2);
+            document.getElementById('scroll-delta').textContent = 
+                inputHandler.state.mouse.scrollDelta.toFixed(2);
+        }
+        
+        /**
+         * Update gamepad display
+         */
+        function updateGamepad() {
+            if (inputHandler.state.gamepad.connected) {
+                const axes = inputHandler.state.gamepad.axes;
+                document.getElementById('gamepad-left').textContent = 
+                    `${axes[0].toFixed(2)}, ${axes[1].toFixed(2)}`;
+                document.getElementById('gamepad-right').textContent = 
+                    `${axes[2].toFixed(2)}, ${axes[3].toFixed(2)}`;
+            } else {
+                document.getElementById('gamepad-left').textContent = 'N/A';
+                document.getElementById('gamepad-right').textContent = 'N/A';
+            }
+        }
+        
+        /**
+         * Update active actions display
+         */
+        function updateActions(actions) {
+            const actionList = document.getElementById('action-list');
+            
+            if (actions.length === 0) {
+                actionList.innerHTML = '<span style="color: #666;">No active actions</span>';
+            } else {
+                actionList.innerHTML = actions.map(action => 
+                    `<span class="action-badge">${action.replace(/_/g, ' ')}</span>`
+                ).join('');
+            }
+        }
+        
+        // Start
+        init();
+    </script>
+</body>
+</html>

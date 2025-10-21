@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "enabled": true,
+  "configs": {
+    "distance": "lod_distance_selector.json",
+    "memory": "lod_memory_monitor.json",
+    "fps": "lod_fps_adjuster.json",
+    "transition": "lod_transition_system.json",
+    "prediction": "lod_prediction_engine.json",
+    "thermal": "lod_thermal_detector.json",
+    "hysteresis": "lod_hysteresis_controller.json"
+  },
+  "manager": "dynamic_lod_manager.js"
+}

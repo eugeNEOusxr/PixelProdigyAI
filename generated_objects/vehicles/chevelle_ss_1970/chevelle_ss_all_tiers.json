@@ -1,0 +1,111 @@
+{
+  "vehicle": "1970 Chevelle SS 454",
+  "specifications": {
+    "length_cm": 495,
+    "width_cm": 193,
+    "height_cm": 132,
+    "wheelbase_cm": 284,
+    "weight_kg": 1814,
+    "engine": "454 cubic inch V8",
+    "horsepower": 450,
+    "torque_nm": 678
+  },
+  "tiers": {
+    "pro": {
+      "tier": "PRO",
+      "price_usd": 49.99,
+      "price_mpt": 25000,
+      "vls_code": "# ========================================\n# 1970 CHEVELLE SS 454 - PRO TIER\n# Complete Vehicle with Full Detail\n# ========================================\n\n# CHASSIS & FRAME (Foundation)\nCHASSIS:A495B132C193/FRAME:BOX.STEEL.A480^8.CROSSMEMBERS*6.TORQUE-BOX#\n\n# BODY PANELS (Outer Shell)\nBODY/HOOD:A180B10C193.POWERDOME+15.SCOOPS*2.HINGES.STEEL\nBODY/ROOF:A140B5C193.VINYL-TOP.BLACK.SMOOTH\nBODY/DOORS:A120^4B140C10*2.HANDLES.CHROME.HINGES.FRAMELESS-GLASS\nBODY/TRUNK:A130B60C193.DECKLID.SPOILER-READY.HINGES\nBODY/FENDERS_FRONT:A95^6B132C30*2.FLARED.MUSCULAR.STEEL.COMPOUND-CURVES\nBODY/FENDERS_REAR:A85^6B132C35*2.FLARED.WIDE.POWER-BULGE.VENTS\nBODY/QUARTER-PANELS:A180B132C10*2.SCULPTED.BODY-LINES#.COKE-BOTTLE-SHAPE~\nBODY/BUMPERS:A193B12C15*2.CHROME.5MPH-RATED.FRONT+REAR\n\n# ENGINE BAY (Complete 454 Big Block)\nENGINE/BLOCK:A70B75C75.V8.CAST-IRON.454CI.BIG-BLOCK\nENGINE/HEADS:A45^4B25C35*2.RECTANGULAR-PORT.ALUMINUM.POLISHED\nENGINE/INTAKE:A60B30C50.ALUMINUM.DUAL-PLANE.HOLLEY-CARB-MOUNT\nENGINE/CARBURETOR:A25B35C30.HOLLEY-850CFM.4-BARREL.CHROME\nENGINE/HEADERS:A120^8B15C15*8.TUBE.STAINLESS.2.25-INCH.CERAMIC-COATED\nENGINE/EXHAUST:A300B10C10*2.DUAL.CHAMBERED-MUFFLERS.CHROME-TIPS\nENGINE/ALTERNATOR:A20B20C15.100AMP.CHROME.BRACKET\nENGINE/DISTRIBUTOR:A15B25C15.HEI.ELECTRONIC.VACUUM-ADVANCE\nENGINE/VALVE-COVERS:A40B12C35*2.ALUMINUM.FINNED.POLISHED.CHEVROLET-SCRIPT\nENGINE/OIL-PAN:A50B20C40.STEEL.BAFFLED.7-QUART.CHROME\nENGINE/TIMING-CHAIN:A15B15C3.DOUBLE-ROLLER.STEEL.PRECISION\nENGINE/PISTONS:A10^8CYLINDER*8.FORGED.DOME-TOP.10.25:1-COMPRESSION\nENGINE/CRANKSHAFT:A80B35C35.FORGED-STEEL.4-BOLT-MAIN.BALANCED\nENGINE/CAMSHAFT:A75B5C5.HYDRAULIC-ROLLER.PERFORMANCE.LIFT-0.525\nENGINE/PUSHRODS:A25^16*16.CHROMOLY.HARDENED.HEAT-TREATED\nENGINE/ROCKER-ARMS:A8^16*16.ROLLER.1.6-RATIO.STUD-MOUNTED\n\n# TRANSMISSION & DRIVETRAIN\nTRANS/GEARBOX:A70B50C40.TURBO-400.3-SPEED-AUTO.SHIFT-KIT.HEAVY-DUTY\nTRANS/TORQUE-CONVERTER:A30DIAMETER.2800-STALL.HIGH-PERFORMANCE\nTRANS/DRIVESHAFT:A200B10C10.STEEL.2-PIECE.U-JOINTS*3.BALANCED\nTRANS/DIFFERENTIAL:A50B40C60.12-BOLT.POSI.3.73-GEARS.HEAVY-DUTY\n\n# SUSPENSION (Performance)\nSUSP/FRONT-CONTROL-ARMS:A60^4*4.TUBULAR.CHROMOLY.BUSHINGS.BALL-JOINTS\nSUSP/REAR-CONTROL-ARMS:A80^4*4.TUBULAR.ADJUSTABLE.POLYURETHANE\nSUSP/SPRINGS-FRONT:A50COIL*2.PROGRESSIVE-RATE.LOWERED-1INCH\nSUSP/SPRINGS-REAR:A60LEAF*2.MULTI-LEAF.5-LEAF-PACK.HEAVY-DUTY\nSUSP/SHOCKS:A55*4.GAS-CHARGED.ADJUSTABLE.PERFORMANCE.BILSTEIN\nSUSP/SWAY-BARS:A140B5C5+A110B5C5.FRONT-1.25INCH+REAR-1INCH.SOLID-STEEL\n\n# WHEELS & TIRES\nWHEELS/FRONT:A45.5DIAMETER.15X7.RALLY.CHROME.5-LUG*2\nWHEELS/REAR:A45.5DIAMETER.15X8.RALLY.CHROME.5-LUG*2\nTIRES/FRONT:A70PROFILE.225-WIDTH.RADIAL.PERFORMANCE*2\nTIRES/REAR:A60PROFILE.275-WIDTH.RADIAL.PERFORMANCE*2\n\n# BRAKES (4-Wheel Disc)\nBRAKES/FRONT-ROTORS:A30DIAMETER.VENTED.CROSS-DRILLED*2\nBRAKES/REAR-ROTORS:A28DIAMETER.VENTED.CROSS-DRILLED*2\nBRAKES/CALIPERS:A15B10C10*4.DUAL-PISTON.ALUMINUM.RED-POWDER-COAT\nBRAKES/MASTER-CYLINDER:A20B10C10.DUAL-RESERVOIR.POWER-ASSISTED\n\n# INTERIOR (Complete Detail)\nINTERIOR/SEATS-FRONT:A50B120C60*2.BUCKET.VINYL.BLACK.BOLSTERED.HEADRESTS\nINTERIOR/SEATS-REAR:A130B120C50.BENCH.VINYL.BLACK.SPLIT-BACK\nINTERIOR/DASHBOARD:A193B40C15.MOLDED.WOODGRAIN-APPLIQUE.PADDED\nINTERIOR/GAUGES:A15DIAMETER*5.ROUND.SS-LOGO.150MPH-SPEEDO.8K-TACH\nINTERIOR/STEERING-WHEEL:A40DIAMETER.3-SPOKE.HORN-BUTTON.SS-EMBLEM\nINTERIOR/SHIFTER:A30B15C10.FLOOR-MOUNTED.CHROME.T-HANDLE.HORSESHOE\nINTERIOR/CONSOLE:A100B35C20.CENTER.WOODGRAIN.STORAGE.ARMREST\nINTERIOR/DOOR-PANELS:A120B80C5*4.VINYL.WOODGRAIN-INSERTS.CHROME-HANDLES\nINTERIOR/CARPET:A495B193.LOOP-PILE.BLACK.MOLDED.SOUND-DEADENING\nINTERIOR/HEADLINER:A450B190.VINYL.BLACK.BOWS*5.TIGHT-FIT\n\n# EXTERIOR DETAILS\nEXTERIOR/GRILLE:A193B30C5.BLACKED-OUT.EGG-CRATE.SS-EMBLEM-CENTER\nEXTERIOR/HEADLIGHTS:A18DIAMETER*4.SEALED-BEAM.CHROME-BEZELS\nEXTERIOR/TAILLIGHTS:A20B40*2.RECTANGULAR.RED-LENS.CHROME-TRIM\nEXTERIOR/MIRRORS:A15B25C10*2.REMOTE.CHROME.CONVEX-PASSENGER\nEXTERIOR/TRIM:A495B2C2*4.CHROME.BODY-SIDE-MOLDING.POLISHED\nEXTERIOR/EMBLEMS:A15B8*8.SS-454.CHEVROLET.BOWTIE.CHROME.3D\nEXTERIOR/GAS-CAP:A10DIAMETER.LOCKING.CHROME.FLUSH-MOUNT\nEXTERIOR/ANTENNA:A60B2C2.POWER.TELESCOPING.FENDER-MOUNT\n\n# GLASS & WINDOWS\nGLASS/WINDSHIELD:A150B75C5.CURVED.LAMINATED.TINTED.DOT-SAFETY\nGLASS/REAR-WINDOW:A140B50C5.CURVED.TEMPERED.TINTED.DEFROST\nGLASS/SIDE-WINDOWS:A90B50C5*4.FRAMELESS.TEMPERED.TINTED.POWER\nGLASS/VENT-WINDOWS:A25B40C3*2.TRIANGULAR.CHROME-FRAME.MANUAL\n\n# LIGHTING SYSTEM\nLIGHTS/HEADLAMPS:A18DIAMETER*4.HALOGEN.SEALED-BEAM.HIGH-LOW\nLIGHTS/FOG-LAMPS:A12DIAMETER*2.AMBER.BUMPER-MOUNT.AUXILIARY\nLIGHTS/TURN-SIGNALS:A10DIAMETER*4.AMBER-FRONT.RED-REAR.SEQUENTIAL\nLIGHTS/BACKUP:A10DIAMETER*2.WHITE.LENS.BRIGHT\nLIGHTS/INTERIOR:A5DIAMETER*3.DOME.MAP.TRUNK.INCANDESCENT\n\n# ELECTRICAL SYSTEM\nELECTRIC/BATTERY:A30B17C20.12V.850CCA.TOP-POST.OPTIMA\nELECTRIC/WIRING:A500TOTAL-LENGTH.COPPER.16-18GA.FUSED.RELAY-BOX\nELECTRIC/FUSE-BOX:A15B10C5.12-CIRCUIT.BLADE-FUSES.LABELED\nELECTRIC/IGNITION:A20B10C5.ELECTRONIC.KEY-CYLINDER.THEFT-DETERRENT\n\n# COOLING SYSTEM\nCOOLING/RADIATOR:A75B50C10.ALUMINUM.3-ROW.CORE-SUPPORT\nCOOLING/FAN:A45DIAMETER.ELECTRIC.THERMOSTAT-CONTROLLED.CFM-3000\nCOOLING/WATER-PUMP:A25B25C15.ALUMINUM.HIGH-FLOW.PULLEY\nCOOLING/THERMOSTAT:A8DIAMETER.180F-OPENING.STAINLESS.GASKET\n\n# FUEL SYSTEM\nFUEL/TANK:A90B50C30.STEEL.20-GALLON.BAFFLED.VENTED\nFUEL/PUMP:A15B10C10.ELECTRIC.HIGH-PRESSURE.110GPH.IN-TANK\nFUEL/LINES:A500TOTAL.STEEL.3/8-INCH.RUBBER-ENDS.CLAMPS\nFUEL/FILTER:A10B5C5.INLINE.10-MICRON.REPLACEMENT-TYPE\n\n# PAINT & FINISH\nPAINT/BASE:A495B193B132.CRANBERRY-RED.METALLIC.BASE-COAT\nPAINT/CLEAR:A495B193B132.URETHANE.2-STAGE.UV-PROTECTION.WET-SAND\nPAINT/STRIPES:A450B30*2.COWL-INDUCTION.WHITE.VINYL.RALLYE-STYLE\n\n# FINAL ASSEMBLY SPECS\nASSEMBLY/TORQUE-SPECS:ALL-BOLTS.FACTORY-SPEC.LOCTITE-APPLIED\nASSEMBLY/GAPS:PANEL-GAPS<4MM.DOOR-GAPS<5MM.HOOD-FIT-PERFECT\nASSEMBLY/ALIGNMENT:BODY-SQUARE.FRAME-LEVEL.SUSPENSION-GEOMETRY\nASSEMBLY/FINISH:CHROME-POLISHED.PAINT-BUFFED.UNDERCOAT-APPLIED",
+      "gene_code": "# ========================================\n# 1970 CHEVELLE SS 454 - PRO TIER (GENE)\n# Natural Language Complete Detail\n# ========================================\n\n# BODY & STRUCTURE\nCAR > body > blob forward 495cm aerodynamic muscular coefficient 0.45\nCAR > hood > surface forward 180cm scoops repeat 2 powerdome chrome hinged\nCAR > roof > surface vinyl black smooth curved elegant\nCAR > doors > wall repeat 2 frameless-glass handles chrome hinged\nCAR > fenders > blob curved flared muscular compound-curves steel\nCAR > quarter-panels > surface sculpted coke-bottle-shape flowing iconic\nCAR > bumpers > chrome repeat 2 front rear 5mph-rated polished\n\n# ENGINE COMPARTMENT\nCAR > engine > block v8 454cubic-inch cast-iron big-block powerful\nCAR > engine > heads aluminum rectangular-port polished performance\nCAR > engine > intake dual-plane aluminum holley-mount 850cfm\nCAR > engine > carburetor holley 4barrel chrome 850cfm tuned\nCAR > engine > headers tube stainless repeat 8 ceramic-coated 2.25inch\nCAR > engine > exhaust dual chambered-mufflers chrome-tips loud\nCAR > engine > valve-covers aluminum finned polished chevrolet-script\nCAR > engine > pistons forged dome-top repeat 8 10.25compression\nCAR > engine > crankshaft forged-steel 4bolt-main balanced precision\nCAR > engine > camshaft hydraulic-roller performance lift-0.525\n\n# DRIVETRAIN\nCAR > transmission > turbo-400 3speed-auto shift-kit heavy-duty\nCAR > driveshaft > steel 2piece u-joints repeat 3 balanced\nCAR > differential > 12bolt posi 3.73gears heavy-duty limited-slip\n\n# SUSPENSION\nCAR > suspension > control-arms tubular chromoly front rear adjustable\nCAR > suspension > springs progressive-rate lowered coil leaf performance\nCAR > suspension > shocks gas-charged adjustable bilstein repeat 4\nCAR > suspension > sway-bars solid-steel front 1.25inch rear 1inch\n\n# WHEELS & TIRES\nCAR > wheels > rally chrome 15inch diameter front 15x7 rear 15x8 repeat 4\nCAR > tires > performance radial front 225width rear 275width grip\n\n# BRAKES\nCAR > brakes > rotors vented cross-drilled front 30cm rear 28cm repeat 4\nCAR > brakes > calipers dual-piston aluminum red powder-coat repeat 4\n\n# INTERIOR\nCAR > interior > seats bucket vinyl black bolstered headrests repeat 2\nCAR > interior > dashboard molded woodgrain padded gauges repeat 5\nCAR > interior > steering-wheel 3spoke chrome horn-button ss-emblem\nCAR > interior > shifter floor-mounted chrome t-handle horseshoe\nCAR > interior > console center woodgrain storage armrest\nCAR > interior > carpet loop-pile black molded sound-deadening\n\n# EXTERIOR DETAILS\nCAR > exterior > grille blacked-out egg-crate ss-emblem chrome\nCAR > exterior > headlights sealed-beam chrome-bezels repeat 4\nCAR > exterior > taillights rectangular red-lens chrome-trim repeat 2\nCAR > exterior > mirrors remote chrome convex repeat 2\nCAR > exterior > emblems ss-454 chevrolet bowtie chrome repeat 8\n\n# GLASS\nCAR > glass > windshield curved laminated tinted dot-safety\nCAR > glass > windows frameless tempered tinted power repeat 4\n\n# LIGHTING\nCAR > lights > headlamps halogen sealed-beam high-low repeat 4\nCAR > lights > turn-signals amber-front red-rear sequential repeat 4\n\n# ELECTRICAL\nCAR > electrical > battery 12volt 850cca optima top-post\nCAR > electrical > wiring copper 16gauge fused relay-box\n\n# COOLING\nCAR > cooling > radiator aluminum 3row core-support\nCAR > cooling > fan electric thermostat-controlled 3000cfm\n\n# FUEL\nCAR > fuel > tank steel 20gallon baffled vented\nCAR > fuel > pump electric high-pressure 110gph in-tank\n\n# PAINT\nCAR > paint > base cranberry-red metallic base-coat\nCAR > paint > clear urethane 2stage uv-protection wet-sand buffed\nCAR > paint > stripes cowl-induction white vinyl rallye-style repeat 2",
+      "vertex_count": 125000,
+      "polygon_count": 95000,
+      "detail_level": "Maximum",
+      "features": [
+        "Every engine component modeled",
+        "Complete interior detail",
+        "All fasteners and hardware",
+        "Accurate suspension geometry",
+        "Realistic material properties",
+        "Professional-grade accuracy"
+      ]
+    },
+    "premium": {
+      "tier": "PREMIUM",
+      "price_usd": 9.99,
+      "price_mpt": 5000,
+      "vls_code": "# 1970 CHEVELLE SS 454 - PREMIUM TIER\n\n# BODY\nBODY:A495B132C193.HOOD+SCOOPS*2.DOORS*2.FENDERS.QUARTERS.BUMPERS*2\n\n# ENGINE\nENGINE:A70B75C75.V8-454.INTAKE.CARB.HEADERS*2.VALVE-COVERS*2\n\n# TRANSMISSION\nTRANS:A70B50C40.TURBO-400.DRIVESHAFT.12-BOLT-REAR\n\n# SUSPENSION\nSUSP:CONTROL-ARMS*4.SPRINGS*4.SHOCKS*4.SWAY-BARS*2\n\n# WHEELS\nWHEELS:A45.5*4.RALLY.CHROME.TIRES-PERFORMANCE\n\n# INTERIOR\nINTERIOR:SEATS*3.DASHBOARD.STEERING-WHEEL.SHIFTER.CONSOLE\n\n# EXTERIOR\nEXTERIOR:GRILLE.LIGHTS*8.MIRRORS*2.TRIM.EMBLEMS*8\n\n# GLASS\nGLASS:WINDSHIELD.REAR-WINDOW.SIDE-WINDOWS*4\n\n# PAINT\nPAINT:CRANBERRY-RED.METALLIC.STRIPES*2.CLEAR-COAT",
+      "gene_code": "# 1970 CHEVELLE SS 454 - PREMIUM TIER (GENE)\n\nCAR > body > blob forward 495cm muscular aerodynamic\nCAR > hood > surface scoops repeat 2 chrome\nCAR > engine > v8 454cubic-inch big-block powerful\nCAR > transmission > turbo-400 3speed heavy-duty\nCAR > wheels > rally chrome 15inch repeat 4 performance\nCAR > interior > seats bucket vinyl dashboard woodgrain\nCAR > exterior > grille ss-emblem chrome lights repeat 8\nCAR > paint > cranberry-red metallic stripes repeat 2",
+      "vertex_count": 35000,
+      "polygon_count": 25000,
+      "detail_level": "High",
+      "features": [
+        "Major body components",
+        "Engine visible detail",
+        "Interior layout",
+        "Accurate proportions",
+        "Good material quality"
+      ]
+    },
+    "basic": {
+      "tier": "BASIC",
+      "price_usd": 0.0,
+      "price_mpt": 100,
+      "vls_code": "# 1970 CHEVELLE SS 454 - BASIC TIER\n\nBODY:A495B132C193.SIMPLE\nENGINE:A70B75C75.V8-BLOCK\nWHEELS:A45.5*4.ROUND\nINTERIOR:SEATS*2.DASH\nPAINT:RED.STRIPES*2",
+      "gene_code": "# 1970 CHEVELLE SS 454 - BASIC TIER (GENE)\n\nCAR > body > cube forward 495cm simple\nCAR > engine > cube v8 big\nCAR > wheels > cylinder repeat 4\nCAR > interior > seats repeat 2 simple\nCAR > paint > red stripes repeat 2",
+      "vertex_count": 2500,
+      "polygon_count": 1800,
+      "detail_level": "Low",
+      "features": [
+        "Basic shape recognition",
+        "Simple geometry",
+        "Minimal detail",
+        "Fast loading"
+      ]
+    }
+  },
+  "subscription_info": {
+    "free": {
+      "name": "Free Tier",
+      "access": [
+        "basic"
+      ],
+      "monthly_renders": 10,
+      "features": [
+        "Simple shapes",
+        "Basic materials",
+        "Standard rendering"
+      ]
+    },
+    "premium": {
+      "name": "Premium ($9.99/mo)",
+      "access": [
+        "basic",
+        "premium"
+      ],
+      "monthly_renders": 100,
+      "features": [
+        "Detailed models",
+        "Good materials",
+        "Fast rendering",
+        "AI assistance"
+      ]
+    },
+    "pro": {
+      "name": "Pro ($49.99/mo)",
+      "access": [
+        "basic",
+        "premium",
+        "pro"
+      ],
+      "monthly_renders": "unlimited",
+      "features": [
+        "Maximum detail",
+        "Professional accuracy",
+        "All components",
+        "Priority rendering",
+        "AI collaboration",
+        "Commercial license"
+      ]
+    }
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "systemId": "SM_PORTAL_SYSTEM",
+  "name": "Friend Portal Network",
+  "type": "Social Connectivity System",
+  "version": "1.0",
+  
+  "overview": {
+    "purpose": "Enable instant travel between MyPlace properties",
+    "mechanism": "Quantum-style doorways between friend locations",
+    "appearance": "Swirling energy portals customized per friend",
+    "maxActivePortals": 8,
+    "currentActive": 2
+  },
+  
+  "configuration": {
+    "maxSimultaneous": 8,
+    "alwaysOnSlots": 2,
+    "inviteOnlySlots": 6,
+    "temporarySlots": 4,
+    
+    "placement": {
+      "allowed": ["Living Room", "Entryway", "Game Room", "Office"],
+      "forbidden": ["Bedrooms", "Bathrooms", "Private areas"],
+      "optimal": "Living Room (social hub)"
+    },
+    
+    "size": {
+      "standard": "2m height × 0.9m width",
+      "adjustable": "Can resize smaller/larger",
+      "shape": "Oval doorway"
+    }
+  },
+  
+  "activePortals": [
+    {
+      "portalId": "portal_001",
+      "slotNumber": 1,
+      "type": "always_on",
+      
+      "friend": {
+        "userId": "user_girlfriend",
+        "displayName": "Sarah",
+        "relationship": "Girlfriend",
+        "trustLevel": "Maximum"
+      },
+      
+      "location": {
+        "inMansion": "Living Room East Wall",
+        "position": {
+          "x": 6,
+          "y": 0,
+          "z": 0
+        },
+        "wallMounted": true
+      },
+      
+      "appearance": {
+        "energyColor": "#FF69B4",
+        "effect": "Swirling Pink Energy",
+        "particles": "Rose petals occasionally",
+        "sound": "Gentle chimes",
+        "brightness": "Soft glow"
+      },
+      
+      "permissions": {
+        "alwaysOpen": true,
+        "knockRequired": false,
+        "canVisitAnytime": true,
+        "notificationsOn": false,
+        "twoWayAccess": true
+      },
+      
+      "destination": {
+        "property": "Sarah's Beach House",
+        "room": "Living Room",
+        "district": "Beach_Houses_District_02"
+      },
+      
+      "usage": {
+        "dailyVisits": "Frequent",
+        "lastUsed": "2 hours ago",
+        "totalVisits": 847,
+        "averageStayDuration": "3.5 hours"
+      },
+      
+      "features": {
+        "videoPreview": "See into her place before entering",
+        "knockNotification": "Not needed (always welcome)",
+        "statusIndicator": "Shows if she's home",
+        "activityInfo": "Shows what she's doing",
+        "sharedCinema": "Can watch movies together"
+      }
+    },
+    
+    {
+      "portalId": "portal_002",
+      "slotNumber": 2,
+      "type": "invite_only",
+      
+      "friend": {
+        "userId": "user_mike",
+        "displayName": "Mike",
+        "relationship": "Close Friend",
+        "trustLevel": "High"
+      },
+      
+      "location": {
+        "inMansion": "Living Room South Wall",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 4.5
+        },
+        "wallMounted": true
+      },
+      
+      "appearance": {
+        "energyColor": "#4169E1",
+        "effect": "Blue Digital Gateway",
+        "particles": "Digital matrix code",
+        "sound": "Tech startup sound",
+        "brightness": "Medium glow"
+      },
+      
+      "permissions": {
+        "alwaysOpen": false,
+        "knockRequired": true,
+        "canVisitAnytime": false,
+        "notificationsOn": true,
+        "twoWayAccess": true
+      },
+      
+      "destination": {
+        "property": "Mike's Urban Penthouse",
+        "room": "Main Room",
+        "district": "Urban_Penthouses_District_03"
+      },
+      
+      "usage": {
+        "dailyVisits": "Occasional",
+        "lastUsed": "Yesterday",
+        "totalVisits": 124,
+        "averageStayDuration": "1.2 hours"
+      },
+      
+      "features": {
+        "videoPreview": "Can peek before knocking",
+        "knockNotification": "Sends alert to both",
+        "statusIndicator": "Online/Offline/Busy",
+        "activityInfo": "What he's currently doing",
+        "sharedGaming": "Can play multiplayer together"
+      }
+    }
+  ],
+  
+  "availableSlots": [
+    {
+      "slotNumber": 3,
+      "status": "Empty",
+      "location": "Living Room West Wall",
+      "available": true
+    },
+    {
+      "slotNumber": 4,
+      "status": "Empty",
+      "location": "Living Room North Corner",
+      "available": true
+    },
+    {
+      "slotNumber": 5,
+      "status": "Empty",
+      "location": "Office Wall",
+      "available": true
+    },
+    {
+      "slotNumber": 6,
+      "status": "Empty",
+      "location": "Game Room Wall",
+      "available": true
+    },
+    {
+      "slotNumber": 7,
+      "status": "Empty",
+      "location": "Entryway Side",
+      "available": true
+    },
+    {
+      "slotNumber": 8,
+      "status": "Empty",
+      "location": "Observatory Entry",
+      "available": true
+    }
+  ],
+  
+  "portalMechanics": {
+    "activation": {
+      "method": "Walk through",
+      "transitionTime": "2-3 seconds",
+      "effect": "Smooth fade and step through",
+      "loading": "Minimal (pre-cached)"
+    },
+    
+    "twoWayTravel": {
+      "enabled": true,
+      "returnPortal": "Automatically created at destination",
+      "returnTime": "Instant (portal stays active)",
+      "closeAfterLeaving": "Optional setting"
+    },
+    
+    "privacy": {
+      "ownerControl": "Can close any portal instantly",
+      "guestControl": "Can request portal close",
+      "doNotDisturb": "Blocks all portal access",
+      "invisibleMode": "Portals appear offline"
+    },
+    
+    "notifications": {
+      "friendKnock": "Audio + Visual alert",
+      "friendEnter": "Notification when someone arrives",
+      "friendLeave": "Notification when someone leaves",
+      "customSounds": "Per friend (Sarah = chimes, Mike = beep)"
+    }
+  },
+  
+  "videoPreview": {
+    "enabled": true,
+    "quality": "720p live stream",
+    "viewAngle": "Through portal perspective",
+    "audio": "Optional preview sound",
+    "privacy": "Friend can disable preview",
+    
+    "viewBefore": {
+      "approach": "Walk up to portal",
+      "display": "See into friend's room",
+      "checkStatus": "See if they're home",
+      "respectPrivacy": "Blurred if they're busy"
+    }
+  },
+  
+  "sharedActivities": {
+    "sharedCinema": {
+      "supported": true,
+      "mechanism": "Both watch same content in respective places",
+      "syncedPlayback": true,
+      "sharedAudio": "Voice chat + movie audio",
+      "webcamOverlay": "See each other's faces"
+    },
+    
+    "sharedGaming": {
+      "supported": true,
+      "mechanism": "Multiplayer games across portals",
+      "lowLatency": "Optimized connection",
+      "spectate": "Can watch friend play"
+    },
+    
+    "hangOut": {
+      "supported": true,
+      "mechanism": "Sit in same virtual space",
+      "spatialAudio": "Sounds like you're together",
+      "activities": ["Chat", "Watch TV", "Listen to music", "Show off items"]
+    }
+  },
+  
+  "securityFeatures": {
+    "authentication": {
+      "friendVerification": "Verified friend accounts only",
+      "twoFactor": "Optional 2FA for high security",
+      "biometric": "Facial recognition for entry"
+    },
+    
+    "blocklisting": {
+      "canBlock": true,
+      "blockEffect": "Portal disappears immediately",
+      "unblock": "Restore portal anytime",
+      "reportAbuse": "Flag inappropriate behavior"
+    },
+    
+    "emergencyClose": {
+      "voiceCommand": "Aurora, close all portals",
+      "panicButton": "Physical button in each room",
+      "autoClose": "On security breach detection"
+    }
+  },
+  
+  "customization": {
+    "portalAppearance": {
+      "color": "Choose from RGB spectrum",
+      "effect": [
+        "Swirling energy",
+        "Digital matrix",
+        "Fireflies",
+        "Water ripple",
+        "Lightning bolts",
+        "Starfield",
+        "Custom image"
+      ],
+      "particles": "Add floating elements",
+      "sound": "Entry/exit sounds",
+      "frame": "Decorative border options"
+    },
+    
+    "friendSpecific": {
+      "girlfriend": {
+        "color": "Pink/Rose",
+        "particles": "Hearts or rose petals",
+        "sound": "Romantic chimes",
+        "alwaysWelcome": true
+      },
+      
+      "closeF riends": {
+        "color": "Blue/Green",
+        "particles": "Stars or sparkles",
+        "sound": "Friendly beep",
+        "knockRequired": true
+      },
+      
+      "family": {
+        "color": "Warm orange/yellow",
+        "particles": "Gentle glow",
+        "sound": "Warm tone",
+        "alwaysOpen": true
+      }
+    }
+  },
+  
+  "analytics": {
+    "mostUsedPortal": "portal_001 (Sarah - 847 visits)",
+    "averageVisitsPerDay": 3.2,
+    "peakVisitTimes": ["7-9 PM", "Weekends"],
+    "averageStayDuration": "2.8 hours",
+    "favoriteActivity": "Shared Cinema"
+  },
+  
+  "futureFeatures": [
+    "Group portals (multiple friends at once)",
+    "Temporary event portals (parties)",
+    "One-way portals (viewing only)",
+    "Portal scheduling (auto-open at set times)",
+    "Portal themes (holidays, special occasions)",
+    "AR portal preview (see without entering)",
+    "Portal mini-games",
+    "Cross-platform access (VR, mobile, desktop)"
+  ],
+  
+  "aiAssistantIntegration": {
+    "aurora": {
+      "managePortals": "Aurora, invite Mike to my place",
+      "notifications": "Aurora, tell me when Sarah arrives",
+      "automation": "Aurora, close portals at bedtime",
+      "suggestions": "Aurora suggests optimal portal placement"
+    }
+  },
+  
+  "metadata": {
+    "designedBy": [
+      "AI Personality #43 (System Architect)",
+      "AI Personality #62 (AR/VR Developer)"
+    ],
+    "created": "2025-10-16",
+    "status": "Active",
+    "version": "1.0"
+  }
+}

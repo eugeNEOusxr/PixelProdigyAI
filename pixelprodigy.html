@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy - VLS Object Renderer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .vls-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 20px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            font-family: 'Courier New', monospace;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .personality-info {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .personality-info strong {
+            color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .viewer-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 600px;
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .viewer-controls {
+            padding: 20px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .viewer-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .viewer-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .viewer-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .viewer-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .object-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .object-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .object-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .object-preview {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .object-info {
+            padding: 15px;
+        }
+
+        .object-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .object-vls {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            color: #999;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: #059669;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: #dc2626;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 PixelProdigy VLS Renderer</h1>
+            <p class="subtitle">AI-powered 3D object generation using Vertex Language System</p>
+            <span class="vls-badge">⚡ VLS Protocol Active</span>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalObjects">0</div>
+                    <div class="stat-label">VLS Objects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="compressionRatio">250x</div>
+                    <div class="stat-label">Compression</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="renderTime">0ms</div>
+                    <div class="stat-label">Render Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activePersonalities">5</div>
+                    <div class="stat-label">AI Personalities</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <div class="control-panel">
+                <h2 class="section-title">VLS Input</h2>
+                
+                <div class="control-group">
+                    <label>AI Personality</label>
+                    <select id="personalitySelect">
+                        <option value="">None (Raw VLS)</option>
+                        <option value="30">Personality #30 - Interior Designer</option>
+                        <option value="33">Personality #33 - Industrial Designer</option>
+                        <option value="14">Personality #14 - Organic Naturalist</option>
+                        <option value="20">Personality #20 - Vehicle Designer</option>
+                        <option value="37">Personality #37 - Entertainment Architect</option>
+                    </select>
+                    <div id="personalityInfo" class="personality-info" style="display: none;"></div>
+                </div>
+
+                <div class="control-group">
+                    <label>VLS Code</label>
+                    <textarea id="vlsInput" placeholder="Enter VLS code...
+Example: A5B3C2.D4E4F4.G2H2I2
+
+A-Z = Vertex directions
+0-9 = Scaling factors  
+. = Separator
+/ = Personality partition"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="renderVLS()">
+                    ⚡ Render 3D Model
+                </button>
+
+                <button class="btn btn-secondary" onclick="loadExample()">
+                    📋 Load Example
+                </button>
+
+                <button class="btn btn-secondary" onclick="exportToObjectBrowser()">
+                    💾 Export to Object Browser
+                </button>
+
+                <div id="statusMessage"></div>
+            </div>
+
+            <div class="viewer-container">
+                <canvas id="renderCanvas"></canvas>
+                <div class="viewer-controls">
+                    <div class="viewer-info" id="viewerInfo">
+                        Ready to render VLS objects
+                    </div>
+                    <div class="viewer-buttons">
+                        <button class="viewer-btn" onclick="resetCamera()">🎥 Reset View</button>
+                        <button class="viewer-btn" onclick="toggleWireframe()">🔲 Wireframe</button>
+                        <button class="viewer-btn" onclick="exportVLS()">📤 Export VLS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title" style="color: white; margin-bottom: 20px;">🗄️ VLS Object Library</h2>
+        <div id="objectGrid" class="object-grid">
+            <div class="loading">Loading VLS objects from database...</div>
+        </div>
+    </div>
+
+    <script src="object_generator/vls_parser.js"></script>
+    <script src="object_generator/vls_renderer.js"></script>
+    <script src="object_generator/personality_morpher.js"></script>
+    
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let renderer, scene, camera, controls;
+        let currentObject = null;
+        let personalities = [];
+
+        // Initialize Three.js scene
+        function initScene() {
+            const canvas = document.getElementById('renderCanvas');
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x667eea);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(5, 5, 10);
+            camera.lookAt(0, 0, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 20, 10);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            const pointLight = new THREE.PointLight(0x764ba2, 0.5);
+            pointLight.position.set(-10, 10, -10);
+            scene.add(pointLight);
+
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20);
+            scene.add(gridHelper);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        // Render VLS code
+        async function renderVLS() {
+            const vlsCode = document.getElementById('vlsInput').value.trim();
+            const personalityId = document.getElementById('personalitySelect').value;
+
+            if (!vlsCode) {
+                showStatus('Please enter VLS code', 'error');
+                return;
+            }
+
+            const startTime = performance.now();
+            showStatus('Parsing VLS...', 'info');
+
+            try {
+                // Call API to parse VLS
+                const response = await fetch(`${API_BASE}/vls/parse`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vls: vlsCode, personalityId })
+                });
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Parse failed');
+                }
+
+                // Use VLS renderer to create Three.js mesh
+                const vlsRenderer = new VLSRenderer();
+                const mesh = vlsRenderer.renderVLS(vlsCode, personalityId);
+
+                // Clear previous object
+                if (currentObject) {
+                    scene.remove(currentObject);
+                }
+
+                // Add new object to scene
+                currentObject = mesh;
+                scene.add(currentObject);
+
+                const renderTime = Math.round(performance.now() - startTime);
+                document.getElementById('renderTime').textContent = `${renderTime}ms`;
+
+                showStatus(`✅ Rendered successfully! ${data.vertices.length} vertices`, 'success');
+                document.getElementById('viewerInfo').textContent = 
+                    `Vertices: ${data.vertices.length} | Edges: ${data.edges.length} | Faces: ${data.faces.length}`;
+
+            } catch (error) {
+                console.error('Render error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Load example VLS
+        function loadExample() {
+            const examples = [
+                'A5B5C2.D4E4F4.G2H2I2', // Basic chair
+                'A8B4C6~.CURVES:+3.FABRIC:velvet', // Sofa
+                'CHAIR/30:A5^4B5.LEGS:A2^8N2*4', // Chair with personality
+                'CAR/20:A12B3C8.AERO:+0.85', // Sports car
+            ];
+            const example = examples[Math.floor(Math.random() * examples.length)];
+            document.getElementById('vlsInput').value = example;
+        }
+
+        // Load objects from database
+        async function loadObjects() {
+            try {
+                const response = await fetch(`${API_BASE}/vls/objects?limit=12`);
+                const data = await response.json();
+
+                if (data.success && data.objects.length > 0) {
+                    document.getElementById('totalObjects').textContent = data.total;
+                    renderObjectGrid(data.objects);
+                } else {
+                    document.getElementById('objectGrid').innerHTML = 
+                        '<div class="loading">No VLS objects found. Start by creating some!</div>';
+                }
+            } catch (error) {
+                console.error('Load objects error:', error);
+                document.getElementById('objectGrid').innerHTML = 
+                    '<div class="loading">Could not connect to VLS API. Make sure server is running.</div>';
+            }
+        }
+
+        // Render object grid
+        function renderObjectGrid(objects) {
+            const grid = document.getElementById('objectGrid');
+            grid.innerHTML = objects.map(obj => `
+                <div class="object-card" onclick="loadObject('${obj.object_id}')">
+                    <div class="object-preview" id="preview-${obj.object_id}"></div>
+                    <div class="object-info">
+                        <div class="object-name">${obj.name}</div>
+                        <div class="object-vls">${obj.vls_compressed || obj.vls_code}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render mini 3D previews (async)
+            objects.forEach(obj => {
+                setTimeout(() => renderMiniPreview(obj), 100);
+            });
+        }
+
+        // Render mini preview
+        function renderMiniPreview(obj) {
+            const container = document.getElementById(`preview-${obj.object_id}`);
+            if (!container) return;
+
+            const miniScene = new THREE.Scene();
+            const miniCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            miniCamera.position.set(3, 3, 5);
+
+            const miniRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            miniRenderer.setSize(200, 150);
+            container.appendChild(miniRenderer.domElement);
+
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(5, 5, 5);
+            miniScene.add(light);
+            miniScene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            try {
+                const vlsRenderer = new VLSRenderer();
+                const mesh = vlsRenderer.renderVLS(obj.vls_code, obj.created_by_personality_id);
+                miniScene.add(mesh);
+
+                function animate() {
+                    mesh.rotation.y += 0.01;
+                    miniRenderer.render(miniScene, miniCamera);
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            } catch (error) {
+                console.error('Mini preview error:', error);
+            }
+        }
+
+        // Load specific object
+        async function loadObject(objectId) {
+            try {
+                const response = await fetch(`${API_BASE}/vls/objects/${objectId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('vlsInput').value = data.object.vls_code;
+                    if (data.object.created_by_personality_id) {
+                        document.getElementById('personalitySelect').value = data.object.created_by_personality_id;
+                    }
+                    renderVLS();
+                }
+            } catch (error) {
+                console.error('Load object error:', error);
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.className = type === 'error' ? 'error-message' : 'success-message';
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Export to object browser
+        function exportToObjectBrowser() {
+            alert('Exporting to Object Browser... (Feature coming soon!)');
+        }
+
+        // Reset camera
+        function resetCamera() {
+            camera.position.set(5, 5, 10);
+            camera.lookAt(0, 0, 0);
+            controls.reset();
+        }
+
+        // Toggle wireframe
+        function toggleWireframe() {
+            if (currentObject) {
+                currentObject.traverse(child => {
+                    if (child.isMesh) {
+                        child.material.wireframe = !child.material.wireframe;
+                    }
+                });
+            }
+        }
+
+        // Export VLS
+        function exportVLS() {
+            const vls = document.getElementById('vlsInput').value;
+            const blob = new Blob([vls], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'object.vls';
+            a.click();
+        }
+
+        // Personality selector change
+        document.getElementById('personalitySelect').addEventListener('change', (e) => {
+            const personalityId = e.target.value;
+            const infoEl = document.getElementById('personalityInfo');
+
+            if (!personalityId) {
+                infoEl.style.display = 'none';
+                return;
+            }
+
+            const personality = personalities.find(p => p.id == personalityId);
+            if (personality) {
+                infoEl.innerHTML = `<strong>${personality.name}</strong><br>${personality.focus}`;
+                infoEl.style.display = 'block';
+            }
+        });
+
+        // Load personalities
+        async function loadPersonalities() {
+            try {
+                const response = await fetch(`${API_BASE}/personalities`);
+                const data = await response.json();
+                if (data.success) {
+                    personalities = data.personalities;
+                    document.getElementById('activePersonalities').textContent = personalities.length;
+                }
+            } catch (error) {
+                console.error('Load personalities error:', error);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initScene();
+            loadObjects();
+            loadPersonalities();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('renderCanvas');
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+    </script>
+</body>
+</html>

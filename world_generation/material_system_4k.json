@@ -1,0 +1,118 @@
+{
+  "defaultMaterial": {
+    "albedo": [
+      1,
+      1,
+      1
+    ],
+    "metallic": 0,
+    "roughness": 0.5,
+    "ao": 1,
+    "emissive": [
+      0,
+      0,
+      0
+    ],
+    "emissiveStrength": 0,
+    "normalStrength": 1,
+    "heightScale": 0.05,
+    "enableSSS": false,
+    "sssColor": [
+      1,
+      0.5,
+      0.3
+    ],
+    "sssStrength": 0.5,
+    "sssThickness": 2
+  },
+  "presets": {
+    "gold": {
+      "albedo": [
+        1,
+        0.782,
+        0.344
+      ],
+      "metallic": 1,
+      "roughness": 0.2,
+      "ao": 1
+    },
+    "wood": {
+      "albedo": [
+        0.545,
+        0.353,
+        0.169
+      ],
+      "metallic": 0,
+      "roughness": 0.8,
+      "ao": 0.9
+    },
+    "stone": {
+      "albedo": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "ao": 0.8
+    },
+    "skin": {
+      "albedo": [
+        0.9,
+        0.7,
+        0.6
+      ],
+      "metallic": 0,
+      "roughness": 0.5,
+      "ao": 1,
+      "enableSSS": true,
+      "sssColor": [
+        1,
+        0.5,
+        0.3
+      ],
+      "sssStrength": 0.8,
+      "sssThickness": 3
+    },
+    "glass": {
+      "albedo": [
+        1,
+        1,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0,
+      "ao": 1
+    }
+  },
+  "textureSlots": {
+    "albedo": {
+      "size": 4096,
+      "format": "BC7"
+    },
+    "normal": {
+      "size": 4096,
+      "format": "BC5"
+    },
+    "metallic": {
+      "size": 4096,
+      "format": "BC4"
+    },
+    "roughness": {
+      "size": 4096,
+      "format": "BC4"
+    },
+    "ao": {
+      "size": 4096,
+      "format": "BC4"
+    },
+    "height": {
+      "size": 4096,
+      "format": "BC4"
+    },
+    "emissive": {
+      "size": 4096,
+      "format": "BC7"
+    }
+  }
+}

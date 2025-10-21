@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Renderer Test - PixelVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #renderCanvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+            background: #000;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 300px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .controls h2 {
+            margin-bottom: 15px;
+            color: #4a9eff;
+            font-size: 18px;
+            border-bottom: 2px solid #4a9eff;
+            padding-bottom: 5px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .control-group button {
+            padding: 10px 20px;
+            margin: 5px 5px 5px 0;
+            border: none;
+            border-radius: 5px;
+            background: #4a9eff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .control-group button:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+
+        .control-group button.active {
+            background: #28a745;
+        }
+
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: #2a2a2a;
+            color: white;
+            font-size: 14px;
+        }
+
+        .stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 200px;
+        }
+
+        .stats h3 {
+            margin-bottom: 10px;
+            color: #4a9eff;
+            font-size: 16px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .stat-label {
+            color: #aaa;
+        }
+
+        .stat-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .equipment-slot {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .equipment-slot:hover {
+            background: #3a3a3a;
+            transform: scale(1.05);
+        }
+
+        .equipment-slot.equipped {
+            border: 2px solid #28a745;
+        }
+
+        .slot-name {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .slot-item {
+            font-size: 13px;
+            color: #fff;
+        }
+
+        .log {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            width: 400px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            font-size: 12px;
+            margin: 3px 0;
+            padding: 3px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .log-entry.success {
+            color: #28a745;
+        }
+
+        .log-entry.warning {
+            color: #ffc107;
+        }
+
+        .log-entry.error {
+            color: #dc3545;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4a9eff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+
+    <div id="loadingScreen" class="loading">
+        <div class="loading-spinner"></div>
+        <div>Loading Character Renderer...</div>
+    </div>
+
+    <div class="controls" style="display: none;" id="controls">
+        <h2>Character Renderer Test</h2>
+
+        <div class="control-group">
+            <label>Animation:</label>
+            <button onclick="testAnim('idle')">Idle</button>
+            <button onclick="testAnim('walk')">Walk</button>
+            <button onclick="testAnim('run')">Run</button>
+            <button onclick="testAnim('attack_melee')">Attack</button>
+            <button onclick="testAnim('cast')">Cast</button>
+            <button onclick="testAnim('death')">Death</button>
+        </div>
+
+        <div class="control-group">
+            <label>Race:</label>
+            <select id="raceSelect" onchange="changeRace()">
+                <option value="human">Human</option>
+                <option value="elf">Elf</option>
+                <option value="dwarf">Dwarf</option>
+                <option value="orc">Orc</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Equipment Test:</label>
+            <button onclick="equipItem('weapon', 'iron_sword')">Equip Sword</button>
+            <button onclick="equipItem('armor', 'iron_chestplate')">Equip Armor</button>
+            <button onclick="unequipAll()">Unequip All</button>
+        </div>
+
+        <div class="control-group">
+            <label>Camera:</label>
+            <button onclick="resetCamera()">Reset</button>
+            <button onclick="toggleAutoRotate()">Auto Rotate</button>
+        </div>
+
+        <div class="control-group">
+            <label>LOD Test:</label>
+            <button onclick="setDistance(10)">Close (10m)</button>
+            <button onclick="setDistance(35)">Medium (35m)</button>
+            <button onclick="setDistance(75)">Far (75m)</button>
+            <button onclick="setDistance(150)">Very Far (150m)</button>
+        </div>
+
+        <div class="control-group">
+            <label>Multiple Characters:</label>
+            <button onclick="spawnCharacters(1)">1 Character</button>
+            <button onclick="spawnCharacters(5)">5 Characters</button>
+            <button onclick="spawnCharacters(12)">12 Characters</button>
+            <button onclick="spawnCharacters(20)">20 Characters</button>
+        </div>
+
+        <div class="control-group">
+            <label>Equipment Slots:</label>
+            <div class="equipment-grid">
+                <div class="equipment-slot" data-slot="head">
+                    <div class="slot-name">Head</div>
+                    <div class="slot-item">Empty</div>
+                </div>
+                <div class="equipment-slot" data-slot="chest">
+                    <div class="slot-name">Chest</div>
+                    <div class="slot-item">Empty</div>
+                </div>
+                <div class="equipment-slot" data-slot="legs">
+                    <div class="slot-name">Legs</div>
+                    <div class="slot-item">Empty</div>
+                </div>
+                <div class="equipment-slot" data-slot="weapon_main">
+                    <div class="slot-name">Main Hand</div>
+                    <div class="slot-item">Empty</div>
+                </div>
+                <div class="equipment-slot" data-slot="weapon_off">
+                    <div class="slot-name">Off Hand</div>
+                    <div class="slot-item">Empty</div>
+                </div>
+                <div class="equipment-slot" data-slot="feet">
+                    <div class="slot-name">Feet</div>
+                    <div class="slot-item">Empty</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats" style="display: none;" id="stats">
+        <h3>Performance Stats</h3>
+        <div class="stat-item">
+            <span class="stat-label">FPS:</span>
+            <span class="stat-value" id="fps">60</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Frame Time:</span>
+            <span class="stat-value" id="frameTime">16ms</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Characters:</span>
+            <span class="stat-value" id="charCount">1</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Active Anims:</span>
+            <span class="stat-value" id="animCount">1</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">LOD Level:</span>
+            <span class="stat-value" id="lodLevel">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Distance:</span>
+            <span class="stat-value" id="distance">10m</span>
+        </div>
+    </div>
+
+    <div class="log" style="display: none;" id="log">
+        <div class="log-entry success">System initialized</div>
+    </div>
+
+    <script src="character_renderer.js"></script>
+    <script src="vls_character_loader.js"></script>
+    <script src="../object_generator/vls_parser.js"></script>
+
+    <script>
+        let characterRenderer;
+        let vlsLoader;
+        let characterManager;
+        let currentCharacter;
+        let autoRotate = false;
+        let cameraDistance = 5;
+        let cameraAngle = 0;
+        let frameCount = 0;
+        let lastFrameTime = Date.now();
+
+        // Initialize the test environment
+        async function init() {
+            try {
+                log('Initializing character renderer...', 'success');
+
+                // Create VLS loader
+                vlsLoader = new VLSCharacterLoader();
+                
+                // Load default character model
+                log('Loading human character model...', 'success');
+                const modelData = await vlsLoader.loadCharacterModel('human', 'male');
+                
+                // Create character renderer
+                characterRenderer = new CharacterRenderer('player1', modelData, {
+                    hairColor: '#8B4513',
+                    skinColor: '#FFD9B3',
+                    eyeColor: '#4169E1'
+                });
+
+                // Create character manager
+                characterManager = new CharacterManager();
+                characterManager.addCharacter(characterRenderer);
+                currentCharacter = characterRenderer;
+
+                log('Character renderer ready!', 'success');
+
+                // Setup canvas
+                const canvas = document.getElementById('renderCanvas');
+                setupCanvas(canvas);
+
+                // Start render loop
+                requestAnimationFrame(renderLoop);
+
+                // Hide loading screen
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('controls').style.display = 'block';
+                document.getElementById('stats').style.display = 'block';
+                document.getElementById('log').style.display = 'block';
+
+                log('Test environment ready!', 'success');
+
+            } catch (error) {
+                log(`Error initializing: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        // Setup canvas for rendering
+        function setupCanvas(canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // Simple 2D visualization for now (would be WebGL in production)
+            const ctx = canvas.getContext('2d');
+            canvas.ctx = ctx;
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // Main render loop
+        function renderLoop() {
+            const now = Date.now();
+            const deltaTime = (now - lastFrameTime) / 1000;
+            lastFrameTime = now;
+
+            // Update characters
+            characterManager.updateAll(deltaTime);
+
+            // Render
+            render(deltaTime);
+
+            // Update stats
+            updateStats(deltaTime);
+
+            // Camera auto-rotate
+            if (autoRotate) {
+                cameraAngle += deltaTime * 0.5;
+            }
+
+            frameCount++;
+            requestAnimationFrame(renderLoop);
+        }
+
+        // Render function (simplified 2D projection for testing)
+        function render(deltaTime) {
+            const canvas = document.getElementById('renderCanvas');
+            const ctx = canvas.ctx;
+
+            // Clear canvas
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid
+            drawGrid(ctx, canvas.width, canvas.height);
+
+            // Draw all characters
+            const characters = characterManager.getAllCharacters();
+            characters.forEach(char => {
+                drawCharacter(ctx, char, canvas.width, canvas.height);
+            });
+        }
+
+        // Draw grid floor
+        function drawGrid(ctx, width, height) {
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const gridSize = 50;
+
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        }
+
+        // Draw a character (simplified 2D representation)
+        function drawCharacter(ctx, char, width, height) {
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Calculate position based on camera
+            const scale = 100 / (cameraDistance + 5);
+            const x = centerX + char.position.x * scale;
+            const y = centerY - char.position.y * scale;
+
+            // Draw character body
+            ctx.fillStyle = char.appearance.skinColor || '#FFD9B3';
+            ctx.beginPath();
+            ctx.arc(x, y - 30 * scale, 15 * scale, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw body
+            ctx.fillStyle = '#4a9eff';
+            ctx.fillRect(x - 10 * scale, y - 15 * scale, 20 * scale, 40 * scale);
+
+            // Draw legs
+            ctx.fillStyle = '#2a5298';
+            ctx.fillRect(x - 10 * scale, y + 25 * scale, 8 * scale, 30 * scale);
+            ctx.fillRect(x + 2 * scale, y + 25 * scale, 8 * scale, 30 * scale);
+
+            // Draw label
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(char.id, x, y + 70 * scale);
+
+            // Draw animation state
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#4a9eff';
+            ctx.fillText(char.animator.currentAnimation || 'idle', x, y + 85 * scale);
+
+            // Draw LOD level
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#ffc107';
+            ctx.fillText(`LOD ${char.lodLevel}`, x, y + 100 * scale);
+        }
+
+        // Update stats display
+        function updateStats(deltaTime) {
+            const fps = Math.round(1 / deltaTime);
+            const frameTime = Math.round(deltaTime * 1000);
+
+            document.getElementById('fps').textContent = fps;
+            document.getElementById('frameTime').textContent = frameTime + 'ms';
+            document.getElementById('charCount').textContent = characterManager.getAllCharacters().length;
+            document.getElementById('animCount').textContent = characterManager.getAllCharacters().length;
+            document.getElementById('lodLevel').textContent = currentCharacter ? currentCharacter.lodLevel : 0;
+            document.getElementById('distance').textContent = Math.round(cameraDistance) + 'm';
+        }
+
+        // Test animation
+        function testAnim(animName) {
+            if (currentCharacter) {
+                currentCharacter.playAnimation(animName);
+                log(`Playing animation: ${animName}`, 'success');
+            }
+        }
+
+        // Change race
+        async function changeRace() {
+            const race = document.getElementById('raceSelect').value;
+            log(`Loading ${race} model...`, 'success');
+            
+            try {
+                const modelData = await vlsLoader.loadCharacterModel(race, 'male');
+                currentCharacter.updateModel(modelData);
+                log(`Changed to ${race}`, 'success');
+            } catch (error) {
+                log(`Error loading ${race}: ${error.message}`, 'error');
+            }
+        }
+
+        // Equip item
+        function equipItem(slot, itemId) {
+            if (currentCharacter) {
+                currentCharacter.equipItem(slot, itemId, {});
+                log(`Equipped ${itemId} to ${slot}`, 'success');
+                
+                // Update UI
+                const slotElement = document.querySelector(`[data-slot="${slot}"]`);
+                if (slotElement) {
+                    slotElement.classList.add('equipped');
+                    slotElement.querySelector('.slot-item').textContent = itemId;
+                }
+            }
+        }
+
+        // Unequip all
+        function unequipAll() {
+            if (currentCharacter) {
+                currentCharacter.equipmentManager.slots.forEach((_, slot) => {
+                    currentCharacter.unequipItem(slot);
+                });
+                log('Unequipped all items', 'success');
+                
+                // Update UI
+                document.querySelectorAll('.equipment-slot').forEach(el => {
+                    el.classList.remove('equipped');
+                    el.querySelector('.slot-item').textContent = 'Empty';
+                });
+            }
+        }
+
+        // Reset camera
+        function resetCamera() {
+            cameraDistance = 5;
+            cameraAngle = 0;
+            log('Camera reset', 'success');
+        }
+
+        // Toggle auto rotate
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+            log(`Auto rotate: ${autoRotate ? 'ON' : 'OFF'}`, 'success');
+        }
+
+        // Set camera distance
+        function setDistance(dist) {
+            cameraDistance = dist;
+            
+            // Update LOD level based on distance
+            if (currentCharacter) {
+                currentCharacter.calculateLODLevel(dist);
+            }
+            
+            log(`Camera distance set to ${dist}m`, 'success');
+        }
+
+        // Spawn multiple characters
+        function spawnCharacters(count) {
+            // Clear existing characters
+            characterManager.characters.clear();
+            
+            // Spawn new characters
+            for (let i = 0; i < count; i++) {
+                const char = new CharacterRenderer(`player${i}`, currentCharacter.modelData, {
+                    hairColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                    skinColor: '#FFD9B3',
+                    eyeColor: `hsl(${Math.random() * 360}, 70%, 50%)`
+                });
+                
+                // Random position in a circle
+                const angle = (i / count) * Math.PI * 2;
+                const radius = count * 0.5;
+                char.position.x = Math.cos(angle) * radius;
+                char.position.z = Math.sin(angle) * radius;
+                
+                // Random animation
+                const anims = ['idle', 'walk', 'emote_wave', 'sit'];
+                char.playAnimation(anims[Math.floor(Math.random() * anims.length)]);
+                
+                characterManager.addCharacter(char);
+            }
+            
+            currentCharacter = characterManager.getAllCharacters()[0];
+            log(`Spawned ${count} characters`, 'success');
+        }
+
+        // Log message
+        function log(message, type = 'success') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+            
+            // Keep only last 20 messages
+            while (logDiv.children.length > 20) {
+                logDiv.removeChild(logDiv.lastChild);
+            }
+        }
+
+        // Start the test
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

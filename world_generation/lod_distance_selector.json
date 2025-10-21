@@ -1,0 +1,64 @@
+{
+  "enabled": true,
+  "method": "spherical-distance",
+  "zones": [
+    {
+      "name": "ultra",
+      "minDist": 0,
+      "maxDist": 10,
+      "quality": "4K",
+      "priority": "ultra"
+    },
+    {
+      "name": "high",
+      "minDist": 10,
+      "maxDist": 50,
+      "quality": "1080p",
+      "priority": "high"
+    },
+    {
+      "name": "medium",
+      "minDist": 50,
+      "maxDist": 200,
+      "quality": "720p",
+      "priority": "medium"
+    },
+    {
+      "name": "low",
+      "minDist": 200,
+      "maxDist": 500,
+      "quality": "360p",
+      "priority": "low"
+    },
+    {
+      "name": "culled",
+      "minDist": 500,
+      "maxDist": null,
+      "quality": null,
+      "priority": "none"
+    }
+  ],
+  "objectSpecific": {
+    "characters": {
+      "maxDist": 100
+    },
+    "weapons": {
+      "maxDist": 50
+    },
+    "buildings": {
+      "maxDist": 500
+    },
+    "terrain": {
+      "maxDist": 1000
+    },
+    "particles": {
+      "maxDist": 100
+    }
+  },
+  "cameraVelocityScale": {
+    "stationary": 1,
+    "walking": 0.8,
+    "running": 0.6,
+    "flying": 0.4
+  }
+}

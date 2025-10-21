@@ -1,0 +1,18 @@
+{
+  "port": 8080,
+  "ssl": true,
+  "corsOrigins": [
+    "https://beta.pixelverse.ai",
+    "https://pixelverse.ai"
+  ],
+  "maxConnections": 200,
+  "rateLimit": {
+    "windowMs": 60000,
+    "max": 100
+  },
+  "websocket": {
+    "pingInterval": 30000,
+    "pongTimeout": 5000,
+    "maxPayload": 1048576
+  }
+}

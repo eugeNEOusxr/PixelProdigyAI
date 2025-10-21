@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy Marketplace - Object Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0f;
+            color: #00ffaa;
+            overflow: hidden;
+        }
+
+        /* Split View Layout */
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left: Icon Grid */
+        #iconPanel {
+            width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            border-right: 2px solid #00ffaa;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        #iconPanel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ffaa;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .icon-item {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #00ffaa;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .icon-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 255, 170, 0.5);
+            border-color: #ffd700;
+        }
+
+        .icon-item.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .icon-canvas {
+            width: 100%;
+            height: 120px;
+            border-radius: 5px;
+            background: radial-gradient(circle, rgba(0, 255, 170, 0.1), transparent);
+        }
+
+        .icon-label {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 8px;
+            color: #ffd700;
+        }
+
+        .icon-price {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(135deg, #ffd700, #ff8800);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        /* Right: 3D Viewport */
+        #viewport {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Top Toolbar */
+        #toolbar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffaa;
+            border-radius: 10px;
+            padding: 15px 20px;
+            z-index: 10;
+        }
+
+        #toolbar h1 {
+            font-size: 1.5em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        #toolbar button {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        #toolbar button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.5);
+        }
+
+        /* Info Panel */
+        #infoPanel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ffaa;
+            border-radius: 10px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            color: #00ffaa;
+            font-weight: bold;
+        }
+
+        #purchaseBtn {
+            width: 100%;
+            background: linear-gradient(135deg, #ffd700, #ff8800);
+            color: #000;
+            border: none;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        #purchaseBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #loadingOverlay.active {
+            display: flex;
+        }
+
+        .loading-text {
+            font-size: 2em;
+            color: #00ffaa;
+            text-shadow: 0 0 20px #00ffaa;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Scrollbar */
+        #iconPanel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #iconPanel::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+
+        #iconPanel::-webkit-scrollbar-thumb {
+            background: #00ffaa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Left Panel: Icon Grid -->
+        <div id="iconPanel">
+            <h2>🛒 OBJECT MARKETPLACE</h2>
+            <div class="icon-grid" id="iconGrid"></div>
+        </div>
+
+        <!-- Right Panel: 3D Viewport -->
+        <div id="viewport">
+            <canvas id="canvas3d"></canvas>
+            
+            <!-- Toolbar -->
+            <div id="toolbar">
+                <h1 id="objectTitle">Select an Object</h1>
+                <div>
+                    <button onclick="exportModel()">💾 Export</button>
+                    <button onclick="addToCart()">🛒 Add to Cart</button>
+                    <button onclick="toggleWireframe()">🔲 Wireframe</button>
+                    <button onclick="resetCamera()">📷 Reset View</button>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div id="infoPanel">
+                <div class="info-row">
+                    <span class="info-label">Vertices:</span>
+                    <span class="info-value" id="vertexCount">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Faces:</span>
+                    <span class="info-value" id="faceCount">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">File Size:</span>
+                    <span class="info-value" id="fileSize">0 KB</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">License:</span>
+                    <span class="info-value" id="license">Commercial Use</span>
+                </div>
+                <button id="purchaseBtn" onclick="purchaseObject()">
+                    💳 Purchase for <span id="price">$0.00</span>
+                </button>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay">
+                <div class="loading-text">⚡ Loading 3D Model...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════
+        // MARKETPLACE OBJECT CATALOG
+        // ═══════════════════════════════════════════════════════════════════════
+
+        const marketplaceObjects = [
+            {
+                id: 'human_male_01',
+                name: 'Human Male',
+                category: 'Anatomy',
+                price: 29.99,
+                vertices: 10247,
+                faces: 9856,
+                fileSize: 847,
+                premium: true,
+                color: 0xffeedd,
+                modelType: 'procedural', // or 'obj' when we have files
+                license: 'Commercial Use'
+            },
+            {
+                id: 'human_female_01',
+                name: 'Human Female',
+                category: 'Anatomy',
+                price: 29.99,
+                vertices: 10543,
+                faces: 10112,
+                fileSize: 892,
+                premium: true,
+                color: 0xffeedd,
+                modelType: 'procedural',
+                license: 'Commercial Use'
+            },
+            {
+                id: 'skeleton_01',
+                name: 'Skeleton',
+                category: 'Anatomy',
+                price: 19.99,
+                vertices: 5234,
+                faces: 4823,
+                fileSize: 412,
+                premium: false,
+                color: 0xeeeeee,
+                modelType: 'procedural',
+                license: 'Commercial Use'
+            },
+            {
+                id: 'tree_oak_01',
+                name: 'Oak Tree',
+                category: 'Nature',
+                price: 9.99,
+                vertices: 3421,
+                faces: 3156,
+                fileSize: 267,
+                premium: false,
+                color: 0x228b22,
+                modelType: 'procedural',
+                license: 'Commercial Use'
+            },
+            {
+                id: 'car_sports_01',
+                name: 'Sports Car',
+                category: 'Vehicles',
+                price: 39.99,
+                vertices: 12456,
+                faces: 11834,
+                fileSize: 1024,
+                premium: true,
+                color: 0xff0000,
+                modelType: 'procedural',
+                license: 'Commercial Use'
+            },
+            {
+                id: 'building_modern_01',
+                name: 'Modern Building',
+                category: 'Architecture',
+                price: 24.99,
+                vertices: 8934,
+                faces: 8467,
+                fileSize: 723,
+                premium: false,
+                color: 0x888888,
+                modelType: 'procedural',
+                license: 'Commercial Use'
+            },
+            {
+                id: 'sword_legendary_01',
+                name: 'Legendary Sword',
+                category: 'Weapons',
+                price: 14.99,
+                vertices: 4567,
+                faces: 4234,
+                fileSize: 356,
+                premium: true,
+                color: 0xccccff,
+                modelType: 'procedural',
+                license: 'Commercial Use'
+            },
+            {
+                id: 'character_warrior_01',
+                name: 'Warrior Character',
+                category: 'Characters',
+                price: 49.99,
+                vertices: 18234,
+                faces: 17456,
+                fileSize: 1456,
+                premium: true,
+                color: 0xff8844,
+                modelType: 'procedural',
+                license: 'Commercial Use'
+            }
+        ];
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // THREE.JS SETUP
+        // ═══════════════════════════════════════════════════════════════════════
+
+        let scene, camera, renderer, controls;
+        let currentModel = null;
+        let iconScenes = [];
+        let iconRenderers = [];
+        let wireframeEnabled = false;
+
+        function initViewport() {
+            const canvas = document.getElementById('canvas3d');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0f);
+            scene.fog = new THREE.Fog(0x0a0a0f, 10, 50);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                45,
+                canvas.clientWidth / canvas.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(5, 3, 5);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            scene.add(ambientLight);
+
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1);
+            keyLight.position.set(10, 10, 10);
+            keyLight.castShadow = true;
+            keyLight.shadow.mapSize.width = 2048;
+            keyLight.shadow.mapSize.height = 2048;
+            scene.add(keyLight);
+
+            const fillLight = new THREE.DirectionalLight(0x00ffaa, 0.5);
+            fillLight.position.set(-10, 5, -10);
+            scene.add(fillLight);
+
+            const rimLight = new THREE.DirectionalLight(0xffd700, 0.3);
+            rimLight.position.set(0, 5, -10);
+            scene.add(rimLight);
+
+            // Ground
+            const groundGeometry = new THREE.CircleGeometry(20, 64);
+            const groundMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1a2e,
+                roughness: 0.8,
+                metalness: 0.2
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Grid
+            const gridHelper = new THREE.GridHelper(40, 40, 0x00ffaa, 0x003333);
+            gridHelper.position.y = 0.01;
+            scene.add(gridHelper);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 2;
+            controls.maxDistance = 50;
+            controls.target.set(0, 1, 0);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            
+            // Animate icon holos
+            iconScenes.forEach((iconScene, index) => {
+                const mesh = iconScene.children.find(child => child.isMesh);
+                if (mesh) {
+                    mesh.rotation.y += 0.01;
+                    mesh.rotation.x += 0.005;
+                }
+                if (iconRenderers[index]) {
+                    iconRenderers[index].render(iconScene, iconScenes[index].camera);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // ICON GENERATION (Holographic Previews)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        function createIconPreview(canvas, objData) {
+            const iconScene = new THREE.Scene();
+            iconScene.background = null;
+
+            const iconCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+            iconCamera.position.set(3, 2, 3);
+            iconCamera.lookAt(0, 0, 0);
+            iconScene.camera = iconCamera;
+
+            const iconRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            iconRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            iconRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create holographic preview mesh
+            const geometry = createPreviewGeometry(objData);
+            const material = new THREE.MeshPhongMaterial({
+                color: objData.color,
+                emissive: objData.color,
+                emissiveIntensity: 0.3,
+                transparent: true,
+                opacity: 0.8,
+                shininess: 100
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            iconScene.add(mesh);
+
+            // Wireframe overlay
+            const wireframeMaterial = new THREE.MeshBasicMaterial({
+                color: objData.color,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2
+            });
+            const wireframe = new THREE.Mesh(geometry.clone(), wireframeMaterial);
+            iconScene.add(wireframe);
+
+            // Lighting
+            const light = new THREE.PointLight(objData.color, 1, 50);
+            light.position.set(5, 5, 5);
+            iconScene.add(light);
+
+            const ambLight = new THREE.AmbientLight(0x404040);
+            iconScene.add(ambLight);
+
+            iconScenes.push(iconScene);
+            iconRenderers.push(iconRenderer);
+
+            return { scene: iconScene, camera: iconCamera, renderer: iconRenderer };
+        }
+
+        function createPreviewGeometry(objData) {
+            // Create simplified preview based on category
+            switch(objData.category) {
+                case 'Anatomy':
+                    if (objData.name.includes('Skeleton')) {
+                        const skull = new THREE.SphereGeometry(0.3, 8, 8);
+                        const spine = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 6);
+                        spine.translate(0, -1, 0);
+                        return THREE.BufferGeometryUtils ?
+                            THREE.BufferGeometryUtils.mergeBufferGeometries([skull, spine]) : skull;
+                    } else {
+                        return new THREE.CapsuleGeometry(0.3, 1.5, 4, 8);
+                    }
+                
+                case 'Nature':
+                    const trunk = new THREE.CylinderGeometry(0.2, 0.3, 1.5, 8);
+                    const crown = new THREE.ConeGeometry(0.8, 1.2, 8);
+                    crown.translate(0, 1.5, 0);
+                    return THREE.BufferGeometryUtils ?
+                        THREE.BufferGeometryUtils.mergeBufferGeometries([trunk, crown]) : trunk;
+                
+                case 'Vehicles':
+                    return new THREE.BoxGeometry(1.5, 0.5, 0.8);
+                
+                case 'Architecture':
+                    return new THREE.BoxGeometry(0.8, 2, 0.8);
+                
+                case 'Weapons':
+                    const blade = new THREE.BoxGeometry(0.05, 1.5, 0.02);
+                    const hilt = new THREE.BoxGeometry(0.3, 0.1, 0.02);
+                    hilt.translate(0, -0.7, 0);
+                    return THREE.BufferGeometryUtils ?
+                        THREE.BufferGeometryUtils.mergeBufferGeometries([blade, hilt]) : blade;
+                
+                case 'Characters':
+                    return new THREE.CapsuleGeometry(0.3, 1.8, 4, 8);
+                
+                default:
+                    return new THREE.IcosahedronGeometry(0.8, 1);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // FULL 3D MODEL LOADING
+        // ═══════════════════════════════════════════════════════════════════════
+
+        function loadFullModel(objData) {
+            showLoading(true);
+            
+            // Remove existing model
+            if (currentModel) {
+                scene.remove(currentModel);
+                currentModel = null;
+            }
+
+            setTimeout(() => {
+                // For now, create procedural model
+                // TODO: Replace with OBJ loader when files are available
+                const geometry = createFullGeometry(objData);
+                const material = new THREE.MeshStandardMaterial({
+                    color: objData.color,
+                    roughness: 0.5,
+                    metalness: 0.3
+                });
+
+                currentModel = new THREE.Mesh(geometry, material);
+                currentModel.castShadow = true;
+                currentModel.receiveShadow = true;
+                currentModel.userData = objData;
+                
+                scene.add(currentModel);
+
+                // Update UI
+                updateInfoPanel(objData);
+                showLoading(false);
+
+                console.log(`✅ Loaded: ${objData.name} (${objData.vertices} vertices)`);
+            }, 500);
+        }
+
+        function createFullGeometry(objData) {
+            // Create detailed geometry based on category
+            // In production, this would load from OBJ files
+            switch(objData.category) {
+                case 'Anatomy':
+                    return createHumanGeometry();
+                case 'Nature':
+                    return createTreeGeometry();
+                case 'Vehicles':
+                    return createVehicleGeometry();
+                default:
+                    return new THREE.IcosahedronGeometry(1, 2);
+            }
+        }
+
+        function createHumanGeometry() {
+            // Simplified human body
+            const body = new THREE.CapsuleGeometry(0.5, 1.5, 8, 16);
+            const head = new THREE.SphereGeometry(0.3, 16, 16);
+            head.translate(0, 1.5, 0);
+            
+            return THREE.BufferGeometryUtils ?
+                THREE.BufferGeometryUtils.mergeBufferGeometries([body, head]) : body;
+        }
+
+        function createTreeGeometry() {
+            const trunk = new THREE.CylinderGeometry(0.3, 0.5, 3, 12);
+            const crown = new THREE.ConeGeometry(1.5, 2.5, 12);
+            crown.translate(0, 3.5, 0);
+            
+            return THREE.BufferGeometryUtils ?
+                THREE.BufferGeometryUtils.mergeBufferGeometries([trunk, crown]) : trunk;
+        }
+
+        function createVehicleGeometry() {
+            return new THREE.BoxGeometry(3, 1, 1.5);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // UI FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════════
+
+        function generateIconGrid() {
+            const grid = document.getElementById('iconGrid');
+            grid.innerHTML = '';
+
+            marketplaceObjects.forEach((obj, index) => {
+                const item = document.createElement('div');
+                item.className = 'icon-item';
+                item.innerHTML = `
+                    ${obj.premium ? '<div class="premium-badge">PRO</div>' : ''}
+                    <canvas class="icon-canvas" id="icon-${index}"></canvas>
+                    <div class="icon-label">${obj.name}</div>
+                    <div class="icon-price">$${obj.price}</div>
+                `;
+                
+                item.onclick = () => selectObject(obj, item);
+                grid.appendChild(item);
+
+                // Create holographic preview
+                const canvas = document.getElementById(`icon-${index}`);
+                setTimeout(() => createIconPreview(canvas, obj), 100);
+            });
+        }
+
+        function selectObject(objData, element) {
+            // Update selection
+            document.querySelectorAll('.icon-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Update title
+            document.getElementById('objectTitle').textContent = objData.name;
+
+            // Load full 3D model
+            loadFullModel(objData);
+        }
+
+        function updateInfoPanel(objData) {
+            document.getElementById('vertexCount').textContent = objData.vertices.toLocaleString();
+            document.getElementById('faceCount').textContent = objData.faces.toLocaleString();
+            document.getElementById('fileSize').textContent = `${objData.fileSize} KB`;
+            document.getElementById('license').textContent = objData.license;
+            document.getElementById('price').textContent = `$${objData.price}`;
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.toggle('active', show);
+        }
+
+        function exportModel() {
+            if (!currentModel) {
+                alert('No model loaded');
+                return;
+            }
+            
+            // Export as OBJ
+            console.log('Exporting model:', currentModel.userData.name);
+            alert(`Exporting ${currentModel.userData.name} as OBJ file...`);
+        }
+
+        function addToCart() {
+            if (!currentModel) {
+                alert('No model selected');
+                return;
+            }
+            
+            console.log('Added to cart:', currentModel.userData.name);
+            alert(`Added "${currentModel.userData.name}" to cart!`);
+        }
+
+        function toggleWireframe() {
+            wireframeEnabled = !wireframeEnabled;
+            if (currentModel) {
+                currentModel.material.wireframe = wireframeEnabled;
+            }
+        }
+
+        function resetCamera() {
+            camera.position.set(5, 3, 5);
+            controls.target.set(0, 1, 0);
+        }
+
+        function purchaseObject() {
+            if (!currentModel) {
+                alert('No model selected');
+                return;
+            }
+            
+            const obj = currentModel.userData;
+            alert(`Processing payment for "${obj.name}" - $${obj.price}\n\nAfter purchase, you'll receive:\n- High-res 3D model (OBJ/FBX/GLTF)\n- Textures and materials\n- Commercial license\n- Lifetime updates`);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════════════
+
+        window.addEventListener('load', () => {
+            initViewport();
+            generateIconGrid();
+            console.log('✅ Marketplace initialized with', marketplaceObjects.length, 'objects');
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        });
+    </script>
+</body>
+</html>

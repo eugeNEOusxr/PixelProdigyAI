@@ -1,0 +1,49 @@
+{
+  "enabled": true,
+  "checkInterval": 1000,
+  "gpuMemoryBudget": 4294967296,
+  "thresholds": {
+    "green": {
+      "max": 0.6,
+      "action": "none",
+      "quality": "maintain"
+    },
+    "yellow": {
+      "max": 0.8,
+      "action": "warn",
+      "quality": "reduce_new"
+    },
+    "orange": {
+      "max": 0.9,
+      "action": "downgrade",
+      "quality": "aggressive_reduce"
+    },
+    "red": {
+      "max": 0.95,
+      "action": "emergency",
+      "quality": "minimum"
+    }
+  },
+  "actions": {
+    "warn": [
+      "log_warning",
+      "disable_4k_loads"
+    ],
+    "downgrade": [
+      "downgrade_distant_4k",
+      "unload_offscreen",
+      "reduce_cache"
+    ],
+    "emergency": [
+      "force_720p",
+      "unload_distant",
+      "clear_cache",
+      "garbage_collect"
+    ]
+  },
+  "recovery": {
+    "enabled": true,
+    "threshold": 0.65,
+    "upgradeDelay": 5000
+  }
+}

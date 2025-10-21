@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelVerse Beta Testing Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            text-shadow: 0 0 20px #0f0;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #0f0;
+            opacity: 0.8;
+        }
+
+        .status {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #0f0;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #0f0;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.3);
+            border-color: #0ff;
+        }
+
+        .card h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+        }
+
+        .card p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #0f0;
+        }
+
+        .card ul {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .card li {
+            padding: 5px 0;
+            color: #0f0;
+        }
+
+        .card li:before {
+            content: "▸ ";
+            color: #0ff;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0f0;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #0ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #0f0;
+            border: 2px solid #0f0;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 0, 0.1);
+            color: #0ff;
+            border-color: #0ff;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #0f0;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #0f0;
+            margin-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid #0f0;
+            color: #0f0;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 PIXELVERSE</h1>
+            <p>Beta Testing Dashboard</p>
+            
+            <div class="status">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Game Server: Online</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Monitoring: Active</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Database: Connected</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value" id="players">0</div>
+                <div class="metric-label">Active Players</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="uptime">--</div>
+                <div class="metric-label">Server Uptime</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="memory">--</div>
+                <div class="metric-label">Memory Usage</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="status">✅</div>
+                <div class="metric-label">Health Status</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🎮 Game Client</h2>
+                <p>Test the multiplayer character rendering system with real-time synchronization.</p>
+                <ul>
+                    <li>144 AI personalities</li>
+                    <li>Real-time character sync</li>
+                    <li>4K graphics support</li>
+                    <li>Equipment system</li>
+                </ul>
+                <a href="world_system/multiplayer_character_test.html" class="btn">Launch Game Client</a>
+            </div>
+
+            <div class="card">
+                <h2>📊 Grafana Dashboard</h2>
+                <p>Monitor performance metrics, player activity, and system health in real-time.</p>
+                <ul>
+                    <li>Performance metrics</li>
+                    <li>Player statistics</li>
+                    <li>Server monitoring</li>
+                    <li>Real-time alerts</li>
+                </ul>
+                <a href="http://localhost:3000" class="btn" target="_blank">Open Grafana</a>
+                <p style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                    Username: admin<br>
+                    Password: admin
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>📈 Prometheus Metrics</h2>
+                <p>View raw metrics data and query system performance indicators.</p>
+                <ul>
+                    <li>Custom queries</li>
+                    <li>Metric exploration</li>
+                    <li>Alert rules</li>
+                    <li>Target status</li>
+                </ul>
+                <a href="http://localhost:9090" class="btn" target="_blank">Open Prometheus</a>
+            </div>
+
+            <div class="card">
+                <h2>💚 Server Health</h2>
+                <p>Direct access to the game server health check endpoint.</p>
+                <ul>
+                    <li>Player count</li>
+                    <li>Server uptime</li>
+                    <li>Memory usage</li>
+                    <li>System status</li>
+                </ul>
+                <a href="http://localhost:8080/health" class="btn" target="_blank">Check Health</a>
+            </div>
+
+            <div class="card">
+                <h2>📚 Documentation</h2>
+                <p>Access comprehensive documentation and test reports.</p>
+                <ul>
+                    <li>Beta deployment guide</li>
+                    <li>Test reports (97% pass)</li>
+                    <li>System architecture</li>
+                    <li>API documentation</li>
+                </ul>
+                <button class="btn btn-secondary" onclick="showDocs()">View Docs</button>
+            </div>
+
+            <div class="card">
+                <h2>🎮 Main Game</h2>
+                <p>Launch the main PixelVerse game interface.</p>
+                <ul>
+                    <li>100km² world</li>
+                    <li>99,640 3D objects</li>
+                    <li>Combat system</li>
+                    <li>Inventory & crafting</li>
+                </ul>
+                <a href="pixelprodigy.html" class="btn">Launch Main Game</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>PixelVerse Beta Testing Environment v1.0.0</p>
+            <p>All systems operational • Ready for alpha testing</p>
+        </div>
+    </div>
+
+    <script>
+        // Update metrics from server
+        async function updateMetrics() {
+            try {
+                const response = await fetch('http://localhost:8080/health');
+                const data = await response.json();
+                
+                document.getElementById('players').textContent = data.players || 0;
+                document.getElementById('uptime').textContent = formatUptime(data.uptime);
+                document.getElementById('memory').textContent = formatMemory(data.memory.heapUsed);
+                document.getElementById('status').textContent = data.status === 'ok' ? '✅' : '⚠️';
+            } catch (error) {
+                console.error('Failed to fetch metrics:', error);
+                document.getElementById('status').textContent = '❌';
+            }
+        }
+
+        function formatUptime(seconds) {
+            if (!seconds) return '--';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+        }
+
+        function formatMemory(bytes) {
+            if (!bytes) return '--';
+            return Math.round(bytes / 1024 / 1024) + ' MB';
+        }
+
+        function showDocs() {
+            const docs = [
+                'TASKS_17_23_COMPLETE.md',
+                'BETA_TESTING_DEPLOYMENT.md',
+                'MULTIPLAYER_TEST_REPORT.md',
+                '4K_INTEGRATION_COMPLETE.md',
+                'COMPLETE_SYSTEM_SUMMARY.md'
+            ];
+            
+            alert('Available Documentation:\n\n' + docs.map((d, i) => `${i+1}. ${d}`).join('\n') + '\n\nAccess via file browser or terminal.');
+        }
+
+        // Update metrics every 5 seconds
+        updateMetrics();
+        setInterval(updateMetrics, 5000);
+
+        // Test WebSocket connection
+        function testWebSocket() {
+            try {
+                const ws = new WebSocket('ws://localhost:8080');
+                ws.onopen = () => {
+                    console.log('✅ WebSocket connected');
+                    ws.close();
+                };
+                ws.onerror = () => {
+                    console.error('❌ WebSocket connection failed');
+                };
+            } catch (error) {
+                console.error('❌ WebSocket error:', error);
+            }
+        }
+
+        testWebSocket();
+    </script>
+</body>
+</html>

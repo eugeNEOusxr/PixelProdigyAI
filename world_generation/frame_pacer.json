@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "vsync": {
+    "enabled": true,
+    "adaptive": true,
+    "fallback": "unlocked"
+  },
+  "targetFPS": 60,
+  "frameLimit": {
+    "enabled": true,
+    "max": 144,
+    "min": 30
+  },
+  "smoothing": {
+    "enabled": true,
+    "method": "triple-buffer",
+    "latency": "low"
+  },
+  "adaptiveSync": {
+    "enabled": true,
+    "gSync": true,
+    "freeSync": true
+  },
+  "frameTime": {
+    "prediction": true,
+    "compensation": true,
+    "jitterReduction": true
+  }
+}

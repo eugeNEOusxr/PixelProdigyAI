@@ -1,0 +1,36 @@
+{
+  "tier": "PRO",
+  "object_id": "legendary_dragon_mount_crimson_001",
+  "name": "Crimsonwing the Eternal",
+  "category": "mount",
+  "sub_category": "dragon",
+  "rarity": "legendary",
+  "price_usd": 49.99,
+  "price_mpt": 25000,
+  "subscription_required": "pro",
+  "gene_code": "DRAGON > body > muscular scaled forward 2000cm wingspan 2800cm powerful\nDRAGON > head > horned reptilian intelligent eyes-glowing-gold fierce\nDRAGON > jaw > articulated teeth-sharp repeat 64 venomous dripping\nDRAGON > neck > long flexible muscular scaled mobile protective\nDRAGON > wings > membrane leathery veined powerful flight-capable majestic\nDRAGON > wing-claws > sharp repeat 4 gripping climbing weapon\nDRAGON > legs-front > muscular clawed repeat 2 powerful gripping\nDRAGON > legs-rear > muscular clawed repeat 2 powerful jumping\nDRAGON > tail > long spiked 1400cm whip-weapon balance counterweight\nDRAGON > scales > overlapping armored iridescent red-gold metallic\nDRAGON > spines > dorsal ridge repeat 40 defensive intimidating\nDRAGON > breath > fire-cone range-30m damage-500 cooldown-10s devastating\nDRAGON > saddle > leather reinforced rider-mount harness-straps secure\nDRAGON > saddle > stirrups repeat 2 adjustable comfortable stable\nDRAGON > particles > flames mouth-glow breathing smoke ambient\nDRAGON > particles > embers trailing falling glowing atmospheric\nDRAGON > audio > roar deep powerful intimidating echoing territorial\nDRAGON > audio > wing-beats whoosh-rhythmic powerful flight-sounds\nDRAGON > audio > fire-breath whoosh-crackling intense explosive\nDRAGON > stats > health 8000 armor 400 speed-fast rideable-2passengers\nDRAGON > stats > abilities fire-breath aerial-combat ground-attack",
+  "vls_code": "DRAGON:A2000B300C500.WING*2+SPAN2800.SCALES~.FIRE-BREATH.RIDEABLE",
+  "polygon_count": 95000,
+  "vertex_count": 110000,
+  "game_stats": {
+    "health": 8000,
+    "armor": 400,
+    "speed": "fast",
+    "passengers": 2,
+    "abilities": {
+      "fire_breath": {
+        "damage": 500,
+        "range": 30,
+        "cooldown": 10
+      },
+      "aerial_combat": {
+        "bonus_damage": 0.25,
+        "evasion": 0.4
+      },
+      "ground_attack": {
+        "aoe_damage": 300,
+        "knockback": true
+      }
+    }
+  }
+}

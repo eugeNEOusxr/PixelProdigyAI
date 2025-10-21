@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelVerse - Complete 3D RPG</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+    }
+
+    #canvas3d {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* HUD Overlay */
+    #hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Top Stats Bar */
+    #stats-bar {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px 40px;
+      border-radius: 10px;
+      display: flex;
+      gap: 30px;
+      color: white;
+      font-size: 14px;
+      border: 2px solid rgba(102, 126, 234, 0.6);
+      pointer-events: auto;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-value {
+      font-weight: bold;
+      color: #00ff00;
+    }
+
+    /* Controls Panel */
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      color: white;
+      font-size: 12px;
+      border: 2px solid rgba(102, 126, 234, 0.6);
+    }
+
+    #controls h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .control-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+      gap: 20px;
+    }
+
+    .key {
+      background: rgba(102, 126, 234, 0.4);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* Info Panel */
+    #info {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      color: white;
+      max-width: 300px;
+      border: 2px solid rgba(102, 126, 234, 0.6);
+    }
+
+    #info h2 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    #info p {
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    /* Message Display */
+    #message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      padding: 30px 50px;
+      border-radius: 15px;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      display: none;
+      border: 3px solid #00ff00;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    /* Loading Screen */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      color: white;
+    }
+
+    #loading.hidden {
+      display: none;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(102, 126, 234, 0.3);
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #loading-text {
+      font-size: 18px;
+      color: #667eea;
+    }
+
+    /* ===== VERTEX GENERATOR PANEL ===== */
+    #vertex-generator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 1200px;
+      height: 85%;
+      background: rgba(10, 10, 30, 0.98);
+      border: 3px solid #00ffaa;
+      border-radius: 15px;
+      z-index: 2000;
+      display: none;
+      box-shadow: 0 0 50px rgba(0, 255, 170, 0.5);
+    }
+
+    #vertex-generator.active {
+      display: grid;
+      grid-template-columns: 300px 1fr 350px;
+      grid-template-rows: 50px 1fr;
+      pointer-events: auto;
+    }
+
+    /* Generator Header */
+    .vg-header {
+      grid-column: 1 / -1;
+      background: linear-gradient(90deg, #00ffaa, #00aaff);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 12px 12px 0 0;
+      color: #000;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .vg-close {
+      background: #ff4444;
+      color: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .vg-close:hover {
+      background: #ff6666;
+      transform: scale(1.1);
+    }
+
+    /* Left Panel - Primitives */
+    .vg-primitives {
+      background: rgba(20, 20, 40, 0.9);
+      border-right: 2px solid #00ffaa;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .vg-section-title {
+      color: #00ffaa;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 20px 0 10px 0;
+      text-transform: uppercase;
+    }
+
+    .primitive-btn {
+      width: 100%;
+      background: rgba(0, 255, 170, 0.1);
+      border: 2px solid #00ffaa;
+      color: #00ffaa;
+      padding: 12px;
+      margin: 5px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .primitive-btn:hover {
+      background: rgba(0, 255, 170, 0.3);
+      transform: translateX(5px);
+    }
+
+    /* Center - 3D Preview */
+    .vg-preview {
+      background: rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .vg-preview canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .vg-preview-info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid #00ffaa;
+      padding: 10px;
+      border-radius: 5px;
+      color: #00ffaa;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Right Panel - Properties */
+    .vg-properties {
+      background: rgba(20, 20, 40, 0.9);
+      border-left: 2px solid #00ffaa;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .property-group {
+      background: rgba(0, 255, 170, 0.05);
+      border: 1px solid #00ffaa;
+      border-radius: 5px;
+      padding: 12px;
+      margin: 10px 0;
+    }
+
+    .property-label {
+      color: #aaa;
+      font-size: 11px;
+      margin: 8px 0 4px 0;
+    }
+
+    .property-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #00ffaa;
+      color: #00ffaa;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .property-slider {
+      width: 100%;
+      margin: 5px 0;
+    }
+
+    .vg-action-btn {
+      width: 100%;
+      background: #00ffaa;
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      margin: 10px 0;
+      transition: all 0.2s;
+    }
+
+    .vg-action-btn:hover {
+      background: #00ffff;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 255, 170, 0.5);
+    }
+
+    .vg-action-btn.danger {
+      background: #ff4444;
+      color: white;
+    }
+
+    .vg-action-btn.danger:hover {
+      background: #ff6666;
+    }
+
+    /* Vertex List */
+    .vertex-list {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #00ffaa;
+      border-radius: 5px;
+      padding: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      color: #00ffaa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <div id="loading-text">Loading PixelVerse...</div>
+  </div>
+
+  <!-- 3D Canvas -->
+  <canvas id="canvas3d"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <!-- Stats Bar -->
+    <div id="stats-bar">
+      <div class="stat">
+        <span>❤️</span>
+        <span class="stat-value" id="health">100/100</span>
+      </div>
+      <div class="stat">
+        <span>⚡</span>
+        <span class="stat-value" id="stamina">100/100</span>
+      </div>
+      <div class="stat">
+        <span>⭐</span>
+        <span class="stat-value" id="level">Level 1</span>
+      </div>
+      <div class="stat">
+        <span>💰</span>
+        <span class="stat-value" id="gold">0</span>
+      </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div id="info">
+      <h2>🎮 PixelVerse RPG</h2>
+      <p>Welcome to the 3D action RPG!</p>
+      <p><strong>Objective:</strong> Explore the world, collect crystals, and level up!</p>
+      <p><strong>Features:</strong></p>
+      <ul style="font-size: 11px; padding-left: 20px;">
+        <li>Real-time 3D movement</li>
+        <li>Dynamic camera system</li>
+        <li>Collectible items</li>
+        <li>Particle effects</li>
+        <li>Day/night cycle</li>
+      </ul>
+    </div>
+
+    <!-- Controls -->
+    <div id="controls">
+      <h3>⌨️ Controls</h3>
+      <div class="control-item">
+        <span>Move</span>
+        <span class="key">WASD</span>
+      </div>
+      <div class="control-item">
+        <span>Jump</span>
+        <span class="key">SPACE</span>
+      </div>
+      <div class="control-item">
+        <span>Look Around</span>
+        <span class="key">Mouse</span>
+      </div>
+      <div class="control-item">
+        <span>Toggle Camera</span>
+        <span class="key">V</span>
+      </div>
+      <div class="control-item" style="margin-top: 10px; border-top: 1px solid rgba(102, 126, 234, 0.4); padding-top: 10px;">
+        <span>Vertex Builder</span>
+        <span class="key">B</span>
+      </div>
+      <div class="control-item">
+        <span>Collect Items</span>
+        <span class="key">E</span>
+      </div>
+    </div>
+
+    <!-- Message Display -->
+    <div id="message"></div>
+  </div>
+
+  <!-- ===== VERTEX GENERATOR PANEL ===== -->
+  <div id="vertex-generator">
+    <!-- Header -->
+    <div class="vg-header">
+      <span>🔷 IN-GAME VERTEX BUILDER - Press B to Toggle</span>
+      <button class="vg-close" onclick="toggleVertexGenerator()">✖</button>
+    </div>
+
+    <!-- Left Panel - Primitives & Tools -->
+    <div class="vg-primitives">
+      <div class="vg-section-title">📦 Primitive Shapes</div>
+      <button class="primitive-btn" onclick="VG.addPrimitive('cube')">📦 Cube</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('sphere')">⚪ Sphere</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('cylinder')">🛢️ Cylinder</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('cone')">🔺 Cone</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('torus')">🍩 Torus</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('plane')">▭ Plane</button>
+
+      <div class="vg-section-title">🌳 Organic Shapes</div>
+      <button class="primitive-btn" onclick="VG.addPrimitive('tree')">🌲 Tree</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('rock')">🪨 Rock</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('crystal')">💎 Crystal</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('cloud')">☁️ Cloud</button>
+
+      <div class="vg-section-title">� Grass Details</div>
+      <button class="primitive-btn" onclick="VG.addPrimitive('grass-blade')">🌱 Single Blade</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('grass-patch')">🌿 Grass Patch</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('grass-field')">🌾 Grass Field</button>
+
+      <div class="vg-section-title">�🏗️ Complex Objects</div>
+      <button class="primitive-btn" onclick="VG.addPrimitive('house')">🏠 House</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('tower')">🗼 Tower</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('bridge')">🌉 Bridge</button>
+      <button class="primitive-btn" onclick="VG.addPrimitive('character')">🧍 Character</button>
+    </div>
+
+    <!-- Center - 3D Preview -->
+    <div class="vg-preview">
+      <canvas id="vg-canvas"></canvas>
+      <div class="vg-preview-info">
+        <div>Vertices: <span id="vg-verts">0</span></div>
+        <div>Faces: <span id="vg-faces">0</span></div>
+        <div>Selected: <span id="vg-selected">None</span></div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Properties & Actions -->
+    <div class="vg-properties">
+      <div class="vg-section-title">⚙️ Transform</div>
+      <div class="property-group">
+        <div class="property-label">Position X</div>
+        <input type="number" class="property-input" id="vg-pos-x" value="0" step="0.1" onchange="VG.updateTransform()">
+        <div class="property-label">Position Y</div>
+        <input type="number" class="property-input" id="vg-pos-y" value="0" step="0.1" onchange="VG.updateTransform()">
+        <div class="property-label">Position Z</div>
+        <input type="number" class="property-input" id="vg-pos-z" value="0" step="0.1" onchange="VG.updateTransform()">
+      </div>
+
+      <div class="property-group">
+        <div class="property-label">Scale</div>
+        <input type="range" class="property-slider" id="vg-scale" min="0.1" max="5" value="1" step="0.1" oninput="VG.updateScale(this.value)">
+        <span style="color: #00ffaa" id="vg-scale-val">1.0</span>
+      </div>
+
+      <div class="vg-section-title">🎨 Material</div>
+      <div class="property-group">
+        <div class="property-label">Color</div>
+        <input type="color" class="property-input" id="vg-color" value="#888888" onchange="VG.updateMaterial()">
+        <div class="property-label">Roughness</div>
+        <input type="range" class="property-slider" id="vg-roughness" min="0" max="1" value="0.7" step="0.1" oninput="VG.updateMaterial()">
+        <div class="property-label">Metallic</div>
+        <input type="range" class="property-slider" id="vg-metallic" min="0" max="1" value="0" step="0.1" oninput="VG.updateMaterial()">
+      </div>
+
+      <div class="vg-section-title">🔧 Actions</div>
+      <button class="vg-action-btn" onclick="VG.subdivide()">➕ Subdivide Surface</button>
+      <button class="vg-action-btn" onclick="VG.smooth()">〰️ Smooth Shading</button>
+      <button class="vg-action-btn" onclick="VG.duplicate()">📋 Duplicate</button>
+      <button class="vg-action-btn" onclick="VG.placeInWorld()">🌍 Place in World</button>
+      <button class="vg-action-btn" style="background: #ff4444" onclick="VG.delete()">🗑️ Delete</button>
+
+      <div class="vg-section-title">💾 Export</div>
+      <button class="vg-action-btn" onclick="VG.exportOBJ()">📤 Export OBJ</button>
+      <button class="vg-action-btn" onclick="VG.exportVLS()">💾 Save as VLS</button>
+    </div>
+  </div>
+
+  <!-- THREE.js from unpkg CDN (more reliable) -->
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+!-- Before </body> tag, add: -->
+<script src="building_system_integration.js"></script>
+<script>
+  window.buildingSystem = new BuildingSystem(scene, camera);
+</script>
+  <!-- VLS (Vertex Language System) - Complete 3D Triangle Matrix Implementation -->
+  <script src="object_generator/vls_parser.js"></script>
+  <script src="object_generator/vls_triangle_matrix.js"></script>
+  <script src="world_generation/vls_tree_generator.js"></script>
+  
+  <!-- Simple Tree Generator - Fallback -->
+  <script src="world_generation/simple_tree_generator.js"></script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════
+    // PIXELVERSE - COMPLETE 3D RPG GAME
+    // ═══════════════════════════════════════════════════════════════════════
+
+    console.log('🎮 PixelVerse script loaded!');
+
+    // Check if THREE.js loaded
+    if (typeof THREE === 'undefined') {
+      console.error('❌ THREE.js not loaded!');
+      alert('THREE.js library failed to load. Check your internet connection.');
+      document.getElementById('loading').style.display = 'none';
+      throw new Error('THREE.js not available');
+    } else {
+      console.log('✅ THREE.js loaded successfully, version:', THREE.REVISION);
+    }
+
+    // Wrap everything in try-catch
+    try {
+
+    console.log('🎮 PixelVerse initializing...');
+
+    // Game State
+    console.log('📊 Creating game state...');
+    const gameState = {
+      health: 100,
+      maxHealth: 100,
+      stamina: 100,
+      maxStamina: 100,
+      level: 1,
+      xp: 0,
+      gold: 0,
+      speed: 5,
+      jumpForce: 10,
+      isJumping: false,
+      velocity: new THREE.Vector3(),
+      cameraMode: 'third-person' // 'third-person' or 'first-person'
+    };
+
+    // Input State
+    console.log('⌨️ Setting up input...');
+    const keys = {};
+    const mouse = { x: 0, y: 0, deltaX: 0, deltaY: 0 };
+    let mouseDown = false;
+
+    // Scene Setup
+    console.log('🎬 Creating scene...');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87CEEB); // Sky blue
+    scene.fog = new THREE.Fog(0x87CEEB, 50, 200);
+    console.log('✅ Scene created with background:', scene.background.getHexString());
+
+    // Camera
+    console.log('📷 Creating camera...');
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(0, 5, 10);
+    console.log('✅ Camera created at position:', camera.position);
+
+    // Renderer
+    console.log('🖼️ Creating renderer...');
+    const canvas = document.getElementById('canvas3d');
+    console.log('Canvas element:', canvas);
+    if (!canvas) {
+      throw new Error('Canvas element not found!');
+    }
+    
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    console.log('✅ Renderer created, size:', window.innerWidth, 'x', window.innerHeight);
+
+    // Clock
+    const clock = new THREE.Clock();
+    console.log('✅ Clock created');
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // LIGHTING
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Sun
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+    sun.position.set(50, 100, 50);
+    sun.castShadow = true;
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
+    sun.shadow.camera.left = -50;
+    sun.shadow.camera.right = 50;
+    sun.shadow.camera.top = 50;
+    sun.shadow.camera.bottom = -50;
+    scene.add(sun);
+
+    // Ambient Light
+    const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambient);
+
+    // Hemisphere Light
+    const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x4a7c59, 0.6);
+    scene.add(hemiLight);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // WORLD CREATION
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Ground
+    const groundSize = 100;
+    const groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, 20, 20);
+    const groundMat = new THREE.MeshStandardMaterial({ 
+      color: 0x4a7c59,
+      roughness: 0.8
+    });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+
+    // Add terrain variation
+    const vertices = ground.geometry.attributes.position;
+    for (let i = 0; i < vertices.count; i++) {
+      const x = vertices.getX(i);
+      const y = vertices.getY(i);
+      const height = Math.sin(x * 0.2) * Math.cos(y * 0.2) * 1.5;
+      vertices.setZ(i, height);
+    }
+    ground.geometry.attributes.position.needsUpdate = true;
+    ground.geometry.computeVertexNormals();
+    scene.add(ground);
+
+    // Player Character (using CharacterFactory)
+    let player;
+    try {
+      player = CharacterFactory.createStylizedCharacter();
+      console.log('✅ Character created with CharacterFactory');
+    } catch (e) {
+      console.warn('⚠️ CharacterFactory not available, using simple character');
+      // Fallback to simple character
+      const playerGeo = new THREE.CapsuleGeometry(0.5, 1, 8, 16);
+      const playerMat = new THREE.MeshStandardMaterial({ color: 0x667eea });
+      player = new THREE.Mesh(playerGeo, playerMat);
+      
+      // Add direction indicator
+      const arrowGeo = new THREE.ConeGeometry(0.3, 0.8, 8);
+      const arrowMat = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+      const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+      arrow.rotation.x = Math.PI / 2;
+      arrow.position.z = 1;
+      player.add(arrow);
+    }
+    
+    player.position.set(0, 1.5, 0);
+    player.castShadow = true;
+    scene.add(player);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // VLS PROCEDURAL TREES - 3D Triangle Matrix SYSTEM
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    console.log('🌲 Initializing VLS 3D Triangle Matrix System...');
+    
+    // Check if VLS system is available
+    let vlsAvailable = false;
+    let treeGenerator = null;
+    
+    try {
+      if (typeof VLSParser !== 'undefined' && 
+          typeof VLSTriangleMatrix !== 'undefined' && 
+          typeof VLSTreeGenerator !== 'undefined') {
+        
+        const vlsParser = new VLSParser();
+        treeGenerator = new VLSTreeGenerator(vlsParser);
+        vlsAvailable = true;
+        console.log('✅ VLS 3D Triangle Matrix System loaded!');
+      } else {
+        console.warn('⚠️ VLS system components missing:');
+        console.log('  VLSParser:', typeof VLSParser);
+        console.log('  VLSTriangleMatrix:', typeof VLSTriangleMatrix);
+        console.log('  VLSTreeGenerator:', typeof VLSTreeGenerator);
+      }
+    } catch (e) {
+      console.warn('⚠️ Error initializing VLS:', e);
+    }
+    
+    // Tree types with distinct appearances
+    const treeTypes = ['oak', 'pine', 'willow', 'dead'];
+    const trees = [];
+    
+    // Create procedural trees
+    for (let i = 0; i < 25; i++) {
+      const x = (Math.random() - 0.5) * 80;
+      const z = (Math.random() - 0.5) * 80;
+      
+      // Not too close to player
+      if (Math.sqrt(x*x + z*z) > 10) {
+        const type = treeTypes[Math.floor(Math.random() * treeTypes.length)];
+        
+        let tree;
+        if (vlsAvailable && treeGenerator) {
+          // Use VLS 3D Triangle Matrix system
+          tree = treeGenerator.generateTree(type, {
+            position: { x, y: 0, z },
+            scale: 0.7 + Math.random() * 0.5, // 0.7-1.2
+            rotation: Math.random() * Math.PI * 2,
+            color: 0x8B4513, // Brown
+            leafColor: type === 'dead' ? 0x666666 : 
+                       type === 'pine' ? 0x1a5f1a : 
+                       type === 'willow' ? 0x90ee90 : 
+                       0x228B22 // Forest green
+          });
+        } else {
+          // Fallback to simple generator
+          tree = SimpleTreeGenerator.generateTree(type, {
+            position: { x, y: 0, z },
+            scale: 0.7 + Math.random() * 0.5,
+            rotation: Math.random() * Math.PI * 2
+          });
+        }
+        
+        if (tree) {
+          scene.add(tree);
+          trees.push({ mesh: tree, type });
+        }
+      }
+    }
+    
+    console.log(`✅ Created ${trees.length} procedural trees:`);
+    if (vlsAvailable) {
+      console.log('   Using VLS 3D Triangle Matrix System (x1,y1,z1 geometry)');
+    } else {
+      console.log('   Using Simple Fallback Generator');
+    }
+    console.log(`   Oak (wide canopy): ${trees.filter(t => t.type === 'oak').length}`);
+    console.log(`   Pine (tall cone): ${trees.filter(t => t.type === 'pine').length}`);
+    console.log(`   Willow (drooping): ${trees.filter(t => t.type === 'willow').length}`);
+    console.log(`   Dead (bare): ${trees.filter(t => t.type === 'dead').length}`);
+
+
+    // Collectible Crystals
+    const crystals = [];
+    function createCrystal(x, z) {
+      const crystalGeo = new THREE.OctahedronGeometry(0.5);
+      const crystalMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffff00,
+        emissive: 0xffff00,
+        emissiveIntensity: 0.5,
+        metalness: 0.8,
+        roughness: 0.2
+      });
+      const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+      crystal.position.set(x, 1, z);
+      crystal.castShadow = true;
+      crystal.userData.rotationSpeed = Math.random() * 2 + 1;
+      crystal.userData.bobSpeed = Math.random() * 2 + 1;
+      crystal.userData.bobOffset = Math.random() * Math.PI * 2;
+      scene.add(crystal);
+      crystals.push(crystal);
+    }
+
+    // Add crystals
+    for (let i = 0; i < 15; i++) {
+      const x = (Math.random() - 0.5) * 80;
+      const z = (Math.random() - 0.5) * 80;
+      createCrystal(x, z);
+    }
+
+    // Rocks
+    for (let i = 0; i < 30; i++) {
+      const rockGeo = new THREE.DodecahedronGeometry(Math.random() * 0.8 + 0.5);
+      const rockMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+      const rock = new THREE.Mesh(rockGeo, rockMat);
+      rock.position.set(
+        (Math.random() - 0.5) * 90,
+        Math.random() * 0.5,
+        (Math.random() - 0.5) * 90
+      );
+      rock.rotation.set(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI
+      );
+      rock.castShadow = true;
+      rock.receiveShadow = true;
+      scene.add(rock);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PARTICLE SYSTEM
+    // ═══════════════════════════════════════════════════════════════════════
+
+    const particles = [];
+    let particleEffects;
+    
+    // Try to use advanced ParticleEffects system
+    try {
+      particleEffects = new ParticleEffects(scene);
+      console.log('✅ Using ParticleEffects system');
+    } catch (e) {
+      console.warn('⚠️ ParticleEffects not available, using simple particles');
+    }
+    
+    function createParticleExplosion(position, color = 0xffff00, count = 20) {
+      // Try advanced system first
+      if (particleEffects && particleEffects.levelUpEffect) {
+        particleEffects.levelUpEffect(position);
+        return;
+      }
+      
+      // Fallback to simple particles
+      for (let i = 0; i < count; i++) {
+        const particleGeo = new THREE.SphereGeometry(0.1);
+        const particleMat = new THREE.MeshBasicMaterial({ color });
+        const particle = new THREE.Mesh(particleGeo, particleMat);
+        particle.position.copy(position);
+        
+        const angle = (i / count) * Math.PI * 2;
+        particle.userData.velocity = new THREE.Vector3(
+          Math.cos(angle) * 2,
+          Math.random() * 3 + 2,
+          Math.sin(angle) * 2
+        );
+        particle.userData.life = 1.0;
+        
+        scene.add(particle);
+        particles.push(particle);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // INPUT HANDLING
+    // ═══════════════════════════════════════════════════════════════════════
+
+    window.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+      
+      // Camera toggle
+      if (e.key.toLowerCase() === 'v') {
+        gameState.cameraMode = gameState.cameraMode === 'third-person' ? 'first-person' : 'third-person';
+        showMessage(`Camera: ${gameState.cameraMode}`);
+      }
+      
+      // Jump
+      if (e.key === ' ' && !gameState.isJumping) {
+        gameState.isJumping = true;
+        gameState.velocity.y = gameState.jumpForce;
+      }
+      
+      // Collect (E key)
+      if (e.key.toLowerCase() === 'e') {
+        checkCrystalCollection();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (mouseDown || document.pointerLockElement === canvas) {
+        mouse.deltaX = e.movementX || 0;
+        mouse.deltaY = e.movementY || 0;
+      }
+    });
+
+    window.addEventListener('mousedown', () => {
+      mouseDown = true;
+      canvas.requestPointerLock();
+    });
+
+    window.addEventListener('mouseup', () => {
+      mouseDown = false;
+    });
+
+    canvas.addEventListener('click', () => {
+      canvas.requestPointerLock();
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // GAME LOGIC
+    // ═══════════════════════════════════════════════════════════════════════
+
+    function showMessage(text, duration = 2000) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.style.display = 'block';
+      setTimeout(() => {
+        msg.style.display = 'none';
+      }, duration);
+    }
+
+    function checkCrystalCollection() {
+      for (let i = crystals.length - 1; i >= 0; i--) {
+        const crystal = crystals[i];
+        const distance = player.position.distanceTo(crystal.position);
+        
+        if (distance < 2) {
+          // Collect crystal
+          createParticleExplosion(crystal.position, 0xffff00, 15);
+          scene.remove(crystal);
+          crystals.splice(i, 1);
+          
+          // Rewards
+          gameState.gold += 10;
+          gameState.xp += 25;
+          
+          showMessage('💎 Crystal Collected! +10 Gold, +25 XP');
+          
+          // Level up check
+          if (gameState.xp >= gameState.level * 100) {
+            gameState.level++;
+            gameState.xp = 0;
+            gameState.maxHealth += 20;
+            gameState.health = gameState.maxHealth;
+            showMessage(`⭐ LEVEL UP! Now Level ${gameState.level}`, 3000);
+            createParticleExplosion(player.position, 0x00ff00, 30);
+          }
+          
+          break;
+        }
+      }
+    }
+
+    function updateUI() {
+      document.getElementById('health').textContent = `${Math.round(gameState.health)}/${gameState.maxHealth}`;
+      document.getElementById('stamina').textContent = `${Math.round(gameState.stamina)}/${gameState.maxStamina}`;
+      document.getElementById('level').textContent = `Level ${gameState.level}`;
+      document.getElementById('gold').textContent = gameState.gold;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // ANIMATION LOOP
+    // ═══════════════════════════════════════════════════════════════════════
+
+    let rotation = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = clock.getDelta();
+
+      // Movement
+      const moveSpeed = gameState.speed * dt;
+      const moveDirection = new THREE.Vector3();
+
+      // Fixed controls - relative to camera rotation
+      if (keys['w']) moveDirection.z -= 1;  // Forward
+      if (keys['s']) moveDirection.z += 1;  // Backward  
+      if (keys['a']) moveDirection.x -= 1;  // Left
+      if (keys['d']) moveDirection.x += 1;  // Right
+
+      if (moveDirection.length() > 0) {
+        moveDirection.normalize();
+        
+        // Apply camera rotation to movement
+        const cameraRotation = rotation;
+        const rotatedDirection = new THREE.Vector3(
+          moveDirection.x * Math.cos(cameraRotation) - moveDirection.z * Math.sin(cameraRotation),
+          0,
+          moveDirection.x * Math.sin(cameraRotation) + moveDirection.z * Math.cos(cameraRotation)
+        );
+        
+        // Rotate player to face movement direction
+        const angle = Math.atan2(rotatedDirection.x, rotatedDirection.z);
+        player.rotation.y = angle;
+        
+        // Move player
+        player.position.x += rotatedDirection.x * moveSpeed;
+        player.position.z += rotatedDirection.z * moveSpeed;
+        
+        // Stamina
+        gameState.stamina = Math.max(0, gameState.stamina - 5 * dt);
+      } else {
+        // Regenerate stamina
+        gameState.stamina = Math.min(gameState.maxStamina, gameState.stamina + 10 * dt);
+      }
+
+      // Gravity and jumping
+      const gravity = -25;
+      gameState.velocity.y += gravity * dt;
+      player.position.y += gameState.velocity.y * dt;
+
+      // Ground collision
+      if (player.position.y <= 1.5) {
+        player.position.y = 1.5;
+        gameState.velocity.y = 0;
+        gameState.isJumping = false;
+      }
+
+      // Keep player in bounds
+      const boundary = groundSize / 2 - 2;
+      player.position.x = Math.max(-boundary, Math.min(boundary, player.position.x));
+      player.position.z = Math.max(-boundary, Math.min(boundary, player.position.z));
+
+      // Mouse look (rotate camera around player)
+      if (mouse.deltaX !== 0 || mouse.deltaY !== 0) {
+        rotation += mouse.deltaX * 0.002;
+        mouse.deltaX = 0;
+        mouse.deltaY = 0;
+      }
+
+      // Camera positioning
+      if (gameState.cameraMode === 'third-person') {
+        const distance = 8;
+        const height = 4;
+        camera.position.x = player.position.x + Math.sin(rotation) * distance;
+        camera.position.z = player.position.z + Math.cos(rotation) * distance;
+        camera.position.y = player.position.y + height;
+        camera.lookAt(player.position);
+      } else {
+        // First person
+        camera.position.copy(player.position);
+        camera.position.y += 0.5;
+        camera.rotation.y = player.rotation.y + Math.PI;
+      }
+
+      // Animate crystals
+      crystals.forEach(crystal => {
+        crystal.rotation.y += crystal.userData.rotationSpeed * dt;
+        const bobOffset = Math.sin(clock.getElapsedTime() * crystal.userData.bobSpeed + crystal.userData.bobOffset) * 0.3;
+        crystal.position.y = 1 + bobOffset;
+      });
+
+      // Update particles
+      if (particleEffects && particleEffects.update) {
+        particleEffects.update(dt);
+      }
+      
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const particle = particles[i];
+        particle.userData.life -= dt;
+        
+        if (particle.userData.life <= 0) {
+          scene.remove(particle);
+          particles.splice(i, 1);
+        } else {
+          particle.position.add(particle.userData.velocity.clone().multiplyScalar(dt));
+          particle.userData.velocity.y -= 9.8 * dt; // Gravity
+          particle.material.opacity = particle.userData.life;
+          particle.material.transparent = true;
+        }
+      }
+
+      // Update sun position (day/night cycle)
+      const time = clock.getElapsedTime() * 0.1;
+      sun.position.x = Math.cos(time) * 50;
+      sun.position.y = Math.sin(time) * 50 + 20;
+
+      // Update UI
+      updateUI();
+
+      // Render
+      renderer.render(scene, camera);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // WINDOW RESIZE
+    // ═══════════════════════════════════════════════════════════════════════
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // START GAME
+    // ═══════════════════════════════════════════════════════════════════════
+
+    console.log('🎮 PixelVerse script starting...');
+
+    // Force hide loading screen and start game
+    window.addEventListener('load', () => {
+      console.log('✅ Window loaded');
+      
+      setTimeout(() => {
+        console.log('🎮 Hiding loading screen...');
+        const loading = document.getElementById('loading');
+        if (loading) {
+          loading.classList.add('hidden');
+          console.log('✅ Loading screen hidden');
+        }
+        
+        console.log('🎮 Starting animation loop...');
+        try {
+          animate();
+          console.log('✅ Animation started!');
+          showMessage('🎮 Welcome to PixelVerse! Use WASD to move, E to collect crystals!', 4000);
+        } catch (error) {
+          console.error('❌ Animation error:', error);
+          alert('Game error: ' + error.message);
+        }
+      }, 1000);
+    });
+
+    } catch (initError) {
+      console.error('❌ CRITICAL INITIALIZATION ERROR:', initError);
+      console.error('Message:', initError.message);
+      console.error('Stack:', initError.stack);
+      alert('Failed to initialize game:\n\n' + initError.message + '\n\nCheck console for details.');
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // VERTEX GENERATOR SYSTEM
+    // ═══════════════════════════════════════════════════════════════════════
+
+    const VG = {
+      scene: null,
+      camera: null,
+      renderer: null,
+      controls: null,
+      currentMesh: null,
+      
+      init: function() {
+        console.log('🔷 Initializing Vertex Generator...');
+        
+        const canvas = document.getElementById('vg-canvas');
+        if (!canvas) return;
+        
+        // Scene
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x0a0a1e);
+        
+        // Camera
+        this.camera = new THREE.PerspectiveCamera(60, canvas.parentElement.clientWidth / canvas.parentElement.clientHeight, 0.1, 1000);
+        this.camera.position.set(5, 5, 5);
+        this.camera.lookAt(0, 0, 0);
+        
+        // Renderer
+        this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        this.renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 10, 5);
+        this.scene.add(directionalLight);
+        
+        // Grid
+        const gridHelper = new THREE.GridHelper(20, 20, 0x00ffaa, 0x004444);
+        this.scene.add(gridHelper);
+        
+        // Axes helper
+        const axesHelper = new THREE.AxesHelper(5);
+        this.scene.add(axesHelper);
+        
+        // Simple orbit controls (mouse drag to rotate)
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        
+        canvas.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+          if (isDragging && this.currentMesh) {
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+            
+            this.currentMesh.rotation.y += deltaX * 0.01;
+            this.currentMesh.rotation.x += deltaY * 0.01;
+            
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+          }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+        
+        // Mouse wheel zoom
+        canvas.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          this.camera.position.z += e.deltaY * 0.01;
+          this.camera.position.z = Math.max(2, Math.min(20, this.camera.position.z));
+        });
+        
+        this.animate();
+        console.log('✅ Vertex Generator initialized');
+      },
+      
+      animate: function() {
+        if (!this.renderer || !this.scene || !this.camera) return;
+        requestAnimationFrame(() => this.animate());
+        this.renderer.render(this.scene, this.camera);
+      },
+      
+      addPrimitive: function(type) {
+        console.log('🔷 Adding primitive:', type);
+        
+        // Remove old mesh
+        if (this.currentMesh) {
+          this.scene.remove(this.currentMesh);
+        }
+        
+        let geometry;
+        
+        switch(type) {
+          case 'cube':
+            geometry = new THREE.BoxGeometry(2, 2, 2, 2, 2, 2);
+            break;
+          case 'sphere':
+            geometry = new THREE.SphereGeometry(1.5, 32, 32);
+            break;
+          case 'cylinder':
+            geometry = new THREE.CylinderGeometry(1, 1, 2, 32);
+            break;
+          case 'cone':
+            geometry = new THREE.ConeGeometry(1, 2, 32);
+            break;
+          case 'torus':
+            geometry = new THREE.TorusGeometry(1, 0.4, 16, 32);
+            break;
+          case 'plane':
+            geometry = new THREE.PlaneGeometry(3, 3, 10, 10);
+            break;
+          case 'tree':
+            this.addTree();
+            return;
+          case 'rock':
+            geometry = this.createRock();
+            break;
+          case 'crystal':
+            geometry = this.createCrystal();
+            break;
+          case 'cloud':
+            geometry = this.createCloud();
+            break;
+          case 'house':
+            geometry = this.createHouse();
+            break;
+          case 'tower':
+            geometry = this.createTower();
+            break;
+          case 'bridge':
+            geometry = this.createBridge();
+            break;
+          case 'character':
+            geometry = this.createCharacter();
+            break;
+          case 'grass-blade':
+            geometry = this.createDetailedGrassBlade();
+            break;
+          case 'grass-patch':
+            this.addGrassPatch();
+            return;
+          case 'grass-field':
+            this.addGrassField();
+            return;
+          default:
+            geometry = new THREE.BoxGeometry(2, 2, 2);
+        }
+        
+        const material = new THREE.MeshStandardMaterial({
+          color: 0x888888,
+          roughness: 0.7,
+          metalness: 0,
+          wireframe: false
+        });
+        
+        this.currentMesh = new THREE.Mesh(geometry, material);
+        this.scene.add(this.currentMesh);
+        
+        this.updateStats();
+        document.getElementById('vg-selected').textContent = type;
+      },
+      
+      addTree: function() {
+        // Create procedural tree
+        const treeGroup = new THREE.Group();
+        
+        // Trunk
+        const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.4, 3, 8, 4);
+        const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x5c4033 });
+        const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+        trunk.position.y = 1.5;
+        treeGroup.add(trunk);
+        
+        // Branches
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2;
+          const branchGeometry = new THREE.CylinderGeometry(0.1, 0.15, 1.5, 6);
+          const branch = new THREE.Mesh(branchGeometry, trunkMaterial);
+          branch.position.set(
+            Math.cos(angle) * 0.5,
+            2 + Math.random() * 0.5,
+            Math.sin(angle) * 0.5
+          );
+          branch.rotation.z = Math.PI / 4;
+          branch.rotation.y = angle;
+          treeGroup.add(branch);
+        }
+        
+        // Leaves
+        const leavesGeometry = new THREE.SphereGeometry(1.5, 8, 8);
+        const leavesMaterial = new THREE.MeshStandardMaterial({ color: 0x44aa33 });
+        const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+        leaves.position.y = 3.5;
+        treeGroup.add(leaves);
+        
+        if (this.currentMesh) this.scene.remove(this.currentMesh);
+        this.currentMesh = treeGroup;
+        this.scene.add(treeGroup);
+        
+        this.updateStats();
+        document.getElementById('vg-selected').textContent = 'Tree';
+      },
+      
+      addGrassPatch: function() {
+        if (this.currentMesh) this.scene.remove(this.currentMesh);
+        this.currentMesh = this.createGrassPatch(50, 2);
+        this.scene.add(this.currentMesh);
+        this.updateStats();
+        document.getElementById('vg-selected').textContent = 'Grass Patch (50 blades)';
+      },
+      
+      addGrassField: function() {
+        if (this.currentMesh) this.scene.remove(this.currentMesh);
+        this.currentMesh = this.createGrassField(10, 10, 0.5);
+        this.scene.add(this.currentMesh);
+        this.updateStats();
+        document.getElementById('vg-selected').textContent = 'Grass Field';
+      },
+      
+      createRock: function() {
+        const geometry = new THREE.DodecahedronGeometry(1.5, 0);
+        // Randomize vertices for organic look
+        const positions = geometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+          positions[i] *= 0.8 + Math.random() * 0.4;
+          positions[i + 1] *= 0.8 + Math.random() * 0.4;
+          positions[i + 2] *= 0.8 + Math.random() * 0.4;
+        }
+        geometry.attributes.position.needsUpdate = true;
+        geometry.computeVertexNormals();
+        return geometry;
+      },
+      
+      createCrystal: function() {
+        const geometry = new THREE.ConeGeometry(0.8, 3, 6);
+        return geometry;
+      },
+      
+      createCloud: function() {
+        // Merge multiple spheres for cloud shape
+        const geometry = new THREE.SphereGeometry(1, 16, 16);
+        return geometry;
+      },
+      
+      createHouse: function() {
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        return geometry;
+      },
+      
+      createTower: function() {
+        const geometry = new THREE.CylinderGeometry(0.8, 1, 4, 8);
+        return geometry;
+      },
+      
+      createBridge: function() {
+        const geometry = new THREE.BoxGeometry(5, 0.2, 1);
+        return geometry;
+      },
+      
+      createCharacter: function() {
+        const geometry = new THREE.CapsuleGeometry(0.5, 1.5, 8, 16);
+        return geometry;
+      },
+      
+      // ===== DETAILED GRASS BLADE GENERATOR =====
+      createDetailedGrassBlade: function() {
+        /*
+         * Creates a single grass blade with detailed vertices
+         * showing the structure between edges and center
+         * 
+         * Grass Blade Structure:
+         * - Base: 3 vertices (triangle at ground)
+         * - Mid sections: Multiple quad segments
+         * - Tip: Single vertex (pointed top)
+         * - Width tapers from base to tip
+         * - Slight curve for realism
+         */
+        
+        const vertices = [];
+        const indices = [];
+        const normals = [];
+        const uvs = [];
+        
+        // Parameters
+        const height = 1.0;           // Total height of grass blade
+        const baseWidth = 0.08;       // Width at base
+        const segments = 8;           // Number of vertical segments (more = smoother)
+        const curveAmount = 0.15;     // How much the blade curves
+        
+        // Build vertices from bottom to top
+        for (let i = 0; i <= segments; i++) {
+          const t = i / segments;  // 0 to 1 from base to tip
+          
+          // Y position (vertical)
+          const y = t * height;
+          
+          // Width tapers to point at tip
+          const width = baseWidth * (1 - t * 0.9); // Gets 90% narrower
+          
+          // Curve the blade (bend in X direction)
+          const curve = Math.sin(t * Math.PI * 0.5) * curveAmount;
+          
+          // Create 3 vertices per segment: left edge, center, right edge
+          // This shows the internal structure of the grass blade
+          
+          // Left edge vertex
+          vertices.push(
+            -width / 2 + curve,  // X (left side + curve)
+            y,                    // Y (height)
+            0                     // Z (flat)
+          );
+          
+          // Center vertex (gives thickness/detail)
+          vertices.push(
+            0 + curve,           // X (center + curve)
+            y,                   // Y (height)
+            0                    // Z (flat)
+          );
+          
+          // Right edge vertex
+          vertices.push(
+            width / 2 + curve,   // X (right side + curve)
+            y,                   // Y (height)
+            0                    // Z (flat)
+          );
+          
+          // UVs for texture mapping
+          uvs.push(0, t);      // Left
+          uvs.push(0.5, t);    // Center
+          uvs.push(1, t);      // Right
+        }
+        
+        // Build faces (triangles) connecting the vertices
+        for (let i = 0; i < segments; i++) {
+          const base = i * 3;      // Current row base index
+          const next = (i + 1) * 3; // Next row base index
+          
+          // Left quad (2 triangles)
+          // Triangle 1: base-left, next-left, base-center
+          indices.push(base, next, base + 1);
+          // Triangle 2: base-center, next-left, next-center
+          indices.push(base + 1, next, next + 1);
+          
+          // Right quad (2 triangles)
+          // Triangle 1: base-center, next-center, base-right
+          indices.push(base + 1, next + 1, base + 2);
+          // Triangle 2: base-right, next-center, next-right
+          indices.push(base + 2, next + 1, next + 2);
+        }
+        
+        // Create BufferGeometry
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geometry.setIndex(indices);
+        geometry.computeVertexNormals();
+        
+        // Add back face for double-sided rendering
+        const backGeometry = geometry.clone();
+        backGeometry.scale(-1, 1, 1);
+        
+        return geometry;
+      },
+      
+      // ===== GRASS PATCH WITH MULTIPLE BLADES =====
+      createGrassPatch: function(bladeCount = 50, patchSize = 2) {
+        /*
+         * Creates a patch of grass with multiple blades
+         * Each blade has detailed vertex structure
+         * Shows spacing and variation between grass blades
+         */
+        
+        const grassGroup = new THREE.Group();
+        grassGroup.name = 'DetailedGrassPatch';
+        
+        // Grass blade material with gradient (darker at base, lighter at tip)
+        const grassMaterial = new THREE.MeshStandardMaterial({
+          color: 0x4a9a3d,
+          roughness: 0.8,
+          metalness: 0,
+          side: THREE.DoubleSide,
+          flatShading: false,
+          vertexColors: false
+        });
+        
+        // Create individual grass blades
+        for (let i = 0; i < bladeCount; i++) {
+          const bladeGeometry = this.createDetailedGrassBlade();
+          const blade = new THREE.Mesh(bladeGeometry, grassMaterial);
+          
+          // Random position within patch
+          const angle = Math.random() * Math.PI * 2;
+          const radius = Math.random() * patchSize;
+          blade.position.x = Math.cos(angle) * radius;
+          blade.position.z = Math.sin(angle) * radius;
+          blade.position.y = 0;
+          
+          // Random rotation (blades face different directions)
+          blade.rotation.y = Math.random() * Math.PI * 2;
+          
+          // Random tilt (wind effect)
+          blade.rotation.z = (Math.random() - 0.5) * 0.3;
+          
+          // Random scale (height variation)
+          const scale = 0.7 + Math.random() * 0.6;
+          blade.scale.set(scale, scale, scale);
+          
+          grassGroup.add(blade);
+        }
+        
+        return grassGroup;
+      },
+      
+      // ===== DETAILED GRASS FIELD =====
+      createGrassField: function(rows = 10, cols = 10, spacing = 0.5) {
+        /*
+         * Creates a field of grass patches
+         * Shows how individual blades connect to form a field
+         */
+        
+        const fieldGroup = new THREE.Group();
+        fieldGroup.name = 'GrassField';
+        
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const patch = this.createGrassPatch(5, 0.3);
+            
+            patch.position.x = (col - cols / 2) * spacing;
+            patch.position.z = (row - rows / 2) * spacing;
+            
+            fieldGroup.add(patch);
+          }
+        }
+        
+        return fieldGroup;
+      },
+      
+      updateStats: function() {
+        if (!this.currentMesh) return;
+        
+        let vertices = 0;
+        let faces = 0;
+        
+        this.currentMesh.traverse((child) => {
+          if (child.geometry) {
+            vertices += child.geometry.attributes.position.count;
+            if (child.geometry.index) {
+              faces += child.geometry.index.count / 3;
+            } else {
+              faces += child.geometry.attributes.position.count / 3;
+            }
+          }
+        });
+        
+        document.getElementById('vg-verts').textContent = vertices;
+        document.getElementById('vg-faces').textContent = Math.floor(faces);
+      },
+      
+      updateTransform: function() {
+        if (!this.currentMesh) return;
+        
+        this.currentMesh.position.x = parseFloat(document.getElementById('vg-pos-x').value);
+        this.currentMesh.position.y = parseFloat(document.getElementById('vg-pos-y').value);
+        this.currentMesh.position.z = parseFloat(document.getElementById('vg-pos-z').value);
+      },
+      
+      updateScale: function(value) {
+        if (!this.currentMesh) return;
+        
+        this.currentMesh.scale.set(value, value, value);
+        document.getElementById('vg-scale-val').textContent = parseFloat(value).toFixed(1);
+      },
+      
+      updateMaterial: function() {
+        if (!this.currentMesh) return;
+        
+        const color = document.getElementById('vg-color').value;
+        const roughness = parseFloat(document.getElementById('vg-roughness').value);
+        const metallic = parseFloat(document.getElementById('vg-metallic').value);
+        
+        this.currentMesh.traverse((child) => {
+          if (child.material) {
+            child.material.color.set(color);
+            child.material.roughness = roughness;
+            child.material.metalness = metallic;
+          }
+        });
+      },
+      
+      subdivide: function() {
+        if (!this.currentMesh || !this.currentMesh.geometry) return;
+        
+        alert('Subdivision will be implemented - increases vertex density for smoother surfaces');
+        console.log('🔷 Subdivide mesh');
+      },
+      
+      smooth: function() {
+        if (!this.currentMesh) return;
+        
+        this.currentMesh.traverse((child) => {
+          if (child.material) {
+            child.material.flatShading = false;
+            child.material.needsUpdate = true;
+          }
+          if (child.geometry) {
+            child.geometry.computeVertexNormals();
+          }
+        });
+        
+        console.log('✅ Smooth shading applied');
+      },
+      
+      duplicate: function() {
+        if (!this.currentMesh) return;
+        
+        const clone = this.currentMesh.clone();
+        clone.position.x += 2;
+        this.scene.add(clone);
+        
+        console.log('✅ Object duplicated');
+      },
+      
+      placeInWorld: function() {
+        if (!this.currentMesh) return;
+        
+        // Clone and add to main game scene
+        const worldClone = this.currentMesh.clone();
+        worldClone.position.copy(player.position);
+        worldClone.position.y = 0;
+        worldClone.position.x += 3;
+        scene.add(worldClone);
+        
+        showMessage('✅ Object placed in world!');
+        console.log('✅ Object placed in game world');
+      },
+      
+      delete: function() {
+        if (!this.currentMesh) return;
+        
+        this.scene.remove(this.currentMesh);
+        this.currentMesh = null;
+        
+        document.getElementById('vg-selected').textContent = 'None';
+        this.updateStats();
+        
+        console.log('🗑️ Object deleted');
+      },
+      
+      exportOBJ: function() {
+        if (!this.currentMesh) return;
+        
+        let objContent = '# PixelProdigy Vertex Generator Export\n\n';
+        let vertexOffset = 1;
+        
+        this.currentMesh.traverse((child) => {
+          if (child.geometry) {
+            const positions = child.geometry.attributes.position.array;
+            const indices = child.geometry.index ? child.geometry.index.array : null;
+            
+            // Vertices
+            for (let i = 0; i < positions.length; i += 3) {
+              objContent += `v ${positions[i].toFixed(4)} ${positions[i+1].toFixed(4)} ${positions[i+2].toFixed(4)}\n`;
+            }
+            
+            // Faces
+            if (indices) {
+              for (let i = 0; i < indices.length; i += 3) {
+                objContent += `f ${indices[i] + vertexOffset} ${indices[i+1] + vertexOffset} ${indices[i+2] + vertexOffset}\n`;
+              }
+            }
+            
+            vertexOffset += positions.length / 3;
+          }
+        });
+        
+        const blob = new Blob([objContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'vertex_object.obj';
+        a.click();
+        
+        console.log('💾 OBJ exported');
+      },
+      
+      exportVLS: function() {
+        alert('VLS export format will save optimized vertex data for PixelProdigy engine');
+        console.log('💾 VLS export');
+      }
+    };
+
+    // Toggle Vertex Generator
+    function toggleVertexGenerator() {
+      const panel = document.getElementById('vertex-generator');
+      const isActive = panel.classList.contains('active');
+      
+      if (isActive) {
+        panel.classList.remove('active');
+        console.log('🔷 Vertex Generator closed');
+      } else {
+        panel.classList.add('active');
+        if (!VG.renderer) {
+          setTimeout(() => VG.init(), 100);
+        }
+        console.log('🔷 Vertex Generator opened');
+      }
+    }
+
+    // Keyboard shortcut - Press B to toggle vertex generator
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'b' || e.key === 'B') {
+        if (!document.getElementById('vertex-generator').classList.contains('active')) {
+          toggleVertexGenerator();
+        }
+      }
+    });
+
+    console.log('✅ Vertex Generator system loaded');
+
+  </script>
+
+  <script src="building_system_integration.js"></script>
+  <script>
+    window.buildingSystem = new BuildingSystem(scene, camera);
+  </script>
+
+</body>
+</html>

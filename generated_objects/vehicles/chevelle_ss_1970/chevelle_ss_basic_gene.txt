@@ -1,0 +1,7 @@
+# 1970 CHEVELLE SS 454 - BASIC TIER (GENE)
+
+CAR > body > cube forward 495cm simple
+CAR > engine > cube v8 big
+CAR > wheels > cylinder repeat 4
+CAR > interior > seats repeat 2 simple
+CAR > paint > red stripes repeat 2

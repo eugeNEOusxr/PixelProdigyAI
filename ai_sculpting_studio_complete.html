@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy - AI Sculpting Studio (Complete Object Library)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            color: #fff;
+        }
+        
+        #container {
+            display: grid;
+            grid-template-columns: 350px 1fr 320px;
+            grid-template-rows: 60px 1fr 80px;
+            height: 100vh;
+        }
+        
+        /* Header */
+        #header {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 3px solid #00ffaa;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        #header h1 {
+            font-size: 24px;
+            background: linear-gradient(90deg, #00ffaa, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Left Panel - Object Categories */
+        #object-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 2px solid #00ffaa;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .category {
+            background: rgba(0, 255, 170, 0.1);
+            border: 1px solid #00ffaa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .category h3 {
+            color: #00ffaa;
+            font-size: 14px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        
+        .object-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .object-btn {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid #667eea;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .object-btn:hover {
+            background: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+        }
+        
+        /* Center Viewport */
+        #viewport {
+            position: relative;
+            background: #1a1a2e;
+        }
+        
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Right Panel - Tools */
+        #tools-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 2px solid #00ffaa;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .tool-section {
+            background: rgba(0, 255, 170, 0.05);
+            border: 1px solid #00ffaa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .tool-section h3 {
+            color: #00ffaa;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .slider-control {
+            margin: 10px 0;
+        }
+        
+        .slider-label {
+            color: #aaa;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            border-radius: 2px;
+        }
+        
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .action-btn {
+            width: 100%;
+            background: #00ffaa;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            margin: 5px 0;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #00ffff;
+            transform: translateY(-2px);
+        }
+        
+        /* Bottom Timeline */
+        #timeline {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 2px solid #00ffaa;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        #stats {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+        }
+        
+        .stat-item {
+            color: #aaa;
+        }
+        
+        .stat-value {
+            color: #00ffaa;
+            font-weight: bold;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 255, 170, 0.5); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Header -->
+        <div id="header">
+            <h1>🎨 AI SCULPTING STUDIO - Complete Object Library</h1>
+            <div style="color: #aaa; font-size: 12px;">Integrated: Humans, Vehicles, Buildings, Nature & More</div>
+        </div>
+        
+        <!-- Left Panel - Object Categories -->
+        <div id="object-panel">
+            <div class="category">
+                <h3>👤 HUMANS & CHARACTERS</h3>
+                <div class="object-grid">
+                    <button class="object-btn" onclick="createHuman('male')">🧍 Male</button>
+                    <button class="object-btn" onclick="createHuman('female')">🧍‍♀️ Female</button>
+                    <button class="object-btn" onclick="createHuman('athletic')">💪 Athletic</button>
+                    <button class="object-btn" onclick="createHuman('skeleton')">💀 Skeleton</button>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>🚗 VEHICLES</h3>
+                <div class="object-grid">
+                    <button class="object-btn" onclick="createVehicle('chevelle')">🚗 Chevelle SS</button>
+                    <button class="object-btn" onclick="createVehicle('sports_car')">🏎️ Sports Car</button>
+                    <button class="object-btn" onclick="createVehicle('truck')">🚚 Pickup Truck</button>
+                    <button class="object-btn" onclick="createVehicle('boat')">🚤 Speedboat</button>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>🏛️ BUILDINGS</h3>
+                <div class="object-grid">
+                    <button class="object-btn" onclick="createBuilding('library')">📚 Library</button>
+                    <button class="object-btn" onclick="createBuilding('science')">🔬 Science Lab</button>
+                    <button class="object-btn" onclick="createBuilding('modern')">🏢 Modern Tower</button>
+                    <button class="object-btn" onclick="createBuilding('house')">🏠 House</button>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>🌲 NATURE</h3>
+                <div class="object-grid">
+                    <button class="object-btn" onclick="createNature('oak')">🌳 Oak Tree</button>
+                    <button class="object-btn" onclick="createNature('pine')">🌲 Pine Tree</button>
+                    <button class="object-btn" onclick="createNature('rock')">🪨 Rock</button>
+                    <button class="object-btn" onclick="createNature('bush')">🌿 Bush</button>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>🪑 FURNITURE</h3>
+                <div class="object-grid">
+                    <button class="object-btn" onclick="createFurniture('chair')">🪑 Chair</button>
+                    <button class="object-btn" onclick="createFurniture('desk')">🖥️ Desk</button>
+                    <button class="object-btn" onclick="createFurniture('couch')">🛋️ Couch</button>
+                    <button class="object-btn" onclick="createFurniture('bed')">🛏️ Bed</button>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>📦 PRIMITIVES</h3>
+                <div class="object-grid">
+                    <button class="object-btn" onclick="createPrimitive('sphere')">🌐 Sphere</button>
+                    <button class="object-btn" onclick="createPrimitive('cube')">📦 Cube</button>
+                    <button class="object-btn" onclick="createPrimitive('cylinder')">🥫 Cylinder</button>
+                    <button class="object-btn" onclick="createPrimitive('torus')">🍩 Torus</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Center Viewport -->
+        <div id="viewport">
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <!-- Right Panel - Tools -->
+        <div id="tools-panel">
+            <div class="tool-section">
+                <h3>🎨 MATERIAL</h3>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Color</span>
+                    </div>
+                    <input type="color" id="color-picker" value="#9c27b0">
+                </div>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Metallic</span>
+                        <span id="metallic-val">0.50</span>
+                    </div>
+                    <input type="range" id="metallic" min="0" max="100" value="50">
+                </div>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Roughness</span>
+                        <span id="roughness-val">0.50</span>
+                    </div>
+                    <input type="range" id="roughness" min="0" max="100" value="50">
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <h3>🔧 TRANSFORM</h3>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Scale</span>
+                        <span id="scale-val">1.00x</span>
+                    </div>
+                    <input type="range" id="scale" min="10" max="300" value="100">
+                </div>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Detail Level</span>
+                        <span id="detail-val">3</span>
+                    </div>
+                    <input type="range" id="detail-level" min="1" max="5" value="3">
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <h3>💡 LIGHTING</h3>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Intensity</span>
+                        <span id="light-val">1.50</span>
+                    </div>
+                    <input type="range" id="light-intensity" min="0" max="300" value="150">
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <h3>👁️ VIEW</h3>
+                <button class="action-btn" onclick="toggleWireframe()">📐 Wireframe</button>
+                <button class="action-btn" onclick="toggleRotation()">🔄 Auto-Rotate</button>
+                <button class="action-btn" onclick="resetCamera()">📷 Reset Camera</button>
+            </div>
+            
+            <div class="tool-section">
+                <h3>💾 EXPORT</h3>
+                <button class="action-btn" onclick="exportOBJ()">📄 Export OBJ</button>
+                <button class="action-btn" onclick="exportSTL()">🖨️ Export STL</button>
+                <button class="action-btn" onclick="exportGLTF()">📦 Export GLTF</button>
+            </div>
+        </div>
+        
+        <!-- Bottom Timeline -->
+        <div id="timeline">
+            <div id="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="object-type">None</span>
+                </div>
+                <div class="stat-item">
+                    Vertices: <span class="stat-value" id="vertex-count">0</span>
+                </div>
+                <div class="stat-item">
+                    Triangles: <span class="stat-value" id="triangle-count">0</span>
+                </div>
+                <div class="stat-item">
+                    FPS: <span class="stat-value" id="fps">60</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════
+        // SCENE SETUP
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        let scene, camera, renderer, currentMesh, isRotating = false;
+        let wireframeMode = false;
+        let currentObjectType = 'None';
+        
+        const canvas = document.getElementById('canvas');
+        const materialProps = {
+            color: 0x9c27b0,
+            metalness: 0.5,
+            roughness: 0.5
+        };
+        
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+            
+            // Camera
+            const aspect = canvas.clientWidth / canvas.clientHeight;
+            camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+            camera.position.set(5, 3, 5);
+            camera.lookAt(0, 0, 0);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.shadowMap.enabled = true;
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00ffaa, 0x333333);
+            scene.add(gridHelper);
+            
+            // Mouse controls
+            setupMouseControls();
+            
+            // UI controls
+            setupUIControls();
+            
+            // Start animation
+            animate();
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // HUMAN GENERATION (From complete_human_generator.html)
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function createHuman(type) {
+            if (currentMesh) scene.remove(currentMesh);
+            
+            const humanGroup = new THREE.Group();
+            const detailLevel = parseInt(document.getElementById('detail-level').value);
+            const scale = 1.7; // Average human height in meters
+            
+            // Body proportions
+            const headSize = 0.12 * scale;
+            const torsoWidth = 0.25 * scale;
+            const torsoHeight = 0.5 * scale;
+            const armLength = 0.6 * scale;
+            const legLength = 0.9 * scale;
+            
+            // Skin color based on type
+            let skinColor = 0xffdbac;
+            if (type === 'skeleton') skinColor = 0xe8e0d0;
+            
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: skinColor,
+                roughness: 0.7,
+                metalness: 0.1
+            });
+            
+            // Head
+            const headGeom = new THREE.SphereGeometry(headSize, 16 * detailLevel, 16 * detailLevel);
+            const head = new THREE.Mesh(headGeom, bodyMaterial);
+            head.position.y = 1.5 * scale;
+            head.castShadow = true;
+            humanGroup.add(head);
+            
+            // Torso
+            const torsoGeom = new THREE.CapsuleGeometry(torsoWidth, torsoHeight, 8 * detailLevel, 16 * detailLevel);
+            const torso = new THREE.Mesh(torsoGeom, bodyMaterial);
+            torso.position.y = 1.0 * scale;
+            torso.castShadow = true;
+            humanGroup.add(torso);
+            
+            // Arms
+            const armGeom = new THREE.CapsuleGeometry(0.04 * scale, armLength, 4 * detailLevel, 8 * detailLevel);
+            for (let side of [-1, 1]) {
+                const arm = new THREE.Mesh(armGeom, bodyMaterial);
+                arm.position.set(side * (torsoWidth + 0.05 * scale), 1.1 * scale, 0);
+                arm.rotation.z = side * 0.2;
+                arm.castShadow = true;
+                humanGroup.add(arm);
+            }
+            
+            // Legs
+            const legGeom = new THREE.CapsuleGeometry(0.06 * scale, legLength, 6 * detailLevel, 10 * detailLevel);
+            for (let side of [-1, 1]) {
+                const leg = new THREE.Mesh(legGeom, bodyMaterial);
+                leg.position.set(side * 0.1 * scale, 0.45 * scale, 0);
+                leg.castShadow = true;
+                humanGroup.add(leg);
+            }
+            
+            // Skeleton extras
+            if (type === 'skeleton') {
+                // Ribcage detail
+                for (let i = 0; i < 6; i++) {
+                    const rib = new THREE.Mesh(
+                        new THREE.TorusGeometry(0.15 * scale, 0.01 * scale, 8, 16),
+                        bodyMaterial
+                    );
+                    rib.position.y = 1.2 * scale - i * 0.08 * scale;
+                    rib.rotation.x = Math.PI / 2;
+                    humanGroup.add(rib);
+                }
+            }
+            
+            currentMesh = humanGroup;
+            scene.add(currentMesh);
+            currentObjectType = `Human (${type})`;
+            updateStats();
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // VEHICLE GENERATION (From Chevelle SS system)
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function createVehicle(type) {
+            if (currentMesh) scene.remove(currentMesh);
+            
+            const vehicleGroup = new THREE.Group();
+            const detailLevel = parseInt(document.getElementById('detail-level').value);
+            
+            let bodyColor = 0xcc0000; // Cranberry red
+            if (type === 'sports_car') bodyColor = 0xffcc00;
+            if (type === 'truck') bodyColor = 0x333333;
+            if (type === 'boat') bodyColor = 0x0088ff;
+            
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: bodyColor,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+            
+            if (type === 'boat') {
+                // Speedboat
+                const hullGeom = new THREE.BoxGeometry(1.0, 0.3, 3.5);
+                const hull = new THREE.Mesh(hullGeom, bodyMaterial);
+                hull.position.y = 0.5;
+                vehicleGroup.add(hull);
+                
+                // Windshield
+                const windshieldGeom = new THREE.BoxGeometry(0.8, 0.5, 0.1);
+                const windshieldMat = new THREE.MeshStandardMaterial({
+                    color: 0x88ccff,
+                    transparent: true,
+                    opacity: 0.3,
+                    roughness: 0.1,
+                    metalness: 0.1
+                });
+                const windshield = new THREE.Mesh(windshieldGeom, windshieldMat);
+                windshield.position.set(0, 0.9, -0.5);
+                vehicleGroup.add(windshield);
+                
+            } else {
+                // Car body (Chevelle-inspired)
+                const bodyGeom = new THREE.BoxGeometry(1.8, 0.6, 4.5);
+                const body = new THREE.Mesh(bodyGeom, bodyMaterial);
+                body.position.y = 0.5;
+                vehicleGroup.add(body);
+                
+                // Hood with power dome
+                const hoodGeom = new THREE.BoxGeometry(1.6, 0.2, 1.5);
+                const hood = new THREE.Mesh(hoodGeom, bodyMaterial);
+                hood.position.set(0, 0.9, 1.0);
+                vehicleGroup.add(hood);
+                
+                // Power dome scoop
+                const scoopGeom = new THREE.BoxGeometry(0.4, 0.15, 0.6);
+                const scoop = new THREE.Mesh(scoopGeom, bodyMaterial);
+                scoop.position.set(0, 1.05, 1.0);
+                vehicleGroup.add(scoop);
+                
+                // Roof
+                const roofGeom = new THREE.BoxGeometry(1.4, 0.05, 1.9);
+                const roof = new THREE.Mesh(roofGeom, bodyMaterial);
+                roof.position.set(0, 1.1, -0.2);
+                vehicleGroup.add(roof);
+                
+                // Wheels
+                const wheelGeom = new THREE.CylinderGeometry(0.35, 0.35, 0.25, 16 * detailLevel);
+                const wheelMat = new THREE.MeshStandardMaterial({
+                    color: 0x222222,
+                    roughness: 0.8,
+                    metalness: 0.2
+                });
+                
+                const wheelPositions = [
+                    [-0.85, 0.35, 1.3],   // Front left
+                    [0.85, 0.35, 1.3],    // Front right
+                    [-0.85, 0.35, -1.3],  // Rear left
+                    [0.85, 0.35, -1.3]    // Rear right
+                ];
+                
+                wheelPositions.forEach(pos => {
+                    const wheel = new THREE.Mesh(wheelGeom, wheelMat);
+                    wheel.position.set(...pos);
+                    wheel.rotation.z = Math.PI / 2;
+                    vehicleGroup.add(wheel);
+                });
+                
+                // Chrome bumpers
+                const bumperMat = new THREE.MeshStandardMaterial({
+                    color: 0xcccccc,
+                    roughness: 0.1,
+                    metalness: 1.0
+                });
+                const frontBumper = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.9, 0.15, 0.2),
+                    bumperMat
+                );
+                frontBumper.position.set(0, 0.3, 2.4);
+                vehicleGroup.add(frontBumper);
+                
+                const rearBumper = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.9, 0.15, 0.2),
+                    bumperMat
+                );
+                rearBumper.position.set(0, 0.3, -2.4);
+                vehicleGroup.add(rearBumper);
+            }
+            
+            currentMesh = vehicleGroup;
+            scene.add(currentMesh);
+            currentObjectType = `Vehicle (${type})`;
+            updateStats();
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // BUILDING GENERATION (From college_building_library.html)
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function createBuilding(type) {
+            if (currentMesh) scene.remove(currentMesh);
+            
+            const buildingGroup = new THREE.Group();
+            const detailLevel = parseInt(document.getElementById('detail-level').value);
+            
+            let width = 5, height = 3, depth = 4;
+            let buildingColor = 0xd4a574;
+            let floors = 3;
+            
+            if (type === 'library') {
+                buildingColor = 0xd4a574;
+                floors = 3;
+            } else if (type === 'science') {
+                buildingColor = 0xb8b8b8;
+                floors = 3;
+            } else if (type === 'modern') {
+                buildingColor = 0x3a3a3a;
+                height = 8;
+                floors = 6;
+            } else if (type === 'house') {
+                width = 3;
+                height = 2.5;
+                depth = 3;
+                floors = 2;
+                buildingColor = 0xc89860;
+            }
+            
+            const buildingMaterial = new THREE.MeshStandardMaterial({
+                color: buildingColor,
+                roughness: 0.8,
+                metalness: 0.1
+            });
+            
+            // Main building
+            const buildingGeom = new THREE.BoxGeometry(width, height, depth);
+            const building = new THREE.Mesh(buildingGeom, buildingMaterial);
+            building.position.y = height / 2;
+            building.castShadow = true;
+            buildingGroup.add(building);
+            
+            // Windows
+            const windowMat = new THREE.MeshStandardMaterial({
+                color: 0x88ccff,
+                emissive: 0x4488ff,
+                emissiveIntensity: 0.3,
+                transparent: true,
+                opacity: 0.5
+            });
+            
+            const windowsPerFloor = 4;
+            const windowWidth = 0.4;
+            const windowHeight = 0.6;
+            
+            for (let floor = 0; floor < floors; floor++) {
+                const floorY = (floor + 0.5) * (height / floors);
+                
+                for (let i = 0; i < windowsPerFloor; i++) {
+                    const windowX = -width / 2 + (i + 1) * (width / (windowsPerFloor + 1));
+                    
+                    // Front windows
+                    const windowFront = new THREE.Mesh(
+                        new THREE.BoxGeometry(windowWidth, windowHeight, 0.05),
+                        windowMat
+                    );
+                    windowFront.position.set(windowX, floorY, depth / 2 + 0.01);
+                    buildingGroup.add(windowFront);
+                    
+                    // Back windows
+                    const windowBack = windowFront.clone();
+                    windowBack.position.z = -depth / 2 - 0.01;
+                    buildingGroup.add(windowBack);
+                }
+            }
+            
+            // Entrance
+            if (type !== 'modern') {
+                const doorGeom = new THREE.BoxGeometry(0.8, 1.5, 0.1);
+                const doorMat = new THREE.MeshStandardMaterial({ color: 0x553311 });
+                const door = new THREE.Mesh(doorGeom, doorMat);
+                door.position.set(0, 0.75, depth / 2 + 0.05);
+                buildingGroup.add(door);
+            }
+            
+            // Roof
+            if (type === 'house') {
+                // Pitched roof
+                const roofGeom = new THREE.ConeGeometry(width * 0.8, 1.5, 4);
+                const roofMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                const roof = new THREE.Mesh(roofGeom, roofMat);
+                roof.position.y = height + 0.5;
+                roof.rotation.y = Math.PI / 4;
+                buildingGroup.add(roof);
+            } else {
+                // Flat roof with detail
+                const roofGeom = new THREE.BoxGeometry(width + 0.2, 0.2, depth + 0.2);
+                const roofMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
+                const roof = new THREE.Mesh(roofGeom, roofMat);
+                roof.position.y = height;
+                buildingGroup.add(roof);
+            }
+            
+            currentMesh = buildingGroup;
+            scene.add(currentMesh);
+            currentObjectType = `Building (${type})`;
+            updateStats();
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // NATURE GENERATION (Trees, rocks, etc.)
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function createNature(type) {
+            if (currentMesh) scene.remove(currentMesh);
+            
+            const natureGroup = new THREE.Group();
+            const detailLevel = parseInt(document.getElementById('detail-level').value);
+            
+            if (type === 'oak' || type === 'pine') {
+                // Tree trunk
+                const trunkHeight = type === 'oak' ? 2.5 : 3.5;
+                const trunkRadius = type === 'oak' ? 0.15 : 0.12;
+                
+                const trunkGeom = new THREE.CylinderGeometry(
+                    trunkRadius, 
+                    trunkRadius * 1.2, 
+                    trunkHeight, 
+                    8 * detailLevel
+                );
+                const trunkMat = new THREE.MeshStandardMaterial({
+                    color: 0x4a3520,
+                    roughness: 0.9
+                });
+                const trunk = new THREE.Mesh(trunkGeom, trunkMat);
+                trunk.position.y = trunkHeight / 2;
+                trunk.castShadow = true;
+                natureGroup.add(trunk);
+                
+                // Foliage
+                const foliageMat = new THREE.MeshStandardMaterial({
+                    color: type === 'oak' ? 0x2d5016 : 0x1a3a1a,
+                    roughness: 0.8
+                });
+                
+                if (type === 'oak') {
+                    // Oak - spherical canopy
+                    const canopyGeom = new THREE.SphereGeometry(1.5, 8 * detailLevel, 8 * detailLevel);
+                    const canopy = new THREE.Mesh(canopyGeom, foliageMat);
+                    canopy.position.y = trunkHeight + 0.8;
+                    canopy.scale.set(1, 0.8, 1);
+                    natureGroup.add(canopy);
+                } else {
+                    // Pine - cone shape
+                    const canopyGeom = new THREE.ConeGeometry(1.2, 2.5, 8 * detailLevel);
+                    const canopy = new THREE.Mesh(canopyGeom, foliageMat);
+                    canopy.position.y = trunkHeight + 1.2;
+                    natureGroup.add(canopy);
+                }
+                
+            } else if (type === 'rock') {
+                // Irregular rock
+                const rockGeom = new THREE.DodecahedronGeometry(0.8, detailLevel - 1);
+                const rockMat = new THREE.MeshStandardMaterial({
+                    color: 0x808080,
+                    roughness: 0.95,
+                    metalness: 0.1
+                });
+                
+                // Randomize vertices for irregular shape
+                const positions = rockGeom.attributes.position;
+                for (let i = 0; i < positions.count; i++) {
+                    positions.setY(i, positions.getY(i) * (0.5 + Math.random() * 0.5));
+                }
+                positions.needsUpdate = true;
+                
+                const rock = new THREE.Mesh(rockGeom, rockMat);
+                rock.position.y = 0.4;
+                rock.castShadow = true;
+                natureGroup.add(rock);
+                
+            } else if (type === 'bush') {
+                // Bush - multiple spheres
+                const bushMat = new THREE.MeshStandardMaterial({
+                    color: 0x3a6b1a,
+                    roughness: 0.9
+                });
+                
+                for (let i = 0; i < 5; i++) {
+                    const bushGeom = new THREE.SphereGeometry(
+                        0.3 + Math.random() * 0.2,
+                        6 * detailLevel,
+                        6 * detailLevel
+                    );
+                    const bushPart = new THREE.Mesh(bushGeom, bushMat);
+                    bushPart.position.set(
+                        (Math.random() - 0.5) * 0.6,
+                        0.2 + Math.random() * 0.3,
+                        (Math.random() - 0.5) * 0.6
+                    );
+                    natureGroup.add(bushPart);
+                }
+            }
+            
+            currentMesh = natureGroup;
+            scene.add(currentMesh);
+            currentObjectType = `Nature (${type})`;
+            updateStats();
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // FURNITURE GENERATION
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function createFurniture(type) {
+            if (currentMesh) scene.remove(currentMesh);
+            
+            const furnitureGroup = new THREE.Group();
+            const detailLevel = parseInt(document.getElementById('detail-level').value);
+            
+            const woodMat = new THREE.MeshStandardMaterial({
+                color: 0x8b4513,
+                roughness: 0.7,
+                metalness: 0.1
+            });
+            
+            const fabricMat = new THREE.MeshStandardMaterial({
+                color: 0x4a4a6a,
+                roughness: 0.9,
+                metalness: 0.0
+            });
+            
+            if (type === 'chair') {
+                // Seat
+                const seat = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.5, 0.05, 0.5),
+                    fabricMat
+                );
+                seat.position.y = 0.5;
+                furnitureGroup.add(seat);
+                
+                // Backrest
+                const backrest = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.5, 0.6, 0.05),
+                    fabricMat
+                );
+                backrest.position.set(0, 0.8, -0.22);
+                furnitureGroup.add(backrest);
+                
+                // Legs
+                const legGeom = new THREE.CylinderGeometry(0.02, 0.02, 0.5, 8 * detailLevel);
+                const legPositions = [
+                    [-0.2, 0.25, 0.2],
+                    [0.2, 0.25, 0.2],
+                    [-0.2, 0.25, -0.2],
+                    [0.2, 0.25, -0.2]
+                ];
+                
+                legPositions.forEach(pos => {
+                    const leg = new THREE.Mesh(legGeom, woodMat);
+                    leg.position.set(...pos);
+                    furnitureGroup.add(leg);
+                });
+                
+            } else if (type === 'desk') {
+                // Desktop
+                const desktop = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.6, 0.05, 0.8),
+                    woodMat
+                );
+                desktop.position.y = 0.75;
+                furnitureGroup.add(desktop);
+                
+                // Legs
+                const legGeom = new THREE.BoxGeometry(0.05, 0.75, 0.05);
+                const legPositions = [
+                    [-0.75, 0.375, 0.35],
+                    [0.75, 0.375, 0.35],
+                    [-0.75, 0.375, -0.35],
+                    [0.75, 0.375, -0.35]
+                ];
+                
+                legPositions.forEach(pos => {
+                    const leg = new THREE.Mesh(legGeom, woodMat);
+                    leg.position.set(...pos);
+                    furnitureGroup.add(leg);
+                });
+                
+            } else if (type === 'couch') {
+                // Seat base
+                const seat = new THREE.Mesh(
+                    new THREE.BoxGeometry(2.0, 0.4, 0.8),
+                    fabricMat
+                );
+                seat.position.y = 0.4;
+                furnitureGroup.add(seat);
+                
+                // Backrest
+                const backrest = new THREE.Mesh(
+                    new THREE.BoxGeometry(2.0, 0.6, 0.15),
+                    fabricMat
+                );
+                backrest.position.set(0, 0.7, -0.32);
+                furnitureGroup.add(backrest);
+                
+                // Armrests
+                const armrestGeom = new THREE.BoxGeometry(0.15, 0.5, 0.8);
+                [-1.07, 1.07].forEach(x => {
+                    const armrest = new THREE.Mesh(armrestGeom, fabricMat);
+                    armrest.position.set(x, 0.55, 0);
+                    furnitureGroup.add(armrest);
+                });
+                
+            } else if (type === 'bed') {
+                // Mattress
+                const mattress = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.9, 0.3, 2.0),
+                    fabricMat
+                );
+                mattress.position.y = 0.5;
+                furnitureGroup.add(mattress);
+                
+                // Frame
+                const frameGeom = new THREE.BoxGeometry(2.0, 0.15, 2.1);
+                const frame = new THREE.Mesh(frameGeom, woodMat);
+                frame.position.y = 0.3;
+                furnitureGroup.add(frame);
+                
+                // Headboard
+                const headboard = new THREE.Mesh(
+                    new THREE.BoxGeometry(2.0, 1.0, 0.1),
+                    woodMat
+                );
+                headboard.position.set(0, 0.85, -1.05);
+                furnitureGroup.add(headboard);
+            }
+            
+            currentMesh = furnitureGroup;
+            scene.add(currentMesh);
+            currentObjectType = `Furniture (${type})`;
+            updateStats();
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // PRIMITIVE SHAPES
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function createPrimitive(type) {
+            if (currentMesh) scene.remove(currentMesh);
+            
+            const detailLevel = parseInt(document.getElementById('detail-level').value);
+            const segments = detailLevel * 8;
+            
+            let geometry;
+            switch(type) {
+                case 'sphere':
+                    geometry = new THREE.SphereGeometry(1, segments, segments);
+                    break;
+                case 'cube':
+                    geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5, detailLevel, detailLevel, detailLevel);
+                    break;
+                case 'cylinder':
+                    geometry = new THREE.CylinderGeometry(0.7, 0.7, 2, segments);
+                    break;
+                case 'torus':
+                    geometry = new THREE.TorusGeometry(0.8, 0.3, segments / 2, segments);
+                    break;
+            }
+            
+            const material = new THREE.MeshStandardMaterial({
+                color: materialProps.color,
+                metalness: materialProps.metalness,
+                roughness: materialProps.roughness,
+                wireframe: wireframeMode
+            });
+            
+            currentMesh = new THREE.Mesh(geometry, material);
+            currentMesh.castShadow = true;
+            currentMesh.position.y = 1;
+            scene.add(currentMesh);
+            currentObjectType = `Primitive (${type})`;
+            updateStats();
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // MOUSE CONTROLS
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function setupMouseControls() {
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDragging && currentMesh) {
+                    const deltaX = e.offsetX - previousMousePosition.x;
+                    const deltaY = e.offsetY - previousMousePosition.y;
+                    
+                    currentMesh.rotation.y += deltaX * 0.01;
+                    currentMesh.rotation.x += deltaY * 0.01;
+                }
+                
+                previousMousePosition = { x: e.offsetX, y: e.offsetY };
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                camera.position.z += e.deltaY * 0.01;
+                camera.position.z = Math.max(2, Math.min(20, camera.position.z));
+            });
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // UI CONTROLS
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function setupUIControls() {
+            // Color
+            document.getElementById('color-picker').addEventListener('input', (e) => {
+                materialProps.color = parseInt(e.target.value.replace('#', '0x'));
+                updateMaterialColor();
+            });
+            
+            // Metallic
+            document.getElementById('metallic').addEventListener('input', (e) => {
+                materialProps.metalness = e.target.value / 100;
+                document.getElementById('metallic-val').textContent = (e.target.value / 100).toFixed(2);
+                updateMaterial();
+            });
+            
+            // Roughness
+            document.getElementById('roughness').addEventListener('input', (e) => {
+                materialProps.roughness = e.target.value / 100;
+                document.getElementById('roughness-val').textContent = (e.target.value / 100).toFixed(2);
+                updateMaterial();
+            });
+            
+            // Scale
+            document.getElementById('scale').addEventListener('input', (e) => {
+                const scale = e.target.value / 100;
+                document.getElementById('scale-val').textContent = scale.toFixed(2) + 'x';
+                if (currentMesh) {
+                    currentMesh.scale.setScalar(scale);
+                }
+            });
+            
+            // Detail Level
+            document.getElementById('detail-level').addEventListener('input', (e) => {
+                document.getElementById('detail-val').textContent = e.target.value;
+            });
+            
+            // Light Intensity
+            document.getElementById('light-intensity').addEventListener('input', (e) => {
+                const intensity = e.target.value / 100;
+                document.getElementById('light-val').textContent = intensity.toFixed(2);
+                scene.children.forEach(child => {
+                    if (child instanceof THREE.DirectionalLight) {
+                        child.intensity = intensity;
+                    }
+                });
+            });
+        }
+        
+        function updateMaterial() {
+            if (currentMesh) {
+                currentMesh.traverse((child) => {
+                    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+                        child.material.metalness = materialProps.metalness;
+                        child.material.roughness = materialProps.roughness;
+                    }
+                });
+            }
+        }
+        
+        function updateMaterialColor() {
+            if (currentMesh) {
+                currentMesh.traverse((child) => {
+                    if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+                        child.material.color.setHex(materialProps.color);
+                    }
+                });
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // VIEW CONTROLS
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function toggleWireframe() {
+            wireframeMode = !wireframeMode;
+            if (currentMesh) {
+                currentMesh.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        child.material.wireframe = wireframeMode;
+                    }
+                });
+            }
+        }
+        
+        function toggleRotation() {
+            isRotating = !isRotating;
+        }
+        
+        function resetCamera() {
+            camera.position.set(5, 3, 5);
+            camera.lookAt(0, 0, 0);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // EXPORT FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function exportOBJ() {
+            if (!currentMesh) return;
+            
+            let objContent = `# PixelProdigy ${currentObjectType} Export\n\n`;
+            let vertexOffset = 1;
+            
+            currentMesh.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    const geometry = child.geometry;
+                    const positions = geometry.attributes.position;
+                    
+                    // Vertices
+                    for (let i = 0; i < positions.count; i++) {
+                        const v = new THREE.Vector3(
+                            positions.getX(i),
+                            positions.getY(i),
+                            positions.getZ(i)
+                        );
+                        v.applyMatrix4(child.matrixWorld);
+                        objContent += `v ${v.x.toFixed(6)} ${v.y.toFixed(6)} ${v.z.toFixed(6)}\n`;
+                    }
+                    
+                    // Faces
+                    if (geometry.index) {
+                        for (let i = 0; i < geometry.index.count; i += 3) {
+                            const a = geometry.index.array[i] + vertexOffset;
+                            const b = geometry.index.array[i + 1] + vertexOffset;
+                            const c = geometry.index.array[i + 2] + vertexOffset;
+                            objContent += `f ${a} ${b} ${c}\n`;
+                        }
+                    }
+                    
+                    vertexOffset += positions.count;
+                }
+            });
+            
+            download(objContent, `${currentObjectType.replace(/\s+/g, '_')}.obj`, 'text/plain');
+        }
+        
+        function exportSTL() {
+            if (!currentMesh) return;
+            
+            let stlContent = `solid ${currentObjectType}\n`;
+            
+            currentMesh.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    const geometry = child.geometry;
+                    const positions = geometry.attributes.position;
+                    const indices = geometry.index ? geometry.index.array : null;
+                    
+                    const vertexCount = indices ? indices.length : positions.count;
+                    
+                    for (let i = 0; i < vertexCount; i += 3) {
+                        const i1 = indices ? indices[i] : i;
+                        const i2 = indices ? indices[i + 1] : i + 1;
+                        const i3 = indices ? indices[i + 2] : i + 2;
+                        
+                        const v1 = new THREE.Vector3(positions.getX(i1), positions.getY(i1), positions.getZ(i1));
+                        const v2 = new THREE.Vector3(positions.getX(i2), positions.getY(i2), positions.getZ(i2));
+                        const v3 = new THREE.Vector3(positions.getX(i3), positions.getY(i3), positions.getZ(i3));
+                        
+                        v1.applyMatrix4(child.matrixWorld);
+                        v2.applyMatrix4(child.matrixWorld);
+                        v3.applyMatrix4(child.matrixWorld);
+                        
+                        const normal = new THREE.Vector3();
+                        const edge1 = new THREE.Vector3().subVectors(v2, v1);
+                        const edge2 = new THREE.Vector3().subVectors(v3, v1);
+                        normal.crossVectors(edge1, edge2).normalize();
+                        
+                        stlContent += `facet normal ${normal.x} ${normal.y} ${normal.z}\n`;
+                        stlContent += `  outer loop\n`;
+                        stlContent += `    vertex ${v1.x} ${v1.y} ${v1.z}\n`;
+                        stlContent += `    vertex ${v2.x} ${v2.y} ${v2.z}\n`;
+                        stlContent += `    vertex ${v3.x} ${v3.y} ${v3.z}\n`;
+                        stlContent += `  endloop\n`;
+                        stlContent += `endfacet\n`;
+                    }
+                }
+            });
+            
+            stlContent += `endsolid ${currentObjectType}\n`;
+            download(stlContent, `${currentObjectType.replace(/\s+/g, '_')}.stl`, 'text/plain');
+        }
+        
+        function exportGLTF() {
+            alert('GLTF export requires GLTFExporter library. Use OBJ or STL for now.');
+        }
+        
+        function download(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // STATS & ANIMATION
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function updateStats() {
+            if (!currentMesh) {
+                document.getElementById('vertex-count').textContent = '0';
+                document.getElementById('triangle-count').textContent = '0';
+                document.getElementById('object-type').textContent = 'None';
+                return;
+            }
+            
+            let totalVertices = 0;
+            let totalTriangles = 0;
+            
+            currentMesh.traverse((child) => {
+                if (child instanceof THREE.Mesh && child.geometry) {
+                    totalVertices += child.geometry.attributes.position.count;
+                    if (child.geometry.index) {
+                        totalTriangles += child.geometry.index.count / 3;
+                    } else {
+                        totalTriangles += child.geometry.attributes.position.count / 3;
+                    }
+                }
+            });
+            
+            document.getElementById('vertex-count').textContent = Math.floor(totalVertices).toLocaleString();
+            document.getElementById('triangle-count').textContent = Math.floor(totalTriangles).toLocaleString();
+            document.getElementById('object-type').textContent = currentObjectType;
+        }
+        
+        let lastTime = performance.now();
+        let frameCount = 0;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (currentMesh && isRotating) {
+                currentMesh.rotation.y += 0.005;
+            }
+            
+            renderer.render(scene, camera);
+            
+            // FPS counter
+            frameCount++;
+            const currentTime = performance.now();
+            if (currentTime >= lastTime + 1000) {
+                document.getElementById('fps').textContent = frameCount;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // INITIALIZE
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        });
+        
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigy - 4K Artwork Vertex Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            overflow: hidden;
+        }
+        
+        #container {
+            display: grid;
+            grid-template-columns: 350px 1fr 400px;
+            height: 100vh;
+        }
+        
+        /* LEFT - CODE INPUT */
+        #code-panel {
+            background: rgba(0, 0, 0, 0.95);
+            border-right: 3px solid #00ff00;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            background: #003300;
+            color: #00ffff;
+            padding: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 2px solid #00ff00;
+        }
+        
+        #code-editor {
+            flex: 1;
+            background: #001100;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 15px;
+            border: none;
+            resize: none;
+            line-height: 1.5;
+        }
+        
+        .button-bar {
+            padding: 10px;
+            background: #002200;
+            border-top: 2px solid #00ff00;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #00ffff;
+            transform: scale(1.05);
+        }
+        
+        button.export {
+            background: #ffff00;
+        }
+        
+        /* CENTER - 4K RENDER */
+        #render-panel {
+            background: #0a0a0a;
+            position: relative;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #render-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+        
+        .info-row {
+            margin: 5px 0;
+        }
+        
+        .info-label {
+            color: #ffff00;
+            font-weight: bold;
+        }
+        
+        /* RIGHT - VERTEX DETAILS */
+        #details-panel {
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 3px solid #00ff00;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .detail-section {
+            background: rgba(0, 255, 0, 0.05);
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            color: #ffff00;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 5px;
+        }
+        
+        .vertex-data {
+            font-size: 10px;
+            line-height: 1.4;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #000;
+            padding: 8px;
+            border-radius: 3px;
+        }
+        
+        .code-output {
+            font-size: 10px;
+            background: #001100;
+            padding: 10px;
+            border-radius: 3px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .example-btn {
+            background: #0066ff;
+            color: #fff;
+            font-size: 11px;
+            padding: 8px;
+            margin: 3px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- LEFT PANEL: CODE INPUT -->
+        <div id="code-panel">
+            <div class="panel-header">
+                📝 VERTEX CODE GENERATOR
+            </div>
+            
+            <textarea id="code-editor" spellcheck="false">// VERTEX ARTWORK CODE
+// Each function defines vertices with precision
+
+function createTree() {
+    // Trunk - detailed cylinder with bark texture
+    const trunk = cylinder(0, 0, 0, {
+        radius: 0.3,
+        height: 3,
+        segments: 32,  // More segments = smoother
+        rings: 20,     // Vertical detail
+        barkDetail: true
+    });
+    
+    // Main branches - use bezier curves for organic shapes
+    const branch1 = branch(0, 2, 0, {
+        start: [0, 2, 0],
+        control1: [0.5, 2.5, 0.3],
+        control2: [1, 2.8, 0.5],
+        end: [1.5, 3, 0.6],
+        thickness: 0.15,
+        segments: 24
+    });
+    
+    // Leaves - each with detailed edge work
+    const leaves = [];
+    for (let i = 0; i < 200; i++) {
+        leaves.push(leaf({
+            position: randomOnBranch(),
+            size: random(0.1, 0.2),
+            edgeDetail: 16,  // 16 points around edge
+            veinDepth: 3,    // 3 levels of veins
+            curveAmount: 0.3
+        }));
+    }
+    
+    return combine(trunk, branch1, ...leaves);
+}
+
+function createHorse() {
+    // High-detail chess piece horse
+    const head = sculptedHead({
+        baseShape: 'elongated',
+        vertices: 2048,  // 4K detail level
+        features: {
+            eyes: { depth: 0.1, size: 0.08 },
+            ears: { height: 0.3, angle: 45 },
+            muzzle: { width: 0.6, detail: 32 },
+            mane: { strands: 50, flow: 'curved' }
+        }
+    });
+    
+    const neck = bezierExtrude({
+        path: [
+            [0, 0, 0],
+            [0, 0.5, 0.2],
+            [0, 1, 0.3],
+            [0, 1.5, 0.2]
+        ],
+        crossSection: circle(0.4, 24),
+        detail: 32
+    });
+    
+    return combine(head, neck);
+}
+
+// EXECUTE: createTree()
+createTree();</textarea>
+            
+            <div class="button-bar">
+                <button onclick="executeCode()">▶️ GENERATE</button>
+                <button onclick="clearAll()">🗑️ CLEAR</button>
+                <button class="export" onclick="export4K()">💾 EXPORT 4K</button>
+                <button class="export" onclick="exportCode()">📋 CODE</button>
+            </div>
+        </div>
+        
+        <!-- CENTER PANEL: 4K RENDER -->
+        <div id="render-panel">
+            <canvas id="render-canvas"></canvas>
+            
+            <div id="render-info">
+                <div class="info-row">
+                    <span class="info-label">Resolution:</span> 
+                    <span id="resolution">1920x1080</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Vertices:</span> 
+                    <span id="vertex-count">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Triangles:</span> 
+                    <span id="triangle-count">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Edge Detail:</span> 
+                    <span id="edge-detail">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">4K Ready:</span> 
+                    <span id="4k-ready">NO</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RIGHT PANEL: DETAILS -->
+        <div id="details-panel">
+            <div class="panel-header">
+                📊 VERTEX DETAILS
+            </div>
+            
+            <div class="detail-section">
+                <div class="section-title">EXAMPLE TEMPLATES</div>
+                <button class="example-btn" onclick="loadExample('tree')">🌲 DETAILED TREE</button>
+                <button class="example-btn" onclick="loadExample('horse')">🐴 CHESS HORSE</button>
+                <button class="example-btn" onclick="loadExample('character')">👤 CHARACTER</button>
+                <button class="example-btn" onclick="loadExample('building')">🏛️ BUILDING</button>
+                <button class="example-btn" onclick="loadExample('sculpture')">🗿 SCULPTURE</button>
+            </div>
+            
+            <div class="detail-section">
+                <div class="section-title">VERTEX ARRAY</div>
+                <div class="vertex-data" id="vertex-array">
+No vertices generated yet.
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="section-title">EDGE WORK DETAILS</div>
+                <div class="vertex-data" id="edge-work">
+Edge work will appear here after generation.
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="section-title">GENERATED THREE.JS CODE</div>
+                <div class="code-output" id="threejs-code">
+// Code will appear here after generation
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="section-title">AVAILABLE FUNCTIONS</div>
+                <div style="font-size: 10px; line-height: 1.6;">
+                    <b>Primitives:</b><br>
+                    • cylinder(x,y,z, opts)<br>
+                    • sphere(x,y,z, opts)<br>
+                    • box(x,y,z, opts)<br>
+                    • cone(x,y,z, opts)<br><br>
+                    
+                    <b>Organic Shapes:</b><br>
+                    • branch(x,y,z, opts)<br>
+                    • leaf(opts)<br>
+                    • tree(opts)<br>
+                    • flower(opts)<br><br>
+                    
+                    <b>Advanced:</b><br>
+                    • bezierExtrude(path, opts)<br>
+                    • loft(profiles, opts)<br>
+                    • lathe(profile, opts)<br>
+                    • sculptedHead(opts)<br><br>
+                    
+                    <b>Modifiers:</b><br>
+                    • subdivide(mesh, levels)<br>
+                    • smooth(mesh, amount)<br>
+                    • addEdgeDetail(mesh, segments)<br>
+                    • combine(...meshes)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+    
+    <script>
+        // ===== GLOBAL STATE =====
+        let scene, camera, renderer;
+        let currentMesh = null;
+        let allVertices = [];
+        let allIndices = [];
+        let edgeDetails = [];
+        
+        // ===== INITIALIZE THREE.JS =====
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            
+            const canvas = document.getElementById('render-canvas');
+            const container = canvas.parentElement;
+            
+            camera = new THREE.PerspectiveCamera(
+                60,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(4, 3, 5);
+            camera.lookAt(0, 1.5, 0);
+            
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas,
+                antialias: true,
+                preserveDrawingBuffer: true  // For 4K export
+            });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // Lighting setup for 4K quality
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            mainLight.position.set(5, 10, 5);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 4096;  // 4K shadow maps
+            mainLight.shadow.mapSize.height = 4096;
+            scene.add(mainLight);
+            
+            const fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
+            fillLight.position.set(-5, 5, -5);
+            scene.add(fillLight);
+            
+            const rimLight = new THREE.DirectionalLight(0xffaa44, 0.4);
+            rimLight.position.set(0, 5, -10);
+            scene.add(rimLight);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x003300, 0x001100);
+            scene.add(gridHelper);
+            
+            animate();
+            
+            console.log('✅ 4K Artwork Vertex Generator Ready');
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (currentMesh) {
+                currentMesh.rotation.y += 0.003;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        // ===== VERTEX GENERATION API =====
+        const VertexAPI = {
+            // Primitives
+            cylinder: function(x, y, z, opts = {}) {
+                const radius = opts.radius || 0.5;
+                const height = opts.height || 2;
+                const segments = opts.segments || 32;
+                const rings = opts.rings || 10;
+                
+                const geometry = new THREE.CylinderGeometry(
+                    radius, radius, height, segments, rings
+                );
+                
+                if (opts.barkDetail) {
+                    this.addBarkTexture(geometry);
+                }
+                
+                const mesh = new THREE.Mesh(geometry);
+                mesh.position.set(x, y + height/2, z);
+                return mesh;
+            },
+            
+            sphere: function(x, y, z, opts = {}) {
+                const radius = opts.radius || 1;
+                const segments = opts.segments || 32;
+                
+                const geometry = new THREE.SphereGeometry(
+                    radius, segments, segments
+                );
+                
+                const mesh = new THREE.Mesh(geometry);
+                mesh.position.set(x, y, z);
+                return mesh;
+            },
+            
+            box: function(x, y, z, opts = {}) {
+                const width = opts.width || 1;
+                const height = opts.height || 1;
+                const depth = opts.depth || 1;
+                const segments = opts.segments || 1;
+                
+                const geometry = new THREE.BoxGeometry(
+                    width, height, depth, segments, segments, segments
+                );
+                
+                const mesh = new THREE.Mesh(geometry);
+                mesh.position.set(x, y, z);
+                return mesh;
+            },
+            
+            cone: function(x, y, z, opts = {}) {
+                const radius = opts.radius || 0.5;
+                const height = opts.height || 1;
+                const segments = opts.segments || 32;
+                
+                const geometry = new THREE.ConeGeometry(
+                    radius, height, segments
+                );
+                
+                const mesh = new THREE.Mesh(geometry);
+                mesh.position.set(x, y, z);
+                return mesh;
+            },
+            
+            // Organic shapes
+            branch: function(x, y, z, opts = {}) {
+                const start = opts.start || [0, 0, 0];
+                const control1 = opts.control1 || [0.5, 0.5, 0];
+                const control2 = opts.control2 || [1, 0.8, 0];
+                const end = opts.end || [1.5, 1, 0];
+                const thickness = opts.thickness || 0.1;
+                const segments = opts.segments || 24;
+                
+                // Create bezier curve
+                const curve = new THREE.CubicBezierCurve3(
+                    new THREE.Vector3(...start),
+                    new THREE.Vector3(...control1),
+                    new THREE.Vector3(...control2),
+                    new THREE.Vector3(...end)
+                );
+                
+                // Create tube geometry along curve
+                const tubeGeometry = new THREE.TubeGeometry(
+                    curve, segments, thickness, 8, false
+                );
+                
+                const mesh = new THREE.Mesh(tubeGeometry);
+                mesh.position.set(x, y, z);
+                return mesh;
+            },
+            
+            leaf: function(opts = {}) {
+                const position = opts.position || [0, 0, 0];
+                const size = opts.size || 0.15;
+                const edgeDetail = opts.edgeDetail || 16;
+                const veinDepth = opts.veinDepth || 2;
+                const curveAmount = opts.curveAmount || 0.2;
+                
+                // Create detailed leaf shape
+                const shape = new THREE.Shape();
+                
+                // Draw leaf outline with detailed edges
+                for (let i = 0; i <= edgeDetail; i++) {
+                    const t = i / edgeDetail;
+                    const angle = t * Math.PI * 2;
+                    
+                    // Leaf-like shape with variations
+                    let r = size;
+                    if (t < 0.5) {
+                        r *= (1 - Math.abs(t - 0.25) * 2);
+                    } else {
+                        r *= (1 - Math.abs(t - 0.75) * 2);
+                    }
+                    
+                    // Add edge variation
+                    r += Math.sin(angle * 8) * size * 0.1;
+                    
+                    const x = Math.cos(angle) * r;
+                    const y = Math.sin(angle) * r;
+                    
+                    if (i === 0) {
+                        shape.moveTo(x, y);
+                    } else {
+                        shape.lineTo(x, y);
+                    }
+                }
+                
+                const geometry = new THREE.ExtrudeGeometry(shape, {
+                    depth: size * 0.05,
+                    bevelEnabled: true,
+                    bevelThickness: size * 0.02,
+                    bevelSize: size * 0.02,
+                    bevelSegments: 2
+                });
+                
+                // Apply curve
+                const positions = geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    const y = positions[i + 1];
+                    positions[i + 2] += Math.sin(y / size * Math.PI) * curveAmount * size;
+                }
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                const mesh = new THREE.Mesh(geometry);
+                mesh.position.set(...position);
+                
+                edgeDetails.push({
+                    type: 'leaf',
+                    edgePoints: edgeDetail,
+                    veinDepth: veinDepth
+                });
+                
+                return mesh;
+            },
+            
+            tree: function(opts = {}) {
+                const height = opts.height || 3;
+                const trunkRadius = opts.trunkRadius || 0.3;
+                const branches = opts.branches || 8;
+                const leaves = opts.leaves || 100;
+                
+                const parts = [];
+                
+                // Trunk
+                parts.push(this.cylinder(0, 0, 0, {
+                    radius: trunkRadius,
+                    height: height,
+                    segments: 32,
+                    rings: 20,
+                    barkDetail: true
+                }));
+                
+                // Branches
+                for (let i = 0; i < branches; i++) {
+                    const angle = (i / branches) * Math.PI * 2;
+                    const branchHeight = height * (0.4 + Math.random() * 0.4);
+                    const branchLength = 1 + Math.random();
+                    
+                    const startX = Math.cos(angle) * trunkRadius;
+                    const startZ = Math.sin(angle) * trunkRadius;
+                    
+                    parts.push(this.branch(0, branchHeight, 0, {
+                        start: [startX, 0, startZ],
+                        control1: [startX * 2, branchLength * 0.3, startZ * 2],
+                        control2: [startX * 3, branchLength * 0.6, startZ * 3],
+                        end: [startX * 4, branchLength, startZ * 4],
+                        thickness: trunkRadius * 0.4,
+                        segments: 16
+                    }));
+                }
+                
+                // Leaves
+                for (let i = 0; i < leaves; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 1 + Math.random() * 2;
+                    const leafHeight = height * 0.4 + Math.random() * height * 0.5;
+                    
+                    parts.push(this.leaf({
+                        position: [
+                            Math.cos(angle) * radius,
+                            leafHeight,
+                            Math.sin(angle) * radius
+                        ],
+                        size: 0.1 + Math.random() * 0.1,
+                        edgeDetail: 12,
+                        veinDepth: 2,
+                        curveAmount: 0.3
+                    }));
+                }
+                
+                return this.combine(...parts);
+            },
+            
+            sculptedHead: function(opts = {}) {
+                const baseShape = opts.baseShape || 'elongated';
+                const vertices = opts.vertices || 2048;
+                const features = opts.features || {};
+                
+                // Start with high-detail sphere
+                const segments = Math.sqrt(vertices / 2);
+                const geometry = new THREE.SphereGeometry(1, segments, segments);
+                
+                // Sculpt features
+                const positions = geometry.attributes.position.array;
+                
+                for (let i = 0; i < positions.length; i += 3) {
+                    let x = positions[i];
+                    let y = positions[i + 1];
+                    let z = positions[i + 2];
+                    
+                    // Elongate for horse head
+                    y *= 1.5;
+                    z *= 0.8;
+                    
+                    // Eye sockets
+                    if (features.eyes) {
+                        const eyeL = new THREE.Vector3(-0.3, 0.3, 0.8);
+                        const eyeR = new THREE.Vector3(0.3, 0.3, 0.8);
+                        const v = new THREE.Vector3(x, y, z);
+                        
+                        const distL = v.distanceTo(eyeL);
+                        const distR = v.distanceTo(eyeR);
+                        
+                        if (distL < features.eyes.size) {
+                            const indent = (1 - distL / features.eyes.size) * features.eyes.depth;
+                            z -= indent;
+                        }
+                        if (distR < features.eyes.size) {
+                            const indent = (1 - distR / features.eyes.size) * features.eyes.depth;
+                            z -= indent;
+                        }
+                    }
+                    
+                    // Muzzle
+                    if (features.muzzle && y < -0.5) {
+                        x *= 0.7;
+                        z *= 1.2;
+                    }
+                    
+                    positions[i] = x;
+                    positions[i + 1] = y;
+                    positions[i + 2] = z;
+                }
+                
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+                
+                const mesh = new THREE.Mesh(geometry);
+                return mesh;
+            },
+            
+            // Utilities
+            combine: function(...meshes) {
+                const geometries = [];
+                meshes.forEach(mesh => {
+                    if (mesh.geometry) {
+                        const geo = mesh.geometry.clone();
+                        geo.applyMatrix4(mesh.matrix);
+                        geometries.push(geo);
+                    }
+                });
+                
+                const mergedGeometry = THREE.BufferGeometryUtils ?
+                    THREE.BufferGeometryUtils.mergeBufferGeometries(geometries) :
+                    this.mergeGeometries(geometries);
+                
+                return new THREE.Mesh(mergedGeometry);
+            },
+            
+            mergeGeometries: function(geometries) {
+                // Simple merge for when BufferGeometryUtils not available
+                const merged = new THREE.BufferGeometry();
+                const positions = [];
+                const indices = [];
+                let vertexOffset = 0;
+                
+                geometries.forEach(geo => {
+                    const pos = geo.attributes.position.array;
+                    const idx = geo.index ? geo.index.array : null;
+                    
+                    positions.push(...pos);
+                    
+                    if (idx) {
+                        for (let i = 0; i < idx.length; i++) {
+                            indices.push(idx[i] + vertexOffset);
+                        }
+                    }
+                    
+                    vertexOffset += pos.length / 3;
+                });
+                
+                merged.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                if (indices.length > 0) {
+                    merged.setIndex(indices);
+                }
+                merged.computeVertexNormals();
+                
+                return merged;
+            },
+            
+            subdivide: function(mesh, levels) {
+                // This is a placeholder for a more complex subdivision algorithm.
+                // The original SubdivisionModifier is not in the core Three.js library anymore.
+                console.warn("Subdivision is a complex topic. This is a placeholder.");
+                return mesh;
+            },
+            
+            addBarkTexture: function(geometry) {
+                const positions = geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    const angle = Math.atan2(positions[i + 2], positions[i]);
+                    const noise = Math.sin(angle * 8 + positions[i + 1] * 5) * 0.05;
+                    const r = Math.sqrt(positions[i] ** 2 + positions[i + 2] ** 2);
+                    positions[i] += positions[i] / r * noise;
+                    positions[i + 2] += positions[i + 2] / r * noise;
+                }
+                geometry.attributes.position.needsUpdate = true;
+                geometry.computeVertexNormals();
+            },
+            
+            random: Math.random,
+            randomOnBranch: function() {
+                return [
+                    Math.random() * 3 - 1.5,
+                    Math.random() * 3,
+                    Math.random() * 3 - 1.5
+                ];
+            },
+            circle: function(radius, segments) {
+                const points = [];
+                for (let i = 0; i < segments; i++) {
+                    const angle = (i / segments) * Math.PI * 2;
+                    points.push(new THREE.Vector2(
+                        Math.cos(angle) * radius,
+                        Math.sin(angle) * radius
+                    ));
+                }
+                return points;
+            },
+            bezierExtrude: function(opts) {
+                // Simplified bezier extrude
+                return this.branch(0, 0, 0, opts);
+            }
+        };
+        
+        // ===== CODE EXECUTION =====
+        function executeCode() {
+            try {
+                const code = document.getElementById('code-editor').value;
+                
+                // Reset state
+                allVertices = [];
+                allIndices = [];
+                edgeDetails = [];
+                
+                // Remove old mesh
+                if (currentMesh) {
+                    scene.remove(currentMesh);
+                }
+                
+                // Create safe execution context
+                const safeCode = `
+                    (function() {
+                        ${code}
+                    })();
+                `;
+                
+                // Execute with API
+                const result = eval(safeCode.replace(/createTree|createHorse|tree|leaf|branch|cylinder|sphere|box|cone|sculptedHead|combine|subdivide|random|randomOnBranch|circle|bezierExtrude/g, 
+                    match => `VertexAPI.${match}`));
+                
+                if (result && result.geometry) {
+                    currentMesh = result;
+                    
+                    // Apply high-quality material
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0x228844,
+                        roughness: 0.7,
+                        metalness: 0.2,
+                        flatShading: false,
+                        side: THREE.DoubleSide
+                    });
+                    currentMesh.material = material;
+                    
+                    scene.add(currentMesh);
+                    
+                    // Extract vertex data
+                    const geometry = currentMesh.geometry;
+                    allVertices = Array.from(geometry.attributes.position.array);
+                    if (geometry.index) {
+                        allIndices = Array.from(geometry.index.array);
+                    }
+                    
+                    updateStats();
+                    updateVertexDisplay();
+                    generateThreeJSCode();
+                    
+                    console.log('✅ Generated mesh with', allVertices.length / 3, 'vertices');
+                } else {
+                    console.error('❌ No mesh returned from code');
+                }
+                
+            } catch (error) {
+                console.error('❌ Code execution error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        function updateStats() {
+            const vertexCount = allVertices.length / 3;
+            const triangleCount = allIndices.length / 3;
+            
+            document.getElementById('vertex-count').textContent = vertexCount.toLocaleString();
+            document.getElementById('triangle-count').textContent = Math.floor(triangleCount).toLocaleString();
+            document.getElementById('edge-detail').textContent = edgeDetails.length;
+            
+            // Check if 4K ready (need enough vertices for detail)
+            const is4KReady = vertexCount >= 10000;
+            document.getElementById('4k-ready').textContent = is4KReady ? 'YES ✅' : 'NO (need 10k+ vertices)';
+            document.getElementById('4k-ready').style.color = is4KReady ? '#00ff00' : '#ff0000';
+        }
+        
+        function updateVertexDisplay() {
+            let vertexText = `Total Vertices: ${allVertices.length / 3}\n\n`;
+            vertexText += 'First 100 vertices:\n';
+            
+            for (let i = 0; i < Math.min(300, allVertices.length); i += 3) {
+                vertexText += `v${i/3}: [${allVertices[i].toFixed(3)}, ${allVertices[i+1].toFixed(3)}, ${allVertices[i+2].toFixed(3)}]\n`;
+            }
+            
+            if (allVertices.length > 300) {
+                vertexText += `\n... ${(allVertices.length - 300) / 3} more vertices`;
+            }
+            
+            document.getElementById('vertex-array').textContent = vertexText;
+            
+            // Edge work details
+            let edgeText = `Total Edge Details: ${edgeDetails.length}\n\n`;
+            edgeDetails.forEach((detail, i) => {
+                edgeText += `${i + 1}. ${detail.type}: ${detail.edgePoints} points, depth ${detail.veinDepth}\n`;
+            });
+            
+            document.getElementById('edge-work').textContent = edgeText || 'No edge details yet';
+        }
+        
+        function generateThreeJSCode() {
+            let code = `// Generated THREE.js Code\n`;
+            code += `// Vertices: ${allVertices.length / 3}\n`;
+            code += `// Triangles: ${allIndices.length / 3}\n\n`;
+            
+            code += `const geometry = new THREE.BufferGeometry();\n\n`;
+            code += `const vertices = new Float32Array([\n`;
+            
+            for (let i = 0; i < allVertices.length; i += 9) {
+                code += `  ${allVertices.slice(i, i + 9).map(v => v.toFixed(3)).join(', ')}`;
+                if (i + 9 < allVertices.length) code += ',';
+                code += '\n';
+            }
+            
+            code += `]);\n\n`;
+            code += `geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));\n\n`;
+            
+            if (allIndices.length > 0) {
+                code += `const indices = new Uint32Array([\n`;
+                for (let i = 0; i < Math.min(300, allIndices.length); i += 9) {
+                    code += `  ${allIndices.slice(i, i + 9).join(', ')}`;
+                    if (i + 9 < allIndices.length) code += ',';
+                    code += '\n';
+                }
+                if (allIndices.length > 300) {
+                    code += `  // ... ${allIndices.length - 300} more indices\n`;
+                }
+                code += `]);\n\n`;
+                code += `geometry.setIndex(new THREE.BufferAttribute(indices, 1));\n`;
+            }
+            
+            code += `\ngeometry.computeVertexNormals();\n\n`;
+            code += `const material = new THREE.MeshStandardMaterial({\n`;
+            code += `  color: 0x228844,\n`;
+            code += `  roughness: 0.7,\n`;
+            code += `  metalness: 0.2\n`;
+            code += `});\n\n`;
+            code += `const mesh = new THREE.Mesh(geometry, material);\n`;
+            code += `scene.add(mesh);`;
+            
+            document.getElementById('threejs-code').textContent = code;
+        }
+        
+        // ===== EXAMPLES =====
+        const examples = {
+            tree: `// DETAILED TREE WITH EDGE WORK
+function createDetailedTree() {
+    const trunk = cylinder(0, 0, 0, {
+        radius: 0.3,
+        height: 3,
+        segments: 32,
+        rings: 20,
+        barkDetail: true
+    });
+    
+    const branches = [];
+    for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        const height = 1.5 + random() * 1;
+        const length = 1 + random() * 0.5;
+        
+        branches.push(branch(0, height, 0, {
+            start: [Math.cos(angle) * 0.3, 0, Math.sin(angle) * 0.3],
+            control1: [Math.cos(angle) * 0.8, length * 0.3, Math.sin(angle) * 0.8],
+            control2: [Math.cos(angle) * 1.2, length * 0.6, Math.sin(angle) * 1.2],
+            end: [Math.cos(angle) * 1.5, length, Math.sin(angle) * 1.5],
+            thickness: 0.1,
+            segments: 16
+        }));
+    }
+    
+    const leaves = [];
+    for (let i = 0; i < 200; i++) {
+        const pos = randomOnBranch();
+        leaves.push(leaf({
+            position: pos,
+            size: 0.12,
+            edgeDetail: 16,
+            veinDepth: 3,
+            curveAmount: 0.3
+        }));
+    }
+    
+    return combine(trunk, ...branches, ...leaves);
+}
+
+createDetailedTree();`,
+
+            horse: `// CHESS HORSE WITH 4K DETAIL
+function createChessHorse() {
+    const head = sculptedHead({
+        baseShape: 'elongated',
+        vertices: 2048,
+        features: {
+            eyes: { depth: 0.12, size: 0.1 },
+            ears: { height: 0.3, angle: 45 },
+            muzzle: { width: 0.6, detail: 32 }
+        }
+    });
+    
+    const neck = branch(0, -0.5, 0, {
+        start: [0, 0, 0],
+        control1: [0, -0.3, 0.2],
+        control2: [0, -0.6, 0.3],
+        end: [0, -1, 0.2],
+        thickness: 0.4,
+        segments: 24
+    });
+    
+    const base = cylinder(0, -1.5, 0, {
+        radius: 0.6,
+        height: 0.5,
+        segments: 32,
+        rings: 4
+    });
+    
+    return combine(head, neck, base);
+}
+
+createChessHorse();`,
+
+            character: `// CHARACTER WITH DETAILED FEATURES
+function createCharacter() {
+    const head = sculptedHead({
+        baseShape: 'round',
+        vertices: 1024,
+        features: {
+            eyes: { depth: 0.08, size: 0.06 },
+            muzzle: { width: 0.4, detail: 24 }
+        }
+    });
+    
+    const body = cylinder(0, -1, 0, {
+        radius: 0.4,
+        height: 1.5,
+        segments: 24,
+        rings: 12
+    });
+    
+    return combine(head, body);
+}
+
+createCharacter();`,
+
+            building: `// ARCHITECTURAL BUILDING
+function createBuilding() {
+    const base = box(0, 0.5, 0, {
+        width: 2,
+        height: 1,
+        depth: 2,
+        segments: 8
+    });
+    
+    const walls = box(0, 2, 0, {
+        width: 1.8,
+        height: 2,
+        depth: 1.8,
+        segments: 12
+    });
+    
+    const roof = cone(0, 3.5, 0, {
+        radius: 1.2,
+        height: 1,
+        segments: 32
+    });
+    
+    return combine(base, walls, roof);
+}
+
+createBuilding();`,
+
+            sculpture: `// ABSTRACT SCULPTURE
+function createSculpture() {
+    const base = sphere(0, 0, 0, {
+        radius: 0.8,
+        segments: 32
+    });
+    
+    const parts = [base];
+    
+    for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        parts.push(branch(0, 0, 0, {
+            start: [0, 0, 0],
+            control1: [Math.cos(angle) * 0.5, 0.5, Math.sin(angle) * 0.5],
+            control2: [Math.cos(angle), 1, Math.sin(angle)],
+            end: [Math.cos(angle) * 1.2, 1.5, Math.sin(angle) * 1.2],
+            thickness: 0.1,
+            segments: 16
+        }));
+    }
+    
+    return combine(...parts);
+}
+
+createSculpture();`
+        };
+        
+        function loadExample(name) {
+        };
+        
+        function loadExample(name) {
+            document.getElementById('code-editor').value = examples[name];
+            executeCode();
+        }
+        
+        // ===== EXPORT FUNCTIONS =====
+        function export4K() {
+            // Render at 4K resolution
+            const originalSize = renderer.getSize(new THREE.Vector2());
+            const originalPixelRatio = renderer.getPixelRatio();
+            
+            renderer.setSize(3840, 2160);  // 4K resolution
+            renderer.setPixelRatio(1);
+            renderer.render(scene, camera);
+            
+            // Export as PNG
+            renderer.domElement.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '4k_artwork.png';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                // Restore original size
+                renderer.setSize(originalSize.x, originalSize.y);
+                renderer.setPixelRatio(originalPixelRatio);
+                
+                console.log('💾 Exported 4K image');
+            });
+        }
+        
+        function exportCode() {
+            const code = document.getElementById('threejs-code').textContent;
+            const blob = new Blob([code], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated_code.js';
+            a.click();
+            URL.revokeObjectURL(url);
+            console.log('📋 Exported code');
+        }
+        
+        function clearAll() {
+            if (currentMesh) {
+                scene.remove(currentMesh);
+                currentMesh = null;
+            }
+            allVertices = [];
+            allIndices = [];
+            edgeDetails = [];
+            updateStats();
+            document.getElementById('vertex-array').textContent = 'No vertices generated yet.';
+            document.getElementById('edge-work').textContent = 'Edge work will appear here after generation.';
+            document.getElementById('threejs-code').textContent = '// Code will appear here after generation';
+        }
+        
+        // ===== START =====
+        window.addEventListener('load', () => {
+            init();
+            // Load tree example by default
+            loadExample('tree');
+        });
+        
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('render-canvas');
+            const container = canvas.parentElement;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+</body>
+</html>
