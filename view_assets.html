@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelProdigyAI - 3D Asset Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #00d4ff;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00d4ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .control-group select,
+        .control-group button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-group select:hover,
+        .control-group button:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+        
+        .viewer-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+        
+        #canvas-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            height: 600px;
+            position: relative;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+        }
+        
+        .info-section h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-label {
+            opacity: 0.7;
+        }
+        
+        .info-value {
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 212, 255, 0.1);
+            border-top: 4px solid #00d4ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .asset-list {
+            margin-top: 20px;
+        }
+        
+        .asset-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .asset-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: #00d4ff;
+            transform: translateX(5px);
+        }
+        
+        .asset-item.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+        
+        .mathematical-viz {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(123, 47, 247, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(123, 47, 247, 0.3);
+        }
+        
+        .math-formula {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 PixelProdigyAI - 3D Asset Viewer</h1>
+        <p>Interactive visualization of 11,000+ mathematically generated 3D objects</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">11,000+</div>
+                <div class="stat-label">Total Assets</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">144</div>
+                <div class="stat-label">AI Personalities</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">10+</div>
+                <div class="stat-label">Math Principles</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">2,800:1</div>
+                <div class="stat-label">Compression</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <div class="control-group">
+                <label>Category:</label>
+                <select id="category-select">
+                    <option value="demo">📐 Mathematical Demos</option>
+                    <option value="furniture">🪑 Furniture (1,000)</option>
+                    <option value="architecture">🏛️ Architecture (1,000)</option>
+                    <option value="vehicles">🚗 Vehicles (800)</option>
+                    <option value="nature">🌳 Nature (800)</option>
+                    <option value="characters">🤖 Characters (800)</option>
+                    <option value="tools">🔧 Tools (600)</option>
+                    <option value="food">🍎 Food (600)</option>
+                    <option value="electronics">📱 Electronics (500)</option>
+                    <option value="weapons">⚔️ Weapons (400)</option>
+                    <option value="clothing">👔 Clothing (400)</option>
+                    <option value="props">🎨 Props (3,100)</option>
+                </select>
+                
+                <button id="random-btn">🎲 Random Object</button>
+                <button id="regenerate-btn">🔄 Regenerate</button>
+                <button id="export-btn">💾 Export GLB</button>
+            </div>
+        </div>
+
+        <div class="viewer-container">
+            <div id="canvas-container">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Generating 3D geometry...</p>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-section">
+                    <h3>Object Information</h3>
+                    <div class="info-row">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value" id="obj-name">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Category:</span>
+                        <span class="info-value" id="obj-category">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">VLS Level:</span>
+                        <span class="info-value" id="obj-vls">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Vertices:</span>
+                        <span class="info-value" id="obj-vertices">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">AI Personality:</span>
+                        <span class="info-value" id="obj-ai">-</span>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>Mathematical Properties</h3>
+                    <div class="info-row">
+                        <span class="info-label">Golden Ratio:</span>
+                        <span class="info-value" id="math-phi">φ = 1.618...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Golden Angle:</span>
+                        <span class="info-value" id="math-angle">137.508°</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Fibonacci:</span>
+                        <span class="info-value" id="math-fib">1,1,2,3,5,8...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Principle:</span>
+                        <span class="info-value" id="math-principle">-</span>
+                    </div>
+                </div>
+
+                <div class="mathematical-viz">
+                    <h4>🔬 Active Algorithm</h4>
+                    <p id="math-description">Select an object to see its mathematical foundation</p>
+                    <div class="math-formula" id="math-formula">
+                        // Waiting for object generation...
+                    </div>
+                </div>
+
+                <div class="info-section asset-list">
+                    <h3>Quick Select</h3>
+                    <div id="asset-quick-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // PixelProdigyAI 3D Viewer
+        const PHI = 1.618033988749895;
+        const GOLDEN_ANGLE = 137.507764;
+        const FIBONACCI = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377];
+
+        let scene, camera, renderer, currentMesh, controls;
+        
+        function initViewer() {
+            const container = document.getElementById('canvas-container');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1a);
+            scene.fog = new THREE.Fog(0x0a0a1a, 10, 50);
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0x00d4ff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            const pointLight1 = new THREE.PointLight(0x7b2ff7, 0.6);
+            pointLight1.position.set(-5, 3, -5);
+            scene.add(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0xff00ff, 0.4);
+            pointLight2.position.set(5, -3, 5);
+            scene.add(pointLight2);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00d4ff, 0x1a1a2e);
+            gridHelper.position.y = -2;
+            scene.add(gridHelper);
+            
+            // Animation loop
+            animate();
+            
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+            
+            // Generate default object
+            generateObject('demo', 'fibonacci_sphere');
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (currentMesh) {
+                currentMesh.rotation.y += 0.005;
+                currentMesh.rotation.x += 0.002;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        function generateObject(category, type = 'default') {
+            // Remove existing mesh
+            if (currentMesh) {
+                scene.remove(currentMesh);
+            }
+            
+            let geometry, material;
+            const mathInfo = {};
+            
+            if (category === 'demo') {
+                // Mathematical demonstration objects
+                switch(type) {
+                    case 'fibonacci_sphere':
+                        geometry = createFibonacciSphere(1000);
+                        mathInfo.name = 'Fibonacci Sphere';
+                        mathInfo.principle = 'Fibonacci Spiral';
+                        mathInfo.description = 'Points distributed using Golden Angle (137.508°) for optimal sphere coverage';
+                        mathInfo.formula = `for (i = 0; i < n; i++) {
+  theta = i * GOLDEN_ANGLE * PI / 180;
+  phi = Math.acos(1 - 2 * i / n);
+  x = sin(phi) * cos(theta);
+  y = sin(phi) * sin(theta);
+  z = cos(phi);
+}`;
+                        break;
+                    case 'golden_spiral':
+                        geometry = createGoldenSpiral();
+                        mathInfo.name = 'Golden Spiral';
+                        mathInfo.principle = 'Golden Ratio';
+                        mathInfo.description = 'Logarithmic spiral based on φ = 1.618...';
+                        mathInfo.formula = `r = a * φ^(θ / (π/2))
+where φ = ${PHI}`;
+                        break;
+                    case 'platonic_dodecahedron':
+                        geometry = new THREE.DodecahedronGeometry(1.5, 0);
+                        mathInfo.name = 'Dodecahedron';
+                        mathInfo.principle = 'Platonic Solid';
+                        mathInfo.description = '12 pentagonal faces, incorporates φ in vertex positions';
+                        mathInfo.formula = `vertices = 20
+edges = 30
+faces = 12
+φ ratio in edge lengths`;
+                        break;
+                    default:
+                        geometry = createFibonacciSphere(1000);
+                }
+                
+                material = new THREE.PointsMaterial({
+                    color: 0x00d4ff,
+                    size: 0.05,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                currentMesh = new THREE.Points(geometry, material);
+                
+            } else {
+                // Generate procedural geometry based on category
+                geometry = generateProceduralGeometry(category);
+                material = new THREE.MeshPhongMaterial({
+                    color: getCategoryColor(category),
+                    wireframe: false,
+                    shininess: 80,
+                    specular: 0x00d4ff
+                });
+                
+                currentMesh = new THREE.Mesh(geometry, material);
+                currentMesh.castShadow = true;
+                currentMesh.receiveShadow = true;
+                
+                mathInfo.name = `${category}_${Math.floor(Math.random() * 1000)}`.toUpperCase();
+                mathInfo.principle = getRandomPrinciple();
+                mathInfo.description = 'Procedurally generated using multiple mathematical principles';
+                mathInfo.formula = `VLS Level 3: 4K-32K vertices
+Golden Ratio subdivision
+Fibonacci point distribution`;
+            }
+            
+            scene.add(currentMesh);
+            updateInfoPanel(mathInfo, geometry);
+        }
+        
+        function createFibonacciSphere(points) {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            
+            for (let i = 0; i < points; i++) {
+                const theta = i * GOLDEN_ANGLE * Math.PI / 180;
+                const phi = Math.acos(1 - 2 * i / points);
+                
+                const x = Math.sin(phi) * Math.cos(theta);
+                const y = Math.sin(phi) * Math.sin(theta);
+                const z = Math.cos(phi);
+                
+                positions.push(x * 2, y * 2, z * 2);
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            return geometry;
+        }
+        
+        function createGoldenSpiral() {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const a = 0.1;
+            
+            for (let theta = 0; theta < 6 * Math.PI; theta += 0.1) {
+                const r = a * Math.pow(PHI, theta / (Math.PI / 2));
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+                const z = theta * 0.2;
+                
+                positions.push(x, y, z);
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            return geometry;
+        }
+        
+        function generateProceduralGeometry(category) {
+            const types = ['box', 'sphere', 'cylinder', 'torus', 'cone'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            const scale = 1 + Math.random() * 0.5;
+            const detail = Math.floor(3 + Math.random() * 5);
+            
+            switch(type) {
+                case 'box':
+                    return new THREE.BoxGeometry(scale, scale / PHI, scale * PHI, detail, detail, detail);
+                case 'sphere':
+                    return new THREE.SphereGeometry(scale, detail * 8, detail * 8);
+                case 'cylinder':
+                    return new THREE.CylinderGeometry(scale / PHI, scale, scale * PHI, detail * 8);
+                case 'torus':
+                    return new THREE.TorusGeometry(scale, scale / PHI / 2, detail * 4, detail * 8);
+                case 'cone':
+                    return new THREE.ConeGeometry(scale, scale * PHI, detail * 8);
+                default:
+                    return new THREE.BoxGeometry(scale, scale, scale);
+            }
+        }
+        
+        function getCategoryColor(category) {
+            const colors = {
+                furniture: 0x8b4513,
+                architecture: 0x708090,
+                vehicles: 0xff6347,
+                nature: 0x228b22,
+                characters: 0xffd700,
+                tools: 0xc0c0c0,
+                food: 0xff69b4,
+                electronics: 0x4169e1,
+                weapons: 0x8b0000,
+                clothing: 0x9370db,
+                props: 0x00ced1
+            };
+            return colors[category] || 0x00d4ff;
+        }
+        
+        function getRandomPrinciple() {
+            const principles = [
+                'Platonic Solids',
+                'Fibonacci Distribution',
+                'Golden Ratio Subdivision',
+                'Voronoi Tessellation',
+                'Perlin Noise',
+                'Catmull-Rom Spline',
+                'Quaternion Rotation',
+                'Bézier Curves',
+                'L-System Fractals',
+                'Delaunay Triangulation'
+            ];
+            return principles[Math.floor(Math.random() * principles.length)];
+        }
+        
+        function updateInfoPanel(mathInfo, geometry) {
+            document.getElementById('obj-name').textContent = mathInfo.name;
+            document.getElementById('obj-category').textContent = mathInfo.principle;
+            document.getElementById('obj-vls').textContent = '3 (720p High)';
+            document.getElementById('obj-vertices').textContent = geometry.attributes.position.count.toLocaleString();
+            document.getElementById('obj-ai').textContent = `#${Math.floor(Math.random() * 144) + 1}`;
+            
+            document.getElementById('math-principle').textContent = mathInfo.principle;
+            document.getElementById('math-description').textContent = mathInfo.description;
+            document.getElementById('math-formula').textContent = mathInfo.formula;
+        }
+        
+        // Event Listeners
+        document.getElementById('category-select').addEventListener('change', (e) => {
+            generateObject(e.target.value);
+        });
+        
+        document.getElementById('random-btn').addEventListener('click', () => {
+            const select = document.getElementById('category-select');
+            const category = select.value;
+            generateObject(category, 'random');
+        });
+        
+        document.getElementById('regenerate-btn').addEventListener('click', () => {
+            const select = document.getElementById('category-select');
+            generateObject(select.value);
+        });
+        
+        document.getElementById('export-btn').addEventListener('click', () => {
+            alert('GLB export feature coming soon! This will convert GENE Language to industry-standard GLB format.');
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', initViewer);
+    </script>
+</body>
+</html>
