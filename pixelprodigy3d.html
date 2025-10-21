@@ -1477,42 +1477,173 @@
     let currentTool = 'sculpt';
     let currentBrush = 'draw';
 
-    // Initialize Canvas
-    const canvas = document.getElementById('viewportCanvas');
-    const ctx = canvas.getContext('2d');
+    // ============================================
+    // REAL THREE.JS SCULPTING SETUP
+    // ============================================
+    let sculptScene, sculptCamera, sculptRenderer, sculptControls;
+    let sculptMesh = null;
+    let raycaster = new THREE.Raycaster();
+    let mouse = new THREE.Vector2();
+    let isMouseDown = false;
+    let brushSize = 0.5;
+    let brushStrength = 0.1;
 
-    function resizeCanvas() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      drawPlaceholder();
+    // Initialize Three.js for Sculpting
+    const canvas = document.getElementById('viewportCanvas');
+    
+    function initSculptingViewport() {
+      // Scene
+      sculptScene = new THREE.Scene();
+      sculptScene.background = new THREE.Color(0x0a1520);
+      
+      // Camera
+      sculptCamera = new THREE.PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
+      sculptCamera.position.set(0, 2, 5);
+      
+      // Renderer
+      sculptRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      sculptRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+      sculptRenderer.setPixelRatio(window.devicePixelRatio);
+      
+      // Controls
+      sculptControls = new THREE.OrbitControls(sculptCamera, sculptRenderer.domElement);
+      sculptControls.enableDamping = true;
+      sculptControls.dampingFactor = 0.05;
+      
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      sculptScene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(5, 10, 7.5);
+      sculptScene.add(directionalLight);
+      
+      // Grid
+      const gridHelper = new THREE.GridHelper(20, 20, 0x00ffff, 0x444444);
+      sculptScene.add(gridHelper);
+      
+      // Add default sphere to sculpt
+      createSculptableSphere();
+      
+      // Mouse events for sculpting
+      canvas.addEventListener('mousemove', onSculptMouseMove);
+      canvas.addEventListener('mousedown', onSculptMouseDown);
+      canvas.addEventListener('mouseup', onSculptMouseUp);
+      
+      // Start animation
+      animateSculpting();
     }
 
-    function drawPlaceholder() {
-      ctx.fillStyle = '#0a1520';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function createSculptableSphere() {
+      const geometry = new THREE.SphereGeometry(1.5, 64, 64);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x00d4ff,
+        roughness: 0.7,
+        metalness: 0.3,
+        flatShading: false
+      });
       
-      ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
-      ctx.lineWidth = 1;
+      sculptMesh = new THREE.Mesh(geometry, material);
+      sculptScene.add(sculptMesh);
+    }
+
+    function onSculptMouseMove(event) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
       
-      // Draw center crosshair
-      ctx.beginPath();
-      ctx.moveTo(canvas.width / 2 - 50, canvas.height / 2);
-      ctx.lineTo(canvas.width / 2 + 50, canvas.height / 2);
-      ctx.moveTo(canvas.width / 2, canvas.height / 2 - 50);
-      ctx.lineTo(canvas.width / 2, canvas.height / 2 + 50);
-      ctx.stroke();
+      if (isMouseDown && sculptMesh && currentTool === 'sculpt') {
+        applySculpting();
+      }
+    }
+
+    function onSculptMouseDown(event) {
+      if (event.button === 0) { // Left click only
+        isMouseDown = true;
+      }
+    }
+
+    function onSculptMouseUp(event) {
+      isMouseDown = false;
+    }
+
+    function applySculpting() {
+      raycaster.setFromCamera(mouse, sculptCamera);
+      const intersects = raycaster.intersectObject(sculptMesh);
       
-      // Draw placeholder text
-      ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
-      ctx.font = '24px Inter';
-      ctx.textAlign = 'center';
-      ctx.fillText('3D Viewport', canvas.width / 2, canvas.height / 2 - 20);
-      ctx.font = '14px Inter';
-      ctx.fillText('Select a tool to begin', canvas.width / 2, canvas.height / 2 + 10);
+      if (intersects.length > 0) {
+        const point = intersects[0].point;
+        const geometry = sculptMesh.geometry;
+        const positions = geometry.attributes.position;
+        
+        for (let i = 0; i < positions.count; i++) {
+          const vertex = new THREE.Vector3(
+            positions.getX(i),
+            positions.getY(i),
+            positions.getZ(i)
+          );
+          vertex.applyMatrix4(sculptMesh.matrixWorld);
+          
+          const distance = vertex.distanceTo(point);
+          
+          if (distance < brushSize) {
+            const falloff = 1 - (distance / brushSize);
+            const intensity = brushStrength * falloff * 0.05;
+            
+            const localVertex = vertex.clone();
+            localVertex.applyMatrix4(sculptMesh.matrixWorld.clone().invert());
+            
+            // Apply brush effect based on current brush type
+            switch(currentBrush) {
+              case 'draw':
+                const normal = new THREE.Vector3();
+                normal.copy(localVertex).normalize();
+                localVertex.add(normal.multiplyScalar(intensity));
+                break;
+              case 'grab':
+                // Move vertex towards mouse
+                break;
+              case 'smooth':
+                // Smooth with neighbors
+                break;
+              case 'pinch':
+                localVertex.multiplyScalar(1 - intensity * 0.1);
+                break;
+              case 'inflate':
+                localVertex.multiplyScalar(1 + intensity);
+                break;
+              case 'flatten':
+                localVertex.y *= (1 - intensity * 0.5);
+                break;
+            }
+            
+            positions.setXYZ(i, localVertex.x, localVertex.y, localVertex.z);
+          }
+        }
+        
+        positions.needsUpdate = true;
+        geometry.computeVertexNormals();
+      }
+    }
+
+    function animateSculpting() {
+      requestAnimationFrame(animateSculpting);
+      sculptControls.update();
+      sculptRenderer.render(sculptScene, sculptCamera);
+    }
+
+    function resizeCanvas() {
+      if (sculptRenderer) {
+        sculptCamera.aspect = canvas.offsetWidth / canvas.offsetHeight;
+        sculptCamera.updateProjectionMatrix();
+        sculptRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+      }
     }
 
     window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    
+    // Initialize sculpting viewport on load
+    setTimeout(initSculptingViewport, 100);
 
     // Switch Workspace
     function switchWorkspace(workspace) {
@@ -1592,6 +1723,14 @@
       if (element) {
         element.textContent = displayValue;
       }
+      
+      // Update sculpting parameters
+      if (param === 'size') {
+        brushSize = parseFloat(value);
+      } else if (param === 'strength') {
+        brushStrength = parseFloat(value);
+      }
+      
       console.log(`${param} updated to ${displayValue}`);
     }
 
@@ -2272,8 +2411,8 @@
       }
     });
     
-    // Raycaster for button interaction
-    const raycaster = new THREE.Raycaster();
+    // Raycaster for button interaction (reuse existing one)
+    const gridRaycaster = new THREE.Raycaster();
     const rayDirection = new THREE.Vector3(0, 0, -1);
     
     // Update Camera and Movement
