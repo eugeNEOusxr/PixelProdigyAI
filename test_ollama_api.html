@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama API Test - Llama 3.1</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 100%);
+            color: #00ffff;
+        }
+        
+        h1 {
+            color: #ffaa00;
+            text-shadow: 0 0 10px #ffaa00;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.6);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #00ffff;
+        }
+        
+        .status {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: rgba(0,255,0,0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+        }
+        
+        .status.error {
+            background: rgba(255,0,0,0.2);
+            border: 2px solid #ff0000;
+            color: #ff0000;
+        }
+        
+        .status.info {
+            background: rgba(0,255,255,0.2);
+            border: 2px solid #00ffff;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #00ffff, #0099ff);
+            border: none;
+            color: #000;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #00ff00, #00aa00);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(0,255,255,0.1);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        .response {
+            background: rgba(255,170,0,0.1);
+            border: 2px solid #ffaa00;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦙 Ollama + Llama 3.1 API Test</h1>
+        
+        <div id="status" class="status info">
+            Checking Ollama connection...
+        </div>
+        
+        <h2>Quick Tests:</h2>
+        <div class="test-buttons">
+            <button onclick="testConnection()">1. Test Connection</button>
+            <button onclick="testMathGenius()">2. Test Math (Fibonacci)</button>
+            <button onclick="testCodeGen()">3. Generate Three.js Code</button>
+            <button onclick="testStoryGen()">4. Generate Quest</button>
+            <button onclick="testVillageLayout()">5. Design Village</button>
+            <button onclick="testOptimization()">6. Performance Tips</button>
+        </div>
+        
+        <h2>Custom Prompt:</h2>
+        <textarea id="customPrompt" placeholder="Type your prompt here...">Generate a Fibonacci spiral with 100 points in Three.js</textarea>
+        <button onclick="askAI()" style="width: 100%; margin: 10px 0;">Ask Llama 3.1</button>
+        
+        <h2>Response:</h2>
+        <div id="response" class="response">Responses will appear here...</div>
+        
+        <h2>Available Models:</h2>
+        <div id="models" class="response">Loading models...</div>
+    </div>
+    
+    <script>
+        const OLLAMA_URL = 'http://localhost:11434';
+        
+        // Check connection on load
+        window.onload = async () => {
+            await checkConnection();
+            await listModels();
+        };
+        
+        async function checkConnection() {
+            const statusDiv = document.getElementById('status');
+            try {
+                const response = await fetch(`${OLLAMA_URL}/api/tags`);
+                if (response.ok) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ Ollama is running on http://localhost:11434';
+                } else {
+                    throw new Error('Ollama not responding');
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `❌ Ollama not running. Start it with: <code>ollama serve</code>`;
+            }
+        }
+        
+        async function listModels() {
+            const modelsDiv = document.getElementById('models');
+            try {
+                const response = await fetch(`${OLLAMA_URL}/api/tags`);
+                const data = await response.json();
+                
+                if (data.models && data.models.length > 0) {
+                    modelsDiv.innerHTML = data.models.map(m => 
+                        `📦 ${m.name} (${(m.size / 1e9).toFixed(2)} GB) - Modified: ${new Date(m.modified_at).toLocaleString()}`
+                    ).join('\n');
+                } else {
+                    modelsDiv.innerHTML = '⚠️ No models installed. Download with:\n  ollama pull llama3.1:8b';
+                }
+            } catch (error) {
+                modelsDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        async function askAI(prompt, temperature = 0.7) {
+            const responseDiv = document.getElementById('response');
+            const customPromptArea = document.getElementById('customPrompt');
+            
+            const actualPrompt = prompt || customPromptArea.value;
+            
+            if (!actualPrompt) {
+                responseDiv.innerHTML = '❌ Please enter a prompt';
+                return;
+            }
+            
+            responseDiv.innerHTML = '🤔 Thinking... (This may take 10-30 seconds)';
+            
+            try {
+                const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'llama3.1:8b',
+                        prompt: actualPrompt,
+                        stream: false,
+                        options: {
+                            temperature: temperature
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                responseDiv.innerHTML = `✅ Response from Llama 3.1:\n\n${data.response}\n\n---\nGeneration time: ${(data.total_duration / 1e9).toFixed(2)}s\nTokens: ${data.eval_count || 'N/A'}`;
+                
+            } catch (error) {
+                responseDiv.innerHTML = `❌ Error: ${error.message}\n\nMake sure:\n1. Ollama is running (ollama serve)\n2. Model is downloaded (ollama pull llama3.1:8b)`;
+            }
+        }
+        
+        async function testConnection() {
+            await checkConnection();
+            await listModels();
+        }
+        
+        async function testMathGenius() {
+            await askAI('You are a mathematical genius. Generate the formula for a Fibonacci spiral with 100 points distributed on a sphere. Return ONLY the mathematical formula with clear variable definitions.', 0.2);
+        }
+        
+        async function testCodeGen() {
+            await askAI(`You are a Three.js expert. Generate JavaScript code to create a Fibonacci sphere with 500 points using THREE.BufferGeometry. Include:
+1. Golden angle calculation (2.399963 radians)
+2. Spherical coordinate conversion
+3. BufferGeometry setup
+4. PointsMaterial with cyan color
+
+Return ONLY the code, no explanations.`, 0.3);
+        }
+        
+        async function testStoryGen() {
+            await askAI('You are a fantasy storyteller. Create a quest for a player who discovers an ancient forest library. Include: quest name, objective, 2 NPCs with personalities, moral choice, and reward. Return as JSON.', 0.8);
+        }
+        
+        async function testVillageLayout() {
+            await askAI(`You are a world architect. Design a medieval village with 10 buildings. Use golden ratio (1.618) for spacing. Return as JSON with this structure:
+{
+  "village": "Village Name",
+  "buildings": [
+    {"type": "town_hall", "position": [x, z], "scale": [width, height, depth]}
+  ]
+}
+
+Return ONLY valid JSON, no markdown.`, 0.5);
+        }
+        
+        async function testOptimization() {
+            await askAI('You are a performance optimizer. I have a Three.js scene with 195,000 vertices running at 35 FPS. Terrain: 45K vertices, Buildings: 140K vertices, Characters: 10K vertices. Suggest 5 specific optimizations to reach 60 FPS without sacrificing visual quality. Be precise and technical.', 0.1);
+        }
+    </script>
+</body>
+</html>

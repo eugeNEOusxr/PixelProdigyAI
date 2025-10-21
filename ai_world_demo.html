@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI World Generator Demo - eugeNEOusXR</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 100%);
+            color: #00ffff;
+            overflow: hidden;
+        }
+        
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        #console {
+            width: 40%;
+            padding: 20px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.8);
+            border-right: 2px solid #00ffff;
+        }
+        
+        #viewport {
+            width: 60%;
+            position: relative;
+        }
+        
+        h1 {
+            color: #ffaa00;
+            text-shadow: 0 0 10px #ffaa00;
+            margin: 0 0 20px 0;
+        }
+        
+        .command-input {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        input {
+            flex: 1;
+            background: rgba(0,255,255,0.1);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #00ffff, #0099ff);
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #00ff00, #00aa00);
+        }
+        
+        .log {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0,255,255,0.05);
+            border-left: 3px solid #00ffff;
+        }
+        
+        .log.success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+        
+        .log.error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+        
+        .log.ai {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        .examples {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,170,0,0.1);
+            border: 1px solid #ffaa00;
+        }
+        
+        .examples h3 {
+            color: #ffaa00;
+            margin: 0 0 10px 0;
+        }
+        
+        .example-cmd {
+            cursor: pointer;
+            padding: 5px;
+            margin: 5px 0;
+            background: rgba(0,255,255,0.1);
+            border-radius: 3px;
+        }
+        
+        .example-cmd:hover {
+            background: rgba(0,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="console">
+            <h1>🤖 AI WORLD GENERATOR</h1>
+            <p style="color: #888; font-size: 12px;">
+                Creator: Jeremy Courson + AI Crew<br>
+                Personalities: Mathematician, Storyteller, Architect, Coder, Optimizer
+            </p>
+            
+            <div class="command-input">
+                <input type="text" id="commandInput" placeholder="Type command... e.g., '/create forest village'" />
+                <button onclick="executeCommand()">Execute</button>
+            </div>
+            
+            <div class="examples">
+                <h3>📋 Example Commands:</h3>
+                <div class="example-cmd" onclick="setCommand('/create forest village with 10 houses')">
+                    /create forest village with 10 houses
+                </div>
+                <div class="example-cmd" onclick="setCommand('/quest adventure forest')">
+                    /quest adventure forest
+                </div>
+                <div class="example-cmd" onclick="setCommand('/geometry fibonacci spiral')">
+                    /geometry fibonacci spiral
+                </div>
+                <div class="example-cmd" onclick="setCommand('/optimize scene')">
+                    /optimize scene
+                </div>
+                <div class="example-cmd" onclick="setCommand('/create desert castle')">
+                    /create desert castle
+                </div>
+            </div>
+            
+            <div id="logs"></div>
+        </div>
+        
+        <div id="viewport">
+            <canvas id="renderCanvas"></canvas>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="ai_world_generator.js"></script>
+    <script>
+        // Initialize AI
+        const ai = new AIWorldGenerator();
+        
+        // Three.js setup
+        let scene, camera, renderer;
+        let generatedObjects = [];
+        
+        function initThreeJS() {
+            const canvas = document.getElementById('renderCanvas');
+            const viewport = document.getElementById('viewport');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1a);
+            scene.fog = new THREE.Fog(0x0a0a1a, 10, 100);
+            
+            camera = new THREE.PerspectiveCamera(
+                75,
+                viewport.clientWidth / viewport.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 15, 30);
+            camera.lookAt(0, 0, 0);
+            
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+            renderer.shadowMap.enabled = true;
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(10, 20, 10);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(100, 100, 0x00ffff, 0x004444);
+            scene.add(gridHelper);
+            
+            // Animate
+            function animate() {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = viewport.clientWidth / viewport.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+            });
+        }
+        
+        // Logging
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong><br>${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        function setCommand(cmd) {
+            document.getElementById('commandInput').value = cmd;
+        }
+        
+        async function executeCommand() {
+            const input = document.getElementById('commandInput').value.trim();
+            if (!input) return;
+            
+            log(`> ${input}`, 'info');
+            
+            try {
+                // Check Ollama status first
+                if (input === '/status') {
+                    const isRunning = await ai.checkOllamaStatus();
+                    log(isRunning ? '✅ Ollama is running' : '❌ Ollama not connected', isRunning ? 'success' : 'error');
+                    return;
+                }
+                
+                // Parse command type
+                if (input.startsWith('/create')) {
+                    await handleCreate(input);
+                } else if (input.startsWith('/quest')) {
+                    await handleQuest(input);
+                } else if (input.startsWith('/geometry')) {
+                    await handleGeometry(input);
+                } else if (input.startsWith('/optimize')) {
+                    await handleOptimize(input);
+                } else {
+                    log('❌ Unknown command. Try /create, /quest, /geometry, or /optimize', 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+        
+        async function handleCreate(command) {
+            log('🤖 Architect AI: Designing world...', 'ai');
+            
+            const result = await ai.handlePlayerCommand(command);
+            
+            if (result.error) {
+                log(`❌ ${result.error}`, 'error');
+                return;
+            }
+            
+            log(`✅ ${result.message}`, 'success');
+            log(`📖 Quest: ${result.quest?.name || 'No quest generated'}`, 'ai');
+            log(`🏘️ Buildings: ${result.village?.buildings?.length || 0}`, 'ai');
+            
+            // Visualize buildings
+            if (result.village && result.village.buildings) {
+                visualizeVillage(result.village);
+            }
+        }
+        
+        async function handleQuest(command) {
+            log('📖 Storyteller AI: Creating quest...', 'ai');
+            
+            const parts = command.split(' ');
+            const theme = parts[1] || 'adventure';
+            const location = parts[2] || 'village';
+            
+            const quest = await ai.generateQuest(theme, location);
+            
+            if (quest) {
+                log(`✅ Quest Generated: ${quest.name || 'Untitled'}`, 'success');
+                log(`📝 Objective: ${quest.objective || 'N/A'}`, 'info');
+                log(`👥 NPCs: ${quest.npcs?.join(', ') || 'None'}`, 'info');
+                log(`🎁 Reward: ${quest.reward || 'Unknown'}`, 'info');
+            } else {
+                log('❌ Failed to generate quest', 'error');
+            }
+        }
+        
+        async function handleGeometry(command) {
+            log('🔷 Mathematician AI: Generating geometry...', 'ai');
+            
+            const description = command.replace('/geometry', '').trim();
+            const code = await ai.generateGeometry(description);
+            
+            if (code) {
+                log(`✅ Geometry code generated (${code.length} chars)`, 'success');
+                log(`<pre style="font-size: 10px; overflow-x: auto;">${code.substring(0, 500)}...</pre>`, 'info');
+                
+                // Try to execute the code
+                try {
+                    eval(code);
+                    log('✅ Code executed successfully', 'success');
+                } catch (error) {
+                    log(`❌ Code execution error: ${error.message}`, 'error');
+                }
+            } else {
+                log('❌ Failed to generate geometry', 'error');
+            }
+        }
+        
+        async function handleOptimize(command) {
+            log('⚡ Optimizer AI: Analyzing scene...', 'ai');
+            
+            const sceneStats = {
+                fps: 45,
+                vertices: 195000,
+                drawCalls: 450,
+                textures: 120
+            };
+            
+            const suggestions = await ai.optimizeScene(sceneStats);
+            
+            if (suggestions && Array.isArray(suggestions)) {
+                log(`✅ ${suggestions.length} optimization suggestions:`, 'success');
+                suggestions.forEach((s, i) => {
+                    log(`   ${i + 1}. ${s}`, 'info');
+                });
+            } else {
+                log('❌ Failed to generate optimizations', 'error');
+            }
+        }
+        
+        function visualizeVillage(village) {
+            // Clear previous objects
+            generatedObjects.forEach(obj => scene.remove(obj));
+            generatedObjects = [];
+            
+            if (!village.buildings) return;
+            
+            village.buildings.forEach(building => {
+                const [x, z] = building.position;
+                const [w, h, d] = building.scale || [5, 3, 5];
+                
+                // Create building mesh
+                const geometry = new THREE.BoxGeometry(w, h, d);
+                const material = new THREE.MeshStandardMaterial({
+                    color: building.type === 'town_hall' ? 0xffaa00 : 0x00ffff,
+                    metalness: 0.3,
+                    roughness: 0.7
+                });
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(x, h / 2, z);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                
+                scene.add(mesh);
+                generatedObjects.push(mesh);
+            });
+            
+            log(`🏘️ Visualized ${village.buildings.length} buildings`, 'success');
+        }
+        
+        // Initialize
+        initThreeJS();
+        log('🌟 AI World Generator ready!', 'success');
+        log('💡 Tip: Install Ollama (https://ollama.com) for AI generation', 'info');
+        log('💡 Or use /create commands for fallback generation', 'info');
+        
+        // Check Ollama on startup
+        ai.checkOllamaStatus();
+        
+        // Allow Enter key to execute
+        document.getElementById('commandInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') executeCommand();
+        });
+    </script>
+</body>
+</html>

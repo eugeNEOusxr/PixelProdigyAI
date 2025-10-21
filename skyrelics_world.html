@@ -1672,7 +1672,10 @@
                                 showDamageIndicator(ability.damage || 50, 'physical');
                                 updateCombatUI();
                             };
-                            playerAbilityManager.hotbar.assignSlot(0, 'fireball');
+                            // Only assign to hotbar if the method exists
+                            if (playerAbilityManager.hotbar && typeof playerAbilityManager.hotbar.assignSlot === 'function') {
+                                playerAbilityManager.hotbar.assignSlot(0, 'fireball');
+                            }
                             console.log('🔥 Fireball unlocked (Press 1)');
                         }
                     }
@@ -1689,7 +1692,10 @@
                             velocity.z *= 3;
                             updateCombatUI();
                         };
-                        playerAbilityManager.hotbar.assignSlot(1, 'dash');
+                        // Only assign to hotbar if the method exists
+                        if (playerAbilityManager.hotbar && typeof playerAbilityManager.hotbar.assignSlot === 'function') {
+                            playerAbilityManager.hotbar.assignSlot(1, 'dash');
+                        }
                         console.log('💨 Dash unlocked (Press 2)');
                     }
                     
@@ -1708,7 +1714,10 @@
                                 updateCombatUI();
                             }
                         };
-                        playerAbilityManager.hotbar.assignSlot(2, 'heal');
+                        // Only assign to hotbar if the method exists
+                        if (playerAbilityManager.hotbar && typeof playerAbilityManager.hotbar.assignSlot === 'function') {
+                            playerAbilityManager.hotbar.assignSlot(2, 'heal');
+                        }
                         console.log('💚 Heal unlocked (Press 3)');
                     }
                     
