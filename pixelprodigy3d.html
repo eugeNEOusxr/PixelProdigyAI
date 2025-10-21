@@ -1082,40 +1082,84 @@
 
       <!-- Main Tool Grid -->
       <div class="section-header">
-        🖌️ SCULPTING TOOLS
+        � MODELING MODE
+      </div>
+      <div class="control-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+        <div class="grid-control-btn active" onclick="selectMode('additive', this)" style="background: rgba(0, 255, 100, 0.1); border: 1px solid #0f8;">
+          ➕
+          <span class="label">ADD</span>
+        </div>
+        <div class="grid-control-btn" onclick="selectMode('subtractive', this)" style="background: rgba(255, 50, 50, 0.1); border: 1px solid #f44;">
+          ➖
+          <span class="label">SUBTRACT</span>
+        </div>
+      </div>
+      
+      <div class="section-header">
+        🎯 3D PRIMITIVES (Click to Place)
       </div>
       <div class="control-grid">
-        <div class="grid-control-btn active" onclick="selectBrush('draw', this)">
-          ✏️
-          <span class="label">Draw</span>
+        <div class="grid-control-btn" onclick="selectPrimitive('cylinder', this)">
+          🔵
+          <span class="label">Cylinder</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('grab', this)">
-          ✋
-          <span class="label">Grab</span>
+        <div class="grid-control-btn" onclick="selectPrimitive('pyramid', this)">
+          🔺
+          <span class="label">Pyramid</span>
+        </div>
+        <div class="grid-control-btn" onclick="selectPrimitive('cube', this)">
+          ⬛
+          <span class="label">Cube</span>
+        </div>
+        <div class="grid-control-btn" onclick="selectPrimitive('sphere', this)">
+          ⚪
+          <span class="label">Sphere</span>
+        </div>
+        <div class="grid-control-btn" onclick="selectPrimitive('cone', this)">
+          🔻
+          <span class="label">Cone</span>
+        </div>
+        <div class="grid-control-btn" onclick="selectPrimitive('torus', this)">
+          🍩
+          <span class="label">Torus</span>
+        </div>
+      </div>
+      
+      <div class="section-header">
+        📐 PLACEMENT ANGLE (Right-Click to Set)
+      </div>
+      <div class="control-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px;">
+        <div class="grid-control-btn active" onclick="selectAngle(0, this)" style="font-size: 11px; padding: 8px 4px;">0°</div>
+        <div class="grid-control-btn" onclick="selectAngle(5, this)" style="font-size: 11px; padding: 8px 4px;">5°</div>
+        <div class="grid-control-btn" onclick="selectAngle(10, this)" style="font-size: 11px; padding: 8px 4px;">10°</div>
+        <div class="grid-control-btn" onclick="selectAngle(15, this)" style="font-size: 11px; padding: 8px 4px;">15°</div>
+        <div class="grid-control-btn" onclick="selectAngle(20, this)" style="font-size: 11px; padding: 8px 4px;">20°</div>
+        <div class="grid-control-btn" onclick="selectAngle(25, this)" style="font-size: 11px; padding: 8px 4px;">25°</div>
+        <div class="grid-control-btn" onclick="selectAngle(30, this)" style="font-size: 11px; padding: 8px 4px;">30°</div>
+        <div class="grid-control-btn" onclick="selectAngle(45, this)" style="font-size: 11px; padding: 8px 4px;">45°</div>
+        <div class="grid-control-btn" onclick="selectAngle(60, this)" style="font-size: 11px; padding: 8px 4px;">60°</div>
+        <div class="grid-control-btn" onclick="selectAngle(90, this)" style="font-size: 11px; padding: 8px 4px;">90°</div>
+      </div>
+      
+      <div class="section-header">
+        🖌️ VERTEX TOOLS
+      </div>
+      <div class="control-grid">
+        <div class="grid-control-btn" onclick="selectBrush('carve', this)">
+          🔪
+          <span class="label">Carve</span>
+        </div>
+        <div class="grid-control-btn" onclick="selectBrush('cut', this)">
+          ✂️
+          <span class="label">Cut</span>
         </div>
         <div class="grid-control-btn" onclick="selectBrush('smooth', this)">
           〰️
           <span class="label">Smooth</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('inflate', this)">
-          ⬆️
-          <span class="label">Inflate</span>
-        </div>
-        <div class="grid-control-btn" onclick="selectBrush('pinch', this)">
-          📍
-          <span class="label">Pinch</span>
-        </div>
         <div class="grid-control-btn" onclick="selectBrush('flatten', this)">
           ▭
           <span class="label">Flatten</span>
-        </div>
-        <div class="grid-control-btn" onclick="selectBrush('clay', this)">
-          🧱
-          <span class="label">Clay</span>
-        </div>
-        <div class="grid-control-btn" onclick="selectBrush('crease', this)">
-          ⚡
-          <span class="label">Crease</span>
         </div>
       </div>
 
@@ -1475,7 +1519,11 @@
     // Global State
     let currentWorkspace = 'modeling';
     let currentTool = 'sculpt';
-    let currentBrush = 'draw';
+    let currentBrush = 'carve';
+    let currentMode = 'additive'; // 'additive' or 'subtractive'
+    let currentPrimitive = 'cylinder'; // Shape to place
+    let placementAngle = 0; // Angle in degrees for primitive placement
+    let primitiveSize = 0.5; // Size of primitive to place
 
     // ============================================
     // REAL THREE.JS SCULPTING SETUP
@@ -1558,8 +1606,28 @@
     }
 
     function onSculptMouseDown(event) {
-      if (event.button === 0) { // Left click only
+      if (event.button === 0) { // Left click
         isMouseDown = true;
+        
+        // If we're in primitive placement mode, place a primitive
+        if (currentTool === 'sculpt' && ['cylinder', 'pyramid', 'cube', 'sphere', 'cone', 'torus'].includes(currentPrimitive)) {
+          raycaster.setFromCamera(mouse, sculptCamera);
+          
+          // Try to intersect with existing mesh
+          const intersects = raycaster.intersectObjects(sculptScene.children, true);
+          
+          if (intersects.length > 0) {
+            placePrimitive(intersects[0].point);
+          } else {
+            // Place on ground plane if no intersection
+            const groundY = 0;
+            const dir = new THREE.Vector3();
+            raycaster.ray.direction.normalize();
+            const distance = (groundY - sculptCamera.position.y) / raycaster.ray.direction.y;
+            const position = sculptCamera.position.clone().add(raycaster.ray.direction.multiplyScalar(distance));
+            placePrimitive(position);
+          }
+        }
       }
     }
 
@@ -1599,6 +1667,18 @@
                 const normal = new THREE.Vector3();
                 normal.copy(localVertex).normalize();
                 localVertex.add(normal.multiplyScalar(intensity));
+                break;
+              case 'carve':
+                // Subtract material - push vertices inward
+                const carveNormal = new THREE.Vector3();
+                carveNormal.copy(localVertex).normalize();
+                localVertex.add(carveNormal.multiplyScalar(-intensity * 2)); // Stronger inward push
+                break;
+              case 'cut':
+                // Sharp cut - flatten in direction perpendicular to view
+                const cutDir = point.clone().sub(sculptCamera.position).normalize();
+                const projection = localVertex.clone().projectOnVector(cutDir);
+                localVertex.sub(projection.multiplyScalar(intensity * 0.5));
                 break;
               case 'grab':
                 // Move vertex towards mouse
@@ -1721,6 +1801,100 @@
       document.getElementById('currentTool').textContent = brush.toUpperCase();
       
       console.log('Selected brush:', brush);
+    }
+    
+    // Select Mode (Additive/Subtractive)
+    function selectMode(mode, buttonElement) {
+      currentMode = mode;
+      
+      // Update button UI - only for mode buttons
+      const modeButtons = buttonElement.parentElement.querySelectorAll('.grid-control-btn');
+      modeButtons.forEach(btn => btn.classList.remove('active'));
+      buttonElement.classList.add('active');
+      
+      document.getElementById('currentMode').textContent = mode.toUpperCase();
+      console.log('Mode changed to:', mode);
+    }
+    
+    // Select Primitive
+    function selectPrimitive(primitive, buttonElement) {
+      currentPrimitive = primitive;
+      
+      // Update button UI - find the primitive section specifically
+      const primitiveSection = buttonElement.closest('.control-grid');
+      if (primitiveSection) {
+        primitiveSection.querySelectorAll('.grid-control-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+      }
+      buttonElement.classList.add('active');
+      
+      document.getElementById('currentTool').textContent = primitive.toUpperCase();
+      console.log('Primitive selected:', primitive);
+    }
+    
+    // Select Angle
+    function selectAngle(angle, buttonElement) {
+      placementAngle = angle;
+      
+      // Update button UI - find the angle section specifically
+      const angleSection = buttonElement.closest('.control-grid');
+      if (angleSection) {
+        angleSection.querySelectorAll('.grid-control-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+      }
+      buttonElement.classList.add('active');
+      
+      console.log('Placement angle set to:', angle + '°');
+    }
+    
+    // Place Primitive (called on mouse click)
+    function placePrimitive(position) {
+      if (!sculptScene) return;
+      
+      let geometry;
+      const angleRad = (placementAngle * Math.PI) / 180;
+      
+      // Create primitive geometry
+      switch(currentPrimitive) {
+        case 'cylinder':
+          geometry = new THREE.CylinderGeometry(primitiveSize, primitiveSize, primitiveSize * 2, 16);
+          break;
+        case 'pyramid':
+          geometry = new THREE.ConeGeometry(primitiveSize, primitiveSize * 1.5, 4);
+          break;
+        case 'cube':
+          geometry = new THREE.BoxGeometry(primitiveSize, primitiveSize, primitiveSize);
+          break;
+        case 'sphere':
+          geometry = new THREE.SphereGeometry(primitiveSize, 16, 16);
+          break;
+        case 'cone':
+          geometry = new THREE.ConeGeometry(primitiveSize, primitiveSize * 1.5, 16);
+          break;
+        case 'torus':
+          geometry = new THREE.TorusGeometry(primitiveSize, primitiveSize * 0.3, 12, 24);
+          break;
+      }
+      
+      // Create material based on mode
+      const material = new THREE.MeshStandardMaterial({
+        color: currentMode === 'additive' ? 0x00ff66 : 0xff3333,
+        transparent: true,
+        opacity: 0.7,
+        wireframe: false
+      });
+      
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.copy(position);
+      mesh.rotation.z = angleRad; // Apply angle rotation
+      mesh.userData.mode = currentMode;
+      mesh.userData.primitive = currentPrimitive;
+      
+      sculptScene.add(mesh);
+      
+      console.log(`Placed ${currentMode} ${currentPrimitive} at`, position, `angle: ${placementAngle}°`);
     }
 
     // Update Slider Values
