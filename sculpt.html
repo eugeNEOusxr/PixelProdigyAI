@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigy Sculpt</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    #container {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      grid-template-rows: 60px 1fr 40px;
+      height: 100vh;
+    }
+
+    #header {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 20px;
+    }
+
+    #header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    #sidebar {
+      background: #1a1a1a;
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 2px solid #333;
+    }
+
+    #viewport {
+      background: #0f0f0f;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    #footer {
+      grid-column: 1 / -1;
+      background: #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-top: 2px solid #333;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .section {
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: #2a2a2a;
+      border: 2px solid #3a3a3a;
+      color: #fff;
+      padding: 12px 8px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 13px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tool-btn:hover {
+      background: #3a3a3a;
+      border-color: #667eea;
+    }
+
+    .tool-btn.active {
+      background: #667eea;
+      border-color: #764ba2;
+      box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+    }
+
+    .tool-icon {
+      font-size: 24px;
+    }
+
+    .slider-control {
+      margin-bottom: 15px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #2a2a2a;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #667eea;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #764ba2;
+      transform: scale(1.2);
+    }
+
+    .primitive-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="header">
+      <h1>⚡ PixelProdigy Sculpt</h1>
+      <div style="flex: 1;"></div>
+      <div style="color: rgba(255,255,255,0.8); font-size: 14px;">3D Sculpting Studio</div>
+    </div>
+
+    <div id="sidebar">
+      <div class="section">
+        <div class="section-title">🔧 Mode</div>
+        <div class="tool-grid">
+          <button class="tool-btn active" onclick="setMode('add', this)">
+            <span class="tool-icon">➕</span>
+            <span>Add</span>
+          </button>
+          <button class="tool-btn" onclick="setMode('subtract', this)">
+            <span class="tool-icon">➖</span>
+            <span>Subtract</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🎨 Primitives</div>
+        <div class="primitive-grid">
+          <button class="tool-btn active" onclick="setPrimitive('sphere', this)">
+            <span class="tool-icon">⚪</span>
+            <span>Sphere</span>
+          </button>
+          <button class="tool-btn" onclick="setPrimitive('cube', this)">
+            <span class="tool-icon">⬛</span>
+            <span>Cube</span>
+          </button>
+          <button class="tool-btn" onclick="setPrimitive('cylinder', this)">
+            <span class="tool-icon">🔵</span>
+            <span>Cylinder</span>
+          </button>
+          <button class="tool-btn" onclick="setPrimitive('cone', this)">
+            <span class="tool-icon">🔻</span>
+            <span>Cone</span>
+          </button>
+          <button class="tool-btn" onclick="setPrimitive('torus', this)">
+            <span class="tool-icon">🍩</span>
+            <span>Torus</span>
+          </button>
+          <button class="tool-btn" onclick="setPrimitive('pyramid', this)">
+            <span class="tool-icon">🔺</span>
+            <span>Pyramid</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">⚙️ Settings</div>
+        <div class="slider-control">
+          <div class="slider-label">
+            <span>Size</span>
+            <span id="sizeValue">0.5</span>
+          </div>
+          <input type="range" min="0.1" max="2" step="0.1" value="0.5" oninput="updateSize(this.value)">
+        </div>
+        <div class="slider-control">
+          <div class="slider-label">
+            <span>Angle</span>
+            <span id="angleValue">0°</span>
+          </div>
+          <input type="range" min="0" max="360" step="15" value="0" oninput="updateAngle(this.value)">
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🎯 Actions</div>
+        <button class="tool-btn" onclick="clearScene()" style="width: 100%; grid-column: 1 / -1;">
+          <span class="tool-icon">🗑️</span>
+          <span>Clear All</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="viewport">
+      <canvas id="canvas"></canvas>
+      <div class="loading" id="loading">Initializing 3D Engine...</div>
+    </div>
+
+    <div id="footer">
+      <div>Mode: <strong id="modeDisplay">ADD</strong> | Primitive: <strong id="primitiveDisplay">SPHERE</strong></div>
+      <div>Click viewport to place objects | Drag to rotate view</div>
+      <div>Objects: <strong id="objectCount">0</strong></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    // State
+    let scene, camera, renderer, controls;
+    let currentMode = 'add';
+    let currentPrimitive = 'sphere';
+    let primitiveSize = 0.5;
+    let rotationAngle = 0;
+    let objects = [];
+    let raycaster = new THREE.Raycaster();
+    let mouse = new THREE.Vector2();
+
+    // Initialize
+    function init() {
+      const canvas = document.getElementById('canvas');
+      
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a0a);
+      scene.fog = new THREE.Fog(0x0a0a0a, 10, 50);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(
+        75,
+        canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(5, 5, 5);
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 2;
+      controls.maxDistance = 50;
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 10, 5);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+
+      const pointLight = new THREE.PointLight(0x667eea, 1, 100);
+      pointLight.position.set(-5, 5, -5);
+      scene.add(pointLight);
+
+      // Ground plane
+      const groundGeometry = new THREE.PlaneGeometry(50, 50);
+      const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a1a,
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // Grid
+      const gridHelper = new THREE.GridHelper(50, 50, 0x667eea, 0x2a2a2a);
+      scene.add(gridHelper);
+
+      // Events
+      canvas.addEventListener('click', onCanvasClick);
+      window.addEventListener('resize', onWindowResize);
+
+      // Hide loading
+      document.getElementById('loading').style.display = 'none';
+
+      // Start animation
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const canvas = document.getElementById('canvas');
+      camera.aspect = canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+    }
+
+    function onCanvasClick(event) {
+      const canvas = document.getElementById('canvas');
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      
+      // Find intersection with ground plane
+      const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const intersectPoint = new THREE.Vector3();
+      raycaster.ray.intersectPlane(groundPlane, intersectPoint);
+
+      if (intersectPoint) {
+        placePrimitive(intersectPoint);
+      }
+    }
+
+    function placePrimitive(position) {
+      let geometry;
+      
+      switch(currentPrimitive) {
+        case 'sphere':
+          geometry = new THREE.SphereGeometry(primitiveSize, 32, 32);
+          break;
+        case 'cube':
+          geometry = new THREE.BoxGeometry(primitiveSize, primitiveSize, primitiveSize);
+          break;
+        case 'cylinder':
+          geometry = new THREE.CylinderGeometry(primitiveSize, primitiveSize, primitiveSize * 2, 32);
+          break;
+        case 'cone':
+          geometry = new THREE.ConeGeometry(primitiveSize, primitiveSize * 2, 32);
+          break;
+        case 'torus':
+          geometry = new THREE.TorusGeometry(primitiveSize, primitiveSize * 0.3, 16, 32);
+          break;
+        case 'pyramid':
+          geometry = new THREE.ConeGeometry(primitiveSize, primitiveSize * 1.5, 4);
+          break;
+      }
+
+      const material = new THREE.MeshStandardMaterial({
+        color: currentMode === 'add' ? 0x00ff88 : 0xff3366,
+        roughness: 0.7,
+        metalness: 0.3,
+        transparent: true,
+        opacity: 0.9
+      });
+
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.copy(position);
+      mesh.position.y = primitiveSize / 2;
+      mesh.rotation.y = (rotationAngle * Math.PI) / 180;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.userData.mode = currentMode;
+
+      scene.add(mesh);
+      objects.push(mesh);
+      
+      updateObjectCount();
+      console.log(`Placed ${currentPrimitive} at`, position);
+    }
+
+    function setMode(mode, btn) {
+      currentMode = mode;
+      document.querySelectorAll('#sidebar .tool-grid .tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('modeDisplay').textContent = mode.toUpperCase();
+    }
+
+    function setPrimitive(primitive, btn) {
+      currentPrimitive = primitive;
+      document.querySelectorAll('.primitive-grid .tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('primitiveDisplay').textContent = primitive.toUpperCase();
+    }
+
+    function updateSize(value) {
+      primitiveSize = parseFloat(value);
+      document.getElementById('sizeValue').textContent = value;
+    }
+
+    function updateAngle(value) {
+      rotationAngle = parseFloat(value);
+      document.getElementById('angleValue').textContent = value + '°';
+    }
+
+    function clearScene() {
+      if (confirm('Clear all objects?')) {
+        objects.forEach(obj => scene.remove(obj));
+        objects = [];
+        updateObjectCount();
+      }
+    }
+
+    function updateObjectCount() {
+      document.getElementById('objectCount').textContent = objects.length;
+    }
+
+    // Start
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>
