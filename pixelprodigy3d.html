@@ -1085,35 +1085,35 @@
         🖌️ SCULPTING TOOLS
       </div>
       <div class="control-grid">
-        <div class="grid-control-btn active" onclick="selectBrush('draw')">
+        <div class="grid-control-btn active" onclick="selectBrush('draw', this)">
           ✏️
           <span class="label">Draw</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('grab')">
+        <div class="grid-control-btn" onclick="selectBrush('grab', this)">
           ✋
           <span class="label">Grab</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('smooth')">
+        <div class="grid-control-btn" onclick="selectBrush('smooth', this)">
           〰️
           <span class="label">Smooth</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('inflate')">
+        <div class="grid-control-btn" onclick="selectBrush('inflate', this)">
           ⬆️
           <span class="label">Inflate</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('pinch')">
+        <div class="grid-control-btn" onclick="selectBrush('pinch', this)">
           📍
           <span class="label">Pinch</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('flatten')">
+        <div class="grid-control-btn" onclick="selectBrush('flatten', this)">
           ▭
           <span class="label">Flatten</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('clay')">
+        <div class="grid-control-btn" onclick="selectBrush('clay', this)">
           🧱
           <span class="label">Clay</span>
         </div>
-        <div class="grid-control-btn" onclick="selectBrush('crease')">
+        <div class="grid-control-btn" onclick="selectBrush('crease', this)">
           ⚡
           <span class="label">Crease</span>
         </div>
@@ -1703,14 +1703,22 @@
     }
 
     // Select Brush
-    function selectBrush(brush) {
+    function selectBrush(brush, buttonElement) {
       currentBrush = brush;
       
       // Update button UI
       document.querySelectorAll('#rightPanel .control-grid .grid-control-btn').forEach(btn => {
         btn.classList.remove('active');
       });
-      event.target.classList.add('active');
+      
+      // Find the button that was clicked (either passed directly or via event)
+      const targetBtn = buttonElement || event.currentTarget;
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+      }
+      
+      // Update HUD
+      document.getElementById('currentTool').textContent = brush.toUpperCase();
       
       console.log('Selected brush:', brush);
     }
