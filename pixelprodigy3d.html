@@ -2456,8 +2456,8 @@
       gridCamera.position.add(velocity);
       
       // Update raycaster for button hovering
-      raycaster.set(gridCamera.position, forward);
-      const intersects = raycaster.intersectObjects(gridButtons);
+      gridRaycaster.set(gridCamera.position, forward);
+      const intersects = gridRaycaster.intersectObjects(gridButtons);
       
       // Reset all buttons
       gridButtons.forEach(btn => {
