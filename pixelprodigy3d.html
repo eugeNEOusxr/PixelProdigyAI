@@ -1002,12 +1002,12 @@
     <div id="topBar">
       <div class="top-logo">⚡ PixelProdigy Universe</div>
       <div class="top-tabs">
-        <div class="top-tab active" onclick="switchWorkspace('modeling')">3D Studio</div>
-        <div class="top-tab" onclick="switchWorkspace('css')">CSS Designer</div>
-        <div class="top-tab" onclick="switchWorkspace('wordweaver')">WordWeaver</div>
-        <div class="top-tab" onclick="switchWorkspace('campus')">Campus</div>
-        <div class="top-tab" onclick="switchWorkspace('perfect')">Perfect</div>
-        <div class="top-tab" onclick="switchWorkspace('universe')">🌌 UI Grids</div>
+        <div class="top-tab active" onclick="switchWorkspace('modeling', this)">3D Studio</div>
+        <div class="top-tab" onclick="switchWorkspace('css', this)">CSS Designer</div>
+        <div class="top-tab" onclick="switchWorkspace('wordweaver', this)">WordWeaver</div>
+        <div class="top-tab" onclick="switchWorkspace('campus', this)">Campus</div>
+        <div class="top-tab" onclick="switchWorkspace('perfect', this)">Perfect</div>
+        <div class="top-tab" onclick="switchWorkspace('universe', this)">🌌 UI Grids</div>
       </div>
       <button class="top-tab" onclick="toggleGridMode()">🔲 2D/3D Grid</button>
       <button class="top-tab" onclick="exportProject()">💾 Export</button>
@@ -1015,16 +1015,16 @@
 
     <!-- Left Tool Strip -->
     <div id="toolStrip">
-      <div class="tool-icon active" data-tooltip="Select" onclick="selectTool('select')">🎯</div>
-      <div class="tool-icon" data-tooltip="Sculpt" onclick="selectTool('sculpt')">🖌️</div>
-      <div class="tool-icon" data-tooltip="Transform" onclick="selectTool('transform')">🔄</div>
-      <div class="tool-icon" data-tooltip="Paint" onclick="selectTool('paint')">🎨</div>
-      <div class="tool-icon" data-tooltip="Add Object" onclick="selectTool('add')">➕</div>
-      <div class="tool-icon" data-tooltip="Camera" onclick="selectTool('camera')">📷</div>
-      <div class="tool-icon" data-tooltip="Light" onclick="selectTool('light')">💡</div>
-      <div class="tool-icon" data-tooltip="Render" onclick="selectTool('render')">✨</div>
+      <div class="tool-icon active" data-tooltip="Select" onclick="selectTool('select', this)">🎯</div>
+      <div class="tool-icon" data-tooltip="Sculpt" onclick="selectTool('sculpt', this)">🖌️</div>
+      <div class="tool-icon" data-tooltip="Transform" onclick="selectTool('transform', this)">🔄</div>
+      <div class="tool-icon" data-tooltip="Paint" onclick="selectTool('paint', this)">🎨</div>
+      <div class="tool-icon" data-tooltip="Add Object" onclick="selectTool('add', this)">➕</div>
+      <div class="tool-icon" data-tooltip="Camera" onclick="selectTool('camera', this)">📷</div>
+      <div class="tool-icon" data-tooltip="Light" onclick="selectTool('light', this)">💡</div>
+      <div class="tool-icon" data-tooltip="Render" onclick="selectTool('render', this)">✨</div>
       <div style="flex: 1;"></div>
-      <div class="tool-icon" data-tooltip="Settings" onclick="selectTool('settings')">⚙️</div>
+      <div class="tool-icon" data-tooltip="Settings" onclick="selectTool('settings', this)">⚙️</div>
     </div>
 
     <!-- Center Viewport -->
@@ -1726,12 +1726,14 @@
     setTimeout(initSculptingViewport, 100);
 
     // Switch Workspace
-    function switchWorkspace(workspace) {
+    function switchWorkspace(workspace, buttonElement) {
       currentWorkspace = workspace;
       
       // Update tab UI
-      document.querySelectorAll('.top-tab').forEach(tab => tab.classList.remove('active'));
-      event.target.classList.add('active');
+      document.querySelectorAll('.top-tabs .top-tab').forEach(tab => tab.classList.remove('active'));
+      if (buttonElement) {
+        buttonElement.classList.add('active');
+      }
       
       // Update mode display
       const modeNames = {
@@ -1739,30 +1741,77 @@
         'css': 'CSS Designer',
         'wordweaver': 'WordWeaver',
         'campus': 'Campus',
-        'perfect': 'Perfect'
+        'perfect': 'Perfect',
+        'universe': 'UI Grids'
       };
-      document.getElementById('statusMode').textContent = modeNames[workspace];
-      document.getElementById('currentMode').textContent = modeNames[workspace].toUpperCase();
+      document.getElementById('statusMode').textContent = modeNames[workspace] || workspace;
+      document.getElementById('currentMode').textContent = (modeNames[workspace] || workspace).toUpperCase();
       
       // Show/hide relevant controls
+      const cssSection = document.getElementById('cssSection');
+      const cssGrid = document.getElementById('cssGrid');
+      
       if (workspace === 'css') {
-        document.getElementById('cssSection').style.display = 'block';
-        document.getElementById('cssGrid').style.display = 'grid';
+        if (cssSection) cssSection.style.display = 'block';
+        if (cssGrid) cssGrid.style.display = 'grid';
+        // Show CSS designer environment
+        document.getElementById('currentTool').textContent = 'CSS TOOLS';
       } else {
-        document.getElementById('cssSection').style.display = 'none';
-        document.getElementById('cssGrid').style.display = 'none';
+        if (cssSection) cssSection.style.display = 'none';
+        if (cssGrid) cssGrid.style.display = 'none';
       }
       
       console.log('Switched to workspace:', workspace);
     }
+    
+    // CSS Designer Actions
+    function cssAction(action) {
+      console.log('CSS Action:', action);
+      
+      // Add visual feedback
+      event.target.classList.add('active');
+      setTimeout(() => {
+        event.target.classList.remove('active');
+      }, 200);
+      
+      // Placeholder for actual CSS generation
+      switch(action) {
+        case 'gradient':
+          alert('Gradient Generator - Coming soon!');
+          break;
+        case 'shadow':
+          alert('Shadow Generator - Coming soon!');
+          break;
+        case 'border':
+          alert('Border Designer - Coming soon!');
+          break;
+        case 'animate':
+          alert('Animation Builder - Coming soon!');
+          break;
+        case 'transform3d':
+          alert('3D Transform - Coming soon!');
+          break;
+        case 'filter':
+          alert('Filter Effects - Coming soon!');
+          break;
+        case 'grid':
+          alert('CSS Grid Builder - Coming soon!');
+          break;
+        case 'flexbox':
+          alert('Flexbox Builder - Coming soon!');
+          break;
+      }
+    }
 
     // Select Tool
-    function selectTool(tool) {
+    function selectTool(tool, buttonElement) {
       currentTool = tool;
       
       // Update tool strip UI
       document.querySelectorAll('.tool-icon').forEach(icon => icon.classList.remove('active'));
-      event.target.classList.add('active');
+      if (buttonElement) {
+        buttonElement.classList.add('active');
+      }
       
       // Update status
       const toolNames = {
