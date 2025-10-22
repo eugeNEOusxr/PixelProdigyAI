@@ -265,6 +265,92 @@
           </div>
         </div>
 
+        <!-- LEARN MODE TOGGLE -->
+        <div class="section">
+          <div class="section-title">📚 Learn Mode</div>
+          <button class="tool-btn" id="learnModeToggle" onclick="toggleLearnMode(this)" style="width: 100%; background: rgba(0, 255, 136, 0.1); border: 2px solid rgba(0, 255, 136, 0.3);">
+            <span class="tool-icon">👨‍🏫</span>
+            <span>Enable Story Mode</span>
+          </button>
+          <div id="learnModeInfo" style="display: none; margin-top: 10px; padding: 12px; background: rgba(0, 255, 136, 0.1); border-radius: 8px; font-size: 11px; line-height: 1.5; color: rgba(255, 255, 255, 0.9);">
+            <strong>Learn Mode Active!</strong><br>
+            Click any Mathematical Method below to see the mathematician's story and how their discovery powers your creations! 🏆
+          </div>
+        </div>
+
+        <!-- MATHEMATICAL METHODS -->
+        <div class="section">
+          <div class="section-title">🏆 Mathematical Methods</div>
+          <div class="tool-grid">
+            <button class="tool-btn active" onclick="selectMethod('fibonacci', this)">
+              <span class="tool-icon">🇮🇹</span>
+              <span>Fibonacci</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('catmull', this)">
+              <span class="tool-icon">🇺🇸</span>
+              <span>Catmull-Rom</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('bezier', this)">
+              <span class="tool-icon">🇫🇷</span>
+              <span>Bézier</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('perlin', this)">
+              <span class="tool-icon">🎮</span>
+              <span>Perlin Noise</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('quaternion', this)">
+              <span class="tool-icon">🇮🇪</span>
+              <span>Quaternion</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('lsystem', this)">
+              <span class="tool-icon">🇭🇺</span>
+              <span>L-System</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('voronoi', this)">
+              <span class="tool-icon">🇺🇦</span>
+              <span>Voronoi</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('phong', this)">
+              <span class="tool-icon">🇻🇳</span>
+              <span>Phong</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('delaunay', this)">
+              <span class="tool-icon">🇷🇺</span>
+              <span>Delaunay</span>
+            </button>
+            <button class="tool-btn" onclick="selectMethod('subdivision', this)">
+              <span class="tool-icon">💎</span>
+              <span>Subdivision</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MATHEMATICIAN STORY PANEL -->
+        <div id="mathematicianStory" class="section" style="display: none;">
+          <div class="section-title" id="storyTitle">🏆 Mathematician Story</div>
+          <div style="padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; border: 2px solid rgba(102, 126, 234, 0.3);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+              <span id="storyFlag" style="font-size: 24px;">🇮🇹</span>
+              <div>
+                <div id="storyName" style="font-weight: 700; font-size: 14px; color: #00ff88;">Leonardo Fibonacci</div>
+                <div id="storyDates" style="font-size: 11px; opacity: 0.8;">1170-1250</div>
+              </div>
+            </div>
+            <div id="storyDiscovery" style="font-size: 12px; font-weight: 600; color: #667eea; margin-bottom: 8px;">
+              Discovery: Fibonacci Sequence
+            </div>
+            <div id="storyText" style="font-size: 11px; line-height: 1.6; margin-bottom: 10px; color: rgba(255, 255, 255, 0.9);">
+              Italian mathematician who discovered the famous sequence (0,1,1,2,3,5,8...) while studying rabbit populations.
+            </div>
+            <div style="background: rgba(0, 255, 136, 0.1); padding: 8px; border-radius: 6px; border-left: 3px solid #00ff88;">
+              <div style="font-size: 10px; font-weight: 700; color: #00ff88; margin-bottom: 4px;">💡 KID FACT:</div>
+              <div id="storyKidFact" style="font-size: 11px; line-height: 1.5;">
+                He introduced Arabic numerals (0-9) to Europe! Before him, Europeans used Roman numerals.
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="section">
           <div class="section-title">⚙️ Settings</div>
           <div class="slider-control">
@@ -602,6 +688,193 @@
 
     function updateObjectCount() {
       document.getElementById('objectCount').textContent = objects.length;
+    }
+
+    // =============================================
+    // MATHEMATICIAN TRIBUTE SYSTEM
+    // =============================================
+
+    let learnModeActive = false;
+    let currentMethod = 'fibonacci';
+
+    const MATHEMATICIANS = {
+      fibonacci: {
+        name: "Leonardo Fibonacci",
+        born: 1170,
+        died: 1250,
+        flag: "🇮🇹",
+        nationality: "Italian",
+        discovery: "Fibonacci Sequence",
+        story: "Italian mathematician who discovered the famous sequence (0,1,1,2,3,5,8...) while studying rabbit populations. Each number is the sum of the two before it! This sequence appears everywhere in nature: sunflower spirals, pinecones, nautilus shells.",
+        kidFact: "He introduced Arabic numerals (0-9) to Europe! Before him, Europeans used Roman numerals (I, II, III, IV...) which made math really hard."
+      },
+      catmull: {
+        name: "Edwin Catmull",
+        born: 1945,
+        died: null,
+        flag: "🇺🇸",
+        nationality: "American",
+        discovery: "Catmull-Rom Splines & Subdivision",
+        story: "Co-founder of Pixar! Created smooth curve algorithms while dreaming of making the first computer-animated movie. His math makes characters move smoothly and naturally.",
+        kidFact: "He won an Oscar for his technology! Every Pixar movie (Toy Story, Finding Nemo, The Incredibles) uses his math to make characters move smoothly."
+      },
+      bezier: {
+        name: "Pierre Bézier",
+        born: 1910,
+        died: 1999,
+        flag: "🇫🇷",
+        nationality: "French",
+        discovery: "Bézier Curves",
+        story: "Renault car designer who invented curves you can control with just a few points. Used in fonts, animations, car design, and every vector graphic you see!",
+        kidFact: "Every letter you're reading right now uses Bézier curves! Computer fonts are made entirely of his curves. Even emojis! 😊"
+      },
+      perlin: {
+        name: "Ken Perlin",
+        born: 1951,
+        died: null,
+        flag: "🎮",
+        nationality: "American",
+        discovery: "Perlin Noise",
+        story: "NYU professor who created natural-looking randomness for the movie TRON (1982). Won an Oscar for making computer graphics look organic instead of artificial!",
+        kidFact: "Minecraft's entire world generation uses Perlin noise! Every mountain, cave, and biome is created with his algorithm. Without it, Minecraft wouldn't exist!"
+      },
+      quaternion: {
+        name: "William Hamilton",
+        born: 1805,
+        died: 1865,
+        flag: "🇮🇪",
+        nationality: "Irish",
+        discovery: "Quaternions",
+        story: "Had a 'eureka moment' while walking across Brougham Bridge in Dublin. He was so excited he carved the formula (i²=j²=k²=ijk=-1) into the bridge stone with his knife!",
+        kidFact: "Every 3D video game character rotation uses quaternions! They prevent 'gimbal lock' - a glitch that made old games spin weirdly. Your character wouldn't turn smoothly without them!"
+      },
+      lsystem: {
+        name: "Aristid Lindenmayer",
+        born: 1925,
+        died: 1989,
+        flag: "🇭🇺",
+        nationality: "Hungarian",
+        discovery: "L-Systems (Lindenmayer Systems)",
+        story: "Biologist and botanist who created a simple alphabet system to model how plants grow. Simple rules like 'A becomes AB, B becomes A' create complex fractal patterns that look like real plants!",
+        kidFact: "Video game trees and plants are grown with L-Systems! One simple rule repeated over and over can create an entire realistic forest. It's like growing a digital plant from a seed!"
+      },
+      voronoi: {
+        name: "Georgy Voronoi",
+        born: 1868,
+        died: 1908,
+        flag: "🇺🇦",
+        nationality: "Ukrainian",
+        discovery: "Voronoi Diagrams",
+        story: "Mathematician who figured out how to divide space based on nearest neighbors. Imagine drawing territories around each point where everything inside is closer to that point than any other!",
+        kidFact: "Giraffe spots follow Voronoi patterns! Nature uses this math for animal patterns, cell structures, and crystal growth. Your body's cells organize using Voronoi math!"
+      },
+      phong: {
+        name: "Bui Tuong Phong",
+        born: 1942,
+        died: 1975,
+        flag: "🇻🇳",
+        nationality: "Vietnamese",
+        discovery: "Phong Shading",
+        story: "Created the lighting model that made 3D objects look shiny and realistic. His PhD thesis at University of Utah changed computer graphics forever. Tragically died of leukemia at age 32, but his legacy lives in every 3D game.",
+        kidFact: "Every shiny surface in 3D games uses Phong shading! He made plastic, metal, and glass look real on computers. When you see light reflecting off a character's armor - that's his math!"
+      },
+      delaunay: {
+        name: "Boris Delaunay",
+        born: 1890,
+        died: 1980,
+        flag: "🇷🇺",
+        nationality: "Russian",
+        discovery: "Delaunay Triangulation",
+        story: "Russian mathematician who figured out the optimal way to connect dots with triangles. His method creates the 'fattest' triangles possible, avoiding skinny ones that cause problems in 3D graphics.",
+        kidFact: "3D game terrain is built with Delaunay triangles! Mountains, valleys, and landscapes are made by connecting height points with his optimal triangles. Every open-world game uses this!"
+      },
+      subdivision: {
+        name: "Jim Clark & Edwin Catmull",
+        born: 1944,
+        died: null,
+        flag: "💎",
+        nationality: "American",
+        discovery: "Subdivision Surfaces",
+        story: "Jim Clark founded Silicon Graphics (the company that made movie CGI possible) and Netscape (early web browser). With Catmull, they figured out how to make blocky shapes smooth by subdividing faces repeatedly.",
+        kidFact: "Every smooth 3D character starts blocky! Artists model a simple cube-like shape, then subdivision turns it into a smooth character. It's like magic - a cube becomes a smooth head!"
+      }
+    };
+
+    function toggleLearnMode(btn) {
+      learnModeActive = !learnModeActive;
+      const info = document.getElementById('learnModeInfo');
+      
+      if (learnModeActive) {
+        btn.innerHTML = '<span class="tool-icon">🎓</span><span>Learn Mode ON</span>';
+        btn.style.background = 'rgba(0, 255, 136, 0.3)';
+        btn.style.borderColor = '#00ff88';
+        info.style.display = 'block';
+        
+        // Show initial method story
+        showMathematicianStory(currentMethod);
+        
+        console.log(`
+📚 ============================================
+   LEARN MODE ACTIVATED!
+   
+   Now when you select Mathematical Methods,
+   you'll see the mathematician's story, their
+   discovery, and how it powers your creations!
+   
+   Click any method below to learn! 🏆
+============================================
+        `);
+      } else {
+        btn.innerHTML = '<span class="tool-icon">👨‍🏫</span><span>Enable Story Mode</span>';
+        btn.style.background = 'rgba(0, 255, 136, 0.1)';
+        btn.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+        info.style.display = 'none';
+        document.getElementById('mathematicianStory').style.display = 'none';
+      }
+    }
+
+    function selectMethod(method, btn) {
+      currentMethod = method;
+      
+      // Update active button
+      btn.parentElement.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Show story if Learn Mode is active
+      if (learnModeActive) {
+        showMathematicianStory(method);
+      }
+      
+      // Log to console
+      const mathematician = MATHEMATICIANS[method];
+      console.log(`
+🏆 ============================================
+   METHOD SELECTED: ${mathematician.discovery}
+   Mathematician: ${mathematician.name} (${mathematician.born}-${mathematician.died || 'Present'})
+   ${mathematician.flag} ${mathematician.nationality}
+   
+   📖 Story: ${mathematician.story}
+   
+   💡 Kid Fact: ${mathematician.kidFact}
+============================================
+      `);
+    }
+
+    function showMathematicianStory(method) {
+      const mathematician = MATHEMATICIANS[method];
+      const panel = document.getElementById('mathematicianStory');
+      
+      // Update story content
+      document.getElementById('storyTitle').textContent = `🏆 ${mathematician.discovery}`;
+      document.getElementById('storyFlag').textContent = mathematician.flag;
+      document.getElementById('storyName').textContent = mathematician.name;
+      document.getElementById('storyDates').textContent = `${mathematician.born}-${mathematician.died || 'Present'} • ${mathematician.nationality}`;
+      document.getElementById('storyDiscovery').textContent = `Discovery: ${mathematician.discovery}`;
+      document.getElementById('storyText').textContent = mathematician.story;
+      document.getElementById('storyKidFact').textContent = mathematician.kidFact;
+      
+      // Show panel with smooth animation
+      panel.style.display = 'block';
     }
 
     // Start

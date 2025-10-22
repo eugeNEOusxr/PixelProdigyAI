@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expert Onboarding Portal - PixelProdigy AI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .hero-section {
+      text-align: center;
+      padding: 80px 20px 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0, 255, 136, 0.2);
+      border: 2px solid rgba(0, 255, 136, 0.5);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #00ff88;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.9; }
+    }
+
+    h1 {
+      font-size: 56px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-subtitle {
+      font-size: 24px;
+      margin-bottom: 15px;
+      opacity: 0.95;
+      font-weight: 600;
+    }
+
+    .hero-description {
+      font-size: 16px;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      line-height: 1.6;
+    }
+
+    .value-prop {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      margin: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .section-title {
+      font-size: 36px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #00ff88 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      font-size: 16px;
+      opacity: 0.8;
+      margin-bottom: 50px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 80px;
+    }
+
+    .benefit-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 16px;
+      padding: 30px;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-5px);
+      border-color: #00ff88;
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+    }
+
+    .benefit-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .benefit-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #00ff88;
+    }
+
+    .benefit-description {
+      font-size: 15px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .onboarding-form {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 20px;
+      padding: 50px;
+      max-width: 800px;
+      margin: 0 auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-section {
+      margin-bottom: 40px;
+    }
+
+    .form-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #667eea;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .label-hint {
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.7;
+      margin-left: 5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    select option {
+      background: #1a1a2e;
+      color: #fff;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .checkbox-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .checkbox-label {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .generated-id-display {
+      background: rgba(0, 255, 136, 0.1);
+      border: 2px solid rgba(0, 255, 136, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .generated-id-label {
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+
+    .generated-id-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #00ff88;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .success-message {
+      display: none;
+      background: rgba(0, 255, 136, 0.15);
+      border: 2px solid #00ff88;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .success-message.show {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-icon {
+      font-size: 72px;
+      margin-bottom: 20px;
+    }
+
+    .success-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #00ff88;
+    }
+
+    .success-description {
+      font-size: 16px;
+      opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .next-steps {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: left;
+    }
+
+    .next-steps-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #667eea;
+    }
+
+    .next-steps ol {
+      padding-left: 20px;
+      line-height: 2;
+    }
+
+    .next-steps li {
+      font-size: 15px;
+      opacity: 0.9;
+    }
+
+    .dashboard-btn {
+      display: inline-block;
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+      color: #0a0a0a;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      margin-top: 20px;
+      transition: all 0.3s;
+    }
+
+    .dashboard-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 36px; }
+      .hero-subtitle { font-size: 18px; }
+      .onboarding-form { padding: 30px 20px; }
+      .benefits-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- HERO SECTION -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">🏆 Expert Program • Beta Launch</div>
+      <h1>Escape Your Profession.<br>Teach The World.</h1>
+      <div class="hero-subtitle">Turn Your Expertise Into AI-Powered Training Simulations</div>
+      <p class="hero-description">
+        You spent years mastering your field. Now imagine helping others learn without the burnout, 
+        student loans, or corporate grind. Build immersive 3D training environments powered by AI.
+      </p>
+      <div>
+        <div class="value-prop">💰 Earn Royalties Forever</div>
+        <div class="value-prop">🎓 No Teaching Experience Required</div>
+        <div class="value-prop">🤖 AI Does The Heavy Lifting</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENEFITS SECTION -->
+  <div class="container">
+    <h2 class="section-title">Why Join As An Expert?</h2>
+    <p class="section-subtitle">
+      You bring the knowledge. AI builds the world. Learners get real experience without the real-world cost.
+    </p>
+
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">💊</div>
+        <div class="benefit-title">Your Domain, Your Rules</div>
+        <div class="benefit-description">
+          Define training scenarios from your real experience. "Pharmacy counter interactions", "prescription verification", 
+          "inventory management" - you know what matters. AI generates the environment.
+        </div>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">🏗️</div>
+        <div class="benefit-title">Oversee, Don't Build</div>
+        <div class="benefit-description">
+          You're the architect, not the construction crew. Describe what you need, review AI-generated layouts, 
+          approve or adjust. No 3D modeling skills required.
+        </div>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">🎯</div>
+        <div class="benefit-title">Get Attributed Forever</div>
+        <div class="benefit-description">
+          Like our mathematician tribute system, your name stays attached to your training sim. 
+          "Dr. [Your Name]'s Pharmacy Simulation" - permanent recognition for your contribution.
+        </div>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">💸</div>
+        <div class="benefit-title">Passive Income Potential</div>
+        <div class="benefit-description">
+          Once your training sim is complete, earn royalties every time someone uses it. 
+          Your expertise generates income while you sleep.
+        </div>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">🌍</div>
+        <div class="benefit-title">Impact Thousands</div>
+        <div class="benefit-description">
+          Help people learn without the barriers you faced. No gatekeeping, no $200K degrees, 
+          no 8-year commitments. Just real training that works.
+        </div>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">🚀</div>
+        <div class="benefit-title">First-Mover Advantage</div>
+        <div class="benefit-description">
+          You're joining at the ground floor. Early experts get priority placement, 
+          enhanced royalty splits, and permanent "Founding Expert" status.
+        </div>
+      </div>
+    </div>
+
+    <!-- ONBOARDING FORM -->
+    <h2 class="section-title">Join The Expert Program</h2>
+    <p class="section-subtitle">
+      Fill out this form to get your unique Expert ID and start building your training simulation.
+    </p>
+
+    <form class="onboarding-form" id="expertForm" onsubmit="handleSubmit(event)">
+      <!-- PERSONAL INFO -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>👤</span>
+          <span>Personal Information</span>
+        </div>
+
+        <div class="form-group">
+          <label>Full Name <span class="label-hint">(as it will appear on your training sims)</span></label>
+          <input type="text" id="fullName" placeholder="Dr. John Smith" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address <span class="label-hint">(for your Expert ID and updates)</span></label>
+          <input type="email" id="email" placeholder="john.smith@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number <span class="label-hint">(optional, for priority support)</span></label>
+          <input type="tel" id="phone" placeholder="+1 (555) 123-4567">
+        </div>
+      </div>
+
+      <!-- PROFESSIONAL INFO -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>💼</span>
+          <span>Professional Background</span>
+        </div>
+
+        <div class="form-group">
+          <label>Primary Profession/Industry</label>
+          <select id="industry" required onchange="handleIndustryChange(this.value)">
+            <option value="">-- Select Your Field --</option>
+            <option value="pharmacy">💊 Pharmacy / Pharmaceutical</option>
+            <option value="medical">🏥 Medical / Healthcare</option>
+            <option value="architecture">🏗️ Architecture / Construction</option>
+            <option value="engineering">⚙️ Engineering</option>
+            <option value="culinary">👨‍🍳 Culinary / Food Service</option>
+            <option value="aviation">✈️ Aviation / Aerospace</option>
+            <option value="legal">⚖️ Legal / Law</option>
+            <option value="finance">💰 Finance / Banking</option>
+            <option value="education">🎓 Education / Teaching</option>
+            <option value="technology">💻 Technology / IT</option>
+            <option value="retail">🛒 Retail / Customer Service</option>
+            <option value="hospitality">🏨 Hospitality / Tourism</option>
+            <option value="manufacturing">🏭 Manufacturing / Industrial</option>
+            <option value="agriculture">🌾 Agriculture / Farming</option>
+            <option value="emergency">🚨 Emergency Services / First Response</option>
+            <option value="other">🔧 Other (Please Specify)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="otherIndustryGroup" style="display: none;">
+          <label>Specify Your Industry</label>
+          <input type="text" id="otherIndustry" placeholder="e.g., Veterinary Medicine, Logistics, etc.">
+        </div>
+
+        <div class="form-group">
+          <label>Current Job Title / Role</label>
+          <input type="text" id="jobTitle" placeholder="e.g., Lead Pharmacist, Director of Operations" required>
+        </div>
+
+        <div class="form-group">
+          <label>Years of Experience</label>
+          <select id="experience" required>
+            <option value="">-- Select --</option>
+            <option value="1-3">1-3 years</option>
+            <option value="3-5">3-5 years</option>
+            <option value="5-10">5-10 years</option>
+            <option value="10-15">10-15 years</option>
+            <option value="15-20">15-20 years</option>
+            <option value="20+">20+ years</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Current Company/Organization <span class="label-hint">(optional)</span></label>
+          <input type="text" id="company" placeholder="e.g., Albertsons Pharmacy, Mayo Clinic">
+        </div>
+      </div>
+
+      <!-- TRAINING VISION -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>🎯</span>
+          <span>Your Training Vision</span>
+        </div>
+
+        <div class="form-group">
+          <label>What Do You Want To Teach? <span class="label-hint">(describe the training experience you envision)</span></label>
+          <textarea id="trainingVision" placeholder="Example: 'I want to create a realistic pharmacy counter simulation where students learn to verify prescriptions, handle customer interactions, manage insurance claims, and spot potential drug interactions. They need to experience the pressure of a busy pharmacy without making real-world mistakes.'" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Key Skills/Scenarios To Include <span class="label-hint">(list 3-5 critical training scenarios)</span></label>
+          <textarea id="keySkills" placeholder="Example scenarios:&#10;• Prescription verification workflow&#10;• Customer interaction at counter&#10;• Insurance claim processing&#10;• Drug interaction checking&#10;• Inventory management&#10;• Emergency medication dispensing" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Who Is This For? <span class="label-hint">(target learners)</span></label>
+          <select id="targetAudience" required>
+            <option value="">-- Select Target Audience --</option>
+            <option value="students">Students / Aspiring Professionals</option>
+            <option value="career-changers">Career Changers</option>
+            <option value="entry-level">Entry-Level Employees</option>
+            <option value="continuing-ed">Continuing Education / Upskilling</option>
+            <option value="certification">Certification Prep</option>
+            <option value="general-public">General Public / Hobbyists</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- MOTIVATION -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>💭</span>
+          <span>Why You're Here</span>
+        </div>
+
+        <div class="form-group">
+          <label>What Excites You About This? <span class="label-hint">(optional but helps us understand your goals)</span></label>
+          <textarea id="motivation" placeholder="Example: 'After 12 years as a pharmacist, I'm burnt out but still passionate about the field. I want to help others learn without the massive student debt I had, and potentially transition into educational consulting.'"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>How Did You Hear About Us?</label>
+          <select id="referralSource">
+            <option value="">-- Select --</option>
+            <option value="friend">Friend / Colleague Referral</option>
+            <option value="website">Found Your Website</option>
+            <option value="social">Social Media</option>
+            <option value="search">Search Engine</option>
+            <option value="industry">Industry Event / Conference</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- COMMITMENTS -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <span>✅</span>
+          <span>Expert Commitments</span>
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="commit1" required>
+            <span class="checkbox-label">I will provide accurate, professional-grade domain knowledge</span>
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" id="commit2" required>
+            <span class="checkbox-label">I will review AI-generated training scenarios for realism and accuracy</span>
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" id="commit3" required>
+            <span class="checkbox-label">I understand this is currently in beta and features are being actively developed</span>
+          </label>
+
+          <label class="checkbox-item">
+            <input type="checkbox" id="commit4" required>
+            <span class="checkbox-label">I'm excited to collaborate and provide feedback to improve the platform</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- GENERATED EXPERT ID PREVIEW -->
+      <div class="generated-id-display">
+        <div class="generated-id-label">Your Unique Expert ID:</div>
+        <div class="generated-id-value" id="expertIdPreview">EXPERT-XXXX-XXXX</div>
+        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+          (Generated upon submission • Used to track all your contributions)
+        </div>
+      </div>
+
+      <!-- SUBMIT BUTTON -->
+      <button type="submit" class="submit-btn">
+        🚀 Generate My Expert ID & Join Program
+      </button>
+    </form>
+
+    <!-- SUCCESS MESSAGE -->
+    <div class="success-message" id="successMessage">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Welcome To The Expert Program!</div>
+      <div class="success-description">
+        Your unique Expert ID has been generated and sent to your email. 
+        You're now part of an exclusive group building the future of professional training.
+      </div>
+      
+      <div class="generated-id-display">
+        <div class="generated-id-label">Your Expert ID:</div>
+        <div class="generated-id-value" id="finalExpertId">EXPERT-1234-ABCD</div>
+      </div>
+
+      <div class="next-steps">
+        <div class="next-steps-title">📋 What Happens Next:</div>
+        <ol>
+          <li><strong>Email Confirmation:</strong> Check your inbox for your Expert ID and welcome packet</li>
+          <li><strong>Portal Access:</strong> You'll receive login credentials for your Expert Dashboard</li>
+          <li><strong>Kickoff Call:</strong> Schedule a 30-minute onboarding call to discuss your training vision</li>
+          <li><strong>AI Generation:</strong> We'll start generating your first training environment prototypes</li>
+          <li><strong>Review & Iterate:</strong> You'll review, approve, and refine until it's perfect</li>
+        </ol>
+      </div>
+
+      <a href="#" class="dashboard-btn" onclick="alert('Expert Dashboard coming soon! Check your email for early access.')">
+        Go To Expert Dashboard →
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Generate preview Expert ID based on name
+    document.getElementById('fullName').addEventListener('input', function(e) {
+      const name = e.target.value.trim();
+      if (name.length > 0) {
+        const initials = name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 4);
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const expertId = `EXPERT-${initials}-${randomNum}`;
+        document.getElementById('expertIdPreview').textContent = expertId;
+      } else {
+        document.getElementById('expertIdPreview').textContent = 'EXPERT-XXXX-XXXX';
+      }
+    });
+
+    // Show/hide "Other Industry" field
+    function handleIndustryChange(value) {
+      const otherGroup = document.getElementById('otherIndustryGroup');
+      const otherInput = document.getElementById('otherIndustry');
+      
+      if (value === 'other') {
+        otherGroup.style.display = 'block';
+        otherInput.required = true;
+      } else {
+        otherGroup.style.display = 'none';
+        otherInput.required = false;
+      }
+    }
+
+    // Form submission handler
+    function handleSubmit(event) {
+      event.preventDefault();
+      
+      // Collect form data
+      const formData = {
+        fullName: document.getElementById('fullName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        industry: document.getElementById('industry').value,
+        otherIndustry: document.getElementById('otherIndustry').value,
+        jobTitle: document.getElementById('jobTitle').value,
+        experience: document.getElementById('experience').value,
+        company: document.getElementById('company').value,
+        trainingVision: document.getElementById('trainingVision').value,
+        keySkills: document.getElementById('keySkills').value,
+        targetAudience: document.getElementById('targetAudience').value,
+        motivation: document.getElementById('motivation').value,
+        referralSource: document.getElementById('referralSource').value,
+        timestamp: new Date().toISOString(),
+        expertId: document.getElementById('expertIdPreview').textContent
+      };
+
+      // Log to console (in production, send to backend)
+      console.log('🏆 NEW EXPERT APPLICATION:', formData);
+      console.log(`
+╔════════════════════════════════════════════════════════════╗
+║           🎉 NEW EXPERT JOINED THE PROGRAM! 🎉            ║
+╠════════════════════════════════════════════════════════════╣
+║  Expert ID: ${formData.expertId}
+║  Name: ${formData.fullName}
+║  Industry: ${formData.industry}
+║  Experience: ${formData.experience}
+║  Email: ${formData.email}
+╠════════════════════════════════════════════════════════════╣
+║  TRAINING VISION:
+║  ${formData.trainingVision.substring(0, 200)}...
+╠════════════════════════════════════════════════════════════╣
+║  📧 NEXT STEPS:
+║  • Send welcome email with Expert ID
+║  • Create Expert Dashboard account
+║  • Schedule kickoff call
+║  • Begin AI prototype generation
+╚════════════════════════════════════════════════════════════╝
+      `);
+
+      // Save to localStorage (temporary solution until backend exists)
+      const experts = JSON.parse(localStorage.getItem('pixelprodigy_experts') || '[]');
+      experts.push(formData);
+      localStorage.setItem('pixelprodigy_experts', JSON.stringify(experts));
+
+      // Show success message
+      document.getElementById('expertForm').style.display = 'none';
+      document.getElementById('successMessage').classList.add('show');
+      document.getElementById('finalExpertId').textContent = formData.expertId;
+
+      // Scroll to success message
+      document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // In production, send to backend API
+      // await fetch('/api/expert-onboarding', { method: 'POST', body: JSON.stringify(formData) });
+    }
+
+    // Log all existing experts on page load
+    window.addEventListener('load', function() {
+      const experts = JSON.parse(localStorage.getItem('pixelprodigy_experts') || '[]');
+      if (experts.length > 0) {
+        console.log(`📊 Total Experts Registered: ${experts.length}`);
+        console.table(experts.map(e => ({
+          ID: e.expertId,
+          Name: e.fullName,
+          Industry: e.industry,
+          Experience: e.experience,
+          Date: new Date(e.timestamp).toLocaleDateString()
+        })));
+      }
+    });
+  </script>
+</body>
+</html>

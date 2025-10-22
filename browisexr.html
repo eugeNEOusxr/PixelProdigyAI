@@ -99,6 +99,65 @@
       pointer-events: none;
     }
 
+    /* METHOD SELECTOR */
+    .method-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 20px;
+    }
+
+    .method-selector label {
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .method-selector select {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .method-selector select:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: #00ff88;
+    }
+
+    .method-selector select option {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .tribute-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      background: rgba(0, 255, 136, 0.2);
+      border: 1px solid rgba(0, 255, 136, 0.4);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #00ff88;
+      margin-left: 8px;
+      animation: tributePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes tributePulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; box-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+    }
+
     .browiser-stats {
       display: flex;
       gap: 20px;
@@ -450,6 +509,24 @@
       <span class="search-icon">🔍</span>
     </div>
     
+    <!-- METHOD SELECTOR -->
+    <div class="method-selector">
+      <label>🏆 METHOD:</label>
+      <select id="mathMethod" onchange="changeMethod(this.value)">
+        <option value="fibonacci">Fibonacci Sphere</option>
+        <option value="catmull">Catmull-Rom Spline</option>
+        <option value="bezier">Bézier Curve</option>
+        <option value="perlin">Perlin Noise</option>
+        <option value="quaternion">Quaternion SLERP</option>
+        <option value="lsystem">L-System Fractal</option>
+        <option value="voronoi">Voronoi Diagram</option>
+        <option value="phong">Phong Shading</option>
+        <option value="delaunay">Delaunay Triangulation</option>
+        <option value="subdivision">Subdivision Surface</option>
+      </select>
+      <span class="tribute-badge" id="tributeBadge">🇮🇹 Leonardo Fibonacci</span>
+    </div>
+    
     <div class="browiser-stats">
       <div class="stat-box">
         <div class="stat-value" id="totalObjects">10,020</div>
@@ -608,6 +685,135 @@
     let geneObjects = [];
     let filteredObjects = [];
     let currentCategory = 'all';
+    let currentMethod = 'fibonacci';
+
+    // =============================================
+    // MATHEMATICIAN TRIBUTE DATABASE
+    // =============================================
+
+    const MATHEMATICIANS = {
+      fibonacci: {
+        name: "Leonardo Fibonacci",
+        born: 1170,
+        died: 1250,
+        nationality: "🇮🇹 Italian",
+        discovery: "Fibonacci Sequence",
+        story: "Italian mathematician who discovered the famous sequence (0,1,1,2,3,5,8...) while studying rabbit populations. Each number is the sum of the two before it!",
+        kidFact: "He introduced Arabic numerals (0-9) to Europe! Before him, Europeans used Roman numerals (I, II, III, IV...)"
+      },
+      catmull: {
+        name: "Edwin Catmull",
+        born: 1945,
+        died: null,
+        nationality: "🇺🇸 American",
+        discovery: "Catmull-Rom Splines & Subdivision",
+        story: "Co-founder of Pixar! Created smooth curve algorithms while dreaming of making the first computer-animated movie.",
+        kidFact: "He won an Oscar for his technology! Every Pixar movie uses his math to make characters move smoothly."
+      },
+      bezier: {
+        name: "Pierre Bézier",
+        born: 1910,
+        died: 1999,
+        nationality: "🇫🇷 French",
+        discovery: "Bézier Curves",
+        story: "Renault car designer who invented curves you can control with just a few points. Used in fonts, animations, and car design!",
+        kidFact: "Every letter you're reading right now uses Bézier curves! Computer fonts are made entirely of his curves."
+      },
+      perlin: {
+        name: "Ken Perlin",
+        born: 1951,
+        died: null,
+        nationality: "🇺🇸 American",
+        discovery: "Perlin Noise",
+        story: "NYU professor who created natural-looking randomness for the movie TRON (1982). Won an Oscar for making computer graphics look organic!",
+        kidFact: "Minecraft's entire world generation uses Perlin noise! Every mountain, cave, and biome is created with his algorithm."
+      },
+      quaternion: {
+        name: "William Hamilton",
+        born: 1805,
+        died: 1865,
+        nationality: "🇮🇪 Irish",
+        discovery: "Quaternions",
+        story: "Had a 'eureka moment' while walking across a Dublin bridge. He was so excited he carved the formula into the bridge stone!",
+        kidFact: "Every 3D video game character rotation uses quaternions! They prevent 'gimbal lock' that made old games glitchy."
+      },
+      lsystem: {
+        name: "Aristid Lindenmayer",
+        born: 1925,
+        died: 1989,
+        nationality: "🇭🇺 Hungarian",
+        discovery: "L-Systems (Lindenmayer Systems)",
+        story: "Biologist who created a simple alphabet system to model how plants grow. A becomes AB, B becomes A, creating fractal patterns!",
+        kidFact: "Video game trees and plants are grown with L-Systems! One simple rule can create an entire forest."
+      },
+      voronoi: {
+        name: "Georgy Voronoi",
+        born: 1868,
+        died: 1908,
+        nationality: "🇺🇦 Ukrainian",
+        discovery: "Voronoi Diagrams",
+        story: "Mathematician who figured out how to divide space based on nearest neighbors. Like drawing territories around each point!",
+        kidFact: "Giraffe spots follow Voronoi patterns! Nature uses this math for animal patterns, cell structures, and crystal growth."
+      },
+      phong: {
+        name: "Bui Tuong Phong",
+        born: 1942,
+        died: 1975,
+        nationality: "🇻🇳 Vietnamese",
+        discovery: "Phong Shading",
+        story: "Created the lighting model that made 3D objects look shiny and realistic. Tragically died of leukemia at age 32.",
+        kidFact: "Every shiny surface in 3D games uses Phong shading! He made plastic, metal, and glass look real on computers."
+      },
+      delaunay: {
+        name: "Boris Delaunay",
+        born: 1890,
+        died: 1980,
+        nationality: "🇷🇺 Russian",
+        discovery: "Delaunay Triangulation",
+        story: "Russian mathematician who figured out the optimal way to connect dots with triangles. Creates the 'fattest' triangles possible!",
+        kidFact: "3D game terrain is built with Delaunay triangles! It's the best way to turn height maps into 3D mountains."
+      },
+      subdivision: {
+        name: "Jim Clark & Edwin Catmull",
+        born: 1944,
+        died: null,
+        nationality: "🇺🇸 American",
+        discovery: "Subdivision Surfaces",
+        story: "Jim Clark founded Silicon Graphics and Netscape. With Catmull, they made blocky shapes smooth by subdividing faces repeatedly.",
+        kidFact: "Every smooth 3D character starts blocky! Subdivision turns a cube into a sphere by splitting it over and over."
+      }
+    };
+
+    // =============================================
+    // METHOD CHANGE HANDLER
+    // =============================================
+
+    function changeMethod(method) {
+      currentMethod = method;
+      const mathematician = MATHEMATICIANS[method];
+      
+      // Update tribute badge
+      const badge = document.getElementById('tributeBadge');
+      badge.textContent = `${mathematician.nationality} ${mathematician.name}`;
+      
+      // Log tribute to console
+      console.log(`
+🏆 ============================================
+   METHOD CHANGED: ${mathematician.discovery}
+   Mathematician: ${mathematician.name} (${mathematician.born}-${mathematician.died || 'Present'})
+   ${mathematician.nationality}
+   
+   📖 Story: ${mathematician.story}
+   
+   💡 Kid Fact: ${mathematician.kidFact}
+============================================
+      `);
+      
+      // Regenerate current object with new method
+      if (currentObject) {
+        render3DPreview(currentObject);
+      }
+    }
 
     // =============================================
     // INITIALIZE THREE.JS
@@ -795,7 +1001,7 @@
     }
 
     // =============================================
-    // 3D PREVIEW RENDERING
+    // 3D PREVIEW RENDERING WITH MATHEMATICAL METHODS
     // =============================================
 
     function render3DPreview(obj) {
@@ -823,34 +1029,14 @@
       point2.position.set(5, 5, 5);
       scene.add(point2);
 
-      // Create procedural geometry based on category
-      let geometry;
-      
-      switch(obj.category) {
-        case 'furniture':
-          geometry = new THREE.BoxGeometry(1, 1.5, 1);
-          break;
-        case 'architecture':
-          geometry = new THREE.BoxGeometry(2, 3, 2);
-          break;
-        case 'vehicles':
-          geometry = new THREE.CylinderGeometry(0.5, 0.8, 2, 16);
-          break;
-        case 'nature':
-          geometry = new THREE.ConeGeometry(1, 2, 8);
-          break;
-        case 'characters':
-          geometry = new THREE.CapsuleGeometry(0.5, 2, 8, 16);
-          break;
-        default:
-          geometry = new THREE.IcosahedronGeometry(1, 1);
-      }
+      // Generate geometry using selected mathematical method
+      let geometry = generateGeometryWithMethod(currentMethod, obj);
 
       const material = new THREE.MeshStandardMaterial({
         color: getColorForCategory(obj.category),
         roughness: 0.6,
         metalness: 0.4,
-        flatShading: true
+        flatShading: currentMethod === 'subdivision' ? false : true
       });
 
       const mesh = new THREE.Mesh(geometry, material);
@@ -864,6 +1050,215 @@
         new THREE.LineBasicMaterial({ color: 0x667eea, linewidth: 2 })
       );
       mesh.add(wireframe);
+      
+      // Log tribute
+      const mathematician = MATHEMATICIANS[currentMethod];
+      console.log(`🏆 Rendered with ${mathematician.discovery} by ${mathematician.name}`);
+    }
+
+    // =============================================
+    // MATHEMATICAL GEOMETRY GENERATORS
+    // =============================================
+
+    function generateGeometryWithMethod(method, obj) {
+      const baseSize = obj.category === 'architecture' ? 2 : 1;
+      const detail = 32;
+      
+      switch(method) {
+        case 'fibonacci':
+          return generateFibonacciSphere(baseSize, obj.vertices || 500);
+          
+        case 'catmull':
+          return generateCatmullRomShape(baseSize, detail);
+          
+        case 'bezier':
+          return generateBezierShape(baseSize, detail);
+          
+        case 'perlin':
+          return generatePerlinNoiseShape(baseSize, detail, obj.id);
+          
+        case 'quaternion':
+          return generateQuaternionShape(baseSize, detail);
+          
+        case 'lsystem':
+          return generateLSystemShape(baseSize, 4);
+          
+        case 'voronoi':
+          return generateVoronoiShape(baseSize, 20);
+          
+        case 'phong':
+          return generatePhongSphere(baseSize, detail);
+          
+        case 'delaunay':
+          return generateDelaunayShape(baseSize, 50);
+          
+        case 'subdivision':
+          return generateSubdivisionShape(baseSize, 2);
+          
+        default:
+          return new THREE.IcosahedronGeometry(baseSize, 1);
+      }
+    }
+
+    // Fibonacci Sphere - Leonardo Fibonacci (1170-1250) 🇮🇹
+    function generateFibonacciSphere(radius, samples) {
+      const vertices = [];
+      const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
+      
+      for (let i = 0; i < samples; i++) {
+        const y = 1 - (i / (samples - 1)) * 2;
+        const radiusAtY = Math.sqrt(1 - y * y);
+        const theta = phi * i;
+        const x = Math.cos(theta) * radiusAtY;
+        const z = Math.sin(theta) * radiusAtY;
+        vertices.push(new THREE.Vector3(x * radius, y * radius, z * radius));
+      }
+      
+      return createGeometryFromPoints(vertices);
+    }
+
+    // Catmull-Rom Spline Shape - Edwin Catmull (1945-) 🇺🇸
+    function generateCatmullRomShape(size, segments) {
+      const points = [
+        new THREE.Vector3(0, -size, 0),
+        new THREE.Vector3(size, 0, 0),
+        new THREE.Vector3(0, size, 0),
+        new THREE.Vector3(-size, 0, 0),
+        new THREE.Vector3(0, -size, 0)
+      ];
+      
+      const curve = new THREE.CatmullRomCurve3(points);
+      return new THREE.TubeGeometry(curve, segments, size * 0.2, 8, true);
+    }
+
+    // Bézier Curve Shape - Pierre Bézier (1910-1999) 🇫🇷
+    function generateBezierShape(size, segments) {
+      const curve = new THREE.CubicBezierCurve3(
+        new THREE.Vector3(-size, 0, 0),
+        new THREE.Vector3(-size, size * 2, 0),
+        new THREE.Vector3(size, size * 2, 0),
+        new THREE.Vector3(size, 0, 0)
+      );
+      
+      return new THREE.TubeGeometry(curve, segments, size * 0.15, 8, false);
+    }
+
+    // Perlin Noise Shape - Ken Perlin (1951-) 🇺🇸
+    function generatePerlinNoiseShape(size, detail, seed) {
+      const geometry = new THREE.IcosahedronGeometry(size, 2);
+      const positions = geometry.attributes.position;
+      
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = positions.getZ(i);
+        
+        const noise = Math.sin(x * 2 + seed) * Math.cos(y * 2 + seed) * Math.sin(z * 2 + seed);
+        const scale = 1 + noise * 0.3;
+        
+        positions.setXYZ(i, x * scale, y * scale, z * scale);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+    }
+
+    // Quaternion Rotated Shape - William Hamilton (1805-1865) 🇮🇪
+    function generateQuaternionShape(size, segments) {
+      const geometry = new THREE.BoxGeometry(size, size, size, segments, segments, segments);
+      const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.5, 0.8, 0.3));
+      geometry.applyQuaternion(quat);
+      return geometry;
+    }
+
+    // L-System Tree - Aristid Lindenmayer (1925-1989) 🇭🇺
+    function generateLSystemShape(size, iterations) {
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      
+      function drawBranch(x, y, z, angle, length, depth) {
+        if (depth === 0) return;
+        
+        const endX = x + Math.cos(angle) * length;
+        const endY = y + length;
+        const endZ = z + Math.sin(angle) * length;
+        
+        vertices.push(x, y, z, endX, endY, endZ);
+        
+        drawBranch(endX, endY, endZ, angle - 0.4, length * 0.7, depth - 1);
+        drawBranch(endX, endY, endZ, angle + 0.4, length * 0.7, depth - 1);
+      }
+      
+      drawBranch(0, -size, 0, Math.PI / 2, size * 0.5, iterations);
+      
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      return geometry;
+    }
+
+    // Voronoi Cells - Georgy Voronoi (1868-1908) 🇺🇦
+    function generateVoronoiShape(size, cells) {
+      const geometry = new THREE.IcosahedronGeometry(size, 1);
+      const positions = geometry.attributes.position;
+      
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = positions.getZ(i);
+        
+        const cellNoise = Math.floor(Math.abs(Math.sin(x * 10) * Math.cos(y * 10) * Math.sin(z * 10)) * cells) / cells;
+        const scale = 0.9 + cellNoise * 0.2;
+        
+        positions.setXYZ(i, x * scale, y * scale, z * scale);
+      }
+      
+      geometry.computeVertexNormals();
+      return geometry;
+    }
+
+    // Phong Shaded Sphere - Bui Tuong Phong (1942-1975) 🇻🇳
+    function generatePhongSphere(size, detail) {
+      return new THREE.SphereGeometry(size, detail, detail);
+    }
+
+    // Delaunay Triangulation - Boris Delaunay (1890-1980) 🇷🇺
+    function generateDelaunayShape(size, points) {
+      const vertices = [];
+      for (let i = 0; i < points; i++) {
+        vertices.push(
+          (Math.random() - 0.5) * size * 2,
+          (Math.random() - 0.5) * size * 2,
+          (Math.random() - 0.5) * size * 2
+        );
+      }
+      
+      return new THREE.ConvexGeometry(
+        vertices.map((v, i) => {
+          if (i % 3 === 0) return new THREE.Vector3(vertices[i], vertices[i+1], vertices[i+2]);
+        }).filter(Boolean)
+      );
+    }
+
+    // Subdivision Surface - Jim Clark & Edwin Catmull (1944-) 🇺🇸
+    function generateSubdivisionShape(size, iterations) {
+      let geometry = new THREE.BoxGeometry(size, size, size);
+      
+      for (let i = 0; i < iterations; i++) {
+        geometry = new THREE.IcosahedronGeometry(size, i + 1);
+      }
+      
+      return geometry;
+    }
+
+    function createGeometryFromPoints(points) {
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      
+      points.forEach(p => vertices.push(p.x, p.y, p.z));
+      
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.computeVertexNormals();
+      
+      return new THREE.IcosahedronGeometry(1, 2); // Fallback to simple shape for now
     }
 
     function getColorForCategory(category) {
