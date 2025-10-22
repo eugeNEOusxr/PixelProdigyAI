@@ -26,5 +26,6 @@ Crawl-delay: 1
 
 # Contact
 # Creator: Eugene Ousos
+# Email: eugeneousxr2025@outlook.com
 # GitHub: https://github.com/eugeNEOusxr
 # Site: https://pixel-prodigy.com
