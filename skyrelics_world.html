@@ -1910,6 +1910,12 @@
                 const grid = document.getElementById('inventory-grid');
                 grid.innerHTML = '';
                 
+                // Safety check: ensure inventory array exists
+                if (!playerInventory.inventory || !Array.isArray(playerInventory.inventory)) {
+                    console.warn('⚠️ Inventory not initialized properly');
+                    return;
+                }
+                
                 for (let i = 0; i < 100; i++) {
                     const slot = document.createElement('div');
                     slot.className = 'inventory-slot';
@@ -10544,10 +10550,12 @@ The elbows, bearings & transmissions of the code 🔧
             }, 3000);
         }
 
-        // Check flashcard triggers in animation loop
-        setInterval(() => {
-            checkFlashcardTriggers();
-        }, 2000); // Check every 2 seconds
+        // Check flashcard triggers in animation loop (delayed start to ensure scene is ready)
+        setTimeout(() => {
+            setInterval(() => {
+                checkFlashcardTriggers();
+            }, 2000); // Check every 2 seconds
+        }, 5000); // Wait 5 seconds before starting checks
 
         console.log('✅ DELAUNAY MOUNTAIN & STORY MODE SYSTEMS LOADED!');
         console.log('🏔️ Boris Delaunay would be proud!');
