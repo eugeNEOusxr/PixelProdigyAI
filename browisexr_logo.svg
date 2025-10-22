@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background circle with XR gradient -->
+  <defs>
+    <linearGradient id="xrGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#00ffff;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Outer XR ring -->
+  <circle cx="100" cy="100" r="90" fill="url(#xrGradient)" opacity="0.9"/>
+  
+  <!-- VR Headset outline -->
+  <rect x="40" y="70" width="120" height="60" rx="10" fill="none" stroke="white" stroke-width="4"/>
+  
+  <!-- Left lens -->
+  <circle cx="70" cy="100" r="20" fill="none" stroke="white" stroke-width="3"/>
+  <circle cx="70" cy="100" r="12" fill="url(#glowGradient)" filter="url(#glow)"/>
+  
+  <!-- Right lens -->
+  <circle cx="130" cy="100" r="20" fill="none" stroke="white" stroke-width="3"/>
+  <circle cx="130" cy="100" r="12" fill="url(#glowGradient)" filter="url(#glow)"/>
+  
+  <!-- Headset strap -->
+  <path d="M 40 100 Q 20 100 20 80" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 160 100 Q 180 100 180 80" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- XR text inside -->
+  <text x="100" y="108" text-anchor="middle" fill="white" font-size="24" font-weight="bold" font-family="Arial, sans-serif">
+    XR
+  </text>
+  
+  <!-- BRO and WISE text -->
+  <text x="100" y="40" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    BRO
+  </text>
+  <text x="100" y="170" text-anchor="middle" fill="#00ff88" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    WISE
+  </text>
+  
+  <!-- Corner tech accents -->
+  <line x1="15" y1="15" x2="35" y2="15" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <line x1="15" y1="15" x2="15" y2="35" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  
+  <line x1="185" y1="15" x2="165" y2="15" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <line x1="185" y1="15" x2="185" y2="35" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  
+  <line x1="15" y1="185" x2="35" y2="185" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <line x1="15" y1="185" x2="15" y2="165" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  
+  <line x1="185" y1="185" x2="165" y2="185" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <line x1="185" y1="185" x2="185" y2="165" stroke="#00ffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  
+  <!-- GENE helix (DNA structure) -->
+  <path d="M 60 150 Q 75 155 90 150" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.6"/>
+  <path d="M 110 150 Q 125 155 140 150" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.6"/>
+</svg>
