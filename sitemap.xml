@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- MAIN PAGES -->
+  <url>
+    <loc>https://pixel-prodigy.com/</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- SKYRELICS GAME -->
+  <url>
+    <loc>https://pixel-prodigy.com/skyrelics_world.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:meta name="author" content="Eugene Ousos" />
+    <xhtml:meta name="description" content="144 AI Legends game with Delaunay mountains and mathematical learning" />
+  </url>
+  
+  <!-- EXPERT BUILDER STUDIO -->
+  <url>
+    <loc>https://pixel-prodigy.com/expert_builder_studio.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:meta name="author" content="Eugene Ousos" />
+    <xhtml:meta name="description" content="AI co-creation platform for domain experts to build training simulations" />
+  </url>
+  
+  <!-- RECOVERY VIRTUAL HUB -->
+  <url>
+    <loc>https://pixel-prodigy.com/recovery_virtual_hub.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:meta name="author" content="Eugene Ousos" />
+    <xhtml:meta name="description" content="Free 24/7 NA meetings and homeless support platform" />
+  </url>
+  
+  <!-- MATHEMATICIAN DIRECTORY -->
+  <url>
+    <loc>https://pixel-prodigy.com/mathematician_directory.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:meta name="author" content="Eugene Ousos" />
+    <xhtml:meta name="description" content="25+ mathematicians and their algorithms used in PixelProdigy" />
+  </url>
+  
+  <!-- EXPERT ONBOARDING -->
+  <url>
+    <loc>https://pixel-prodigy.com/expert_onboarding_portal.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:meta name="author" content="Eugene Ousos" />
+  </url>
+  
+  <!-- AI STUDIO -->
+  <url>
+    <loc>https://pixel-prodigy.com/ai_sculpting_studio_complete.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:meta name="author" content="Eugene Ousos" />
+  </url>
+  
+  <!-- BETA DASHBOARD -->
+  <url>
+    <loc>https://pixel-prodigy.com/beta_dashboard.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- BROWISEXR MARKETPLACE -->
+  <url>
+    <loc>https://pixel-prodigy.com/browisexr.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:meta name="author" content="Eugene Ousos" />
+  </url>
+  
+  <!-- CHARACTER CREATION -->
+  <url>
+    <loc>https://pixel-prodigy.com/complete_human_generator.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- 4K ARTWORK GENERATOR -->
+  <url>
+    <loc>https://pixel-prodigy.com/4k_artwork_vertex_generator.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- PIXELPRODIGY 3D STUDIO -->
+  <url>
+    <loc>https://pixel-prodigy.com/pixelprodigy3d.html</loc>
+    <lastmod>2025-10-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>

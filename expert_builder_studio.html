@@ -4,6 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Expert Builder Studio - Co-Create Your Training World</title>
+  
+  <!-- 🔍 SEO & CREATOR ATTRIBUTION METADATA -->
+  <meta name="description" content="Professional training simulation builder where domain experts co-create with AI. Build pharmacy, medical, culinary, and educational experiences.">
+  <meta name="keywords" content="training simulation, expert creator, AI co-pilot, educational games, professional training">
+  <meta name="author" content="Eugene Ousos, PixelProdigy AI">
+  
+  <!-- JSON-LD Structured Data for Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Expert Builder Studio",
+    "applicationCategory": "DesignApplication",
+    "description": "AI-powered co-creation platform for building professional training simulations",
+    "author": {
+      "@type": "Person",
+      "name": "Eugene Ousos",
+      "url": "https://pixel-prodigy.com",
+      "sameAs": [
+        "https://github.com/eugeNEOusxr"
+      ]
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "PixelProdigy AI",
+      "founder": {
+        "@type": "Person",
+        "name": "Eugene Ousos"
+      }
+    },
+    "softwareVersion": "1.0",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  
   <style>
     * {
       margin: 0;
@@ -109,6 +149,17 @@
     .header-btn.primary {
       background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
       color: #0a0a0a;
+    }
+
+    /* Creator input (small) */
+    .creator-input {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 12px;
+      width: 180px;
     }
 
     /* LEFT SIDEBAR - TOOLBOX */
@@ -1041,16 +1092,120 @@ Example: 'Add a pharmacy counter with 3 registers, behind-the-counter workspace,
 
     function saveProgress() {
       const data = {
+        // Core data
         expertId: expertData.expertId,
         objects: objects.length,
         scenarios: scenarios.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        
+        // 🏆 CREATOR ATTRIBUTION METADATA
+        creator: {
+          name: expertData.fullName || 'Unknown Expert',
+          expertId: expertData.expertId,
+          industry: expertData.industry || 'General',
+          email: expertData.email || null
+        },
+        
+        // Asset metadata
+        assetType: 'training_simulation',
+        title: `${expertData.fullName}'s ${expertData.industry} Training`,
+        description: `Professional training simulation created by ${expertData.fullName}`,
+        
+        // Searchability
+        tags: [
+          expertData.industry,
+          'training',
+          'simulation',
+          'expert-created',
+          expertData.fullName.split(' ')[0] // First name
+        ],
+        
+        // Version tracking
+        version: '1.0.0',
+        engine: 'PixelProdigy Expert Builder',
+        generatedBy: 'AI Co-Pilot + Human Expert'
       };
       
+      // Save progress
       localStorage.setItem(`expert_progress_${expertData.expertId}`, JSON.stringify(data));
       
-      addAIMessage('✅ Progress saved! Your simulation is auto-backed up.');
-      console.log('💾 Saved:', data);
+      // 🔍 ADD TO SEARCH INDEX
+      updateSearchIndex(data);
+      
+      addAIMessage(`✅ Progress saved! Your simulation is auto-backed up.<br><br><small>Creator: <strong>${data.creator.name}</strong> | Assets: ${objects.length} | Searchable ✓</small>`);
+      console.log('💾 Saved with Attribution:', data);
+    }
+    
+    // 🔍 SEARCH INDEX SYSTEM
+    function updateSearchIndex(assetData) {
+      // Get or create search index
+      let searchIndex = JSON.parse(localStorage.getItem('pp_search_index') || '{}');
+      
+      // Initialize if empty
+      if (!searchIndex.creators) {
+        searchIndex = {
+          creators: {},
+          assets: [],
+          lastUpdated: new Date().toISOString()
+        };
+      }
+      
+      // Add/update creator
+      const creatorId = assetData.creator.expertId;
+      if (!searchIndex.creators[creatorId]) {
+        searchIndex.creators[creatorId] = {
+          name: assetData.creator.name,
+          expertId: creatorId,
+          industry: assetData.creator.industry,
+          assetsCreated: 0,
+          firstSeen: new Date().toISOString()
+        };
+      }
+      
+      searchIndex.creators[creatorId].assetsCreated++;
+      searchIndex.creators[creatorId].lastActive = new Date().toISOString();
+      
+      // Add asset to index
+      const assetEntry = {
+        id: assetData.expertId + '_' + Date.now(),
+        title: assetData.title,
+        creator: assetData.creator.name,
+        creatorId: creatorId,
+        industry: assetData.creator.industry,
+        tags: assetData.tags,
+        created: assetData.timestamp,
+        type: assetData.assetType
+      };
+      
+      // Remove old versions of same asset
+      searchIndex.assets = searchIndex.assets.filter(a => 
+        !(a.creatorId === creatorId && a.type === assetData.assetType)
+      );
+      
+      searchIndex.assets.push(assetEntry);
+      searchIndex.lastUpdated = new Date().toISOString();
+      
+      // Save index
+      localStorage.setItem('pp_search_index', JSON.stringify(searchIndex));
+      
+      console.log('🔍 Search Index Updated:', {
+        totalCreators: Object.keys(searchIndex.creators).length,
+        totalAssets: searchIndex.assets.length,
+        newAsset: assetEntry
+      });
+    }
+    
+    // 🏆 GET CREATOR BY NAME (for autocomplete)
+    function searchCreators(query) {
+      const searchIndex = JSON.parse(localStorage.getItem('pp_search_index') || '{}');
+      if (!searchIndex.creators) return [];
+      
+      const results = Object.values(searchIndex.creators).filter(creator => 
+        creator.name.toLowerCase().includes(query.toLowerCase()) ||
+        creator.industry.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      return results.sort((a, b) => b.assetsCreated - a.assetsCreated);
     }
 
     function previewMode() {

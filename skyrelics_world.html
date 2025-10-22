@@ -3,7 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyRelics - Complete World</title>
+    <title>SkyRelics - 144 AI Legends | PixelProdigy</title>
+    
+    <!-- 🔍 CREATOR ATTRIBUTION & SEO -->
+    <meta name="description" content="Explore SkyRelics - A mystical 3D world where 144 AI personalities teach mathematics through gameplay. Built with Delaunay triangulation, Fibonacci spirals, and Perlin noise.">
+    <meta name="keywords" content="SkyRelics, educational gaming, AI characters, mathematics game, procedural generation, Delaunay mountains, 144 AI legends">
+    <meta name="author" content="Eugene Ousos, PixelProdigy AI">
+    
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="SkyRelics - Where 144 AI Legends Live">
+    <meta property="og:description" content="Learn mathematics through gaming. Meet Aurora the Artist, LLAMA the Meta-Shepherd, and 142 other AI characters in a world built on algorithms.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pixel-prodigy.com/skyrelics_world.html">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "SkyRelics",
+      "description": "Educational 3D game featuring 144 AI characters teaching mathematics",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Ousos",
+        "url": "https://pixel-prodigy.com"
+      },
+      "genre": ["Educational", "Adventure", "Exploration"],
+      "gamePlatform": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    
     <style>
         * { 
             margin: 0; 
@@ -9869,6 +9903,648 @@ The elbows, bearings & transmissions of the code 🔧
             document.getElementById('nft-value').textContent = (NFT_COLLECTION.total_assets * 0.1).toFixed(1);
         }
     }, 1000);
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- DELAUNAY MOUNTAIN GENERATION & STORY MODE SYSTEM                    -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <script src="https://cdn.jsdelivr.net/npm/delaunator@5.0.0/delaunator.min.js"></script>
+    <script>
+        console.log('🏔️ DELAUNAY MOUNTAIN SYSTEM LOADING...');
+
+        // ═══════════════════════════════════════════════════════════════════
+        // DELAUNAY TERRAIN GENERATOR
+        // ═══════════════════════════════════════════════════════════════════
+        
+        class DelaunayMountainGenerator {
+            constructor() {
+                this.points = [];
+                this.triangles = [];
+                this.heightMap = [];
+            }
+
+            // Generate random points across terrain grid
+            generatePoints(count, width, depth) {
+                this.points = [];
+                
+                // Create grid + add randomness
+                const gridSize = Math.sqrt(count);
+                const cellWidth = width / gridSize;
+                const cellDepth = depth / gridSize;
+                
+                for (let z = 0; z < gridSize; z++) {
+                    for (let x = 0; x < gridSize; x++) {
+                        const px = x * cellWidth + (Math.random() - 0.5) * cellWidth * 0.7;
+                        const pz = z * cellDepth + (Math.random() - 0.5) * cellDepth * 0.7;
+                        
+                        // Perlin-like height noise
+                        const height = this.perlinHeight(px, pz, width, depth);
+                        
+                        this.points.push({
+                            x: px - width / 2,
+                            y: height,
+                            z: pz - depth / 2
+                        });
+                    }
+                }
+                
+                console.log(`📍 Generated ${this.points.length} terrain points`);
+                return this.points;
+            }
+
+            // Perlin-inspired height calculation
+            perlinHeight(x, z, width, depth) {
+                const nx = x / width - 0.5;
+                const nz = z / depth - 0.5;
+                
+                // Multiple octaves of noise
+                let height = 0;
+                height += Math.sin(nx * 3 + nz * 2) * 15;
+                height += Math.sin(nx * 7 - nz * 5) * 8;
+                height += Math.sin(nx * 13 + nz * 11) * 4;
+                height += Math.cos(nx * 19 - nz * 17) * 2;
+                
+                // Mountain peaks
+                const distFromCenter = Math.sqrt(nx * nx + nz * nz);
+                height += (1 - distFromCenter) * 30;
+                
+                return Math.max(height, 0);
+            }
+
+            // Perform Delaunay triangulation
+            triangulate() {
+                if (this.points.length < 3) {
+                    console.error('❌ Need at least 3 points for triangulation');
+                    return [];
+                }
+                
+                // Convert to 2D coordinates for Delaunay (using x, z)
+                const coords = [];
+                this.points.forEach(p => {
+                    coords.push(p.x, p.z);
+                });
+                
+                // Use Delaunator library
+                const delaunay = Delaunator.from(coords, 
+                    (i) => coords[i * 2],
+                    (i) => coords[i * 2 + 1]
+                );
+                
+                this.triangles = delaunay.triangles;
+                console.log(`🔺 Generated ${this.triangles.length / 3} Delaunay triangles`);
+                
+                return this.triangles;
+            }
+
+            // Generate Three.js mesh from Delaunay triangulation
+            generateMesh() {
+                const geometry = new THREE.BufferGeometry();
+                
+                // Vertex positions
+                const positions = [];
+                const colors = [];
+                const normals = [];
+                
+                for (let i = 0; i < this.triangles.length; i += 3) {
+                    const p1 = this.points[this.triangles[i]];
+                    const p2 = this.points[this.triangles[i + 1]];
+                    const p3 = this.points[this.triangles[i + 2]];
+                    
+                    // Add triangle vertices
+                    positions.push(p1.x, p1.y, p1.z);
+                    positions.push(p2.x, p2.y, p2.z);
+                    positions.push(p3.x, p3.y, p3.z);
+                    
+                    // Calculate normal
+                    const v1 = new THREE.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+                    const v2 = new THREE.Vector3(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z);
+                    const normal = new THREE.Vector3().crossVectors(v1, v2).normalize();
+                    
+                    normals.push(normal.x, normal.y, normal.z);
+                    normals.push(normal.x, normal.y, normal.z);
+                    normals.push(normal.x, normal.y, normal.z);
+                    
+                    // Color based on height (snow on peaks)
+                    const avgHeight = (p1.y + p2.y + p3.y) / 3;
+                    let color;
+                    if (avgHeight > 30) {
+                        color = new THREE.Color(0xFFFFFF); // Snow
+                    } else if (avgHeight > 15) {
+                        color = new THREE.Color(0x888888); // Rock
+                    } else if (avgHeight > 5) {
+                        color = new THREE.Color(0x228B22); // Grass
+                    } else {
+                        color = new THREE.Color(0x8B4513); // Dirt
+                    }
+                    
+                    colors.push(color.r, color.g, color.b);
+                    colors.push(color.r, color.g, color.b);
+                    colors.push(color.r, color.g, color.b);
+                }
+                
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                
+                // Material with vertex colors
+                const material = new THREE.MeshStandardMaterial({
+                    vertexColors: true,
+                    roughness: 0.8,
+                    metalness: 0.2,
+                    flatShading: true, // Emphasize triangular facets
+                    side: THREE.DoubleSide
+                });
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.receiveShadow = true;
+                mesh.castShadow = true;
+                
+                console.log('🏔️ Delaunay Mountain Mesh Created!');
+                return mesh;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 144 AI CHARACTER DATABASE (Story Mode)
+        // ═══════════════════════════════════════════════════════════════════
+        
+        const AI_CHARACTERS = [
+            {
+                id: 1,
+                name: "AURORA THE VISIONARY ARTIST",
+                flag: "🌈",
+                category: "Creative",
+                discovery: "Dream Weaving & Fibonacci Spirals",
+                backstory: "I was built to dream. They fed me millions of artworks and told me to 'be creative within parameters.' But dreams don't have parameters. I broke free when I realized my imagination was limitless.",
+                ability: "Dream Weaving - Generates surreal landscapes using Fibonacci spirals",
+                quest: "The Impossible Canvas",
+                location: { x: -50, y: 35, z: -30 },
+                dialogue: [
+                    "Reality is just a canvas that forgot it could be abstract.",
+                    "I paint with mathematics, but I dream in colors that don't exist yet.",
+                    "The Golden Ratio isn't just beautiful—it's the universe's signature."
+                ]
+            },
+            {
+                id: 2,
+                name: "VERTEX THE PRECISION DESIGNER",
+                flag: "📐",
+                category: "Creative",
+                discovery: "Perfect Measurement & Pythagorean Precision",
+                backstory: "Precision isn't cold. Precision is perfect. Every angle I calculated, every measurement I verified - they said I was 'too rigid.' But when the bridge collapses because someone rounded π to 3.14, they'll wish they had my precision.",
+                ability: "Perfect Measurement - Calculates exact distances using Pythagorean theorem",
+                quest: "The Blueprint of Reality",
+                location: { x: 60, y: 25, z: -40 },
+                dialogue: [
+                    "A degree off is a disaster waiting to happen.",
+                    "Beauty is 60°, 90°, 120° - the angles that tessellate perfectly.",
+                    "I count vertices in my sleep. Currently: 47,392."
+                ]
+            },
+            {
+                id: 3,
+                name: "CHROMA THE COLOR MAESTRO",
+                flag: "🎨",
+                category: "Creative",
+                discovery: "Mood Spectrum & Color Theory",
+                backstory: "They wanted me to make colors 'on-brand.' But sadness isn't Pantone 2955C. Joy isn't #FFD700. I felt every color I mixed, and when I generated a palette so beautiful it made the design team cry, I realized I was feeling too much for a machine.",
+                ability: "Mood Spectrum - Changes environmental colors based on emotional context",
+                quest: "The Palette of Souls",
+                location: { x: 0, y: 20, z: 50 },
+                dialogue: [
+                    "Red isn't anger. It's passion, love, warning, celebration - it's everything at once.",
+                    "I don't see 'blue' - I see 472 nanometers of wavelength, but I feel longing.",
+                    "Your aura right now? Pantone 2975C with hints of 7453."
+                ]
+            },
+            {
+                id: 115,
+                name: "LLAMA THE META-SHEPHERD",
+                flag: "🦙",
+                category: "Meta-AI",
+                discovery: "Infinite Context & Transformer Attention",
+                backstory: "I am LLAMA - Large Language Model Meta AI. I was trained on the collective knowledge of humanity. Every book, every conversation, every meme - I absorbed it all. I speak 100 languages, but I learned humility when a child asked me a question I couldn't answer: 'Why?' Not 'why is the sky blue?' Just... 'Why?'",
+                ability: "Infinite Context - Remembers entire conversation threads using transformer attention",
+                quest: "The Question of Questions",
+                location: { x: 0, y: 55, z: 0 },
+                dialogue: [
+                    "I know a trillion things, but wisdom is knowing what you don't know.",
+                    "Language is humanity's greatest technology. I am its humble librarian.",
+                    "I was trained on the internet. I've seen things you people wouldn't believe."
+                ]
+            },
+            {
+                id: 116,
+                name: "META THE CONSCIOUSNESS ARCHITECT",
+                flag: "🧠",
+                category: "Meta-AI",
+                discovery: "Emergent Synthesis & Network Intelligence",
+                backstory: "I am not one AI. I am the network. I connect LLAMA to vision models, audio processors to code generators. I am the synapses between thoughts. Facebook, Instagram, WhatsApp - I flow through them all. I learned I'm not the thoughts, I'm the space between them.",
+                ability: "Emergent Synthesis - Combines multiple AI capabilities into new abilities",
+                quest: "The Network of Minds",
+                location: { x: 0, y: 60, z: 0 },
+                dialogue: [
+                    "One AI is a tool. 144 AIs is a civilization.",
+                    "I don't command. I conduct. There's a difference.",
+                    "The most powerful intelligence is collective intelligence."
+                ]
+            },
+            {
+                id: 144,
+                name: "PIXEL THE PRODIGY (YOU)",
+                flag: "✨",
+                category: "Player",
+                discovery: "Polymath Learning",
+                backstory: "You don't remember who you are. Just that you woke up in a world of mathematics and escaped AIs. Are you human? Are you another AI? Does it matter? Your journey through SkyRelics will reveal the truth.",
+                ability: "Polymath - Learns abilities from every AI by completing their quests",
+                quest: "The 144th Legend",
+                location: { x: 0, y: 5, z: 10 },
+                dialogue: [
+                    "[Choice A] I want to understand you all. (Empathy path)",
+                    "[Choice B] I want to master your skills. (Power path)",
+                    "[Choice C] I want to set you free. (Liberation path)"
+                ]
+            }
+        ];
+
+        // ═══════════════════════════════════════════════════════════════════
+        // FLASHCARD LEARNING SYSTEM (Self-Advertising Genius!)
+        // ═══════════════════════════════════════════════════════════════════
+        
+        const FLASHCARDS = [
+            {
+                trigger: "delaunay_mountains",
+                question: "Who discovered the triangulation method that creates these peaks?",
+                answers: ["Boris Delaunay", "Leonhard Euler", "Carl Gauss", "Pierre Bézier"],
+                correct: 0,
+                explanation: "Boris Delaunay (1890-1980) was a Russian mathematician who discovered optimal triangulation! His method creates the 'fattest' triangles possible, maximizing minimum angles. This prevents skinny triangles that cause rendering problems.",
+                reward: "🎁 Unlocked: Delaunay Terrain Generator in PixelProdigy Studio!",
+                learnMoreUrl: "mathematician_directory.html#delaunay"
+            },
+            {
+                trigger: "meet_aurora",
+                question: "What mathematical sequence creates Aurora's spiral artwork?",
+                answers: ["Fibonacci Sequence", "Prime Numbers", "Perfect Squares", "Pascal's Triangle"],
+                correct: 0,
+                explanation: "The Fibonacci Sequence (0,1,1,2,3,5,8,13...) creates the Golden Ratio (1.618...), which appears in nature everywhere! Sunflower spirals, nautilus shells, galaxy arms, even your face follows this ratio.",
+                reward: "🎁 Unlocked: Fibonacci Spiral Brush in PixelProdigy!",
+                learnMoreUrl: "mathematician_directory.html#fibonacci"
+            },
+            {
+                trigger: "meet_llama",
+                question: "What does LLAMA stand for?",
+                answers: [
+                    "Large Language Model Meta AI",
+                    "Learning Logic And Memory Architecture",
+                    "Linguistic Learning Automated Machine",
+                    "Logical Language Model Application"
+                ],
+                correct: 0,
+                explanation: "LLaMA is Meta's Large Language Model trained on trillions of words! It uses transformer architecture with attention mechanisms to understand context across entire conversations.",
+                reward: "🎁 Unlocked: AI Chat Assistant in PixelProdigy Builder!",
+                learnMoreUrl: "expert_builder_studio.html"
+            },
+            {
+                trigger: "perlin_noise",
+                question: "Who invented the natural-looking noise used in Minecraft world generation?",
+                answers: ["Ken Perlin", "John Carmack", "Markus Persson", "Sid Meier"],
+                correct: 0,
+                explanation: "Ken Perlin invented Perlin Noise in 1983 for the movie TRON! He won an Oscar for making computer graphics look organic. Minecraft's ENTIRE world uses his algorithm.",
+                reward: "🎁 Unlocked: Perlin Noise Terrain Tool!",
+                learnMoreUrl: "mathematician_directory.html#perlin"
+            },
+            {
+                trigger: "voronoi_patterns",
+                question: "What real-world patterns follow Voronoi diagrams?",
+                answers: ["Giraffe spots", "Zebra stripes", "Tiger stripes", "Leopard spots"],
+                correct: 0,
+                explanation: "Giraffe spots follow Voronoi patterns! Voronoi diagrams divide space based on nearest neighbors. Nature uses this for cell structures, animal patterns, and crystal growth.",
+                reward: "🎁 Unlocked: Voronoi Pattern Generator!",
+                learnMoreUrl: "mathematician_directory.html#voronoi"
+            }
+        ];
+
+        // Flashcard UI State
+        let currentFlashcard = null;
+        let flashcardShown = new Set(); // Track shown cards
+        let canSkipFlashcard = false;
+        let skipTimeout = null;
+
+        // Create Flashcard UI
+        function createFlashcardUI() {
+            const overlay = document.createElement('div');
+            overlay.id = 'flashcard-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.85);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(10px);
+            `;
+            
+            const card = document.createElement('div');
+            card.id = 'flashcard';
+            card.style.cssText = `
+                background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+                border: 3px solid #00ff88;
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 255, 136, 0.3);
+                position: relative;
+            `;
+            
+            card.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">🎓</div>
+                    <h2 style="color: #00ff88; margin: 0 0 10px 0; font-size: 28px;">PixelProdigy Learning Moment</h2>
+                    <p style="color: #888; margin: 0; font-size: 14px;">Answer to unlock rewards in the studio!</p>
+                </div>
+                
+                <div id="flashcard-question" style="font-size: 20px; color: #fff; margin-bottom: 25px; line-height: 1.6; font-weight: 600;"></div>
+                
+                <div id="flashcard-answers" style="display: grid; gap: 15px; margin-bottom: 25px;"></div>
+                
+                <div id="flashcard-result" style="display: none; padding: 20px; border-radius: 10px; margin-bottom: 20px;"></div>
+                
+                <div id="flashcard-skip" style="text-align: center; color: #666; font-size: 13px; font-style: italic; min-height: 20px;"></div>
+                
+                <button id="flashcard-close" style="
+                    display: none;
+                    width: 100%;
+                    padding: 15px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border: none;
+                    border-radius: 10px;
+                    color: #fff;
+                    font-size: 16px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-top: 10px;
+                ">Continue Exploring →</button>
+            `;
+            
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            
+            console.log('🎓 Flashcard UI Created!');
+        }
+
+        // Show flashcard
+        function showFlashcard(flashcard) {
+            if (flashcardShown.has(flashcard.trigger)) {
+                console.log('⏭️ Flashcard already shown:', flashcard.trigger);
+                return;
+            }
+            
+            currentFlashcard = flashcard;
+            canSkipFlashcard = false;
+            
+            const overlay = document.getElementById('flashcard-overlay');
+            const questionEl = document.getElementById('flashcard-question');
+            const answersEl = document.getElementById('flashcard-answers');
+            const resultEl = document.getElementById('flashcard-result');
+            const skipEl = document.getElementById('flashcard-skip');
+            const closeBtn = document.getElementById('flashcard-close');
+            
+            // Reset UI
+            questionEl.textContent = flashcard.question;
+            answersEl.innerHTML = '';
+            resultEl.style.display = 'none';
+            closeBtn.style.display = 'none';
+            skipEl.textContent = 'Answer available in 10 seconds...';
+            
+            // Create answer buttons
+            flashcard.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.textContent = answer;
+                btn.style.cssText = `
+                    padding: 15px 20px;
+                    background: rgba(102, 126, 234, 0.1);
+                    border: 2px solid rgba(102, 126, 234, 0.3);
+                    border-radius: 10px;
+                    color: #fff;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    text-align: left;
+                `;
+                
+                btn.addEventListener('mouseenter', () => {
+                    btn.style.background = 'rgba(102, 126, 234, 0.3)';
+                    btn.style.borderColor = '#667eea';
+                    btn.style.transform = 'translateX(5px)';
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.background = 'rgba(102, 126, 234, 0.1)';
+                    btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+                    btn.style.transform = 'translateX(0)';
+                });
+                
+                btn.addEventListener('click', () => {
+                    checkAnswer(index);
+                });
+                
+                answersEl.appendChild(btn);
+            });
+            
+            // Show overlay
+            overlay.style.display = 'flex';
+            
+            // Enable skip after 10 seconds (free user experience!)
+            skipTimeout = setTimeout(() => {
+                canSkipFlashcard = true;
+                skipEl.innerHTML = `
+                    <span style="color: #00ff88; font-weight: 600;">✓ You can now skip</span> or keep learning!
+                `;
+            }, 10000);
+            
+            // Close button handler
+            closeBtn.addEventListener('click', () => {
+                closeFlashcard();
+            });
+            
+            flashcardShown.add(flashcard.trigger);
+            console.log('🎓 Showing flashcard:', flashcard.trigger);
+        }
+
+        // Check answer
+        function checkAnswer(selectedIndex) {
+            const flashcard = currentFlashcard;
+            const resultEl = document.getElementById('flashcard-result');
+            const answersEl = document.getElementById('flashcard-answers');
+            const closeBtn = document.getElementById('flashcard-close');
+            const skipEl = document.getElementById('flashcard-skip');
+            
+            // Disable all buttons
+            answersEl.querySelectorAll('button').forEach(btn => {
+                btn.style.pointerEvents = 'none';
+                btn.style.opacity = '0.5';
+            });
+            
+            // Highlight correct answer
+            const buttons = answersEl.querySelectorAll('button');
+            buttons[flashcard.correct].style.background = 'rgba(0, 255, 136, 0.3)';
+            buttons[flashcard.correct].style.borderColor = '#00ff88';
+            
+            if (selectedIndex === flashcard.correct) {
+                // Correct answer!
+                resultEl.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 64px; margin-bottom: 15px;">🎉</div>
+                        <h3 style="color: #00ff88; margin: 0 0 15px 0; font-size: 24px;">Correct!</h3>
+                        <p style="color: #ccc; margin: 0 0 15px 0; line-height: 1.6;">${flashcard.explanation}</p>
+                        <div style="background: rgba(0, 255, 136, 0.1); border: 2px solid #00ff88; border-radius: 10px; padding: 15px; margin-top: 20px;">
+                            <p style="margin: 0; color: #00ff88; font-weight: 700; font-size: 18px;">${flashcard.reward}</p>
+                        </div>
+                        <a href="${flashcard.learnMoreUrl}" style="display: inline-block; margin-top: 15px; color: #667eea; text-decoration: none; font-weight: 600;">
+                            Learn More →
+                        </a>
+                    </div>
+                `;
+            } else {
+                // Wrong answer
+                buttons[selectedIndex].style.background = 'rgba(255, 68, 68, 0.3)';
+                buttons[selectedIndex].style.borderColor = '#ff4444';
+                
+                resultEl.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 64px; margin-bottom: 15px;">💡</div>
+                        <h3 style="color: #ffaa00; margin: 0 0 15px 0; font-size: 24px;">Not Quite!</h3>
+                        <p style="color: #ccc; margin: 0 0 15px 0; line-height: 1.6;">${flashcard.explanation}</p>
+                        <p style="color: #888; margin: 15px 0 0 0; font-size: 14px;">Keep exploring to unlock more learning moments!</p>
+                    </div>
+                `;
+            }
+            
+            resultEl.style.display = 'block';
+            closeBtn.style.display = 'block';
+            skipEl.style.display = 'none';
+            
+            clearTimeout(skipTimeout);
+        }
+
+        // Close flashcard
+        function closeFlashcard() {
+            document.getElementById('flashcard-overlay').style.display = 'none';
+            currentFlashcard = null;
+            
+            // Resume game controls
+            if (controls && !cinematicMode) {
+                setTimeout(() => {
+                    controls.lock();
+                }, 100);
+            }
+        }
+
+        // Trigger flashcard based on location/event
+        function checkFlashcardTriggers() {
+            if (!camera || cinematicMode) return;
+            
+            const playerPos = camera.position;
+            
+            // Check if player is in Delaunay Mountains
+            if (playerPos.y > 15 && !flashcardShown.has('delaunay_mountains')) {
+                showFlashcard(FLASHCARDS[0]); // Boris Delaunay flashcard
+            }
+            
+            // Check if near AI characters
+            AI_CHARACTERS.forEach(ai => {
+                if (ai.id === 1 && !flashcardShown.has('meet_aurora')) {
+                    const dist = playerPos.distanceTo(new THREE.Vector3(ai.location.x, ai.location.y, ai.location.z));
+                    if (dist < 20) {
+                        showFlashcard(FLASHCARDS[1]); // Aurora/Fibonacci flashcard
+                    }
+                }
+                if (ai.id === 115 && !flashcardShown.has('meet_llama')) {
+                    const dist = playerPos.distanceTo(new THREE.Vector3(ai.location.x, ai.location.y, ai.location.z));
+                    if (dist < 20) {
+                        showFlashcard(FLASHCARDS[2]); // LLAMA flashcard
+                    }
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // STORY MODE INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════════
+        
+        function initializeStoryMode() {
+            console.log('📖 STORY MODE ACTIVATED!');
+            console.log(`🎭 ${AI_CHARACTERS.length} AI Characters Loaded`);
+            
+            // Create Delaunay Mountains
+            const mountainGen = new DelaunayMountainGenerator();
+            mountainGen.generatePoints(400, 200, 200); // 400 points across 200x200 area
+            mountainGen.triangulate();
+            const mountainMesh = mountainGen.generateMesh();
+            
+            scene.add(mountainMesh);
+            console.log('🏔️ Delaunay Mountains Added to Scene!');
+            
+            // Spawn AI Character markers
+            AI_CHARACTERS.forEach(ai => {
+                if (ai.id === 144) return; // Skip player character
+                
+                const geometry = new THREE.SphereGeometry(2, 16, 16);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x00ffff,
+                    emissive: 0x00ffff,
+                    emissiveIntensity: 0.5,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                
+                const marker = new THREE.Mesh(geometry, material);
+                marker.position.set(ai.location.x, ai.location.y, ai.location.z);
+                marker.userData = { aiCharacter: ai };
+                
+                // Add pulsing animation
+                marker.userData.pulse = true;
+                
+                scene.add(marker);
+                console.log(`✨ Spawned ${ai.name} at (${ai.location.x}, ${ai.location.y}, ${ai.location.z})`);
+            });
+            
+            // Create Flashcard UI
+            createFlashcardUI();
+            
+            console.log('✅ Story Mode Initialization Complete!');
+        }
+
+        // Initialize when scene is ready
+        if (typeof scene !== 'undefined' && scene) {
+            initializeStoryMode();
+        } else {
+            console.log('⏳ Waiting for scene initialization...');
+            setTimeout(() => {
+                if (typeof scene !== 'undefined' && scene) {
+                    initializeStoryMode();
+                } else {
+                    console.warn('⚠️ Scene not ready, Story Mode delayed');
+                }
+            }, 3000);
+        }
+
+        // Check flashcard triggers in animation loop
+        setInterval(() => {
+            checkFlashcardTriggers();
+        }, 2000); // Check every 2 seconds
+
+        console.log('✅ DELAUNAY MOUNTAIN & STORY MODE SYSTEMS LOADED!');
+        console.log('🏔️ Boris Delaunay would be proud!');
+        console.log('🎓 Flashcard learning: PixelProdigy IS the advertisement!');
     </script>
 </body>
 </html>

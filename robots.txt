@@ -1,0 +1,30 @@
+# PixelProdigy AI - robots.txt
+# Creator: Eugene Ousos
+# Last Updated: October 22, 2025
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://pixel-prodigy.com/sitemap.xml
+
+# Priority Pages (High Crawl Frequency)
+Allow: /skyrelics_world.html
+Allow: /expert_builder_studio.html
+Allow: /recovery_virtual_hub.html
+Allow: /mathematician_directory.html
+Allow: /expert_onboarding_portal.html
+
+# Block temp/build files
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /*.json$
+Disallow: /*.md$
+
+# Crawl-delay (be gentle)
+Crawl-delay: 1
+
+# Contact
+# Creator: Eugene Ousos
+# GitHub: https://github.com/eugeNEOusxr
+# Site: https://pixel-prodigy.com
