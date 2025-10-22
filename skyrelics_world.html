@@ -1469,15 +1469,18 @@
             renderer = new THREE.WebGLRenderer({ 
                 canvas: canvas, 
                 antialias: true,
-                powerPreference: 'high-performance'
+                powerPreference: 'high-performance',
+                alpha: false,
+                stencil: false,
+                depth: true
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Reduced for performance
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Better quality on high-DPI displays
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.BasicShadowMap; // Faster than PCFSoft
-            renderer.shadowMap.autoUpdate = false; // Manual shadow updates for performance
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap; // UPGRADED: Softer, more realistic shadows
+            renderer.shadowMap.autoUpdate = true; // Enable for better scene quality
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.35;
+            renderer.toneMappingExposure = 1.5; // BRIGHTER: Enhanced exposure for vibrant colors
             renderer.outputEncoding = THREE.sRGBEncoding;
             if (renderer.outputColorSpace !== undefined) {
                 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -4963,6 +4966,310 @@ The elbows, bearings & transmissions of the code 🔧
             worldObjects.add(sprite);
         }
         
+        // ═══════════════════════════════════════════════════════════════════════
+        // NPC AI SYSTEM WITH PROXIMITY REACTIONS
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        const NPC_REACTIONS = {
+            NOTICE_DISTANCE: 15,      // NPCs notice player at this distance
+            GREET_DISTANCE: 8,        // NPCs greet/wave at this distance
+            PERSONAL_SPACE: 3,        // NPCs back away if player gets this close
+            RUN_DISTANCE: 1.5,        // NPCs run if player is THIS close
+            INTERACTION_COOLDOWN: 5000 // 5 seconds between reactions
+        };
+        
+        function updateNPCAI(delta) {
+            if (!camera || cinematicMode) return;
+            
+            const playerPos = camera.position;
+            
+            // Update all NPCs in worldObjects
+            worldObjects.children.forEach(obj => {
+                // Check if this is an NPC
+                if (obj.userData.walkPath || obj.userData.talking) {
+                    updateNPCBehavior(obj, playerPos, delta);
+                }
+            });
+            
+            // Update VSL characters with proximity AI
+            if (vslCharacterGenerator && vslCharacterGenerator.characters) {
+                vslCharacterGenerator.characters.forEach(char => {
+                    if (char.root && char.name !== 'Player_VSL') {
+                        updateVSLCharacterAI(char, playerPos, delta);
+                    }
+                });
+            }
+        }
+        
+        function updateNPCBehavior(npc, playerPos, delta) {
+            if (!npc.position) return;
+            
+            const distanceToPlayer = npc.position.distanceTo(playerPos);
+            
+            // Initialize NPC state if needed
+            if (!npc.userData.aiState) {
+                npc.userData.aiState = {
+                    state: 'idle',
+                    lastReaction: 0,
+                    originalPosition: npc.position.clone(),
+                    lookAtPlayer: false,
+                    emotion: 'neutral'
+                };
+            }
+            
+            const aiState = npc.userData.aiState;
+            const now = Date.now();
+            
+            // PROXIMITY REACTIONS
+            if (distanceToPlayer < NPC_REACTIONS.RUN_DISTANCE) {
+                // TOO CLOSE! Run away!
+                if (aiState.state !== 'running') {
+                    aiState.state = 'running';
+                    aiState.emotion = 'scared';
+                    console.log('😱 NPC running away - too close!');
+                }
+                
+                // Run away from player
+                const awayDir = new THREE.Vector3()
+                    .subVectors(npc.position, playerPos)
+                    .normalize();
+                npc.position.add(awayDir.multiplyScalar(delta * 5)); // Fast run
+                npc.lookAt(playerPos); // Look at threat while running
+                
+            } else if (distanceToPlayer < NPC_REACTIONS.PERSONAL_SPACE) {
+                // Personal space violated - back away slowly
+                if (aiState.state !== 'backing_away' && now - aiState.lastReaction > NPC_REACTIONS.INTERACTION_COOLDOWN) {
+                    aiState.state = 'backing_away';
+                    aiState.emotion = 'uncomfortable';
+                    aiState.lastReaction = now;
+                    console.log('😬 NPC backing away - personal space');
+                }
+                
+                const awayDir = new THREE.Vector3()
+                    .subVectors(npc.position, playerPos)
+                    .normalize();
+                npc.position.add(awayDir.multiplyScalar(delta * 1.5)); // Slow back away
+                npc.lookAt(playerPos);
+                
+            } else if (distanceToPlayer < NPC_REACTIONS.GREET_DISTANCE) {
+                // Greeting distance - wave and look at player
+                if (aiState.state !== 'greeting' && now - aiState.lastReaction > NPC_REACTIONS.INTERACTION_COOLDOWN) {
+                    aiState.state = 'greeting';
+                    aiState.emotion = 'friendly';
+                    aiState.lastReaction = now;
+                    playNPCGreeting(npc, distanceToPlayer);
+                }
+                
+                // Look at player
+                npc.lookAt(new THREE.Vector3(playerPos.x, npc.position.y, playerPos.z));
+                aiState.lookAtPlayer = true;
+                
+            } else if (distanceToPlayer < NPC_REACTIONS.NOTICE_DISTANCE) {
+                // Awareness distance - glance at player occasionally
+                if (aiState.state === 'idle' && Math.random() < 0.01) { // 1% chance per frame
+                    aiState.state = 'noticed';
+                    aiState.emotion = 'curious';
+                    aiState.lookAtPlayer = true;
+                }
+                
+                if (aiState.lookAtPlayer) {
+                    npc.lookAt(new THREE.Vector3(playerPos.x, npc.position.y, playerPos.z));
+                }
+                
+            } else {
+                // Far away - normal behavior
+                if (aiState.state !== 'idle' && aiState.state !== 'walking') {
+                    aiState.state = 'idle';
+                    aiState.emotion = 'neutral';
+                    aiState.lookAtPlayer = false;
+                }
+                
+                // Normal walking behavior
+                if (npc.userData.walkPath && aiState.state === 'idle') {
+                    updateNPCWalking(npc, delta);
+                }
+            }
+            
+            // Color-code NPCs by emotion (for visibility)
+            if (npc.userData.bodyParts && npc.userData.bodyParts.body) {
+                const body = npc.userData.bodyParts.body;
+                if (body.material) {
+                    switch (aiState.emotion) {
+                        case 'scared':
+                            body.material.color.setHex(0xff4444); // Red
+                            break;
+                        case 'uncomfortable':
+                            body.material.color.setHex(0xffaa44); // Orange
+                            break;
+                        case 'friendly':
+                            body.material.color.setHex(0x44ff44); // Green
+                            break;
+                        case 'curious':
+                            body.material.color.setHex(0x44aaff); // Blue
+                            break;
+                        default:
+                            body.material.color.setHex(0xffc0c0); // Default skin tone
+                    }
+                }
+            }
+        }
+        
+        function updateNPCWalking(npc, delta) {
+            const walkData = npc.userData.walkPath;
+            
+            // Random turning
+            if (Math.random() < walkData.turnChance) {
+                npc.rotation.y += (Math.random() - 0.5) * 0.5;
+            }
+            
+            // Move forward
+            const forward = new THREE.Vector3(0, 0, -1);
+            forward.applyQuaternion(npc.quaternion);
+            npc.position.add(forward.multiplyScalar(walkData.speed));
+            
+            // Random pausing
+            if (Math.random() < walkData.pauseChance) {
+                walkData.speed = 0;
+                setTimeout(() => {
+                    walkData.speed = 0.05 + Math.random() * 0.03;
+                }, walkData.pauseDuration * 1000);
+            }
+        }
+        
+        function updateVSLCharacterAI(char, playerPos, delta) {
+            if (!char.root) return;
+            
+            const distanceToPlayer = char.root.position.distanceTo(playerPos);
+            
+            // Initialize AI state
+            if (!char.aiState) {
+                char.aiState = {
+                    state: 'idle',
+                    lastReaction: 0,
+                    patrolPoints: [
+                        char.root.position.clone(),
+                        char.root.position.clone().add(new THREE.Vector3(10, 0, 0)),
+                        char.root.position.clone().add(new THREE.Vector3(10, 0, 10)),
+                        char.root.position.clone().add(new THREE.Vector3(0, 0, 10))
+                    ],
+                    currentPatrolIndex: 0,
+                    moveSpeed: 0.5
+                };
+            }
+            
+            const aiState = char.aiState;
+            const now = Date.now();
+            
+            // PROXIMITY REACTIONS
+            if (distanceToPlayer < NPC_REACTIONS.RUN_DISTANCE) {
+                // Run away!
+                const awayDir = new THREE.Vector3()
+                    .subVectors(char.root.position, playerPos)
+                    .normalize();
+                char.root.position.add(awayDir.multiplyScalar(delta * 3));
+                
+                // Apply running animation
+                if (vslCharacterGenerator) {
+                    vslCharacterGenerator.executeVSL(char.name, 'left_leg.kick.fast');
+                    vslCharacterGenerator.executeVSL(char.name, 'right_leg.kick.fast');
+                }
+                
+            } else if (distanceToPlayer < NPC_REACTIONS.GREET_DISTANCE) {
+                // Wave at player
+                if (now - aiState.lastReaction > NPC_REACTIONS.INTERACTION_COOLDOWN) {
+                    aiState.lastReaction = now;
+                    
+                    if (vslCharacterGenerator) {
+                        vslCharacterGenerator.executeVSL(char.name, 'right_arm.wave');
+                        vslCharacterGenerator.executeVSL(char.name, 'head.nod');
+                    }
+                    
+                    console.log(`👋 ${char.name} waves at player!`);
+                }
+                
+                // Look at player
+                char.root.lookAt(new THREE.Vector3(playerPos.x, char.root.position.y, playerPos.z));
+                
+            } else if (distanceToPlayer > 30) {
+                // Far away - patrol behavior
+                const targetPoint = aiState.patrolPoints[aiState.currentPatrolIndex];
+                const distToTarget = char.root.position.distanceTo(targetPoint);
+                
+                if (distToTarget < 2) {
+                    // Reached patrol point, move to next
+                    aiState.currentPatrolIndex = (aiState.currentPatrolIndex + 1) % aiState.patrolPoints.length;
+                } else {
+                    // Move toward patrol point
+                    const dir = new THREE.Vector3()
+                        .subVectors(targetPoint, char.root.position)
+                        .normalize();
+                    char.root.position.add(dir.multiplyScalar(delta * aiState.moveSpeed));
+                    char.root.lookAt(targetPoint);
+                    
+                    // Apply walking animation
+                    if (vslCharacterGenerator && Math.random() < 0.1) {
+                        vslCharacterGenerator.executeVSL(char.name, 'left_leg.step');
+                        vslCharacterGenerator.executeVSL(char.name, 'right_arm.swing.gentle');
+                    }
+                }
+            }
+        }
+        
+        function playNPCGreeting(npc, distance) {
+            const greetings = [
+                `👋 Hey there!`,
+                `😊 Hello!`,
+                `🙂 Hi neighbor!`,
+                `👍 What's up?`,
+                `😄 Nice day!`
+            ];
+            
+            const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+            console.log(`${greeting} (${distance.toFixed(1)}m away)`);
+            
+            // Create floating text (optional - can be visible in-world)
+            createFloatingText(npc.position, greeting);
+        }
+        
+        function createFloatingText(position, text) {
+            // Create canvas for text
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 256;
+            canvas.height = 64;
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = '24px Arial';
+            ctx.fillStyle = '#00FFFF';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2 + 8);
+            
+            // Create sprite
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            
+            sprite.position.set(position.x, position.y + 3, position.z);
+            sprite.scale.set(4, 1, 1);
+            
+            scene.add(sprite);
+            
+            // Fade out and remove
+            let opacity = 1;
+            const fadeInterval = setInterval(() => {
+                opacity -= 0.05;
+                sprite.material.opacity = opacity;
+                sprite.position.y += 0.02;
+                
+                if (opacity <= 0) {
+                    scene.remove(sprite);
+                    clearInterval(fadeInterval);
+                }
+            }, 50);
+        }
+        
         function checkPortalProximity() {
             if (!camera) return;
             
@@ -5169,6 +5476,9 @@ The elbows, bearings & transmissions of the code 🔧
             
             // Check portal proximity
             checkPortalProximity();
+            
+            // Update NPC AI and proximity reactions
+            updateNPCAI(delta);
             
             // Create frustum for culling
             const frustum = new THREE.Frustum();
@@ -5738,6 +6048,264 @@ The elbows, bearings & transmissions of the code 🔧
         // ═══════════════════════════════════════════════════════════════════════
         // LOG CABINS IN WILDERNESS
         // ═══════════════════════════════════════════════════════════════════════
+        
+        function createLogCabin(type) {
+            const cabin = new THREE.Group();
+            cabin.name = `LogCabin_${type}`;
+            cabin.userData.isBuilding = true;
+            cabin.userData.hasInterior = true;
+            
+            const width = type === 'family' ? 14 : 10;
+            const depth = type === 'family' ? 12 : 8;
+            const wallHeight = 5;
+            
+            // ═══ LOG WALLS ═══ (BROWN, not purple!)
+            const logMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B4513, // Saddle brown - realistic wood color
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            
+            // Stacked log wall appearance
+            for (let i = 0; i < wallHeight; i += 0.5) {
+                const logGeom = new THREE.BoxGeometry(width, 0.4, 0.3);
+                
+                // Front and back walls
+                const frontLog = new THREE.Mesh(logGeom, logMaterial);
+                frontLog.position.set(0, i, depth/2);
+                frontLog.castShadow = true;
+                cabin.add(frontLog);
+                
+                const backLog = new THREE.Mesh(logGeom, logMaterial);
+                backLog.position.set(0, i, -depth/2);
+                backLog.castShadow = true;
+                cabin.add(backLog);
+                
+                // Side walls
+                const sideGeom = new THREE.BoxGeometry(0.3, 0.4, depth);
+                const leftLog = new THREE.Mesh(sideGeom, logMaterial);
+                leftLog.position.set(-width/2, i, 0);
+                leftLog.castShadow = true;
+                cabin.add(leftLog);
+                
+                const rightLog = new THREE.Mesh(sideGeom, logMaterial);
+                rightLog.position.set(width/2, i, 0);
+                rightLog.castShadow = true;
+                cabin.add(rightLog);
+            }
+            
+            // ═══ ROOF ═══
+            const roofMaterial = new THREE.MeshStandardMaterial({
+                color: 0x654321, // Dark brown roof
+                roughness: 0.8
+            });
+            
+            const roofGeom = new THREE.ConeGeometry(width * 0.8, 2.5, 4);
+            const roof = new THREE.Mesh(roofGeom, roofMaterial);
+            roof.position.y = wallHeight + 1.25;
+            roof.rotation.y = Math.PI / 4;
+            roof.castShadow = true;
+            cabin.add(roof);
+            
+            // ═══ DOOR ═══
+            const doorMaterial = new THREE.MeshStandardMaterial({
+                color: 0x654321,
+                roughness: 0.7
+            });
+            
+            const doorGeom = new THREE.BoxGeometry(1.5, 2.5, 0.1);
+            const door = new THREE.Mesh(doorGeom, doorMaterial);
+            door.position.set(0, 1.25, depth/2 + 0.15);
+            cabin.add(door);
+            
+            // ═══ WINDOWS ═══
+            const windowMaterial = new THREE.MeshStandardMaterial({
+                color: 0xFFE4B5,
+                emissive: 0xFFAA44,
+                emissiveIntensity: 0.3,
+                transparent: true,
+                opacity: 0.7
+            });
+            
+            const windowGeom = new THREE.PlaneGeometry(1, 1);
+            const window1 = new THREE.Mesh(windowGeom, windowMaterial);
+            window1.position.set(-2, 2.5, depth/2 + 0.2);
+            cabin.add(window1);
+            
+            const window2 = new THREE.Mesh(windowGeom, windowMaterial);
+            window2.position.set(2, 2.5, depth/2 + 0.2);
+            cabin.add(window2);
+            
+            // ═══ LOG PILE OUTSIDE ═══
+            const logPile = new THREE.Group();
+            for (let i = 0; i < 6; i++) {
+                const log = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.15, 0.15, 1.5, 8),
+                    logMaterial // BROWN wood material, same as walls
+                );
+                log.rotation.z = Math.PI / 2;
+                log.position.set(
+                    -width/2 - 1,
+                    0.2 + (i * 0.3),
+                    depth/2 - 1 + (Math.random() * 0.3)
+                );
+                logPile.add(log);
+            }
+            cabin.add(logPile);
+            
+            // ═══ INTERIOR FURNITURE ═══
+            const interior = createCabinInterior(type, width, depth);
+            cabin.add(interior);
+            
+            // Warm interior lighting
+            const interiorLight = new THREE.PointLight(0xFFAA44, 3, 15);
+            interiorLight.position.set(0, wallHeight * 0.6, 0);
+            cabin.add(interiorLight);
+            
+            return cabin;
+        }
+        
+        function createCabinInterior(type, width, depth) {
+            const interior = new THREE.Group();
+            interior.name = 'CabinInterior';
+            
+            // ═══ FLOOR ═══
+            const floorMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B7355,
+                roughness: 0.8
+            });
+            const floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(width - 1, depth - 1),
+                floorMaterial
+            );
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = 0.05;
+            floor.receiveShadow = true;
+            interior.add(floor);
+            
+            // ═══ SOFA ═══
+            const sofaMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B4726, // Leather brown
+                roughness: 0.6
+            });
+            
+            const sofaBase = new THREE.Mesh(
+                new THREE.BoxGeometry(3, 0.8, 1.2),
+                sofaMaterial
+            );
+            sofaBase.position.set(-width/2 + 2, 0.4, -depth/2 + 2);
+            sofaBase.castShadow = true;
+            interior.add(sofaBase);
+            
+            const sofaBack = new THREE.Mesh(
+                new THREE.BoxGeometry(3, 1.5, 0.3),
+                sofaMaterial
+            );
+            sofaBack.position.set(-width/2 + 2, 1.15, -depth/2 + 1.45);
+            sofaBack.castShadow = true;
+            interior.add(sofaBack);
+            
+            // ═══ TV with IFRAME (SkyRelics News) ═══
+            const tvStand = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 0.6, 0.8),
+                new THREE.MeshStandardMaterial({ color: 0x2F2F2F })
+            );
+            tvStand.position.set(-width/2 + 2, 0.3, depth/2 - 2);
+            tvStand.castShadow = true;
+            interior.add(tvStand);
+            
+            // TV Screen (will use CSS3DRenderer in future for real iframe)
+            const tvScreen = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.8, 1),
+                new THREE.MeshBasicMaterial({
+                    color: 0x001133,
+                    emissive: 0x0088FF,
+                    emissiveIntensity: 0.5
+                })
+            );
+            tvScreen.position.set(-width/2 + 2, 1.2, depth/2 - 1.6);
+            interior.add(tvScreen);
+            
+            // TV glow effect
+            const tvLight = new THREE.PointLight(0x0088FF, 1, 5);
+            tvLight.position.copy(tvScreen.position);
+            interior.add(tvLight);
+            
+            // ═══ WOODEN TABLE ═══
+            const tableMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B4513,
+                roughness: 0.7
+            });
+            
+            const tableTop = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 0.1, 1.5),
+                tableMaterial
+            );
+            tableTop.position.set(width/2 - 3, 1.5, 0);
+            tableTop.castShadow = true;
+            interior.add(tableTop);
+            
+            // Table legs
+            for (let x of [-0.8, 0.8]) {
+                for (let z of [-0.6, 0.6]) {
+                    const leg = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.05, 0.05, 1.5, 8),
+                        tableMaterial
+                    );
+                    leg.position.set(width/2 - 3 + x, 0.75, z);
+                    leg.castShadow = true;
+                    interior.add(leg);
+                }
+            }
+            
+            // ═══ CHAIRS ═══
+            const chairMaterial = new THREE.MeshStandardMaterial({
+                color: 0x654321,
+                roughness: 0.8
+            });
+            
+            for (let i = 0; i < 2; i++) {
+                const chair = new THREE.Group();
+                
+                const seat = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.6, 0.1, 0.6),
+                    chairMaterial
+                );
+                seat.position.y = 0.8;
+                seat.castShadow = true;
+                chair.add(seat);
+                
+                const back = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.6, 0.8, 0.1),
+                    chairMaterial
+                );
+                back.position.set(0, 1.2, -0.25);
+                back.castShadow = true;
+                chair.add(back);
+                
+                chair.position.set(
+                    width/2 - 3 + (i === 0 ? -1.2 : 1.2),
+                    0,
+                    i === 0 ? 1 : -1
+                );
+                interior.add(chair);
+            }
+            
+            // ═══ RUG ═══
+            const rugMaterial = new THREE.MeshStandardMaterial({
+                color: 0xA0522D,
+                roughness: 0.95
+            });
+            const rug = new THREE.Mesh(
+                new THREE.CircleGeometry(2, 32),
+                rugMaterial
+            );
+            rug.rotation.x = -Math.PI / 2;
+            rug.position.set(0, 0.06, 0);
+            interior.add(rug);
+            
+            return interior;
+        }
         
         function createWildernessLodges() {
             console.log('🪵 Building wilderness log cabins...');
@@ -10789,10 +11357,11 @@ The elbows, bearings & transmissions of the code 🔧
                 });
             });
             
-            // Draw teleport markers on minimap
-            const originalRender = minimap.render.bind(minimap);
-            minimap.render = function() {
-                originalRender();
+            // Draw teleport markers on minimap (check minimap exists first)
+            if (minimap && typeof minimap.render === 'function') {
+                const originalRender = minimap.render.bind(minimap);
+                minimap.render = function() {
+                    originalRender();
                 
                 const ctx = canvas.getContext('2d');
                 
