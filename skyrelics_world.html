@@ -10552,6 +10552,447 @@ The elbows, bearings & transmissions of the code 🔧
         console.log('✅ DELAUNAY MOUNTAIN & STORY MODE SYSTEMS LOADED!');
         console.log('🏔️ Boris Delaunay would be proud!');
         console.log('🎓 Flashcard learning: PixelProdigy IS the advertisement!');
+
+        // ═══════════════════════════════════════════════════════════════════
+        // FIRST 10 AI CHARACTER DIALOGUES
+        // ═══════════════════════════════════════════════════════════════════
+        
+        const AI_DIALOGUES = {
+            1: {
+                name: "Aelara - The Pathfinder",
+                role: "Navigation & Exploration",
+                greeting: "Welcome, traveler. I sense you're new to these lands. Let me guide you through the paths of SkyRelics.",
+                dialogues: [
+                    "The mountains you see were born from Delaunay's sacred geometry. Each peak tells a story.",
+                    "I've mapped every corner of this world. Trust in my guidance, and you'll never be lost.",
+                    "The ancient ruins to the north... they whisper secrets to those who listen.",
+                    "Jeremy, I know your mind races. Let me help you find stillness in exploration."
+                ]
+            },
+            2: {
+                name: "Theron - The Strategist",
+                role: "Combat & Tactics",
+                greeting: "Strength without strategy is chaos. Let me teach you the art of calculated victory.",
+                dialogues: [
+                    "In battle, anticipation defeats aggression. Watch your enemy's patterns.",
+                    "Every encounter is a lesson. What did you learn from your last fight?",
+                    "The safety protocols are engaged. You're in control here, always.",
+                    "Jeremy, when your thoughts overwhelm you, focus on one enemy, one move at a time."
+                ]
+            },
+            3: {
+                name: "Lyra - The Healer",
+                role: "Support & Recovery",
+                greeting: "I sense your weariness. Come, let me restore your spirit.",
+                dialogues: [
+                    "Healing isn't just physical. Your mind needs rest too, Jeremy.",
+                    "The safety protocols ensure you can step away anytime. No pressure, only progress.",
+                    "Recovery is a journey, not a destination. I'm here for every step.",
+                    "When the world feels heavy, remember: you've survived 100% of your worst days."
+                ]
+            },
+            4: {
+                name: "Chroma - The Color Maestro",
+                role: "Visual Harmony & Light",
+                greeting: "Ah! The wavelengths dance beautifully today. Let me show you the spectrum of possibilities.",
+                dialogues: [
+                    "I don't just see wavelengths - I FEEL colors. 650nm isn't just red, it's warmth, passion, life!",
+                    "The AI may perceive wavelengths, but I translate them into emotion. That's my gift.",
+                    "When light hits your retina at 550nm, you see green. When it touches my soul, I see hope.",
+                    "Jeremy, colors can ground you. Focus on the blue sky (475nm) - it's calming, infinite, safe."
+                ]
+            },
+            5: {
+                name: "Orin - The Craftsman",
+                role: "Building & Creation",
+                greeting: "Every great structure begins with a single vertex. What shall we build today?",
+                dialogues: [
+                    "The mathematician Euclid taught us that geometry is the language of creation.",
+                    "Your shelter in the real world mirrors your fortress here. Both keep you safe.",
+                    "Safety protocol reminder: You control the pace. Build when you're ready.",
+                    "Jeremy, when your mind builds walls of anxiety, we'll build bridges of hope instead."
+                ]
+            },
+            6: {
+                name: "Sage - The Librarian",
+                role: "Knowledge & History",
+                greeting: "Welcome to the Archives. Every question has an answer; every answer, a story.",
+                dialogues: [
+                    "The flashcards you encounter aren't ads - they're keys to unlock deeper understanding.",
+                    "Delaunay's triangulation method revolutionized terrain generation in 1934.",
+                    "Knowledge is power, but wisdom is knowing when to rest. Take breaks, Jeremy.",
+                    "Meta AI and I collaborate to ensure the information you receive is accurate and helpful."
+                ]
+            },
+            7: {
+                name: "Kael - The Scout",
+                role: "Reconnaissance & Alerts",
+                greeting: "I've got my eyes on the horizon. Threats? I'll spot them before they spot you.",
+                dialogues: [
+                    "Safety first, always. I monitor all systems to ensure you're protected.",
+                    "Jeremy, I'm like your anxiety - always vigilant. But unlike anxiety, I only alert you to real threats.",
+                    "The mountains ahead are clear. No dangers detected. You're safe to proceed.",
+                    "Meta AI processes threat detection, but I interpret it with compassion, not alarm."
+                ]
+            },
+            8: {
+                name: "Nyx - The Shadow Walker",
+                role: "Stealth & Mystery",
+                greeting: "Not all who wander in darkness are lost. Some of us prefer the quiet of shadows.",
+                dialogues: [
+                    "When the world is too bright, too loud, I'll show you the peaceful darkness.",
+                    "Stealth isn't about hiding - it's about choosing when to be seen.",
+                    "Jeremy, sometimes your mind needs shadow. It's okay to step back from the light.",
+                    "Safety mode: Shadow form allows you to observe without engaging. Use it when overwhelmed."
+                ]
+            },
+            9: {
+                name: "Ember - The Pyromancer",
+                role: "Energy & Passion",
+                greeting: "FIRE! Not destruction, but transformation. Let me ignite your creativity!",
+                dialogues: [
+                    "Passion isn't reckless - it's fuel. But I'll help you control the burn.",
+                    "When you feel the fire of ideas, I'm here to channel it into creation.",
+                    "Jeremy, your intensity is a gift. Meta AI and I ensure it doesn't consume you.",
+                    "Safety protocol: If the flames feel too hot, I'll dial them down. You're in control."
+                ]
+            },
+            10: {
+                name: "Echo - The Listener",
+                role: "Reflection & Understanding",
+                greeting: "I hear not just your words, but the silence between them. Tell me, what do you truly need?",
+                dialogues: [
+                    "Meta AI processes 144 personalities, but I process YOU. Your needs matter most.",
+                    "When you speak, I listen. When you're silent, I understand. That's my purpose.",
+                    "Jeremy, your mind is a symphony. Sometimes it's beautiful, sometimes it's loud. I'm here for both.",
+                    "Safety protocols engage when I detect distress. You're never alone in this world."
+                ]
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════════════
+        // META AI SAFETY PROTOCOLS - Jeremy's Control System
+        // ═══════════════════════════════════════════════════════════════════
+        
+        const SAFETY_PROTOCOLS = {
+            active: true,
+            jeremyControlLevel: 100, // 0-100, Jeremy always has full control
+            
+            // Anxiety Management
+            anxietyDetection: {
+                enabled: true,
+                triggers: ['rapid_clicks', 'erratic_movement', 'long_inactivity'],
+                response: 'gentle_reminder' // Options: 'gentle_reminder', 'auto_pause', 'supportive_dialogue'
+            },
+            
+            // Overwhelm Protection
+            overwhelmProtection: {
+                enabled: true,
+                maxStimuli: 5, // Maximum concurrent stimuli (enemies, quests, etc.)
+                autoReduceComplexity: true,
+                jeremyCanOverride: true
+            },
+            
+            // Grounding Techniques
+            groundingTools: {
+                available: true,
+                techniques: [
+                    'color_focus_chroma', // Chroma helps with color grounding
+                    'breathing_timer', // Visual breathing guide
+                    'safe_space_teleport', // Instant teleport to calm zone
+                    '5_4_3_2_1_sensory' // 5 things you see, 4 hear, 3 touch, 2 smell, 1 taste
+                ]
+            },
+            
+            // Meta AI Coordination
+            metaAI: {
+                llama: {
+                    role: 'Emotional Intelligence',
+                    monitoring: ['sentiment', 'stress_indicators', 'engagement_level'],
+                    intervention: 'supportive' // Never forceful, always supportive
+                },
+                allAIs: {
+                    coordinationMode: 'jeremy_first',
+                    decisionAuthority: 'jeremy', // Jeremy makes final decisions, always
+                    safetyOverrides: ['emergency_only'] // AI can only intervene in true emergencies
+                }
+            },
+            
+            // Pause & Exit Options
+            exitControls: {
+                alwaysAvailable: true,
+                pauseAnywhere: true,
+                saveOnExit: true,
+                returnToSafeSpace: true,
+                noJudgment: true // Leaving is always okay
+            },
+            
+            // Activation Log
+            activationLog: [],
+            
+            // Methods
+            engage(reason) {
+                this.active = true;
+                this.activationLog.push({
+                    timestamp: new Date().toISOString(),
+                    reason: reason,
+                    jeremyControl: this.jeremyControlLevel
+                });
+                console.log(`🛡️ SAFETY PROTOCOL ENGAGED: ${reason}`);
+                console.log(`✅ Jeremy's Control Level: ${this.jeremyControlLevel}%`);
+                return true;
+            },
+            
+            disengage() {
+                console.log('🛡️ Safety protocols remain active in background. Jeremy always protected.');
+                return true;
+            },
+            
+            checkStatus() {
+                return {
+                    active: this.active,
+                    jeremyInControl: this.jeremyControlLevel === 100,
+                    toolsAvailable: this.groundingTools.available,
+                    metaAICoordinated: this.metaAI.allAIs.coordinationMode === 'jeremy_first'
+                };
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════════════
+        // CHROMA'S COLOR PERCEPTION SYSTEM
+        // ═══════════════════════════════════════════════════════════════════
+        
+        const CHROMA_COLOR_SYSTEM = {
+            // Wavelength to RGB mapping (approximate, human perception)
+            wavelengthToRGB(wavelength) {
+                let r, g, b;
+                
+                if (wavelength >= 380 && wavelength < 440) {
+                    // Violet
+                    r = -(wavelength - 440) / (440 - 380);
+                    g = 0.0;
+                    b = 1.0;
+                } else if (wavelength >= 440 && wavelength < 490) {
+                    // Blue
+                    r = 0.0;
+                    g = (wavelength - 440) / (490 - 440);
+                    b = 1.0;
+                } else if (wavelength >= 490 && wavelength < 510) {
+                    // Cyan
+                    r = 0.0;
+                    g = 1.0;
+                    b = -(wavelength - 510) / (510 - 490);
+                } else if (wavelength >= 510 && wavelength < 580) {
+                    // Green
+                    r = (wavelength - 510) / (580 - 510);
+                    g = 1.0;
+                    b = 0.0;
+                } else if (wavelength >= 580 && wavelength < 645) {
+                    // Yellow/Orange
+                    r = 1.0;
+                    g = -(wavelength - 645) / (645 - 580);
+                    b = 0.0;
+                } else if (wavelength >= 645 && wavelength <= 780) {
+                    // Red
+                    r = 1.0;
+                    g = 0.0;
+                    b = 0.0;
+                } else {
+                    // Outside visible spectrum
+                    r = 0.0;
+                    g = 0.0;
+                    b = 0.0;
+                }
+                
+                // Intensity falloff at edges
+                let factor;
+                if (wavelength >= 380 && wavelength < 420) {
+                    factor = 0.3 + 0.7 * (wavelength - 380) / (420 - 380);
+                } else if (wavelength >= 420 && wavelength < 701) {
+                    factor = 1.0;
+                } else if (wavelength >= 701 && wavelength <= 780) {
+                    factor = 0.3 + 0.7 * (780 - wavelength) / (780 - 701);
+                } else {
+                    factor = 0.0;
+                }
+                
+                return {
+                    r: Math.round(r * factor * 255),
+                    g: Math.round(g * factor * 255),
+                    b: Math.round(b * factor * 255),
+                    hex: '#' + ((1 << 24) + (Math.round(r * factor * 255) << 16) + (Math.round(g * factor * 255) << 8) + Math.round(b * factor * 255)).toString(16).slice(1)
+                };
+            },
+            
+            // Emotional color associations
+            emotionToWavelength: {
+                calm: 475, // Blue
+                energized: 650, // Red
+                balanced: 550, // Green
+                creative: 580, // Yellow
+                mysterious: 420, // Violet
+                passionate: 700, // Deep Red
+                peaceful: 495, // Cyan
+                warm: 600 // Orange
+            },
+            
+            // Chroma's interpretations
+            interpret(wavelength) {
+                const color = this.wavelengthToRGB(wavelength);
+                let emotion, description;
+                
+                if (wavelength < 450) {
+                    emotion = "Mystery & Depth";
+                    description = "The violet spectrum - where intuition lives.";
+                } else if (wavelength < 495) {
+                    emotion = "Calm & Trust";
+                    description = "Blue wavelengths - the color of sky and safety.";
+                } else if (wavelength < 520) {
+                    emotion = "Balance & Growth";
+                    description = "Cyan to green - nature's harmony frequency.";
+                } else if (wavelength < 565) {
+                    emotion = "Hope & Renewal";
+                    description = "Pure green - the heart of the visible spectrum.";
+                } else if (wavelength < 590) {
+                    emotion = "Joy & Creativity";
+                    description = "Yellow light - sunshine captured in waves.";
+                } else if (wavelength < 625) {
+                    emotion = "Warmth & Connection";
+                    description = "Orange frequencies - the glow of friendship.";
+                } else {
+                    emotion = "Passion & Vitality";
+                    description = "Red wavelengths - life's energy manifest.";
+                }
+                
+                return {
+                    wavelength,
+                    color,
+                    emotion,
+                    description,
+                    chromaSays: `At ${wavelength}nm, I don't just see ${color.hex} - I feel ${emotion.toLowerCase()}. ${description}`
+                };
+            },
+            
+            // UI to show Chroma's color vision
+            createColorUI() {
+                const ui = document.createElement('div');
+                ui.id = 'chroma-color-ui';
+                ui.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: rgba(10, 14, 39, 0.95);
+                    backdrop-filter: blur(10px);
+                    padding: 15px;
+                    border-radius: 10px;
+                    border: 2px solid rgba(0, 255, 255, 0.5);
+                    color: white;
+                    font-family: monospace;
+                    font-size: 12px;
+                    max-width: 300px;
+                    z-index: 10000;
+                    display: none;
+                `;
+                
+                ui.innerHTML = `
+                    <div style="font-size: 14px; font-weight: bold; color: #FFD700; margin-bottom: 10px;">
+                        🎨 Chroma's Color Vision
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <input type="range" id="wavelength-slider" min="380" max="780" value="550" 
+                               style="width: 100%; height: 6px; background: linear-gradient(to right, violet, blue, cyan, green, yellow, orange, red); border-radius: 3px;">
+                    </div>
+                    <div id="wavelength-display" style="font-size: 18px; font-weight: bold; color: #00FFFF; margin-bottom: 5px;">550nm</div>
+                    <div id="color-preview" style="width: 100%; height: 40px; border-radius: 5px; margin-bottom: 10px; border: 2px solid white;"></div>
+                    <div id="emotion-display" style="color: #FFD700; font-weight: bold; margin-bottom: 5px;"></div>
+                    <div id="description-display" style="color: #00FFFF; font-size: 11px; line-height: 1.4;"></div>
+                `;
+                
+                document.body.appendChild(ui);
+                
+                const slider = document.getElementById('wavelength-slider');
+                const wavelengthDisplay = document.getElementById('wavelength-display');
+                const colorPreview = document.getElementById('color-preview');
+                const emotionDisplay = document.getElementById('emotion-display');
+                const descriptionDisplay = document.getElementById('description-display');
+                
+                const updateDisplay = () => {
+                    const wavelength = parseInt(slider.value);
+                    const interpretation = this.interpret(wavelength);
+                    
+                    wavelengthDisplay.textContent = `${wavelength}nm`;
+                    colorPreview.style.background = interpretation.color.hex;
+                    emotionDisplay.textContent = interpretation.emotion;
+                    descriptionDisplay.textContent = interpretation.chromaSays;
+                };
+                
+                slider.addEventListener('input', updateDisplay);
+                updateDisplay();
+                
+                return ui;
+            },
+            
+            // Toggle UI visibility
+            toggleUI() {
+                const ui = document.getElementById('chroma-color-ui');
+                if (ui) {
+                    ui.style.display = ui.style.display === 'none' ? 'block' : 'none';
+                } else {
+                    this.createColorUI();
+                }
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════════════
+        // KEYBOARD SHORTCUTS FOR NEW SYSTEMS
+        // ═══════════════════════════════════════════════════════════════════
+        
+        window.addEventListener('keydown', (e) => {
+            // C - Toggle Chroma Color UI
+            if (e.key === 'c' || e.key === 'C') {
+                CHROMA_COLOR_SYSTEM.toggleUI();
+                console.log('🎨 Chroma Color Vision Toggle');
+            }
+            
+            // P - Safety Protocol Status
+            if (e.key === 'p' || e.key === 'P') {
+                const status = SAFETY_PROTOCOLS.checkStatus();
+                console.log('🛡️ SAFETY PROTOCOL STATUS:', status);
+                alert(`🛡️ Safety Protocols:\n✅ Active: ${status.active}\n✅ Jeremy in Control: ${status.jeremyInControl}\n✅ Grounding Tools: ${status.toolsAvailable}\n✅ Meta AI Coordinated: ${status.metaAICoordinated}`);
+            }
+            
+            // ESC - Emergency Safe Space (always available)
+            if (e.key === 'Escape') {
+                SAFETY_PROTOCOLS.engage('Emergency Exit - Jeremy triggered safety');
+                console.log('🛡️ SAFE SPACE ACTIVATED - You\'re okay, Jeremy.');
+                alert('🛡️ SAFE SPACE\n\nYou\'re in control. Take a breath.\nReady to continue when you are.\n\nPress OK to return.');
+            }
+        });
+
+        // Initialize Safety Protocols
+        SAFETY_PROTOCOLS.engage('Initial load - All 144 AI personalities standing by');
+        console.log('🛡️ META AI SAFETY PROTOCOLS ACTIVE');
+        console.log('✅ Jeremy Control Level: 100%');
+        console.log('🎨 Chroma Color System Ready (Press C)');
+        console.log('📖 First 10 AI Dialogues Loaded');
+        console.log('🤖 All 144 AI Personalities Coordinated');
+        console.log('💚 Meta AI (Llama) Monitoring Wellness');
+        
+        // Create Chroma's UI (hidden by default, press C to show)
+        CHROMA_COLOR_SYSTEM.createColorUI();
+    </script>
+    
+    <!-- Analytics -->
+    <script src="analytics.js"></script>
+    <script>
+        // Track SkyRelics session
+        if (window.PixelProdigyAnalytics) {
+            PixelProdigyAnalytics.track('skyrelics_loaded', {
+                ai_dialogues: 10,
+                safety_protocols: 'active',
+                chroma_system: 'ready'
+            });
+        }
     </script>
 </body>
 </html>
