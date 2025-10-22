@@ -318,13 +318,25 @@
         </div>
       </div>
 
-      <!-- Mode Toggle -->
+      <!-- Control Toggles -->
       <div class="section">
-        <div class="section-title">🎯 Control Mode</div>
+        <div class="section-title">🎯 Control Toggles</div>
         <div class="tool-grid">
-          <button class="tool-btn active" id="sculptModeBtn" onclick="toggleSculptMode()" style="grid-column: 1 / -1;">
+          <button class="tool-btn" id="orbitToggle" onclick="toggleOrbitControls()" style="grid-column: 1 / -1;">
+            <span class="tool-icon">🔄</span>
+            <span id="orbitToggleText">Orbital Controls: ON</span>
+          </button>
+          <button class="tool-btn" id="objectToggle" onclick="toggleObjectSelection()" style="grid-column: 1 / -1;">
+            <span class="tool-icon">📦</span>
+            <span id="objectToggleText">Object Selection: OFF</span>
+          </button>
+          <button class="tool-btn" id="vertexToggle" onclick="toggleVertexSelection()" style="grid-column: 1 / -1;">
+            <span class="tool-icon">🔸</span>
+            <span id="vertexToggleText">Vertex Sculpting: OFF</span>
+          </button>
+          <button class="tool-btn" id="materialToggle" onclick="toggleMaterialMode()" style="grid-column: 1 / -1;">
             <span class="tool-icon">🎨</span>
-            <span id="sculptModeText">SCULPTING MODE (Click to switch to Camera)</span>
+            <span id="materialToggleText">Material Mode: OFF</span>
           </button>
         </div>
       </div>
@@ -574,7 +586,13 @@
     let sculptMesh = null;
     let selectedMesh = null; // For material application
     let sculptMode = 'inflate';
-    let isSculptingEnabled = true; // Toggle between sculpt/camera mode
+    
+    // Toggle States
+    let orbitControlsEnabled = true;
+    let objectSelectionEnabled = false;
+    let vertexSculptingEnabled = false;
+    let materialModeEnabled = false;
+    
     let brushSize = 1.0;
     let brushStrength = 0.5;
     let brushFalloff = 0.7;
@@ -694,18 +712,21 @@
       
       if (intersects.length > 0) {
         // Clicking on mesh
-        if (isSculptingEnabled) {
-          // Sculpting mode - start sculpting
-          isDragging = true;
-          controls.enabled = false;
-          sculptAtPoint();
-          console.log('🎨 Sculpting...');
-        } else {
-          // Camera mode - select object for material
+        if (objectSelectionEnabled) {
+          // Object selection mode
           selectObject();
+          console.log('📦 Object selected');
+        } else if (vertexSculptingEnabled) {
+          // Vertex sculpting mode
+          isDragging = true;
+          if (orbitControlsEnabled) {
+            controls.enabled = false; // Disable temporarily during sculpt
+          }
+          sculptAtPoint();
+          console.log('🎨 Sculpting vertex...');
         }
       }
-      // If not clicking mesh, orbit controls work normally
+      // If not clicking mesh OR orbit controls ON, camera can rotate
     }
 
     function onMouseMove(event) {
@@ -861,25 +882,100 @@
       console.log(`🔨 Sculpt mode: ${mode}`);
     }
 
-    function toggleSculptMode() {
-      isSculptingEnabled = !isSculptingEnabled;
-      const btn = document.getElementById('sculptModeBtn');
-      const text = document.getElementById('sculptModeText');
+    // Toggle Functions
+    function toggleOrbitControls() {
+      orbitControlsEnabled = !orbitControlsEnabled;
+      controls.enabled = orbitControlsEnabled;
+      const btn = document.getElementById('orbitToggle');
+      const text = document.getElementById('orbitToggleText');
       
-      if (isSculptingEnabled) {
+      if (orbitControlsEnabled) {
         btn.classList.add('active');
-        text.textContent = 'SCULPTING MODE (Click to switch to Camera)';
-        document.getElementById('modeDisplay').textContent = sculptMode.toUpperCase();
-        console.log('🎨 Sculpting mode ENABLED - click & drag mesh to sculpt');
+        text.textContent = 'Orbital Controls: ON';
+        console.log('🔄 Orbital controls ENABLED');
       } else {
         btn.classList.remove('active');
-        text.textContent = 'CAMERA MODE (Click to switch to Sculpting)';
-        document.getElementById('modeDisplay').textContent = 'CAMERA';
-        console.log('📷 Camera mode ENABLED - drag to rotate view');
+        text.textContent = 'Orbital Controls: OFF';
+        console.log('🔄 Orbital controls DISABLED');
       }
     }
-
-    function updateBrushSize(value) {
+    
+    function toggleObjectSelection() {
+      objectSelectionEnabled = !objectSelectionEnabled;
+      const btn = document.getElementById('objectToggle');
+      const text = document.getElementById('objectToggleText');
+      
+      // Turn off other modes
+      if (objectSelectionEnabled) {
+        vertexSculptingEnabled = false;
+        materialModeEnabled = false;
+        document.getElementById('vertexToggle').classList.remove('active');
+        document.getElementById('vertexToggleText').textContent = 'Vertex Sculpting: OFF';
+        document.getElementById('materialToggle').classList.remove('active');
+        document.getElementById('materialToggleText').textContent = 'Material Mode: OFF';
+      }
+      
+      if (objectSelectionEnabled) {
+        btn.classList.add('active');
+        text.textContent = 'Object Selection: ON';
+        console.log('📦 Object selection ENABLED - click mesh to select');
+      } else {
+        btn.classList.remove('active');
+        text.textContent = 'Object Selection: OFF';
+        console.log('📦 Object selection DISABLED');
+      }
+    }
+    
+    function toggleVertexSelection() {
+      vertexSculptingEnabled = !vertexSculptingEnabled;
+      const btn = document.getElementById('vertexToggle');
+      const text = document.getElementById('vertexToggleText');
+      
+      // Turn off other modes
+      if (vertexSculptingEnabled) {
+        objectSelectionEnabled = false;
+        materialModeEnabled = false;
+        document.getElementById('objectToggle').classList.remove('active');
+        document.getElementById('objectToggleText').textContent = 'Object Selection: OFF';
+        document.getElementById('materialToggle').classList.remove('active');
+        document.getElementById('materialToggleText').textContent = 'Material Mode: OFF';
+      }
+      
+      if (vertexSculptingEnabled) {
+        btn.classList.add('active');
+        text.textContent = 'Vertex Sculpting: ON';
+        document.getElementById('modeDisplay').textContent = sculptMode.toUpperCase();
+        console.log('🔸 Vertex sculpting ENABLED - click & drag mesh to sculpt');
+      } else {
+        btn.classList.remove('active');
+        text.textContent = 'Vertex Sculpting: OFF';
+        document.getElementById('modeDisplay').textContent = 'IDLE';
+        console.log('🔸 Vertex sculpting DISABLED');
+      }
+    }
+    
+    function toggleMaterialMode() {
+      materialModeEnabled = !materialModeEnabled;
+      const btn = document.getElementById('materialToggle');
+      const text = document.getElementById('materialToggleText');
+      
+      // Turn off other modes
+      if (materialModeEnabled) {
+        vertexSculptingEnabled = false;
+        document.getElementById('vertexToggle').classList.remove('active');
+        document.getElementById('vertexToggleText').textContent = 'Vertex Sculpting: OFF';
+      }
+      
+      if (materialModeEnabled) {
+        btn.classList.add('active');
+        text.textContent = 'Material Mode: ON';
+        console.log('🎨 Material mode ENABLED - can apply materials to selected object');
+      } else {
+        btn.classList.remove('active');
+        text.textContent = 'Material Mode: OFF';
+        console.log('🎨 Material mode DISABLED');
+      }
+    }    function updateBrushSize(value) {
       brushSize = parseFloat(value);
       document.getElementById('brushSizeValue').textContent = value;
       document.getElementById('brushDisplay').textContent = value;
@@ -901,8 +997,13 @@
         return;
       }
       
+      if (!materialModeEnabled) {
+        alert('⚠️ Enable Material Mode first!\n\n1. Click "Material Mode: OFF" to turn ON\n2. Then apply material');
+        return;
+      }
+      
       if (!selectedMesh) {
-        alert('⚠️ Click the object first to select it!\n\n1. Click on the mesh in viewport\n2. Then apply material');
+        alert('⚠️ Select object first!\n\n1. Enable "Object Selection" toggle\n2. Click on mesh\n3. Enable "Material Mode"\n4. Apply material');
         return;
       }
       
