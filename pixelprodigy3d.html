@@ -170,6 +170,7 @@
       border-radius: 3px;
       outline: none;
       -webkit-appearance: none;
+      appearance: none;
     }
 
     input[type="range"]::-webkit-slider-thumb {
@@ -231,6 +232,24 @@
             <button class="tool-btn" onclick="setMode('subtract', this)">
               <span class="tool-icon">➖</span>
               <span>Subtract</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">✋ Manipulate</div>
+          <div class="tool-grid">
+            <button class="tool-btn" onclick="setTransformMode('translate')">
+              <span class="tool-icon">↔️</span>
+              <span>Move (W)</span>
+            </button>
+            <button class="tool-btn" onclick="setTransformMode('rotate')">
+              <span class="tool-icon">🔄</span>
+              <span>Rotate (E)</span>
+            </button>
+            <button class="tool-btn" onclick="setTransformMode('scale')">
+              <span class="tool-icon">📏</span>
+              <span>Scale (R)</span>
             </button>
           </div>
         </div>
@@ -463,16 +482,18 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="lib/three.min.js"></script>
+  <script src="lib/OrbitControls.js"></script>
+  <script src="lib/TransformControls.js"></script>
   <script>
     // State
-    let scene, camera, renderer, controls;
+    let scene, camera, renderer, controls, transformControl;
     let currentMode = 'add';
     let currentPrimitive = 'sphere';
     let primitiveSize = 0.5;
     let rotationAngle = 0;
     let objects = [];
+    let selectedObject = null;
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
 
@@ -506,6 +527,32 @@
       controls.dampingFactor = 0.05;
       controls.minDistance = 2;
       controls.maxDistance = 50;
+
+      // Transform Controls for object manipulation
+      transformControl = new THREE.TransformControls(camera, renderer.domElement);
+      transformControl.addEventListener('dragging-changed', function(event) {
+        controls.enabled = !event.value;
+      });
+      scene.add(transformControl);
+      
+      // Keyboard: W=move, E=rotate, R=scale, Delete=remove
+      window.addEventListener('keydown', function(event) {
+        switch(event.key.toLowerCase()) {
+          case 'w': transformControl.setMode('translate'); break;
+          case 'e': transformControl.setMode('rotate'); break;
+          case 'r': transformControl.setMode('scale'); break;
+          case 'delete':
+          case 'backspace':
+            if (selectedObject) {
+              scene.remove(selectedObject);
+              objects = objects.filter(obj => obj !== selectedObject);
+              transformControl.detach();
+              selectedObject = null;
+              updateObjectCount();
+            }
+            break;
+        }
+      });
 
       // Lights
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -568,13 +615,25 @@
 
       raycaster.setFromCamera(mouse, camera);
       
-      // Find intersection with ground plane
-      const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-      const intersectPoint = new THREE.Vector3();
-      raycaster.ray.intersectPlane(groundPlane, intersectPoint);
+      // Check if clicking existing object to select it
+      const intersects = raycaster.intersectObjects(objects, true);
+      
+      if (intersects.length > 0 && currentMode === 'add') {
+        selectedObject = intersects[0].object;
+        transformControl.attach(selectedObject);
+        console.log('✅ Object selected - Use W/E/R or buttons to manipulate');
+        return;
+      }
+      
+      // Otherwise place new object on ground
+      if (currentMode === 'add') {
+        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const intersectPoint = new THREE.Vector3();
+        raycaster.ray.intersectPlane(groundPlane, intersectPoint);
 
-      if (intersectPoint) {
-        placePrimitive(intersectPoint);
+        if (intersectPoint) {
+          placePrimitive(intersectPoint);
+        }
       }
     }
 
@@ -630,6 +689,21 @@
       document.querySelectorAll('#sidebar .tool-grid .tool-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('modeDisplay').textContent = mode.toUpperCase();
+      
+      // Detach transform when switching to add mode
+      if (mode === 'add' && selectedObject) {
+        transformControl.detach();
+        selectedObject = null;
+      }
+    }
+
+    function setTransformMode(mode) {
+      if (!selectedObject) {
+        alert('⚠️ Click an object first to select it!\n\n1. Click any object in the scene\n2. Then use Move/Rotate/Scale buttons\n3. Or press W/E/R keys');
+        return;
+      }
+      transformControl.setMode(mode);
+      console.log(`🎨 Transform mode: ${mode.toUpperCase()}`);
     }
 
     function setPrimitive(primitive, btn) {

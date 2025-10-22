@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vertex Sculpting System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      overflow: hidden;
+    }
+
+    #container {
+      display: flex;
+      height: 100vh;
+    }
+
+    #sidebar {
+      width: 300px;
+      background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+      border-right: 1px solid #333;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    #viewport {
+      flex: 1;
+      position: relative;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .section {
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      color: #e0e0e0;
+      padding: 12px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+    }
+
+    .tool-btn:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: rgba(102, 126, 234, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .tool-btn.active {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+    }
+
+    .tool-icon {
+      font-size: 20px;
+    }
+
+    .slider-group {
+      margin-bottom: 15px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 8px;
+      color: #aaa;
+    }
+
+    .slider-value {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 4px;
+      background: rgba(102, 126, 234, 0.2);
+      outline: none;
+      border-radius: 2px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #667eea;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .material-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .material-preset {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .material-preset.active {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .material-header {
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .material-header:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .material-toggle {
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+
+    .material-toggle.expanded {
+      transform: rotate(90deg);
+    }
+
+    .material-details {
+      padding: 10px;
+      font-size: 10px;
+      color: #aaa;
+      line-height: 1.6;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: none;
+    }
+
+    .material-details.show {
+      display: block;
+    }
+
+    .material-apply-btn {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      background: rgba(102, 126, 234, 0.2);
+      border: 1px solid rgba(102, 126, 234, 0.4);
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 10px;
+      transition: all 0.2s;
+    }
+
+    .material-apply-btn:hover {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+    }
+
+    .material-btn {
+      padding: 8px;
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .material-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .material-btn.active {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+    }
+
+    .selection-indicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(102, 126, 234, 0.9);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .selection-indicator.show {
+      display: block;
+    }
+
+    #status {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 12px 20px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #333;
+    }
+
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      color: #667eea;
+    }
+
+    .info-box {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #aaa;
+      margin-bottom: 15px;
+    }
+
+    .info-box strong {
+      color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="sidebar">
+      <h2 style="color: #667eea; margin-bottom: 20px; font-size: 18px;">🎨 Vertex Sculpting</h2>
+
+      <div class="info-box">
+        <strong>How to use:</strong><br>
+        1. Select a sculpting tool<br>
+        2. Adjust brush size & strength<br>
+        3. Click and drag on mesh to sculpt<br>
+        4. Apply materials & save your work
+      </div>
+
+      <!-- Sculpting Tools -->
+      <div class="section">
+        <div class="section-title">🔨 Sculpt Modes</div>
+        <div class="tool-grid">
+          <button class="tool-btn active" onclick="setSculptMode('inflate', this)">
+            <span class="tool-icon">📈</span>
+            <span>Inflate</span>
+          </button>
+          <button class="tool-btn" onclick="setSculptMode('deflate', this)">
+            <span class="tool-icon">📉</span>
+            <span>Deflate</span>
+          </button>
+          <button class="tool-btn" onclick="setSculptMode('smooth', this)">
+            <span class="tool-icon">〰️</span>
+            <span>Smooth</span>
+          </button>
+          <button class="tool-btn" onclick="setSculptMode('pinch', this)">
+            <span class="tool-icon">👌</span>
+            <span>Pinch</span>
+          </button>
+          <button class="tool-btn" onclick="setSculptMode('grab', this)">
+            <span class="tool-icon">✋</span>
+            <span>Grab</span>
+          </button>
+          <button class="tool-btn" onclick="setSculptMode('flatten', this)">
+            <span class="tool-icon">▬</span>
+            <span>Flatten</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode Toggle -->
+      <div class="section">
+        <div class="section-title">🎯 Control Mode</div>
+        <div class="tool-grid">
+          <button class="tool-btn active" id="sculptModeBtn" onclick="toggleSculptMode()" style="grid-column: 1 / -1;">
+            <span class="tool-icon">🎨</span>
+            <span id="sculptModeText">SCULPTING MODE (Click to switch to Camera)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Edge Tools -->
+      <div class="section">
+        <div class="section-title">📐 Edge Tools</div>
+        <div class="tool-grid">
+          <button class="tool-btn" onclick="edgeTighten()">
+            <span class="tool-icon">⬅️➡️</span>
+            <span>Tighten</span>
+          </button>
+          <button class="tool-btn" onclick="edgeExpand()">
+            <span class="tool-icon">↔️</span>
+            <span>Expand</span>
+          </button>
+          <button class="tool-btn" onclick="subdivide()">
+            <span class="tool-icon">➕</span>
+            <span>Subdivide</span>
+          </button>
+          <button class="tool-btn" onclick="decimate()">
+            <span class="tool-icon">➖</span>
+            <span>Decimate</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Brush Settings -->
+      <div class="section">
+        <div class="section-title">🖌️ Brush Settings</div>
+        
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Brush Size</span>
+            <span class="slider-value" id="brushSizeValue">1.0</span>
+          </div>
+          <input type="range" id="brushSize" min="0.1" max="5" step="0.1" value="1.0" oninput="updateBrushSize(this.value)">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Strength</span>
+            <span class="slider-value" id="strengthValue">0.5</span>
+          </div>
+          <input type="range" id="strength" min="0.1" max="2" step="0.1" value="0.5" oninput="updateStrength(this.value)">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Falloff</span>
+            <span class="slider-value" id="falloffValue">0.7</span>
+          </div>
+          <input type="range" id="falloff" min="0.1" max="1" step="0.1" value="0.7" oninput="updateFalloff(this.value)">
+        </div>
+      </div>
+
+      <!-- Material Presets -->
+      <div class="section">
+        <div class="section-title">🎨 Material Presets</div>
+        <div class="info-box" style="font-size: 10px; padding: 8px;">
+          <strong>💡 Tip:</strong> Click object first, then apply material
+        </div>
+        <div class="material-grid">
+          <div class="material-preset" id="mat-default">
+            <div class="material-header" onclick="toggleMaterial('default')">
+              <span>Default (Green)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Green (#00ff88)<br>
+              Roughness: 0.7<br>
+              Metalness: 0.3<br>
+              <button class="material-apply-btn" onclick="applyMaterial('default')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-metal">
+            <div class="material-header" onclick="toggleMaterial('metal')">
+              <span>Metal (Chrome)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Silver (#cccccc)<br>
+              Roughness: 0.2<br>
+              Metalness: 1.0<br>
+              <button class="material-apply-btn" onclick="applyMaterial('metal')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-glass">
+            <div class="material-header" onclick="toggleMaterial('glass')">
+              <span>Glass (Transparent)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: White (#ffffff)<br>
+              Roughness: 0.0<br>
+              Metalness: 0.0<br>
+              Opacity: 0.3<br>
+              <button class="material-apply-btn" onclick="applyMaterial('glass')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-plastic">
+            <div class="material-header" onclick="toggleMaterial('plastic')">
+              <span>Plastic (Red)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Red (#ff6b6b)<br>
+              Roughness: 0.5<br>
+              Metalness: 0.0<br>
+              <button class="material-apply-btn" onclick="applyMaterial('plastic')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-wood">
+            <div class="material-header" onclick="toggleMaterial('wood')">
+              <span>Wood (Brown)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Brown (#8b4513)<br>
+              Roughness: 0.9<br>
+              Metalness: 0.0<br>
+              <button class="material-apply-btn" onclick="applyMaterial('wood')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-stone">
+            <div class="material-header" onclick="toggleMaterial('stone')">
+              <span>Stone (Gray)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Gray (#808080)<br>
+              Roughness: 0.95<br>
+              Metalness: 0.0<br>
+              <button class="material-apply-btn" onclick="applyMaterial('stone')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-gold">
+            <div class="material-header" onclick="toggleMaterial('gold')">
+              <span>Gold (Shiny)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Gold (#ffd700)<br>
+              Roughness: 0.3<br>
+              Metalness: 1.0<br>
+              <button class="material-apply-btn" onclick="applyMaterial('gold')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-copper">
+            <div class="material-header" onclick="toggleMaterial('copper')">
+              <span>Copper (Orange)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Copper (#b87333)<br>
+              Roughness: 0.4<br>
+              Metalness: 1.0<br>
+              <button class="material-apply-btn" onclick="applyMaterial('copper')">Apply to Selected</button>
+            </div>
+          </div>
+
+          <div class="material-preset" id="mat-rubber">
+            <div class="material-header" onclick="toggleMaterial('rubber')">
+              <span>Rubber (Dark)</span>
+              <span class="material-toggle">▶</span>
+            </div>
+            <div class="material-details">
+              Color: Dark Gray (#2c3e50)<br>
+              Roughness: 1.0<br>
+              Metalness: 0.0<br>
+              <button class="material-apply-btn" onclick="applyMaterial('rubber')">Apply to Selected</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primitives -->
+      <div class="section">
+        <div class="section-title">📦 Load Primitive</div>
+        <div class="tool-grid">
+          <button class="tool-btn" onclick="loadPrimitive('sphere')">
+            <span class="tool-icon">⚪</span>
+            <span>Sphere</span>
+          </button>
+          <button class="tool-btn" onclick="loadPrimitive('cube')">
+            <span class="tool-icon">🟦</span>
+            <span>Cube</span>
+          </button>
+          <button class="tool-btn" onclick="loadPrimitive('cylinder')">
+            <span class="tool-icon">🛢️</span>
+            <span>Cylinder</span>
+          </button>
+          <button class="tool-btn" onclick="loadPrimitive('torus')">
+            <span class="tool-icon">🍩</span>
+            <span>Torus</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="section">
+        <div class="section-title">💾 Actions</div>
+        <div class="tool-grid">
+          <button class="tool-btn" onclick="saveMesh()">
+            <span class="tool-icon">💾</span>
+            <span>Save</span>
+          </button>
+          <button class="tool-btn" onclick="exportMesh()">
+            <span class="tool-icon">📤</span>
+            <span>Export</span>
+          </button>
+          <button class="tool-btn" onclick="resetMesh()">
+            <span class="tool-icon">🔄</span>
+            <span>Reset</span>
+          </button>
+          <button class="tool-btn" onclick="clearScene()">
+            <span class="tool-icon">🗑️</span>
+            <span>Clear</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="viewport">
+      <canvas id="canvas"></canvas>
+      <div class="loading" id="loading">Initializing Sculpting Engine...</div>
+      <div class="selection-indicator" id="selectionIndicator">✅ Object Selected</div>
+      <div id="status">
+        <div>Mode: <strong id="modeDisplay">INFLATE</strong> | Brush: <strong id="brushDisplay">1.0</strong></div>
+        <div>Vertices: <strong id="vertexCount">0</strong> | Faces: <strong id="faceCount">0</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="lib/three.min.js"></script>
+  <script src="lib/OrbitControls.js"></script>
+  <script>
+    // State
+    let scene, camera, renderer, controls;
+    let sculptMesh = null;
+    let selectedMesh = null; // For material application
+    let sculptMode = 'inflate';
+    let isSculptingEnabled = true; // Toggle between sculpt/camera mode
+    let brushSize = 1.0;
+    let brushStrength = 0.5;
+    let brushFalloff = 0.7;
+    let isDragging = false;
+    let raycaster = new THREE.Raycaster();
+    let mouse = new THREE.Vector2();
+
+    // Material Presets Library - NO MORE REPEATING!
+    const MATERIAL_PRESETS = {
+      default: { color: 0x00ff88, roughness: 0.7, metalness: 0.3 },
+      metal: { color: 0xcccccc, roughness: 0.2, metalness: 1.0 },
+      glass: { color: 0xffffff, roughness: 0.0, metalness: 0.0, transparent: true, opacity: 0.3 },
+      plastic: { color: 0xff6b6b, roughness: 0.5, metalness: 0.0 },
+      wood: { color: 0x8b4513, roughness: 0.9, metalness: 0.0 },
+      stone: { color: 0x808080, roughness: 0.95, metalness: 0.0 },
+      gold: { color: 0xffd700, roughness: 0.3, metalness: 1.0 },
+      copper: { color: 0xb87333, roughness: 0.4, metalness: 1.0 },
+      rubber: { color: 0x2c3e50, roughness: 1.0, metalness: 0.0 }
+    };
+
+    // Initialize
+    function init() {
+      const canvas = document.getElementById('canvas');
+      
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a0a);
+      scene.fog = new THREE.Fog(0x0a0a0a, 10, 50);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(
+        75,
+        canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(5, 5, 5);
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 10, 5);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+
+      const pointLight = new THREE.PointLight(0x667eea, 1, 100);
+      pointLight.position.set(-5, 5, -5);
+      scene.add(pointLight);
+
+      // Ground
+      const groundGeometry = new THREE.PlaneGeometry(50, 50);
+      const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a1a,
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // Grid
+      const gridHelper = new THREE.GridHelper(50, 50, 0x667eea, 0x2a2a2a);
+      scene.add(gridHelper);
+
+      // Load default primitive
+      loadPrimitive('sphere');
+
+      // Events
+      canvas.addEventListener('mousedown', onMouseDown);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('resize', onWindowResize);
+
+      // Hide loading
+      document.getElementById('loading').style.display = 'none';
+
+      // Start
+      animate();
+      
+      console.log('🎨 Vertex Sculpting System Ready');
+      console.log('Available modes: inflate, deflate, smooth, pinch, grab, flatten');
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const canvas = document.getElementById('canvas');
+      camera.aspect = canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+    }
+
+    function onMouseDown(event) {
+      if (event.button !== 0) return; // Left click only
+      
+      updateMousePosition(event);
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(sculptMesh);
+      
+      if (intersects.length > 0) {
+        // Clicking on mesh
+        if (isSculptingEnabled) {
+          // Sculpting mode - start sculpting
+          isDragging = true;
+          controls.enabled = false;
+          sculptAtPoint();
+          console.log('🎨 Sculpting...');
+        } else {
+          // Camera mode - select object for material
+          selectObject();
+        }
+      }
+      // If not clicking mesh, orbit controls work normally
+    }
+
+    function onMouseMove(event) {
+      if (!isDragging) return;
+      updateMousePosition(event);
+      sculptAtPoint();
+    }
+
+    function onMouseUp(event) {
+      if (isDragging) {
+        isDragging = false;
+        controls.enabled = true; // Re-enable orbit
+        console.log('✅ Sculpt stroke finished');
+      }
+    }
+
+    function updateMousePosition(event) {
+      const canvas = document.getElementById('canvas');
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    }
+
+    function sculptAtPoint() {
+      if (!sculptMesh) return;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(sculptMesh);
+
+      if (intersects.length > 0) {
+        const intersect = intersects[0];
+        const point = intersect.point;
+
+        const geometry = sculptMesh.geometry;
+        const positions = geometry.attributes.position;
+
+        // Find vertices within brush radius
+        for (let i = 0; i < positions.count; i++) {
+          const vertex = new THREE.Vector3(
+            positions.getX(i),
+            positions.getY(i),
+            positions.getZ(i)
+          );
+          
+          vertex.applyMatrix4(sculptMesh.matrixWorld);
+          const distance = vertex.distanceTo(point);
+          
+          if (distance < brushSize) {
+            const falloff = Math.pow(1 - (distance / brushSize), brushFalloff);
+            const influence = brushStrength * falloff * 0.05;
+            
+            const localVertex = new THREE.Vector3(
+              positions.getX(i),
+              positions.getY(i),
+              positions.getZ(i)
+            );
+
+            switch (sculptMode) {
+              case 'inflate':
+                const normal = getNormal(geometry, i);
+                localVertex.add(normal.multiplyScalar(influence));
+                break;
+                
+              case 'deflate':
+                const normalIn = getNormal(geometry, i);
+                localVertex.add(normalIn.multiplyScalar(-influence));
+                break;
+                
+              case 'smooth':
+                const neighbors = getNeighborVertices(geometry, i);
+                const avgPos = new THREE.Vector3();
+                neighbors.forEach(idx => {
+                  avgPos.add(new THREE.Vector3(
+                    positions.getX(idx),
+                    positions.getY(idx),
+                    positions.getZ(idx)
+                  ));
+                });
+                avgPos.divideScalar(neighbors.length);
+                localVertex.lerp(avgPos, influence * 0.5);
+                break;
+                
+              case 'pinch':
+                const worldHitPoint = point.clone();
+                const localHitPoint = sculptMesh.worldToLocal(worldHitPoint);
+                localVertex.lerp(localHitPoint, influence);
+                break;
+                
+              case 'grab':
+                const delta = new THREE.Vector3().subVectors(point, intersect.point);
+                localVertex.add(sculptMesh.worldToLocal(delta));
+                break;
+                
+              case 'flatten':
+                const avgY = 0;
+                localVertex.y += (avgY - localVertex.y) * influence;
+                break;
+            }
+
+            positions.setXYZ(i, localVertex.x, localVertex.y, localVertex.z);
+          }
+        }
+
+        positions.needsUpdate = true;
+        geometry.computeVertexNormals();
+        updateStats();
+      }
+    }
+
+    function getNormal(geometry, vertexIndex) {
+      const normals = geometry.attributes.normal;
+      return new THREE.Vector3(
+        normals.getX(vertexIndex),
+        normals.getY(vertexIndex),
+        normals.getZ(vertexIndex)
+      ).normalize();
+    }
+
+    function getNeighborVertices(geometry, vertexIndex) {
+      const neighbors = [];
+      const positions = geometry.attributes.position;
+      const vertex = new THREE.Vector3(
+        positions.getX(vertexIndex),
+        positions.getY(vertexIndex),
+        positions.getZ(vertexIndex)
+      );
+
+      for (let i = 0; i < positions.count; i++) {
+        if (i === vertexIndex) continue;
+        const other = new THREE.Vector3(
+          positions.getX(i),
+          positions.getY(i),
+          positions.getZ(i)
+        );
+        if (vertex.distanceTo(other) < 0.5) {
+          neighbors.push(i);
+        }
+      }
+
+      return neighbors.length > 0 ? neighbors : [vertexIndex];
+    }
+
+    function setSculptMode(mode, btn) {
+      sculptMode = mode;
+      // Remove active from all sculpt tool buttons
+      document.querySelectorAll('#sidebar .tool-grid .tool-btn').forEach(b => {
+        if (b.onclick && b.onclick.toString().includes('setSculptMode')) {
+          b.classList.remove('active');
+        }
+      });
+      btn.classList.add('active');
+      document.getElementById('modeDisplay').textContent = mode.toUpperCase();
+      console.log(`🔨 Sculpt mode: ${mode}`);
+    }
+
+    function toggleSculptMode() {
+      isSculptingEnabled = !isSculptingEnabled;
+      const btn = document.getElementById('sculptModeBtn');
+      const text = document.getElementById('sculptModeText');
+      
+      if (isSculptingEnabled) {
+        btn.classList.add('active');
+        text.textContent = 'SCULPTING MODE (Click to switch to Camera)';
+        document.getElementById('modeDisplay').textContent = sculptMode.toUpperCase();
+        console.log('🎨 Sculpting mode ENABLED - click & drag mesh to sculpt');
+      } else {
+        btn.classList.remove('active');
+        text.textContent = 'CAMERA MODE (Click to switch to Sculpting)';
+        document.getElementById('modeDisplay').textContent = 'CAMERA';
+        console.log('📷 Camera mode ENABLED - drag to rotate view');
+      }
+    }
+
+    function updateBrushSize(value) {
+      brushSize = parseFloat(value);
+      document.getElementById('brushSizeValue').textContent = value;
+      document.getElementById('brushDisplay').textContent = value;
+    }
+
+    function updateStrength(value) {
+      brushStrength = parseFloat(value);
+      document.getElementById('strengthValue').textContent = value;
+    }
+
+    function updateFalloff(value) {
+      brushFalloff = parseFloat(value);
+      document.getElementById('falloffValue').textContent = value;
+    }
+
+    function applyMaterial(materialName) {
+      if (!sculptMesh) {
+        alert('⚠️ No object loaded! Load a primitive first.');
+        return;
+      }
+      
+      if (!selectedMesh) {
+        alert('⚠️ Click the object first to select it!\n\n1. Click on the mesh in viewport\n2. Then apply material');
+        return;
+      }
+      
+      const preset = MATERIAL_PRESETS[materialName];
+      const material = new THREE.MeshStandardMaterial(preset);
+      selectedMesh.material = material;
+      
+      // Update active state
+      document.querySelectorAll('.material-preset').forEach(el => el.classList.remove('active'));
+      document.getElementById(`mat-${materialName}`).classList.add('active');
+      
+      console.log(`🎨 Applied ${materialName} to selected object`, preset);
+      alert(`✅ ${materialName.toUpperCase()} material applied!`);
+    }
+
+    function toggleMaterial(materialName) {
+      const preset = document.getElementById(`mat-${materialName}`);
+      const details = preset.querySelector('.material-details');
+      const toggle = preset.querySelector('.material-toggle');
+      
+      // Close all others
+      document.querySelectorAll('.material-details').forEach(d => d.classList.remove('show'));
+      document.querySelectorAll('.material-toggle').forEach(t => t.classList.remove('expanded'));
+      
+      // Toggle this one
+      if (details.classList.contains('show')) {
+        details.classList.remove('show');
+        toggle.classList.remove('expanded');
+      } else {
+        details.classList.add('show');
+        toggle.classList.add('expanded');
+      }
+    }
+
+    function selectObject() {
+      if (sculptMesh) {
+        selectedMesh = sculptMesh;
+        document.getElementById('selectionIndicator').classList.add('show');
+        console.log('✅ Object selected - ready for material application');
+        
+        // Auto-hide after 2 seconds
+        setTimeout(() => {
+          document.getElementById('selectionIndicator').classList.remove('show');
+        }, 2000);
+      }
+    }
+
+    function loadPrimitive(type) {
+      if (sculptMesh) scene.remove(sculptMesh);
+
+      let geometry;
+      switch (type) {
+        case 'sphere':
+          geometry = new THREE.SphereGeometry(2, 64, 64);
+          break;
+        case 'cube':
+          geometry = new THREE.BoxGeometry(3, 3, 3, 16, 16, 16);
+          break;
+        case 'cylinder':
+          geometry = new THREE.CylinderGeometry(1.5, 1.5, 4, 32, 16);
+          break;
+        case 'torus':
+          geometry = new THREE.TorusGeometry(2, 0.8, 32, 64);
+          break;
+      }
+
+      const material = new THREE.MeshStandardMaterial(MATERIAL_PRESETS.default);
+      sculptMesh = new THREE.Mesh(geometry, material);
+      sculptMesh.castShadow = true;
+      sculptMesh.receiveShadow = true;
+      scene.add(sculptMesh);
+
+      updateStats();
+      console.log(`📦 Loaded primitive: ${type}`);
+    }
+
+    function edgeTighten() {
+      if (!sculptMesh) return;
+      
+      const geometry = sculptMesh.geometry;
+      const positions = geometry.attributes.position;
+      const center = new THREE.Vector3();
+      
+      for (let i = 0; i < positions.count; i++) {
+        center.add(new THREE.Vector3(
+          positions.getX(i),
+          positions.getY(i),
+          positions.getZ(i)
+        ));
+      }
+      center.divideScalar(positions.count);
+
+      for (let i = 0; i < positions.count; i++) {
+        const vertex = new THREE.Vector3(
+          positions.getX(i),
+          positions.getY(i),
+          positions.getZ(i)
+        );
+        vertex.lerp(center, 0.1);
+        positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
+      }
+
+      positions.needsUpdate = true;
+      geometry.computeVertexNormals();
+      console.log('⬅️➡️ Edges tightened');
+    }
+
+    function edgeExpand() {
+      if (!sculptMesh) return;
+      
+      const geometry = sculptMesh.geometry;
+      const positions = geometry.attributes.position;
+      const center = new THREE.Vector3();
+      
+      for (let i = 0; i < positions.count; i++) {
+        center.add(new THREE.Vector3(
+          positions.getX(i),
+          positions.getY(i),
+          positions.getZ(i)
+        ));
+      }
+      center.divideScalar(positions.count);
+
+      for (let i = 0; i < positions.count; i++) {
+        const vertex = new THREE.Vector3(
+          positions.getX(i),
+          positions.getY(i),
+          positions.getZ(i)
+        );
+        const direction = vertex.clone().sub(center).normalize();
+        vertex.add(direction.multiplyScalar(0.2));
+        positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
+      }
+
+      positions.needsUpdate = true;
+      geometry.computeVertexNormals();
+      console.log('↔️ Edges expanded');
+    }
+
+    function subdivide() {
+      if (!sculptMesh) {
+        alert('⚠️ No mesh loaded! Load a primitive first.');
+        return;
+      }
+      
+      console.log('➕ Subdividing faces...');
+      
+      try {
+        const oldGeometry = sculptMesh.geometry;
+        
+        // Convert indexed geometry to non-indexed first
+        let positions, normals;
+        
+        if (oldGeometry.index) {
+          // Geometry is indexed - need to expand it
+          console.log('Converting indexed geometry...');
+          const tempGeometry = oldGeometry.toNonIndexed();
+          positions = tempGeometry.attributes.position;
+          normals = tempGeometry.attributes.normal;
+        } else {
+          positions = oldGeometry.attributes.position;
+          normals = oldGeometry.attributes.normal;
+        }
+        
+        const newPositions = [];
+        const newNormals = [];
+        const triangleCount = positions.count / 3;
+        
+        console.log(`Processing ${triangleCount} triangles...`);
+        
+        for (let i = 0; i < triangleCount; i++) {
+          const i0 = i * 3;
+          const i1 = i * 3 + 1;
+          const i2 = i * 3 + 2;
+          
+          // Get triangle vertices
+          const v0 = new THREE.Vector3(positions.getX(i0), positions.getY(i0), positions.getZ(i0));
+          const v1 = new THREE.Vector3(positions.getX(i1), positions.getY(i1), positions.getZ(i1));
+          const v2 = new THREE.Vector3(positions.getX(i2), positions.getY(i2), positions.getZ(i2));
+          
+          // Get normals
+          const n0 = new THREE.Vector3(normals.getX(i0), normals.getY(i0), normals.getZ(i0));
+          const n1 = new THREE.Vector3(normals.getX(i1), normals.getY(i1), normals.getZ(i1));
+          const n2 = new THREE.Vector3(normals.getX(i2), normals.getY(i2), normals.getZ(i2));
+          
+          // Calculate midpoints
+          const m01 = new THREE.Vector3().lerpVectors(v0, v1, 0.5);
+          const m12 = new THREE.Vector3().lerpVectors(v1, v2, 0.5);
+          const m20 = new THREE.Vector3().lerpVectors(v2, v0, 0.5);
+          
+          // Calculate midpoint normals
+          const nm01 = new THREE.Vector3().lerpVectors(n0, n1, 0.5).normalize();
+          const nm12 = new THREE.Vector3().lerpVectors(n1, n2, 0.5).normalize();
+          const nm20 = new THREE.Vector3().lerpVectors(n2, n0, 0.5).normalize();
+          
+          // Create 4 new triangles from 1 original
+          // Triangle 1: v0, m01, m20
+          newPositions.push(v0.x, v0.y, v0.z, m01.x, m01.y, m01.z, m20.x, m20.y, m20.z);
+          newNormals.push(n0.x, n0.y, n0.z, nm01.x, nm01.y, nm01.z, nm20.x, nm20.y, nm20.z);
+          
+          // Triangle 2: m01, v1, m12
+          newPositions.push(m01.x, m01.y, m01.z, v1.x, v1.y, v1.z, m12.x, m12.y, m12.z);
+          newNormals.push(nm01.x, nm01.y, nm01.z, n1.x, n1.y, n1.z, nm12.x, nm12.y, nm12.z);
+          
+          // Triangle 3: m20, m12, v2
+          newPositions.push(m20.x, m20.y, m20.z, m12.x, m12.y, m12.z, v2.x, v2.y, v2.z);
+          newNormals.push(nm20.x, nm20.y, nm20.z, nm12.x, nm12.y, nm12.z, n2.x, n2.y, n2.z);
+          
+          // Triangle 4: m01, m12, m20 (center)
+          newPositions.push(m01.x, m01.y, m01.z, m12.x, m12.y, m12.z, m20.x, m20.y, m20.z);
+          newNormals.push(nm01.x, nm01.y, nm01.z, nm12.x, nm12.y, nm12.z, nm20.x, nm20.y, nm20.z);
+        }
+        
+        // Create new geometry
+        const newGeometry = new THREE.BufferGeometry();
+        newGeometry.setAttribute('position', new THREE.Float32BufferAttribute(newPositions, 3));
+        newGeometry.setAttribute('normal', new THREE.Float32BufferAttribute(newNormals, 3));
+        
+        // Replace mesh geometry
+        oldGeometry.dispose();
+        sculptMesh.geometry = newGeometry;
+        
+        updateStats();
+        
+        const newVertexCount = newPositions.length / 3;
+        console.log(`✅ Subdivided! Old: ${triangleCount} faces → New: ${triangleCount * 4} faces`);
+        alert(`✅ Subdivision complete!\n\nOld faces: ${triangleCount.toLocaleString()}\nNew faces: ${(triangleCount * 4).toLocaleString()}\nVertices: ${newVertexCount.toLocaleString()}\n\n💡 Click again for more detail!`);
+        
+      } catch (error) {
+        console.error('❌ Subdivision failed:', error);
+        alert(`❌ Subdivision failed!\n\nError: ${error.message}\n\nCheck browser console (F12) for details.`);
+      }
+    }
+
+    function decimate() {
+      alert('Decimation coming soon! For now, reload lower-poly primitive');
+    }
+
+    function saveMesh() {
+      if (!sculptMesh) return;
+      
+      const meshData = {
+        geometry: sculptMesh.geometry.toJSON(),
+        material: {
+          color: sculptMesh.material.color.getHex(),
+          roughness: sculptMesh.material.roughness,
+          metalness: sculptMesh.material.metalness
+        }
+      };
+
+      localStorage.setItem('savedMesh', JSON.stringify(meshData));
+      alert('💾 Mesh saved!');
+    }
+
+    function exportMesh() {
+      if (!sculptMesh) return;
+      
+      const meshData = {
+        vertices: Array.from(sculptMesh.geometry.attributes.position.array),
+        normals: Array.from(sculptMesh.geometry.attributes.normal.array),
+        material: {
+          color: sculptMesh.material.color.getHex(),
+          roughness: sculptMesh.material.roughness,
+          metalness: sculptMesh.material.metalness
+        }
+      };
+
+      const blob = new Blob([JSON.stringify(meshData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sculpt_${Date.now()}.json`;
+      a.click();
+      console.log('📤 Exported');
+    }
+
+    function resetMesh() {
+      if (confirm('Reset to sphere?')) loadPrimitive('sphere');
+    }
+
+    function clearScene() {
+      if (confirm('Clear everything?')) {
+        if (sculptMesh) {
+          scene.remove(sculptMesh);
+          sculptMesh = null;
+          updateStats();
+        }
+      }
+    }
+
+    function updateStats() {
+      if (sculptMesh) {
+        const geometry = sculptMesh.geometry;
+        const vertexCount = geometry.attributes.position.count;
+        const faceCount = geometry.index ? geometry.index.count / 3 : vertexCount / 3;
+        
+        document.getElementById('vertexCount').textContent = vertexCount;
+        document.getElementById('faceCount').textContent = Math.floor(faceCount);
+      } else {
+        document.getElementById('vertexCount').textContent = '0';
+        document.getElementById('faceCount').textContent = '0';
+      }
+    }
+
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>
