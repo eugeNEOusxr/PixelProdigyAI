@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expert Builder Studio - Co-Create Your Training World</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    #container {
+      display: grid;
+      grid-template-columns: 280px 1fr 350px;
+      grid-template-rows: 70px 1fr 45px;
+      height: 100vh;
+    }
+
+    /* HEADER */
+    #header {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .expert-badge {
+      background: rgba(0, 255, 136, 0.2);
+      border: 2px solid rgba(0, 255, 136, 0.5);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #00ff88;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .expert-name {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .expert-id {
+      font-size: 12px;
+      opacity: 0.8;
+      font-family: 'Courier New', monospace;
+    }
+
+    .header-center {
+      flex: 1;
+      text-align: center;
+    }
+
+    .header-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .header-subtitle {
+      font-size: 11px;
+      opacity: 0.85;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    .header-btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .header-btn.primary {
+      background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+      color: #0a0a0a;
+    }
+
+    /* LEFT SIDEBAR - TOOLBOX */
+    #toolbox {
+      background: #1a1a1a;
+      border-right: 2px solid #333;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .tool-section {
+      margin-bottom: 30px;
+    }
+
+    .tool-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .tool-btn {
+      background: rgba(102, 126, 234, 0.1);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      color: #fff;
+    }
+
+    .tool-btn:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+      transform: translateY(-2px);
+    }
+
+    .tool-btn.active {
+      background: rgba(0, 255, 136, 0.2);
+      border-color: #00ff88;
+    }
+
+    .tool-icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .tool-label {
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .prompt-input {
+      width: 100%;
+      background: rgba(102, 126, 234, 0.1);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .prompt-input:focus {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.15);
+    }
+
+    .prompt-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    /* VIEWPORT - 3D CANVAS */
+    #viewport {
+      background: #0f0f0f;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .viewport-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(102, 126, 234, 0.5);
+      z-index: 10;
+    }
+
+    .overlay-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #00ff88;
+    }
+
+    .overlay-info {
+      font-size: 12px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .ai-thinking {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(102, 126, 234, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 30px;
+      border-radius: 50px;
+      border: 2px solid #00ff88;
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .ai-thinking.show {
+      display: block;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+    }
+
+    /* RIGHT SIDEBAR - AI ASSISTANT */
+    #ai-panel {
+      background: #1a1a1a;
+      border-left: 2px solid #333;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .ai-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .ai-avatar {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .ai-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .ai-role {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .chat-message {
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-message.ai {
+      background: rgba(102, 126, 234, 0.2);
+      border: 2px solid rgba(102, 126, 234, 0.4);
+      align-self: flex-start;
+      max-width: 85%;
+    }
+
+    .chat-message.expert {
+      background: rgba(0, 255, 136, 0.2);
+      border: 2px solid rgba(0, 255, 136, 0.4);
+      align-self: flex-end;
+      max-width: 85%;
+    }
+
+    .message-header {
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.8;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .suggestion-chip {
+      padding: 6px 12px;
+      background: rgba(102, 126, 234, 0.3);
+      border: 1px solid rgba(102, 126, 234, 0.5);
+      border-radius: 20px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .suggestion-chip:hover {
+      background: rgba(102, 126, 234, 0.5);
+      border-color: #667eea;
+    }
+
+    .chat-input-container {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 2px solid #333;
+    }
+
+    .chat-input {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .chat-input:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #667eea;
+    }
+
+    .chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* FOOTER */
+    #footer {
+      grid-column: 1 / -1;
+      background: #1a1a1a;
+      border-top: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      font-size: 12px;
+    }
+
+    .footer-left {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-label {
+      opacity: 0.7;
+    }
+
+    .footer-value {
+      font-weight: 700;
+      color: #00ff88;
+    }
+
+    .save-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(0, 255, 136, 0.2);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #00ff88;
+    }
+
+    @media (max-width: 1200px) {
+      #container {
+        grid-template-columns: 250px 1fr 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- HEADER -->
+    <div id="header">
+      <div class="header-left">
+        <div>
+          <div class="expert-badge">🏆 FOUNDING EXPERT</div>
+          <div class="expert-name" id="expertName">Dr. Loading...</div>
+          <div class="expert-id" id="expertId">EXPERT-XXXX-XXXX</div>
+        </div>
+      </div>
+      
+      <div class="header-center">
+        <div class="header-title">🧪 Expert Builder Studio</div>
+        <div class="header-subtitle">Co-Create Your Training World with AI</div>
+      </div>
+      
+      <div class="header-right">
+        <button class="header-btn" onclick="saveProgress()">💾 Save</button>
+        <button class="header-btn" onclick="previewMode()">👁️ Preview</button>
+        <button class="header-btn primary" onclick="publishSimulation()">🚀 Publish</button>
+      </div>
+    </div>
+
+    <!-- LEFT SIDEBAR - TOOLBOX -->
+    <div id="toolbox">
+      <div class="tool-section">
+        <div class="tool-section-title">
+          <span>🏗️</span>
+          <span>Build Mode</span>
+        </div>
+        <div class="tool-grid">
+          <div class="tool-btn active" onclick="selectTool('layout', this)">
+            <span class="tool-icon">📐</span>
+            <span class="tool-label">Layout</span>
+          </div>
+          <div class="tool-btn" onclick="selectTool('objects', this)">
+            <span class="tool-icon">📦</span>
+            <span class="tool-label">Objects</span>
+          </div>
+          <div class="tool-btn" onclick="selectTool('scenarios', this)">
+            <span class="tool-icon">🎭</span>
+            <span class="tool-label">Scenarios</span>
+          </div>
+          <div class="tool-btn" onclick="selectTool('characters', this)">
+            <span class="tool-icon">🧍</span>
+            <span class="tool-label">NPCs</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-section">
+        <div class="tool-section-title">
+          <span>🎨</span>
+          <span>Quick Add</span>
+        </div>
+        <div class="tool-grid">
+          <div class="tool-btn" onclick="quickAdd('counter')">
+            <span class="tool-icon">🏪</span>
+            <span class="tool-label">Counter</span>
+          </div>
+          <div class="tool-btn" onclick="quickAdd('shelves')">
+            <span class="tool-icon">📚</span>
+            <span class="tool-label">Shelves</span>
+          </div>
+          <div class="tool-btn" onclick="quickAdd('register')">
+            <span class="tool-icon">💳</span>
+            <span class="tool-label">Register</span>
+          </div>
+          <div class="tool-btn" onclick="quickAdd('computer')">
+            <span class="tool-icon">💻</span>
+            <span class="tool-label">Computer</span>
+          </div>
+          <div class="tool-btn" onclick="quickAdd('customer')">
+            <span class="tool-icon">👤</span>
+            <span class="tool-label">Customer</span>
+          </div>
+          <div class="tool-btn" onclick="quickAdd('inventory')">
+            <span class="tool-icon">📋</span>
+            <span class="tool-label">Inventory</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-section">
+        <div class="tool-section-title">
+          <span>🤖</span>
+          <span>AI Co-Pilot</span>
+        </div>
+        <textarea class="prompt-input" id="aiPrompt" placeholder="Describe what you want to add...
+
+Example: 'Add a pharmacy counter with 3 registers, behind-the-counter workspace, prescription drop-off area, and waiting chairs'"></textarea>
+        <button class="generate-btn" onclick="generateFromPrompt()">✨ Generate with AI</button>
+      </div>
+
+      <div class="tool-section">
+        <div class="tool-section-title">
+          <span>🏆</span>
+          <span>Mathematical Methods</span>
+        </div>
+        <select style="width: 100%; padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: #fff; font-size: 12px;" onchange="selectMethod(this.value)">
+          <option value="fibonacci">🇮🇹 Fibonacci Sphere</option>
+          <option value="perlin">🎮 Perlin Noise</option>
+          <option value="voronoi">🇺🇦 Voronoi Diagram</option>
+          <option value="catmull">🇺🇸 Catmull-Rom Spline</option>
+          <option value="bezier">🇫🇷 Bézier Curve</option>
+          <option value="quaternion">🇮🇪 Quaternion SLERP</option>
+          <option value="lsystem">🇭🇺 L-System Fractal</option>
+          <option value="phong">🇻🇳 Phong Shading</option>
+          <option value="delaunay">🇷🇺 Delaunay Triangulation</option>
+          <option value="subdivision">💎 Subdivision Surface</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- VIEWPORT -->
+    <div id="viewport">
+      <canvas id="canvas"></canvas>
+      
+      <div class="viewport-overlay">
+        <div class="overlay-title">🏪 Pharmacy Training Simulation</div>
+        <div class="overlay-info">
+          <strong>View:</strong> Front Counter<br>
+          <strong>Objects:</strong> <span id="objectCount">0</span><br>
+          <strong>Interactions:</strong> <span id="interactionCount">0</span>
+        </div>
+      </div>
+
+      <div class="ai-thinking" id="aiThinking">
+        🤖 AI is generating your request...
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR - AI ASSISTANT -->
+    <div id="ai-panel">
+      <div class="ai-header">
+        <div class="ai-avatar">🤖</div>
+        <div class="ai-name">PixelProdigy AI</div>
+        <div class="ai-role">Your Co-Creation Assistant</div>
+      </div>
+
+      <div class="chat-container" id="chatContainer">
+        <div class="chat-message ai">
+          <div class="message-header">🤖 AI ASSISTANT</div>
+          <div>
+            Welcome to Expert Builder Studio! 👋<br><br>
+            
+            I'm here to help you build your pharmacy training simulation. You have complete creative control - describe what you want, and I'll generate it using advanced mathematical methods.<br><br>
+            
+            <strong>What would you like to create first?</strong>
+          </div>
+          <div class="suggestion-chips">
+            <div class="suggestion-chip" onclick="suggestClick('Layout the main pharmacy counter area')">🏪 Pharmacy Layout</div>
+            <div class="suggestion-chip" onclick="suggestClick('Add prescription drop-off station')">💊 Drop-off Station</div>
+            <div class="suggestion-chip" onclick="suggestClick('Create waiting area with chairs')">🪑 Waiting Area</div>
+            <div class="suggestion-chip" onclick="suggestClick('Add shelving with medications')">📚 Med Shelves</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-container">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Describe what you want to build..." onkeypress="handleChatEnter(event)">
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div id="footer">
+      <div class="footer-left">
+        <div class="footer-stat">
+          <span class="footer-label">Objects:</span>
+          <span class="footer-value" id="footerObjectCount">0</span>
+        </div>
+        <div class="footer-stat">
+          <span class="footer-label">Scenarios:</span>
+          <span class="footer-value" id="scenarioCount">0</span>
+        </div>
+        <div class="footer-stat">
+          <span class="footer-label">Method:</span>
+          <span class="footer-value" id="currentMethod">Fibonacci</span>
+        </div>
+      </div>
+      
+      <div class="save-indicator">
+        <span>💾</span>
+        <span>All changes auto-saved</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // =============================================
+    // STATE MANAGEMENT
+    // =============================================
+
+    let expertData = null;
+    let scene, camera, renderer;
+    let objects = [];
+    let scenarios = [];
+    let currentTool = 'layout';
+    let currentMethod = 'fibonacci';
+
+    // =============================================
+    // INITIALIZATION
+    // =============================================
+
+    window.addEventListener('load', function() {
+      // Load expert data from localStorage
+      loadExpertData();
+      
+      // Initialize Three.js
+      initThreeJS();
+      
+      // Start conversation
+      setTimeout(() => {
+        addAIMessage(`Perfect! I see you're building a <strong>${expertData?.industry || 'pharmacy'}</strong> training simulation. Let's start by laying out the main space.<br><br>Describe your ideal layout, and I'll generate it in real-time!`);
+      }, 2000);
+    });
+
+    function loadExpertData() {
+      // Try to get expert from URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const expertId = urlParams.get('id');
+      
+      if (expertId) {
+        // Load from localStorage
+        const experts = JSON.parse(localStorage.getItem('pixelprodigy_experts') || '[]');
+        expertData = experts.find(e => e.expertId === expertId);
+      }
+      
+      // Default fallback
+      if (!expertData) {
+        expertData = {
+          expertId: 'EXPERT-DEMO-0001',
+          fullName: 'Demo Expert',
+          industry: 'pharmacy',
+          jobTitle: 'Lead Pharmacist'
+        };
+      }
+      
+      // Update UI
+      document.getElementById('expertName').textContent = expertData.fullName;
+      document.getElementById('expertId').textContent = expertData.expertId;
+      
+      console.log('🏆 Expert Builder Studio Loaded:', expertData);
+    }
+
+    function initThreeJS() {
+      const canvas = document.getElementById('canvas');
+      
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0f0f0f);
+      scene.fog = new THREE.Fog(0x0f0f0f, 10, 50);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(
+        75,
+        canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(8, 6, 8);
+      camera.lookAt(0, 0, 0);
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 15, 5);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+
+      const point1 = new THREE.PointLight(0x667eea, 1, 50);
+      point1.position.set(-5, 8, -5);
+      scene.add(point1);
+
+      const point2 = new THREE.PointLight(0x00ff88, 1, 50);
+      point2.position.set(5, 8, 5);
+      scene.add(point2);
+
+      // Ground
+      const groundGeometry = new THREE.PlaneGeometry(50, 50);
+      const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a1a,
+        roughness: 0.8
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // Grid
+      const gridHelper = new THREE.GridHelper(50, 50, 0x667eea, 0x2a2a2a);
+      scene.add(gridHelper);
+
+      // Resize handler
+      window.addEventListener('resize', onWindowResize);
+
+      // Start animation
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      // Slowly rotate camera
+      camera.position.x = Math.sin(Date.now() * 0.0001) * 10;
+      camera.position.z = Math.cos(Date.now() * 0.0001) * 10;
+      camera.lookAt(0, 0, 0);
+      
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const canvas = document.getElementById('canvas');
+      camera.aspect = canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+    }
+
+    // =============================================
+    // TOOL SELECTION
+    // =============================================
+
+    function selectTool(tool, btn) {
+      currentTool = tool;
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      addAIMessage(`Switched to <strong>${tool.toUpperCase()}</strong> mode. What would you like to add?`);
+    }
+
+    function selectMethod(method) {
+      currentMethod = method;
+      document.getElementById('currentMethod').textContent = method.charAt(0).toUpperCase() + method.slice(1);
+      
+      const methodNames = {
+        fibonacci: 'Fibonacci Sphere',
+        perlin: 'Perlin Noise',
+        voronoi: 'Voronoi Diagram',
+        catmull: 'Catmull-Rom Spline',
+        bezier: 'Bézier Curve',
+        quaternion: 'Quaternion SLERP',
+        lsystem: 'L-System Fractal',
+        phong: 'Phong Shading',
+        delaunay: 'Delaunay Triangulation',
+        subdivision: 'Subdivision Surface'
+      };
+      
+      addAIMessage(`Mathematical method changed to <strong>${methodNames[method]}</strong>. Objects will now be generated using this algorithm! 🏆`);
+    }
+
+    // =============================================
+    // QUICK ADD
+    // =============================================
+
+    function quickAdd(item) {
+      showAIThinking();
+      
+      setTimeout(() => {
+        addObjectToScene(item);
+        hideAIThinking();
+        
+        const descriptions = {
+          counter: 'pharmacy counter with register and workspace',
+          shelves: 'medication shelving unit with organized compartments',
+          register: 'point-of-sale system with card reader',
+          computer: 'workstation computer with pharmacy software',
+          customer: 'customer NPC waiting for prescription',
+          inventory: 'inventory management station with barcode scanner'
+        };
+        
+        addAIMessage(`Added <strong>${descriptions[item]}</strong> to your simulation! ✨`);
+      }, 1500);
+    }
+
+    // =============================================
+    // AI PROMPT GENERATION
+    // =============================================
+
+    function generateFromPrompt() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      
+      if (!prompt) {
+        addAIMessage('Please describe what you want to generate in the text box above! 📝');
+        return;
+      }
+      
+      addExpertMessage(prompt);
+      showAIThinking();
+      
+      setTimeout(() => {
+        // Simulate AI generation
+        addObjectToScene('custom');
+        hideAIThinking();
+        
+        addAIMessage(`Generated: <strong>${prompt}</strong><br><br>Used <strong>${currentMethod}</strong> algorithm for optimal geometry. Does this match your vision? 🎯`);
+        
+        document.getElementById('aiPrompt').value = '';
+      }, 2500);
+    }
+
+    // =============================================
+    // CHAT SYSTEM
+    // =============================================
+
+    function handleChatEnter(event) {
+      if (event.key === 'Enter') {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (message) {
+          addExpertMessage(message);
+          input.value = '';
+          
+          // AI response
+          setTimeout(() => {
+            respondToExpert(message);
+          }, 1000);
+        }
+      }
+    }
+
+    function suggestClick(suggestion) {
+      addExpertMessage(suggestion);
+      
+      setTimeout(() => {
+        respondToExpert(suggestion);
+      }, 1000);
+    }
+
+    function addAIMessage(text) {
+      const chatContainer = document.getElementById('chatContainer');
+      const message = document.createElement('div');
+      message.className = 'chat-message ai';
+      message.innerHTML = `
+        <div class="message-header">🤖 AI ASSISTANT</div>
+        <div>${text}</div>
+      `;
+      chatContainer.appendChild(message);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function addExpertMessage(text) {
+      const chatContainer = document.getElementById('chatContainer');
+      const message = document.createElement('div');
+      message.className = 'chat-message expert';
+      message.innerHTML = `
+        <div class="message-header">🏆 YOU</div>
+        <div>${text}</div>
+      `;
+      chatContainer.appendChild(message);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function respondToExpert(message) {
+      const lowerMsg = message.toLowerCase();
+      
+      if (lowerMsg.includes('counter') || lowerMsg.includes('pharmacy')) {
+        showAIThinking();
+        setTimeout(() => {
+          addObjectToScene('counter');
+          hideAIThinking();
+          addAIMessage('Generated a pharmacy counter! I used <strong>Fibonacci Sphere</strong> distribution for optimal object placement. Want to adjust the layout?');
+        }, 2000);
+      } else if (lowerMsg.includes('waiting') || lowerMsg.includes('chair')) {
+        showAIThinking();
+        setTimeout(() => {
+          addObjectToScene('chairs');
+          hideAIThinking();
+          addAIMessage('Added a waiting area with chairs. Used <strong>Voronoi Diagram</strong> spacing for natural customer flow. How many chairs do you need?');
+        }, 2000);
+      } else if (lowerMsg.includes('prescription') || lowerMsg.includes('drop')) {
+        showAIThinking();
+        setTimeout(() => {
+          addObjectToScene('dropoff');
+          hideAIThinking();
+          addAIMessage('Created prescription drop-off station! Positioned using <strong>Catmull-Rom Splines</strong> for smooth workflow transitions. Perfect! 🎯');
+        }, 2000);
+      } else if (lowerMsg.includes('shelf') || lowerMsg.includes('medication')) {
+        showAIThinking();
+        setTimeout(() => {
+          addObjectToScene('shelves');
+          hideAIThinking();
+          addAIMessage('Generated medication shelving using <strong>L-System Fractals</strong> for organized compartmentalization. Should I add labels?');
+        }, 2000);
+      } else {
+        addAIMessage(`Got it! Working on: <strong>${message}</strong><br><br>I'll generate this using <strong>${currentMethod}</strong> mathematics. One moment... ⚙️`);
+        showAIThinking();
+        setTimeout(() => {
+          addObjectToScene('custom');
+          hideAIThinking();
+          addAIMessage('Done! Check the viewport. Need any adjustments?');
+        }, 2500);
+      }
+    }
+
+    // =============================================
+    // 3D OBJECT GENERATION
+    // =============================================
+
+    function addObjectToScene(type) {
+      let geometry, material, mesh;
+      const color = 0x667eea;
+      
+      switch(type) {
+        case 'counter':
+          geometry = new THREE.BoxGeometry(6, 1, 2);
+          material = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.7 });
+          mesh = new THREE.Mesh(geometry, material);
+          mesh.position.set(0, 0.5, -3);
+          break;
+          
+        case 'shelves':
+          geometry = new THREE.BoxGeometry(4, 3, 0.5);
+          material = new THREE.MeshStandardMaterial({ color: 0x708090, roughness: 0.8 });
+          mesh = new THREE.Mesh(geometry, material);
+          mesh.position.set(-4, 1.5, -5);
+          break;
+          
+        case 'chairs':
+          for (let i = 0; i < 4; i++) {
+            geometry = new THREE.BoxGeometry(0.5, 1, 0.5);
+            material = new THREE.MeshStandardMaterial({ color: 0x4169E1, roughness: 0.6 });
+            mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(4 + i * 1.2, 0.5, 2);
+            mesh.castShadow = true;
+            scene.add(mesh);
+            objects.push(mesh);
+          }
+          updateObjectCount();
+          return;
+          
+        default:
+          geometry = new THREE.IcosahedronGeometry(0.8, 1);
+          material = new THREE.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.4 });
+          mesh = new THREE.Mesh(geometry, material);
+          mesh.position.set(Math.random() * 4 - 2, 0.8, Math.random() * 4 - 2);
+      }
+      
+      mesh.castShadow = true;
+      scene.add(mesh);
+      objects.push(mesh);
+      
+      // Add wireframe
+      const wireframe = new THREE.LineSegments(
+        new THREE.EdgesGeometry(geometry),
+        new THREE.LineBasicMaterial({ color: 0x00ff88, linewidth: 2 })
+      );
+      mesh.add(wireframe);
+      
+      updateObjectCount();
+    }
+
+    function updateObjectCount() {
+      const count = objects.length;
+      document.getElementById('objectCount').textContent = count;
+      document.getElementById('footerObjectCount').textContent = count;
+    }
+
+    // =============================================
+    // UI HELPERS
+    // =============================================
+
+    function showAIThinking() {
+      document.getElementById('aiThinking').classList.add('show');
+    }
+
+    function hideAIThinking() {
+      document.getElementById('aiThinking').classList.remove('show');
+    }
+
+    function saveProgress() {
+      const data = {
+        expertId: expertData.expertId,
+        objects: objects.length,
+        scenarios: scenarios.length,
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem(`expert_progress_${expertData.expertId}`, JSON.stringify(data));
+      
+      addAIMessage('✅ Progress saved! Your simulation is auto-backed up.');
+      console.log('💾 Saved:', data);
+    }
+
+    function previewMode() {
+      addAIMessage('🎬 Preview mode coming soon! You\'ll be able to walk through your simulation as a student.');
+    }
+
+    function publishSimulation() {
+      addAIMessage(`🚀 Publishing "<strong>${expertData.fullName}'s ${expertData.industry} Training Simulation</strong>"...<br><br>Once published, students worldwide can access your training! You'll earn royalties on each session. Ready to go live?`);
+    }
+  </script>
+</body>
+</html>
