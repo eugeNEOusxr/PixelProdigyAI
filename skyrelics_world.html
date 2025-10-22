@@ -965,6 +965,9 @@
     // VSL Character System
     let vslCharacterGenerator = null;
     
+    // Ability Manager (needs to be global for animate function)
+    let playerAbilityManager = null;
+    
     // Minimap System
     let minimap = null;
     
@@ -1580,7 +1583,7 @@
             // SKILLS & ABILITIES SYSTEM
             // ═══════════════════════════════════════════════════════════════════════
             
-            let playerAbilityManager = null;
+            // playerAbilityManager already declared globally
             let playerSkills = null;
             let playerCombatStats = null;
             let playerInventory = null;
