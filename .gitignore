@@ -40,6 +40,10 @@ google-cloud-sdk/
 
 # Generated content
 object_generator/
-world_system/
 scraped_images/
 generated_objects/
+
+# Large generated JSON files in world_system
+world_system/object_metadata.json
+world_system/world_object_placements.json
+world_system/world_spatial_index.json
