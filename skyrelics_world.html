@@ -4115,6 +4115,10 @@ The elbows, bearings & transmissions of the code 🔧
                             console.log('🗺️ Fog of War: ' + (minimap.showFogOfWar ? 'ON' : 'OFF'));
                         }
                         break;
+                    case 'KeyT':
+                        // Open teleport menu
+                        openTeleportMenu();
+                        break;
                     case 'KeyK':
                         // Clear waypoint
                         if (minimap) {
@@ -4177,7 +4181,8 @@ The elbows, bearings & transmissions of the code 🔧
         function updateMovement(delta) {
             if (!controls.isLocked && !cinematicMode) return;
             
-            const speed = sprint ? 50.0 : 20.0;
+            // Increased sprint speed: 50 → 100 (2x faster)
+            const speed = sprint ? 100.0 : 20.0;
             
             velocity.x -= velocity.x * 10.0 * delta;
             velocity.z -= velocity.z * 10.0 * delta;
@@ -10466,7 +10471,8 @@ The elbows, bearings & transmissions of the code 🔧
 
         // Trigger flashcard based on location/event
         function checkFlashcardTriggers() {
-            if (!camera || cinematicMode) return;
+            // Safe check using typeof to avoid ReferenceError
+            if (typeof camera === 'undefined' || !camera || cinematicMode) return;
             
             const playerPos = camera.position;
             
@@ -10565,8 +10571,285 @@ The elbows, bearings & transmissions of the code 🔧
         console.log('🎓 Flashcard learning: PixelProdigy IS the advertisement!');
 
         // ═══════════════════════════════════════════════════════════════════
-        // FIRST 10 AI CHARACTER DIALOGUES
+        // TELEPORT MENU SYSTEM
         // ═══════════════════════════════════════════════════════════════════
+        
+        function openTeleportMenu() {
+            if (!controls.isLocked) return;
+            
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'teleport-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(5px);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            // Create menu
+            const menu = document.createElement('div');
+            menu.style.cssText = `
+                background: linear-gradient(135deg, rgba(10, 14, 39, 0.95), rgba(26, 31, 58, 0.95));
+                border: 3px solid #00FFFF;
+                border-radius: 20px;
+                padding: 30px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+            `;
+            
+            menu.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: #00FFFF; font-size: 2em; margin: 0;">🌀 Fast Travel</h2>
+                    <p style="color: #FFD700; margin: 10px 0;">Press T to teleport instantly • ESC to cancel</p>
+                </div>
+                <div id="teleport-locations"></div>
+            `;
+            
+            const locationsContainer = menu.querySelector('#teleport-locations');
+            
+            // Add teleport locations
+            portalLocations.forEach((loc, index) => {
+                const locationDiv = document.createElement('div');
+                locationDiv.style.cssText = `
+                    background: rgba(0, 255, 255, 0.1);
+                    border: 2px solid ${rgbToHex(loc.color)};
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin-bottom: 15px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                `;
+                
+                locationDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="color: ${rgbToHex(loc.color)}; font-size: 1.5em; font-weight: bold;">${loc.name}</div>
+                            <div style="color: #00FFFF; font-size: 0.9em;">
+                                X: ${Math.round(loc.position.x)}, Y: ${Math.round(loc.position.y)}, Z: ${Math.round(loc.position.z)}
+                            </div>
+                        </div>
+                        <div style="color: #FFD700; font-size: 2em;">→</div>
+                    </div>
+                `;
+                
+                locationDiv.onmouseenter = () => {
+                    locationDiv.style.background = 'rgba(0, 255, 255, 0.2)';
+                    locationDiv.style.transform = 'scale(1.05)';
+                };
+                
+                locationDiv.onmouseleave = () => {
+                    locationDiv.style.background = 'rgba(0, 255, 255, 0.1)';
+                    locationDiv.style.transform = 'scale(1)';
+                };
+                
+                locationDiv.onclick = () => {
+                    teleportToLocation(loc);
+                    closeTeleportMenu();
+                };
+                
+                locationsContainer.appendChild(locationDiv);
+            });
+            
+            overlay.appendChild(menu);
+            document.body.appendChild(overlay);
+            
+            // Unlock controls so cursor is visible
+            controls.unlock();
+            
+            // Close on ESC or clicking overlay
+            overlay.onclick = (e) => {
+                if (e.target === overlay) closeTeleportMenu();
+            };
+            
+            document.addEventListener('keydown', function escHandler(e) {
+                if (e.key === 'Escape') {
+                    closeTeleportMenu();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            });
+            
+            console.log('🌀 Teleport menu opened (Press T on any location or ESC to cancel)');
+        }
+        
+        function closeTeleportMenu() {
+            const overlay = document.getElementById('teleport-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+        
+        function teleportToLocation(loc) {
+            if (!camera) return;
+            
+            // Teleport player
+            camera.position.set(loc.position.x, loc.position.y + 3, loc.position.z);
+            
+            // Reset velocity
+            velocity.set(0, 0, 0);
+            
+            // Create teleport effect
+            createTeleportEffect(loc.position, loc.color);
+            
+            // Analytics
+            if (window.PixelProdigyAnalytics) {
+                PixelProdigyAnalytics.track('teleport', {
+                    destination: loc.name,
+                    x: loc.position.x,
+                    z: loc.position.z
+                });
+            }
+            
+            console.log(`✨ Teleported to ${loc.name}`);
+        }
+        
+        function createTeleportEffect(position, color) {
+            // Create particle burst at teleport location
+            const particleCount = 100;
+            const particles = [];
+            
+            for (let i = 0; i < particleCount; i++) {
+                const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const material = new THREE.MeshBasicMaterial({ color: color });
+                const particle = new THREE.Mesh(geometry, material);
+                
+                particle.position.set(position.x, position.y, position.z);
+                particle.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 10,
+                    Math.random() * 10,
+                    (Math.random() - 0.5) * 10
+                );
+                
+                scene.add(particle);
+                particles.push(particle);
+            }
+            
+            // Animate and remove particles
+            let frame = 0;
+            const animate = () => {
+                frame++;
+                particles.forEach(p => {
+                    p.position.add(p.velocity.clone().multiplyScalar(0.05));
+                    p.velocity.y -= 0.2; // Gravity
+                    p.material.opacity = 1 - (frame / 60);
+                    p.material.transparent = true;
+                });
+                
+                if (frame < 60) {
+                    requestAnimationFrame(animate);
+                } else {
+                    particles.forEach(p => scene.remove(p));
+                }
+            };
+            animate();
+        }
+        
+        // Helper function to convert THREE.js color to hex
+        function rgbToHex(color) {
+            const hex = color.toString(16).padStart(6, '0');
+            return '#' + hex;
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════
+        // ENHANCED MINIMAP WITH TELEPORT MARKERS
+        // ═══════════════════════════════════════════════════════════════════
+        
+        function enhanceMinimapWithTeleportMarkers() {
+            if (!minimap) return;
+            
+            const canvas = document.getElementById('minimap-canvas');
+            if (!canvas) return;
+            
+            // Add click handler to minimap for teleport markers
+            canvas.style.cursor = 'pointer';
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Check if click is on a portal marker
+                portalLocations.forEach(loc => {
+                    const minimapX = ((loc.position.x + 500) / 1000) * canvas.width;
+                    const minimapZ = ((loc.position.z + 500) / 1000) * canvas.height;
+                    
+                    const dist = Math.sqrt(Math.pow(x - minimapX, 2) + Math.pow(y - minimapZ, 2));
+                    
+                    if (dist < 10) {
+                        teleportToLocation(loc);
+                    }
+                });
+            });
+            
+            // Draw teleport markers on minimap
+            const originalRender = minimap.render.bind(minimap);
+            minimap.render = function() {
+                originalRender();
+                
+                const ctx = canvas.getContext('2d');
+                
+                // Draw portal markers
+                portalLocations.forEach(loc => {
+                    const minimapX = ((loc.position.x + 500) / 1000) * canvas.width;
+                    const minimapZ = ((loc.position.z + 500) / 1000) * canvas.height;
+                    
+                    // Draw pulsing circle
+                    const pulse = Math.sin(Date.now() / 500) * 2 + 5;
+                    ctx.beginPath();
+                    ctx.arc(minimapX, minimapZ, pulse, 0, Math.PI * 2);
+                    ctx.fillStyle = rgbToHex(loc.color) + '80';
+                    ctx.fill();
+                    
+                    // Draw center dot
+                    ctx.beginPath();
+                    ctx.arc(minimapX, minimapZ, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = rgbToHex(loc.color);
+                    ctx.fill();
+                    
+                    // Draw border
+                    ctx.beginPath();
+                    ctx.arc(minimapX, minimapZ, 3, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+            };
+            
+            console.log('🗺️ Minimap enhanced with clickable teleport markers');
+        }
+        
+        // Initialize enhanced minimap after scene is ready
+        setTimeout(() => {
+            enhanceMinimapWithTeleportMarkers();
+        }, 5000);
+
+        console.log('⚡ SPRINT SPEED DOUBLED (Press Shift)');
+        console.log('🌀 TELEPORT MENU ADDED (Press T)');
+        console.log('🗺️ MINIMAP MARKERS CLICKABLE');
+    </script>
+    
+    <!-- Analytics -->
+    <script src="analytics.js"></script>
+    <script>
+        // Track SkyRelics session
+        if (window.PixelProdigyAnalytics) {
+            PixelProdigyAnalytics.track('skyrelics_loaded', {
+                ai_dialogues: 10,
+                safety_protocols: 'active',
+                chroma_system: 'ready'
+            });
+        }
+    </script>
+</body>
+</html>
         
         const AI_DIALOGUES = {
             1: {
