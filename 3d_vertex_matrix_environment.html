@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦾 3D Vertex Matrix Environment - 86-Point Interactive System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #000000 0%, #0a0a1e 50%, #1a1a3e 100%);
+            color: #00ff88;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #container {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            grid-template-rows: 60px 1fr 80px;
+            height: 100vh;
+            gap: 2px;
+        }
+
+        #header {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 2px solid #00ff88;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #header h1 {
+            font-size: 18px;
+            color: #00ffaa;
+        }
+
+        #vertex-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+        }
+
+        .stat-item {
+            padding: 5px 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 3px;
+        }
+
+        .stat-value {
+            color: #ffaa00;
+            font-weight: bold;
+        }
+
+        .panel {
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #00ff88;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .panel h2 {
+            color: #00ffaa;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-bottom: 1px solid #00ff88;
+            padding-bottom: 5px;
+        }
+
+        #matrix-viewport {
+            position: relative;
+            background: #000;
+            border: 2px solid #00ff88;
+            overflow: hidden;
+        }
+
+        .anatomy-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+        }
+
+        .anatomy-section h3 {
+            color: #00ccff;
+            font-size: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vertex-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+            gap: 3px;
+            margin-top: 8px;
+        }
+
+        .vertex-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 204, 255, 0.2) 100%);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            font-size: 8px;
+            padding: 5px 2px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .vertex-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.5) 0%, rgba(0, 204, 255, 0.5) 100%);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .vertex-btn.active {
+            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
+        }
+
+        .vertex-btn.selected {
+            background: linear-gradient(135deg, #ff6600 0%, #ff9900 100%);
+            color: #000;
+            border-color: #ff6600;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 10px;
+            width: 100%;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .matrix-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px;
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            font-size: 10px;
+            z-index: 100;
+            max-width: 200px;
+        }
+
+        #footer {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 2px solid #00ff88;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .mode-indicator {
+            padding: 8px 15px;
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+
+        .vertex-counter {
+            font-size: 14px;
+            color: #ffaa00;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #00ff88;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            left: 28px;
+        }
+
+        .vertex-info {
+            font-size: 10px;
+            line-height: 1.4;
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 3px;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-toggle {
+            color: #ffaa00;
+            font-size: 10px;
+        }
+
+        .vertex-group.collapsed {
+            display: none;
+        }
+    </style>
+    <script src="lib/three.min.js"></script>
+    <script src="lib/OrbitControls.js"></script>
+</head>
+<body>
+    <div id="container">
+        <!-- Header -->
+        <div id="header">
+            <h1>🦾 3D VERTEX MATRIX ENVIRONMENT</h1>
+            <div id="vertex-stats">
+                <div class="stat-item">
+                    Total: <span class="stat-value" id="totalVertices">0</span>
+                </div>
+                <div class="stat-item">
+                    Selected: <span class="stat-value" id="selectedVertices">0</span>
+                </div>
+                <div class="stat-item">
+                    Active Section: <span class="stat-value" id="activeSection">None</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Panel: Vertex Button Matrix -->
+        <div class="panel">
+            <h2>🎯 VERTEX BUTTON MATRIX</h2>
+
+            <!-- FINGERS (4 × 3 segments + tips = ~192 vertices) -->
+            <div class="anatomy-section">
+                <div class="section-header" onclick="toggleSection('fingers')">
+                    <h3>
+                        <span>🖐️ FINGERS</span>
+                        <span class="vertex-counter">192 vertices</span>
+                    </h3>
+                    <span class="section-toggle" id="fingers-toggle">▼</span>
+                </div>
+                <div class="vertex-group" id="fingers-group"></div>
+            </div>
+
+            <!-- HAND (86 × 21 segments = 1806 vertices) -->
+            <div class="anatomy-section">
+                <div class="section-header" onclick="toggleSection('hand')">
+                    <h3>
+                        <span>👋 HAND</span>
+                        <span class="vertex-counter">1806 vertices</span>
+                    </h3>
+                    <span class="section-toggle" id="hand-toggle">▼</span>
+                </div>
+                <div class="vertex-group" id="hand-group"></div>
+            </div>
+
+            <!-- WRIST (86 vertices) -->
+            <div class="anatomy-section">
+                <div class="section-header" onclick="toggleSection('wrist')">
+                    <h3>
+                        <span>🤚 WRIST</span>
+                        <span class="vertex-counter">86 vertices</span>
+                    </h3>
+                    <span class="section-toggle" id="wrist-toggle">▼</span>
+                </div>
+                <div class="vertex-group" id="wrist-group"></div>
+            </div>
+
+            <!-- FOREARM (86 × 21 = 1806 vertices) -->
+            <div class="anatomy-section">
+                <div class="section-header" onclick="toggleSection('forearm')">
+                    <h3>
+                        <span>💪 FOREARM</span>
+                        <span class="vertex-counter">1806 vertices</span>
+                    </h3>
+                    <span class="section-toggle" id="forearm-toggle">▼</span>
+                </div>
+                <div class="vertex-group" id="forearm-group"></div>
+            </div>
+
+            <!-- ELBOW (86 vertices) -->
+            <div class="anatomy-section">
+                <div class="section-header" onclick="toggleSection('elbow')">
+                    <h3>
+                        <span>🔗 ELBOW</span>
+                        <span class="vertex-counter">86 vertices</span>
+                    </h3>
+                    <span class="section-toggle" id="elbow-toggle">▼</span>
+                </div>
+                <div class="vertex-group" id="elbow-group"></div>
+            </div>
+
+            <!-- BICEP/TRICEP (86 × 26 = 2236 vertices) -->
+            <div class="anatomy-section">
+                <div class="section-header" onclick="toggleSection('bicep')">
+                    <h3>
+                        <span>💪 BICEP/TRICEP</span>
+                        <span class="vertex-counter">2236 vertices</span>
+                    </h3>
+                    <span class="section-toggle" id="bicep-toggle">▼</span>
+                </div>
+                <div class="vertex-group" id="bicep-group"></div>
+            </div>
+        </div>
+
+        <!-- Center: 3D Matrix Viewport -->
+        <div id="matrix-viewport">
+            <canvas id="canvas3d"></canvas>
+            
+            <div class="matrix-overlay">
+                <strong>🎮 MATRIX CONTROLS</strong><br><br>
+                <strong>Mouse:</strong><br>
+                • Left Drag: Rotate<br>
+                • Right Drag: Pan<br>
+                • Scroll: Zoom<br><br>
+                <strong>Vertex Selection:</strong><br>
+                • Click button to highlight<br>
+                • Click in 3D to select<br>
+                • Multi-select: Ctrl+Click<br><br>
+                <strong>Current View:</strong><br>
+                Rotation: <span id="viewRotation">0°, 0°</span><br>
+                Zoom: <span id="viewZoom">100%</span>
+            </div>
+        </div>
+
+        <!-- Right Panel: Actions & Settings -->
+        <div class="panel">
+            <h2>⚡ ACTIONS & SETTINGS</h2>
+
+            <div class="anatomy-section">
+                <h3>🎯 VERTEX ACTIONS</h3>
+                <button class="action-btn" onclick="selectAllVertices()">
+                    SELECT ALL VERTICES
+                </button>
+                <button class="action-btn" onclick="deselectAllVertices()">
+                    DESELECT ALL
+                </button>
+                <button class="action-btn" onclick="selectBySection()">
+                    SELECT BY SECTION
+                </button>
+                <button class="action-btn" onclick="invertSelection()">
+                    INVERT SELECTION
+                </button>
+            </div>
+
+            <div class="anatomy-section">
+                <h3>🔧 MATRIX OPERATIONS</h3>
+                <button class="action-btn" onclick="transformSelected()">
+                    TRANSFORM SELECTED
+                </button>
+                <button class="action-btn" onclick="duplicateSelected()">
+                    DUPLICATE SELECTED
+                </button>
+                <button class="action-btn" onclick="deleteSelected()">
+                    DELETE SELECTED
+                </button>
+                <button class="action-btn" onclick="resetPositions()">
+                    RESET POSITIONS
+                </button>
+            </div>
+
+            <div class="anatomy-section">
+                <h3>💾 EXPORT / IMPORT</h3>
+                <button class="action-btn" onclick="exportVertexMatrix()">
+                    📤 EXPORT MATRIX
+                </button>
+                <button class="action-btn" onclick="importVertexMatrix()">
+                    📥 IMPORT MATRIX
+                </button>
+                <button class="action-btn" onclick="saveToPixelProdigy()">
+                    🎨 SAVE TO PIXELPRODIGY3D
+                </button>
+            </div>
+
+            <div class="anatomy-section">
+                <h3>📊 VERTEX INFO</h3>
+                <div class="vertex-info" id="vertexDetails">
+                    <strong>No vertex selected</strong><br><br>
+                    Click a vertex button or select in 3D to view details.
+                </div>
+            </div>
+
+            <div class="anatomy-section">
+                <h3>🎨 VISUALIZATION</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+                    <span style="font-size: 10px;">Show Grid:</span>
+                    <div class="toggle-switch" id="gridToggle" onclick="toggleGrid()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+                    <span style="font-size: 10px;">Show Vertices:</span>
+                    <div class="toggle-switch active" id="verticesToggle" onclick="toggleVertices()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+                    <span style="font-size: 10px;">Show Edges (Skeleton):</span>
+                    <div class="toggle-switch active" id="edgesToggle" onclick="toggleEdges()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+                    <span style="font-size: 10px;">Show Faces (Skin):</span>
+                    <div class="toggle-switch" id="facesToggle" onclick="toggleFaces()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+                    <span style="font-size: 10px;">Color by Section:</span>
+                    <div class="toggle-switch active" id="colorToggle" onclick="toggleColorMode()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="vertex-info" style="margin-top: 10px;">
+                    <strong>Mesh Topology:</strong><br>
+                    • Vertices: Point positions<br>
+                    • Edges: Connections (flow)<br>
+                    • Faces: Surface skin<br>
+                    • Inter-connections: Joint links<br><br>
+                    <small>Toggle each layer to see internal structure</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div id="footer">
+            <div class="control-group">
+                <div class="mode-indicator">
+                    Mode: <strong id="interactionMode">SELECT</strong>
+                </div>
+                <button class="action-btn" style="width: auto; padding: 8px 20px;" onclick="switchMode('SELECT')">
+                    SELECT
+                </button>
+                <button class="action-btn" style="width: auto; padding: 8px 20px;" onclick="switchMode('TRANSFORM')">
+                    TRANSFORM
+                </button>
+                <button class="action-btn" style="width: auto; padding: 8px 20px;" onclick="switchMode('SCULPT')">
+                    SCULPT
+                </button>
+            </div>
+            <div class="control-group">
+                <button class="action-btn" style="width: auto; padding: 8px 20px;" onclick="generateFullArm()">
+                    🦾 GENERATE FULL ARM
+                </button>
+                <button class="action-btn" style="width: auto; padding: 8px 20px;" onclick="resetMatrix()">
+                    🔄 RESET MATRIX
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Three.js Scene Setup
+        let scene, camera, renderer, controls;
+        let vertices = {};
+        let selectedVertices = new Set();
+        let vertexMeshes = [];
+        let edgeMeshes = []; // Edge connections between vertices
+        let faceMeshes = []; // Face polygons (skin layer)
+        let currentMode = 'SELECT';
+        let showEdges = true;
+        let showFaces = false;
+        let showVertices = true;
+
+        // Vertex counts per section
+        const vertexCounts = {
+            fingers: 192,
+            hand: 1806,
+            wrist: 86,
+            forearm: 1806,
+            elbow: 86,
+            bicep: 2236
+        };
+
+        // Section colors
+        const sectionColors = {
+            fingers: 0xff6600,
+            hand: 0xffaa00,
+            wrist: 0x00ff88,
+            forearm: 0x00ccff,
+            elbow: 0xff6600,
+            bicep: 0xff0088
+        };
+
+        // Connection structure (defines how vertices connect)
+        // Each section has start/end vertices and connection patterns
+        const connectionStructure = {
+            wrist: { start: 0, count: 86, ring: true }, // Circular ring
+            forearm: { start: 86, count: 1806, segments: 21, ring: true }, // 21 rings of 86
+            elbow: { start: 1892, count: 86, ring: true }, // Pivot joint ring
+            hand: { start: 1978, count: 1806, segments: 21, ring: true }, // Palm progression
+            fingers: { start: 3784, count: 192, branches: 4 }, // 4 separate branches
+            bicep: { start: 3976, count: 2236, segments: 26, ring: true } // 26 rings of 86
+        };
+
+        function initThreeJS() {
+            const canvas = document.getElementById('canvas3d');
+            const viewport = document.getElementById('matrix-viewport');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            camera = new THREE.PerspectiveCamera(75, viewport.clientWidth / viewport.clientHeight, 0.1, 1000);
+            camera.position.set(0, 5, 15);
+            
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+            
+            // Orbit Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0x00ff88, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            scene.add(directionalLight);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00ff88, 0x003322);
+            gridHelper.visible = false;
+            scene.add(gridHelper);
+            window.gridHelper = gridHelper;
+            
+            animate();
+        }
+
+        function generateVertexButtons() {
+            Object.keys(vertexCounts).forEach(section => {
+                const group = document.getElementById(`${section}-group`);
+                const count = vertexCounts[section];
+                
+                // Generate vertex buttons (show subset for performance)
+                const displayCount = Math.min(count, 86); // Show up to 86 buttons per section
+                for (let i = 0; i < displayCount; i++) {
+                    const btn = document.createElement('div');
+                    btn.className = 'vertex-btn';
+                    btn.textContent = `V${i + 1}`;
+                    btn.dataset.section = section;
+                    btn.dataset.index = i;
+                    btn.onclick = () => selectVertex(section, i);
+                    group.appendChild(btn);
+                }
+                
+                // If more vertices than buttons, add indicator
+                if (count > displayCount) {
+                    const moreBtn = document.createElement('div');
+                    moreBtn.className = 'vertex-btn';
+                    moreBtn.style.gridColumn = '1 / -1';
+                    moreBtn.style.fontSize = '9px';
+                    moreBtn.textContent = `+${count - displayCount} more vertices`;
+                    moreBtn.onclick = () => expandSection(section);
+                    group.appendChild(moreBtn);
+                }
+            });
+        }
+
+        function selectVertex(section, index) {
+            const btn = document.querySelector(`.vertex-btn[data-section="${section}"][data-index="${index}"]`);
+            const vertexKey = `${section}-${index}`;
+            
+            if (selectedVertices.has(vertexKey)) {
+                selectedVertices.delete(vertexKey);
+                btn.classList.remove('selected');
+            } else {
+                selectedVertices.add(vertexKey);
+                btn.classList.add('selected');
+            }
+            
+            updateStats();
+            updateVertexInfo(section, index);
+            highlightVertexIn3D(section, index);
+        }
+
+        function toggleSection(section) {
+            const group = document.getElementById(`${section}-group`);
+            const toggle = document.getElementById(`${section}-toggle`);
+            
+            if (group.classList.contains('collapsed')) {
+                group.classList.remove('collapsed');
+                toggle.textContent = '▼';
+            } else {
+                group.classList.add('collapsed');
+                toggle.textContent = '▶';
+            }
+        }
+
+        function generateFullArm() {
+            // Clear existing meshes
+            vertexMeshes.forEach(mesh => scene.remove(mesh));
+            edgeMeshes.forEach(mesh => scene.remove(mesh));
+            faceMeshes.forEach(mesh => scene.remove(mesh));
+            vertexMeshes = [];
+            edgeMeshes = [];
+            faceMeshes = [];
+            
+            // Store all vertex positions for edge/face connections
+            const allVertexPositions = [];
+            
+            // Generate arm geometry with all vertices
+            let yOffset = 0;
+            let globalVertexIndex = 0;
+            
+            Object.keys(vertexCounts).forEach(section => {
+                const count = vertexCounts[section];
+                const color = sectionColors[section];
+                const geometry = new THREE.BufferGeometry();
+                const positions = [];
+                const indices = [];
+                
+                const conn = connectionStructure[section];
+                const verticesPerRing = section === 'fingers' ? 16 : 86;
+                
+                // Generate vertex positions for this section
+                for (let i = 0; i < count; i++) {
+                    const angle = (i % verticesPerRing / verticesPerRing) * Math.PI * 2;
+                    const ringIndex = Math.floor(i / verticesPerRing);
+                    const radius = 1.0 + (ringIndex * 0.05); // Slight expansion
+                    const x = Math.cos(angle) * radius;
+                    const z = Math.sin(angle) * radius;
+                    const y = yOffset + (ringIndex * 0.12);
+                    
+                    positions.push(x, y, z);
+                    allVertexPositions.push({ x, y, z, section, localIndex: i, globalIndex: globalVertexIndex++ });
+                }
+                
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                
+                // Create VERTICES (points)
+                if (showVertices) {
+                    const material = new THREE.PointsMaterial({
+                        color: color,
+                        size: 0.1,
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    
+                    const points = new THREE.Points(geometry, material);
+                    points.userData = { section: section, type: 'vertices' };
+                    scene.add(points);
+                    vertexMeshes.push(points);
+                }
+                
+                // Create EDGES (connections between vertices - the "skeleton")
+                if (showEdges && conn.ring) {
+                    createEdgeConnections(positions, verticesPerRing, color, section);
+                }
+                
+                // Create FACES (skin layer - the "boxed environments")
+                if (showFaces && conn.ring) {
+                    createFaceSkin(positions, verticesPerRing, color, section);
+                }
+                
+                yOffset += 2.5;
+            });
+            
+            // Create INTER-SECTION connections (connect wrist→forearm, forearm→elbow, etc.)
+            createInterSectionConnections(allVertexPositions);
+            
+            updateStats();
+        }
+
+        function createEdgeConnections(positions, verticesPerRing, color, section) {
+            const edgeGeometry = new THREE.BufferGeometry();
+            const edgePositions = [];
+            const totalVertices = positions.length / 3;
+            const numRings = Math.ceil(totalVertices / verticesPerRing);
+            
+            // Horizontal edges (around each ring)
+            for (let ring = 0; ring < numRings; ring++) {
+                for (let i = 0; i < verticesPerRing; i++) {
+                    const current = ring * verticesPerRing + i;
+                    const next = ring * verticesPerRing + ((i + 1) % verticesPerRing);
+                    
+                    if (current * 3 + 2 < positions.length && next * 3 + 2 < positions.length) {
+                        edgePositions.push(
+                            positions[current * 3], positions[current * 3 + 1], positions[current * 3 + 2],
+                            positions[next * 3], positions[next * 3 + 1], positions[next * 3 + 2]
+                        );
+                    }
+                }
+            }
+            
+            // Vertical edges (connect rings together - the "flow")
+            for (let ring = 0; ring < numRings - 1; ring++) {
+                for (let i = 0; i < verticesPerRing; i++) {
+                    const current = ring * verticesPerRing + i;
+                    const below = (ring + 1) * verticesPerRing + i;
+                    
+                    if (below * 3 + 2 < positions.length) {
+                        edgePositions.push(
+                            positions[current * 3], positions[current * 3 + 1], positions[current * 3 + 2],
+                            positions[below * 3], positions[below * 3 + 1], positions[below * 3 + 2]
+                        );
+                    }
+                }
+            }
+            
+            edgeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
+            
+            const edgeMaterial = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.4,
+                linewidth: 1
+            });
+            
+            const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+            edges.userData = { section: section, type: 'edges' };
+            scene.add(edges);
+            edgeMeshes.push(edges);
+        }
+
+        function createFaceSkin(positions, verticesPerRing, color, section) {
+            const faceGeometry = new THREE.BufferGeometry();
+            const facePositions = [];
+            const faceIndices = [];
+            const totalVertices = positions.length / 3;
+            const numRings = Math.ceil(totalVertices / verticesPerRing);
+            
+            // Copy positions
+            for (let i = 0; i < positions.length; i++) {
+                facePositions.push(positions[i]);
+            }
+            
+            // Create quad faces (2 triangles per quad)
+            for (let ring = 0; ring < numRings - 1; ring++) {
+                for (let i = 0; i < verticesPerRing; i++) {
+                    const current = ring * verticesPerRing + i;
+                    const next = ring * verticesPerRing + ((i + 1) % verticesPerRing);
+                    const currentBelow = (ring + 1) * verticesPerRing + i;
+                    const nextBelow = (ring + 1) * verticesPerRing + ((i + 1) % verticesPerRing);
+                    
+                    if (nextBelow < totalVertices) {
+                        // First triangle
+                        faceIndices.push(current, currentBelow, next);
+                        // Second triangle
+                        faceIndices.push(next, currentBelow, nextBelow);
+                    }
+                }
+            }
+            
+            faceGeometry.setAttribute('position', new THREE.Float32BufferAttribute(facePositions, 3));
+            faceGeometry.setIndex(faceIndices);
+            faceGeometry.computeVertexNormals();
+            
+            const faceMaterial = new THREE.MeshStandardMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.15,
+                side: THREE.DoubleSide,
+                wireframe: false,
+                flatShading: false
+            });
+            
+            const faces = new THREE.Mesh(faceGeometry, faceMaterial);
+            faces.userData = { section: section, type: 'faces' };
+            scene.add(faces);
+            faceMeshes.push(faces);
+        }
+
+        function createInterSectionConnections(allVertices) {
+            // Connect sections together at their boundaries
+            const connections = [
+                { from: 'wrist', to: 'forearm' },
+                { from: 'forearm', to: 'elbow' },
+                { from: 'elbow', to: 'bicep' },
+                { from: 'wrist', to: 'hand' },
+                { from: 'hand', to: 'fingers' }
+            ];
+            
+            connections.forEach(conn => {
+                const fromVertices = allVertices.filter(v => v.section === conn.from);
+                const toVertices = allVertices.filter(v => v.section === conn.to);
+                
+                if (fromVertices.length > 0 && toVertices.length > 0) {
+                    const edgeGeometry = new THREE.BufferGeometry();
+                    const edgePositions = [];
+                    
+                    // Connect last ring of 'from' section to first ring of 'to' section
+                    const connectCount = Math.min(86, fromVertices.length, toVertices.length);
+                    for (let i = 0; i < connectCount; i++) {
+                        const fromV = fromVertices[fromVertices.length - 86 + i];
+                        const toV = toVertices[i % 86];
+                        
+                        if (fromV && toV) {
+                            edgePositions.push(fromV.x, fromV.y, fromV.z, toV.x, toV.y, toV.z);
+                        }
+                    }
+                    
+                    if (edgePositions.length > 0) {
+                        edgeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
+                        
+                        const edgeMaterial = new THREE.LineBasicMaterial({
+                            color: 0x00ff88,
+                            transparent: true,
+                            opacity: 0.6,
+                            linewidth: 2
+                        });
+                        
+                        const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+                        edges.userData = { type: 'inter-section-connection', from: conn.from, to: conn.to };
+                        scene.add(edges);
+                        edgeMeshes.push(edges);
+                    }
+                }
+            });
+        }
+
+        function updateStats() {
+            const total = Object.values(vertexCounts).reduce((a, b) => a + b, 0);
+            document.getElementById('totalVertices').textContent = total;
+            document.getElementById('selectedVertices').textContent = selectedVertices.size;
+        }
+
+        function updateVertexInfo(section, index) {
+            const details = document.getElementById('vertexDetails');
+            details.innerHTML = `
+                <strong>Vertex ${section.toUpperCase()}-${index + 1}</strong><br><br>
+                Section: ${section.toUpperCase()}<br>
+                Index: ${index + 1}<br>
+                Position: (x, y, z)<br>
+                Color: ${sectionColors[section].toString(16)}<br><br>
+                <small>Click vertex to deselect</small>
+            `;
+        }
+
+        function highlightVertexIn3D(section, index) {
+            // Find and highlight the vertex in 3D space
+            const mesh = vertexMeshes.find(m => m.userData.section === section);
+            if (mesh) {
+                // Add highlight effect (could implement raycasting here)
+                console.log(`Highlighting ${section}-${index} in 3D`);
+            }
+        }
+
+        function selectAllVertices() {
+            document.querySelectorAll('.vertex-btn').forEach(btn => {
+                if (btn.dataset.section && btn.dataset.index) {
+                    const vertexKey = `${btn.dataset.section}-${btn.dataset.index}`;
+                    selectedVertices.add(vertexKey);
+                    btn.classList.add('selected');
+                }
+            });
+            updateStats();
+        }
+
+        function deselectAllVertices() {
+            selectedVertices.clear();
+            document.querySelectorAll('.vertex-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            updateStats();
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('interactionMode').textContent = mode;
+        }
+
+        function toggleGrid() {
+            const toggle = document.getElementById('gridToggle');
+            toggle.classList.toggle('active');
+            if (window.gridHelper) {
+                window.gridHelper.visible = toggle.classList.contains('active');
+            }
+        }
+
+        function toggleVertices() {
+            const toggle = document.getElementById('verticesToggle');
+            toggle.classList.toggle('active');
+            showVertices = toggle.classList.contains('active');
+            
+            vertexMeshes.forEach(mesh => {
+                mesh.visible = showVertices;
+            });
+        }
+
+        function toggleEdges() {
+            const toggle = document.getElementById('edgesToggle');
+            toggle.classList.toggle('active');
+            showEdges = toggle.classList.contains('active');
+            
+            edgeMeshes.forEach(mesh => {
+                mesh.visible = showEdges;
+            });
+        }
+
+        function toggleFaces() {
+            const toggle = document.getElementById('facesToggle');
+            toggle.classList.toggle('active');
+            showFaces = toggle.classList.contains('active');
+            
+            if (showFaces) {
+                // Regenerate with faces
+                generateFullArm();
+            } else {
+                // Remove face meshes
+                faceMeshes.forEach(mesh => scene.remove(mesh));
+                faceMeshes = [];
+            }
+        }
+
+        function toggleColorMode() {
+            const toggle = document.getElementById('colorToggle');
+            toggle.classList.toggle('active');
+            const colorBySection = toggle.classList.contains('active');
+            
+            if (!colorBySection) {
+                // Single color mode
+                vertexMeshes.forEach(mesh => {
+                    mesh.material.color.setHex(0x00ff88);
+                });
+                edgeMeshes.forEach(mesh => {
+                    if (mesh.userData.type === 'edges') {
+                        mesh.material.color.setHex(0x00ccff);
+                    }
+                });
+            } else {
+                // Regenerate with section colors
+                generateFullArm();
+            }
+        }
+
+        function exportVertexMatrix() {
+            const data = {
+                vertices: Array.from(selectedVertices),
+                sections: vertexCounts,
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `vertex_matrix_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function saveToPixelProdigy() {
+            alert('Saving to PixelProdigy3D... (Integration coming soon)');
+        }
+
+        function resetMatrix() {
+            deselectAllVertices();
+            vertexMeshes.forEach(mesh => scene.remove(mesh));
+            vertexMeshes = [];
+            updateStats();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+            
+            // Update view info
+            const rotation = controls.getAzimuthalAngle() * (180 / Math.PI);
+            document.getElementById('viewRotation').textContent = `${Math.round(rotation)}°, 0°`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initThreeJS();
+            generateVertexButtons();
+            updateStats();
+            
+            // Auto-generate arm on load
+            setTimeout(() => generateFullArm(), 500);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const viewport = document.getElementById('matrix-viewport');
+            camera.aspect = viewport.clientWidth / viewport.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+        });
+
+        // Placeholder functions
+        function selectBySection() { alert('Select by section - Coming soon'); }
+        function invertSelection() { 
+            document.querySelectorAll('.vertex-btn').forEach(btn => {
+                if (btn.dataset.section && btn.dataset.index) {
+                    selectVertex(btn.dataset.section, parseInt(btn.dataset.index));
+                }
+            });
+        }
+        function transformSelected() { alert('Transform selected - Coming soon'); }
+        function duplicateSelected() { alert('Duplicate selected - Coming soon'); }
+        function deleteSelected() { 
+            selectedVertices.clear();
+            deselectAllVertices();
+        }
+        function resetPositions() { alert('Reset positions - Coming soon'); }
+        function importVertexMatrix() { alert('Import matrix - Coming soon'); }
+        function expandSection(section) { alert(`Expanding ${section} section - Coming soon`); }
+    </script>
+</body>
+</html>
