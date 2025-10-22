@@ -36,6 +36,7 @@ npm-debug.log*
 google-cloud-cli-*.tar.gz
 google-cloud-sdk/
 *.db
+*.iso
 
 # Generated content
 object_generator/
