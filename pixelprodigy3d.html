@@ -300,6 +300,10 @@
               <span class="tool-icon">🦴</span>
               <span>Load Torso (120V)</span>
             </button>
+            <button class="tool-btn" onclick="loadHumanHead(this)" style="grid-column: 1 / -1; background: rgba(156, 39, 176, 0.2); border: 2px solid rgba(156, 39, 176, 0.4);">
+              <span class="tool-icon">🧠</span>
+              <span>Load Head (100V)</span>
+            </button>
             <button class="tool-btn" onclick="openAnatomyEditor()" style="grid-column: 1 / -1; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4);">
               <span class="tool-icon">✏️</span>
               <span>Edit Anatomy (Advanced)</span>
@@ -321,6 +325,25 @@
             <div style="display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: 2px;">
               <span>180° (straight)</span>
               <span>340° (bent)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- NECK SWIVEL -->
+        <div class="section" id="neckSwivel" style="display: none;">
+          <div class="section-title">🔄 Neck Swivel</div>
+          <div style="margin-bottom: 15px;">
+            <label style="font-size: 12px; color: #888; display: flex; justify-content: space-between; margin-bottom: 5px;">
+              <span>Head Rotation</span>
+              <span id="neckSwivelValue" style="color: #00ff88;">0°</span>
+            </label>
+            <input type="range" id="neckSwivelAngle" min="-180" max="180" value="0" step="1" 
+                   oninput="updateNeckSwivel(parseInt(this.value))"
+                   style="width: 100%; cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: 2px;">
+              <span>-180° (left)</span>
+              <span>0° (center)</span>
+              <span>180° (right)</span>
             </div>
           </div>
         </div>
@@ -539,6 +562,8 @@
     let orbitEnabled = true; // Camera orbit control state
     let currentArmGroup = null; // Reference to loaded arm for articulation
     let armForearmPart = null; // Reference to forearm+hand section
+    let currentHeadGroup = null; // Reference to loaded head
+    let headNeckSwivel = null; // Reference to neck swivel group
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
 
@@ -1160,6 +1185,152 @@
       document.getElementById('primitiveDisplay').textContent = `TORSO (${vertexCount}V)`;
       
       console.log(`✅ Anatomical torso loaded: ${vertexCount}+ vertices - pelvis, spine, 24 ribs, chest, shoulders, clavicles`);
+    }
+
+    // 🧠 HUMAN HEAD & NECK LOADER (100+ Vertices)
+    function loadHumanHead(btn) {
+      console.log('🧠 Loading head and neck anatomy...');
+      
+      // Clear primitive selection
+      document.querySelectorAll('.primitive-grid .tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Create anatomical head & neck group
+      const headGroup = new THREE.Group();
+      let vertexCount = 100;
+      
+      // Neck base (C7 vertebra)
+      const neckBaseGeom = new THREE.CylinderGeometry(0.14, 0.12, 0.4, 12);
+      const neckMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.6 });
+      const neckBase = new THREE.Mesh(neckBaseGeom, neckMat);
+      neckBase.position.y = 0.2;
+      headGroup.add(neckBase);
+      
+      // Create neck swivel group (rotates for head turning)
+      const neckSwivelGroup = new THREE.Group();
+      neckSwivelGroup.position.y = 0.4;
+      headGroup.add(neckSwivelGroup);
+      
+      // Neck cylinder (C1-C6 cervical vertebrae)
+      const neckGeom = new THREE.CylinderGeometry(0.12, 0.14, 1.0, 12);
+      const neck = new THREE.Mesh(neckGeom, neckMat);
+      neck.position.y = 0.5;
+      neckSwivelGroup.add(neck);
+      
+      // Skull base (foramen magnum)
+      const skullBaseGeom = new THREE.CylinderGeometry(0.15, 0.12, 0.2, 12);
+      const boneMat = new THREE.MeshStandardMaterial({ color: 0xfff8e7, roughness: 0.4 });
+      const skullBase = new THREE.Mesh(skullBaseGeom, boneMat);
+      skullBase.position.y = 1.1;
+      neckSwivelGroup.add(skullBase);
+      
+      // Cranium (main skull sphere)
+      const craniumGeom = new THREE.SphereGeometry(0.65, 16, 16);
+      const cranium = new THREE.Mesh(craniumGeom, boneMat);
+      cranium.position.y = 1.6;
+      cranium.scale.set(1, 1.1, 1); // Slightly taller
+      neckSwivelGroup.add(cranium);
+      
+      // Jaw (mandible)
+      const jawGeom = new THREE.BoxGeometry(0.5, 0.3, 0.4);
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const jaw = new THREE.Mesh(jawGeom, skinMat);
+      jaw.position.set(0, 1.0, 0.25);
+      neckSwivelGroup.add(jaw);
+      
+      // Face plane (for features)
+      const faceGeom = new THREE.CircleGeometry(0.55, 16);
+      const faceMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.6, side: THREE.DoubleSide });
+      const face = new THREE.Mesh(faceGeom, faceMat);
+      face.position.set(0, 1.6, 0.6);
+      neckSwivelGroup.add(face);
+      
+      // Left eye
+      const eyeGeom = new THREE.SphereGeometry(0.08, 12, 12);
+      const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+      const leftEye = new THREE.Mesh(eyeGeom, eyeWhiteMat);
+      leftEye.position.set(-0.18, 1.7, 0.58);
+      neckSwivelGroup.add(leftEye);
+      
+      // Left pupil
+      const pupilGeom = new THREE.SphereGeometry(0.04, 12, 12);
+      const pupilMat = new THREE.MeshStandardMaterial({ color: 0x2a4d69, roughness: 0.2 });
+      const leftPupil = new THREE.Mesh(pupilGeom, pupilMat);
+      leftPupil.position.set(-0.18, 1.7, 0.63);
+      neckSwivelGroup.add(leftPupil);
+      
+      // Right eye
+      const rightEye = new THREE.Mesh(eyeGeom, eyeWhiteMat);
+      rightEye.position.set(0.18, 1.7, 0.58);
+      neckSwivelGroup.add(rightEye);
+      
+      // Right pupil
+      const rightPupil = new THREE.Mesh(pupilGeom, pupilMat);
+      rightPupil.position.set(0.18, 1.7, 0.63);
+      neckSwivelGroup.add(rightPupil);
+      
+      // Nose
+      const noseGeom = new THREE.ConeGeometry(0.08, 0.2, 8);
+      const nose = new THREE.Mesh(noseGeom, skinMat);
+      nose.position.set(0, 1.5, 0.62);
+      nose.rotation.x = Math.PI / 2;
+      neckSwivelGroup.add(nose);
+      
+      // Mouth
+      const mouthGeom = new THREE.BoxGeometry(0.25, 0.05, 0.1);
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0xff6b8a, roughness: 0.5 });
+      const mouth = new THREE.Mesh(mouthGeom, mouthMat);
+      mouth.position.set(0, 1.25, 0.6);
+      neckSwivelGroup.add(mouth);
+      
+      // Left ear
+      const earGeom = new THREE.SphereGeometry(0.12, 12, 12);
+      const leftEar = new THREE.Mesh(earGeom, skinMat);
+      leftEar.position.set(-0.6, 1.6, 0.1);
+      leftEar.scale.set(0.5, 1, 0.8);
+      neckSwivelGroup.add(leftEar);
+      
+      // Right ear
+      const rightEar = new THREE.Mesh(earGeom, skinMat);
+      rightEar.position.set(0.6, 1.6, 0.1);
+      rightEar.scale.set(0.5, 1, 0.8);
+      neckSwivelGroup.add(rightEar);
+      
+      // Store reference for neck swivel
+      currentHeadGroup = headGroup;
+      headNeckSwivel = neckSwivelGroup;
+      
+      // Position head at appropriate height
+      headGroup.position.set(0, 4.5, 0);
+      scene.add(headGroup);
+      objects.push(headGroup);
+      
+      // Show neck swivel controls
+      document.getElementById('neckSwivel').style.display = 'block';
+      
+      // Update UI
+      updateObjectCount();
+      updateVertexCount();
+      document.getElementById('primitiveDisplay').textContent = `HEAD (${vertexCount}V)`;
+      
+      console.log(`✅ Anatomical head loaded: ${vertexCount}+ vertices - neck, skull, jaw, eyes, nose, mouth, ears - NECK SWIVEL ENABLED`);
+    }
+    
+    // Update neck swivel angle (-180° to 180°)
+    function updateNeckSwivel(angle) {
+      if (!headNeckSwivel) {
+        console.warn('⚠️ No head loaded for neck swivel');
+        return;
+      }
+      
+      // Convert angle to radians and rotate around Y axis
+      const swivelAngle = angle * (Math.PI / 180);
+      headNeckSwivel.rotation.y = swivelAngle;
+      
+      // Update display
+      document.getElementById('neckSwivelValue').textContent = angle + '°';
+      
+      console.log(`🔄 Neck swivel: ${angle}° (${swivelAngle.toFixed(2)} rad)`);
     }
 
     function updateSize(value) {
