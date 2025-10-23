@@ -292,6 +292,10 @@
               <span class="tool-icon">🦾</span>
               <span>Load Arm (86V)</span>
             </button>
+            <button class="tool-btn" onclick="loadBothArms(this)" style="grid-column: 1 / -1; background: rgba(63, 81, 181, 0.25); border: 2px solid rgba(63, 81, 181, 0.5);">
+              <span class="tool-icon">🦾🦾</span>
+              <span>Both Arms (172V)</span>
+            </button>
             <button class="tool-btn" onclick="loadHumanLeg(this)" style="grid-column: 1 / -1; background: rgba(76, 175, 80, 0.2); border: 2px solid rgba(76, 175, 80, 0.4);">
               <span class="tool-icon">🦵</span>
               <span>Load Leg (86V)</span>
@@ -960,6 +964,129 @@
       document.getElementById('primitiveDisplay').textContent = `HUMAN ARM (${vertexCount}V)`;
       
       console.log(`✅ Anatomical arm loaded: ${vertexCount} vertices - shoulder, upper arm, elbow, forearm, wrist, hand, thumb, 4 fingers - ARTICULATION ENABLED`);
+    }
+    
+    // 🦾🦾 DUAL ARMS LOADER (172 Vertices Total)
+    function loadBothArms(btn) {
+      console.log('🦾🦾 Loading both arms (left + right)...');
+      
+      // Clear primitive selection
+      document.querySelectorAll('.primitive-grid .tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const bothArmsGroup = new THREE.Group();
+      const totalVertexCount = 172;
+      
+      // Helper function to create a single arm
+      function createArm(xOffset, isRight = false) {
+        const armGroup = new THREE.Group();
+        
+        // Shoulder
+        const shoulderGeom = new THREE.SphereGeometry(0.3, 8, 8);
+        const shoulderMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const shoulder = new THREE.Mesh(shoulderGeom, shoulderMat);
+        armGroup.add(shoulder);
+        
+        // Upper arm
+        const upperArmGeom = new THREE.CylinderGeometry(0.2, 0.18, 3.5, 16);
+        const upperArmMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const upperArm = new THREE.Mesh(upperArmGeom, upperArmMat);
+        upperArm.position.y = -1.75;
+        armGroup.add(upperArm);
+        
+        // Elbow joint
+        const elbowGeom = new THREE.SphereGeometry(0.22, 8, 8);
+        const elbowMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+        const elbow = new THREE.Mesh(elbowGeom, elbowMat);
+        elbow.position.y = -3.5;
+        armGroup.add(elbow);
+        
+        // Forearm group for articulation
+        const forearmGroup = new THREE.Group();
+        forearmGroup.position.y = -3.5;
+        armGroup.add(forearmGroup);
+        
+        // Forearm
+        const forearmGeom = new THREE.CylinderGeometry(0.18, 0.15, 3.5, 16);
+        const forearmMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const forearm = new THREE.Mesh(forearmGeom, forearmMat);
+        forearm.position.y = -1.75;
+        forearmGroup.add(forearm);
+        
+        // Wrist
+        const wristGeom = new THREE.SphereGeometry(0.16, 8, 8);
+        const wristMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+        const wrist = new THREE.Mesh(wristGeom, wristMat);
+        wrist.position.y = -3.5;
+        forearmGroup.add(wrist);
+        
+        // Wrist bone (mirror for right arm)
+        const wristBoneGeom = new THREE.SphereGeometry(0.01, 8, 8);
+        const wristBoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+        const wristBone = new THREE.Mesh(wristBoneGeom, wristBoneMat);
+        wristBone.position.set(isRight ? -0.15 : 0.15, -3.5, 0);
+        forearmGroup.add(wristBone);
+        
+        // Hand
+        const handGeom = new THREE.BoxGeometry(0.4, 0.6, 0.15);
+        const handMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const hand = new THREE.Mesh(handGeom, handMat);
+        hand.position.y = -4.3;
+        hand.rotation.x = Math.PI / 8;
+        forearmGroup.add(hand);
+        
+        // Thumb (mirror position for right arm)
+        const thumbGeom = new THREE.CylinderGeometry(0.08, 0.06, 0.5, 8);
+        const thumbMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const thumb = new THREE.Mesh(thumbGeom, thumbMat);
+        thumb.position.set(isRight ? 0.25 : -0.25, -4.1, 0.1);
+        thumb.rotation.z = isRight ? Math.PI / 3 : -Math.PI / 3;
+        forearmGroup.add(thumb);
+        
+        // 4 Fingers
+        const fingerLengths = [0.875, 0.7875, 0.7, 0.6125];
+        for (let i = 0; i < 4; i++) {
+          const fingerGeom = new THREE.CylinderGeometry(0.06 * (1 - i * 0.1), 0.04 * (1 - i * 0.1), fingerLengths[i], 8);
+          const fingerMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+          const finger = new THREE.Mesh(fingerGeom, fingerMat);
+          const xPos = isRight ? 0.15 - (i * 0.1) : -0.15 + (i * 0.1);
+          finger.position.set(xPos, -4.8, 0);
+          finger.rotation.x = Math.PI / 12;
+          forearmGroup.add(finger);
+          
+          // Fingertip
+          const tipGeom = new THREE.SphereGeometry(0.05 * (1 - i * 0.1), 8, 8);
+          const tipMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+          const tip = new THREE.Mesh(tipGeom, tipMat);
+          tip.position.set(xPos, -4.8 - fingerLengths[i] / 2, 0);
+          forearmGroup.add(tip);
+        }
+        
+        // Position arm at shoulder offset
+        armGroup.position.set(xOffset, 0, 0);
+        
+        return { armGroup, forearmGroup };
+      }
+      
+      // Create left arm (negative X)
+      const leftArm = createArm(-1.2, false);
+      bothArmsGroup.add(leftArm.armGroup);
+      
+      // Create right arm (positive X)
+      const rightArm = createArm(1.2, true);
+      bothArmsGroup.add(rightArm.armGroup);
+      
+      // Position both arms at shoulder height
+      bothArmsGroup.position.set(0, 8.75, 0);
+      scene.add(bothArmsGroup);
+      objects.push(bothArmsGroup);
+      
+      // Update UI
+      updateObjectCount();
+      updateVertexCount();
+      document.getElementById('primitiveDisplay').textContent = `BOTH ARMS (${totalVertexCount}V)`;
+      
+      console.log(`✅ Both arms loaded: ${totalVertexCount} vertices (86V × 2) - left shoulder at X=-1.2, right shoulder at X=1.2`);
     }
     
     // Update elbow angle (180° = straight, 340° = fully bent)
