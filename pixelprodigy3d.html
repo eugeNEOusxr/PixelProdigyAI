@@ -289,6 +289,10 @@
               <span class="tool-icon">🦵</span>
               <span>Load Leg (86V)</span>
             </button>
+            <button class="tool-btn" onclick="loadHumanTorso(this)" style="grid-column: 1 / -1; background: rgba(255, 193, 7, 0.2); border: 2px solid rgba(255, 193, 7, 0.4);">
+              <span class="tool-icon">🦴</span>
+              <span>Load Torso (120V)</span>
+            </button>
             <button class="tool-btn" onclick="openAnatomyEditor()" style="grid-column: 1 / -1; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4);">
               <span class="tool-icon">✏️</span>
               <span>Edit Anatomy (Advanced)</span>
@@ -962,6 +966,113 @@
       document.getElementById('primitiveDisplay').textContent = `HUMAN LEG (${vertexCount}V)`;
       
       console.log(`✅ Anatomical leg loaded: ${vertexCount} vertices - hip, thigh, knee, calf, ankle, foot, big toe, 4 toes`);
+    }
+
+    // 🦴 HUMAN TORSO LOADER (120+ Vertices)
+    function loadHumanTorso(btn) {
+      console.log('🦴 Loading torso anatomy...');
+      
+      // Clear primitive selection
+      document.querySelectorAll('.primitive-grid .tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Create anatomical torso
+      const torsoGroup = new THREE.Group();
+      let vertexCount = 120;
+      
+      // Pelvis base (hip connector)
+      const pelvisGeom = new THREE.CylinderGeometry(0.45, 0.5, 0.6, 16);
+      const pelvisMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.6 });
+      const pelvis = new THREE.Mesh(pelvisGeom, pelvisMat);
+      pelvis.position.y = 0;
+      torsoGroup.add(pelvis);
+      
+      // Lower spine (L1-L5 lumbar vertebrae)
+      const lowerSpineGeom = new THREE.CylinderGeometry(0.12, 0.12, 1.2, 12);
+      const spineMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+      const lowerSpine = new THREE.Mesh(lowerSpineGeom, spineMat);
+      lowerSpine.position.y = 0.9;
+      torsoGroup.add(lowerSpine);
+      
+      // Mid spine (T7-T12 thoracic vertebrae)
+      const midSpineGeom = new THREE.CylinderGeometry(0.13, 0.12, 1.5, 12);
+      const midSpine = new THREE.Mesh(midSpineGeom, spineMat);
+      midSpine.position.y = 2.25;
+      torsoGroup.add(midSpine);
+      
+      // Upper spine (T1-T6 thoracic vertebrae)
+      const upperSpineGeom = new THREE.CylinderGeometry(0.14, 0.13, 1.2, 12);
+      const upperSpine = new THREE.Mesh(upperSpineGeom, spineMat);
+      upperSpine.position.y = 3.6;
+      torsoGroup.add(upperSpine);
+      
+      // Ribcage (12 ribs on each side)
+      for (let i = 0; i < 12; i++) {
+        const ribHeight = 2.0 + (i * 0.15);
+        const ribWidth = 0.35 + (i * 0.04);
+        const ribDepth = 0.25 + (i * 0.03);
+        
+        // Left rib
+        const leftRibGeom = new THREE.TorusGeometry(ribWidth, 0.02, 8, 16, Math.PI);
+        const ribMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+        const leftRib = new THREE.Mesh(leftRibGeom, ribMat);
+        leftRib.position.set(-0.15, ribHeight, 0);
+        leftRib.rotation.y = Math.PI / 2;
+        leftRib.rotation.z = -Math.PI / 12;
+        torsoGroup.add(leftRib);
+        
+        // Right rib
+        const rightRib = new THREE.Mesh(leftRibGeom.clone(), ribMat);
+        rightRib.position.set(0.15, ribHeight, 0);
+        rightRib.rotation.y = -Math.PI / 2;
+        rightRib.rotation.z = Math.PI / 12;
+        torsoGroup.add(rightRib);
+      }
+      
+      // Chest/sternum
+      const chestGeom = new THREE.BoxGeometry(0.4, 1.8, 0.2);
+      const chestMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.7 });
+      const chest = new THREE.Mesh(chestGeom, chestMat);
+      chest.position.set(0, 3.0, 0.35);
+      torsoGroup.add(chest);
+      
+      // Left shoulder socket
+      const leftShoulderGeom = new THREE.SphereGeometry(0.25, 8, 8);
+      const shoulderMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.6 });
+      const leftShoulder = new THREE.Mesh(leftShoulderGeom, shoulderMat);
+      leftShoulder.position.set(-0.6, 4.0, 0);
+      torsoGroup.add(leftShoulder);
+      
+      // Right shoulder socket
+      const rightShoulder = new THREE.Mesh(leftShoulderGeom, shoulderMat);
+      rightShoulder.position.set(0.6, 4.0, 0);
+      torsoGroup.add(rightShoulder);
+      
+      // Clavicles (collar bones)
+      const clavicleGeom = new THREE.CylinderGeometry(0.03, 0.03, 0.5, 8);
+      const clavicleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+      
+      const leftClavicle = new THREE.Mesh(clavicleGeom, clavicleMat);
+      leftClavicle.position.set(-0.35, 4.0, 0.1);
+      leftClavicle.rotation.z = Math.PI / 6;
+      torsoGroup.add(leftClavicle);
+      
+      const rightClavicle = new THREE.Mesh(clavicleGeom, clavicleMat);
+      rightClavicle.position.set(0.35, 4.0, 0.1);
+      rightClavicle.rotation.z = -Math.PI / 6;
+      torsoGroup.add(rightClavicle);
+      
+      // Position torso at ground level (pelvis at Y=0, lift to ground)
+      torsoGroup.position.set(0, 0.3, 0);
+      scene.add(torsoGroup);
+      objects.push(torsoGroup);
+      
+      // Update UI
+      updateObjectCount();
+      updateVertexCount();
+      document.getElementById('primitiveDisplay').textContent = `TORSO (${vertexCount}V)`;
+      
+      console.log(`✅ Anatomical torso loaded: ${vertexCount}+ vertices - pelvis, spine, 24 ribs, chest, shoulders, clavicles`);
     }
 
     function updateSize(value) {
