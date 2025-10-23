@@ -596,6 +596,10 @@
     let rightLegGroup = null; // Reference to right leg for animation
     let leftArmGroupRef = null; // Reference to left arm for swing
     let rightArmGroupRef = null; // Reference to right arm for swing
+    let leftKneeGroup = null; // Reference to left lower leg (for knee flexion)
+    let rightKneeGroup = null; // Reference to right lower leg (for knee flexion)
+    let leftFootGroup = null; // Reference to left foot (for heel-toe placement)
+    let rightFootGroup = null; // Reference to right foot (for heel-toe placement)
     
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
@@ -794,7 +798,7 @@
       }
     }
     
-    // Procedural walking/running animation
+    // Procedural walking/running animation with realistic biomechanics
     function updateWalkingAnimation() {
       // Decay walk speed over time if no wheel input
       const timeSinceWheel = Date.now() - lastWheelTime;
@@ -807,32 +811,89 @@
       }
       
       // Only animate if walking/running
-      if (walkCycleSpeed > 0 && leftLegGroup && rightLegGroup) {
+      if (walkCycleSpeed > 0 && leftLegGroup && rightLegGroup && leftKneeGroup && rightKneeGroup) {
         // Determine animation speed based on walk/run state
         const isRunning = walkCycleSpeed > 4;
         const cycleSpeedMultiplier = isRunning ? 0.15 : 0.08;
         walkCyclePhase += walkCycleSpeed * cycleSpeedMultiplier;
         
-        // Walking: smooth sine wave
-        // Running: faster, more exaggerated motion
-        const legSwingAmplitude = isRunning ? 0.6 : 0.4;
+        // === BIOMECHANICAL WALKING CYCLE ===
+        // Phase 0-PI: Right leg forward (heel strike), left leg back (toe-off)
+        // Phase PI-2PI: Left leg forward (heel strike), right leg back (toe-off)
+        
+        const legSwingAmplitude = isRunning ? 0.6 : 0.4; // Hip swing
+        const kneeFlexionMax = isRunning ? 1.2 : 0.8; // Knee bend angle
         const armSwingAmplitude = isRunning ? 0.5 : 0.3;
         
-        // Leg motion (opposite legs swing opposite directions)
-        const leftLegSwing = Math.sin(walkCyclePhase) * legSwingAmplitude;
-        const rightLegSwing = Math.sin(walkCyclePhase + Math.PI) * legSwingAmplitude;
+        // === RIGHT LEG CYCLE ===
+        const rightPhase = walkCyclePhase % (Math.PI * 2);
         
-        // Apply leg rotations at hip
-        if (leftLegGroup) {
-          leftLegGroup.rotation.x = leftLegSwing;
-        }
-        if (rightLegGroup) {
-          rightLegGroup.rotation.x = rightLegSwing;
+        // Right leg hip swing
+        const rightHipSwing = Math.sin(rightPhase) * legSwingAmplitude;
+        rightLegGroup.rotation.x = rightHipSwing;
+        
+        // Right knee flexion (bends during swing phase)
+        if (rightPhase < Math.PI) {
+          // Swing phase: knee flexes to lift foot
+          const flexProgress = Math.sin(rightPhase); // 0 to 1 to 0
+          rightKneeGroup.rotation.x = -flexProgress * kneeFlexionMax; // Negative = bend forward
+        } else {
+          // Stance phase: knee mostly straight (slight flex for cushioning)
+          const stanceProgress = Math.sin(rightPhase - Math.PI);
+          rightKneeGroup.rotation.x = -stanceProgress * 0.2; // Slight bend
         }
         
-        // Arm motion (opposite to legs - left arm swings with right leg)
-        const leftArmSwing = Math.sin(walkCyclePhase + Math.PI) * armSwingAmplitude;
-        const rightArmSwing = Math.sin(walkCyclePhase) * armSwingAmplitude;
+        // Right foot heel-toe placement
+        if (rightPhase < Math.PI * 0.3) {
+          // Heel strike - dorsiflexion (toe up)
+          rightFootGroup.rotation.x = 0.3;
+        } else if (rightPhase < Math.PI * 0.7) {
+          // Mid-stance - foot flat
+          rightFootGroup.rotation.x = 0;
+        } else if (rightPhase < Math.PI) {
+          // Toe-off - plantarflexion (toe push)
+          rightFootGroup.rotation.x = -0.4;
+        } else {
+          // Swing phase - neutral
+          rightFootGroup.rotation.x = 0.1;
+        }
+        
+        // === LEFT LEG CYCLE (opposite phase) ===
+        const leftPhase = (walkCyclePhase + Math.PI) % (Math.PI * 2);
+        
+        // Left leg hip swing
+        const leftHipSwing = Math.sin(leftPhase) * legSwingAmplitude;
+        leftLegGroup.rotation.x = leftHipSwing;
+        
+        // Left knee flexion
+        if (leftPhase < Math.PI) {
+          // Swing phase: knee flexes
+          const flexProgress = Math.sin(leftPhase);
+          leftKneeGroup.rotation.x = -flexProgress * kneeFlexionMax;
+        } else {
+          // Stance phase: knee mostly straight
+          const stanceProgress = Math.sin(leftPhase - Math.PI);
+          leftKneeGroup.rotation.x = -stanceProgress * 0.2;
+        }
+        
+        // Left foot heel-toe placement
+        if (leftPhase < Math.PI * 0.3) {
+          // Heel strike
+          leftFootGroup.rotation.x = 0.3;
+        } else if (leftPhase < Math.PI * 0.7) {
+          // Mid-stance
+          leftFootGroup.rotation.x = 0;
+        } else if (leftPhase < Math.PI) {
+          // Toe-off
+          leftFootGroup.rotation.x = -0.4;
+        } else {
+          // Swing phase
+          leftFootGroup.rotation.x = 0.1;
+        }
+        
+        // === ARM SWING (opposite to legs) ===
+        const leftArmSwing = Math.sin(leftPhase) * armSwingAmplitude;
+        const rightArmSwing = Math.sin(rightPhase) * armSwingAmplitude;
         
         if (leftArmGroupRef) {
           leftArmGroupRef.rotation.x = leftArmSwing;
@@ -841,7 +902,7 @@
           rightArmGroupRef.rotation.x = rightArmSwing;
         }
         
-        // Body bob (vertical movement for realism)
+        // === BODY BOB (vertical center of mass movement) ===
         const bobAmount = isRunning ? 0.15 : 0.08;
         const bodyBob = Math.abs(Math.sin(walkCyclePhase * 2)) * bobAmount;
         if (window.fullBodyGroup) {
@@ -1034,8 +1095,9 @@
         return;
       }
       
-      // If whole body is selected (no specific body part), control walking/running
-      if (selectedObject === window.fullBodyGroup && !selectedBodyPart) {
+      // If whole body is selected OR clicking on body triggers walking/running
+      // Check if fullBodyGroup exists and either selected or we're in the scene
+      if (window.fullBodyGroup && !selectedBodyPart) {
         event.preventDefault();
         
         // Update walk speed based on wheel delta
@@ -1044,7 +1106,7 @@
         lastWheelTime = Date.now();
         
         // Log state changes
-        if (walkCycleSpeed < 1) {
+        if (walkCycleSpeed < 1 && walkCycleSpeed > 0) {
           console.log('🚶 Starting to walk...');
         } else if (walkCycleSpeed > 4 && walkCycleSpeed < 5) {
           console.log('🏃 Breaking into a run!');
@@ -1904,56 +1966,64 @@
         const hip = new THREE.Mesh(hipGeom, hipMat);
         legGroup.add(hip);
         
-        // Thigh
+        // Thigh (femur)
         const thighGeom = new THREE.CylinderGeometry(0.25, 0.22, 3.5, 16);
         const thighMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const thigh = new THREE.Mesh(thighGeom, thighMat);
         thigh.position.y = -1.75;
         legGroup.add(thigh);
         
+        // === KNEE GROUP (for flexion/bending) ===
+        const kneeGroup = new THREE.Group();
+        kneeGroup.position.y = -3.5; // Position at knee joint
+        
         // Knee joint
         const kneeGeom = new THREE.SphereGeometry(0.24, 8, 8);
         const kneeMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
         const knee = new THREE.Mesh(kneeGeom, kneeMat);
-        knee.position.y = -3.5;
-        legGroup.add(knee);
+        knee.position.y = 0; // Relative to kneeGroup
+        kneeGroup.add(knee);
         
-        // Calf
+        // Calf (tibia/fibula) - part of knee group so it bends with knee
         const calfGeom = new THREE.CylinderGeometry(0.22, 0.18, 3.5, 16);
         const calfMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const calf = new THREE.Mesh(calfGeom, calfMat);
-        calf.position.y = -5.25;
-        legGroup.add(calf);
+        calf.position.y = -1.75; // Relative to knee
+        kneeGroup.add(calf);
         
-        // Ankle joint
+        // Ankle joint - part of knee group
         const ankleGeom = new THREE.SphereGeometry(0.18, 8, 8);
         const ankleMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
         const ankle = new THREE.Mesh(ankleGeom, ankleMat);
-        ankle.position.y = -7;
-        legGroup.add(ankle);
+        ankle.position.y = -3.5; // Relative to knee
+        kneeGroup.add(ankle);
         
         // Ankle bone (malleolus) - mirrored
         const ankleBoneGeom = new THREE.SphereGeometry(0.012, 8, 8);
         const ankleBoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
         const ankleBone = new THREE.Mesh(ankleBoneGeom, ankleBoneMat);
-        ankleBone.position.set(isRight ? 0.18 : -0.18, -7, 0);
-        legGroup.add(ankleBone);
+        ankleBone.position.set(isRight ? 0.18 : -0.18, -3.5, 0);
+        kneeGroup.add(ankleBone);
+        
+        // === FOOT GROUP (for heel-toe placement) ===
+        const footGroup = new THREE.Group();
+        footGroup.position.y = -3.8; // Relative to knee
         
         // Foot
         const footGeom = new THREE.BoxGeometry(0.35, 0.25, 0.8);
         const footMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const foot = new THREE.Mesh(footGeom, footMat);
-        foot.position.set(0, -7.3, 0.3);
+        foot.position.set(0, 0, 0.3);
         foot.rotation.x = -Math.PI / 16;
-        legGroup.add(foot);
+        footGroup.add(foot);
         
         // Big toe - mirrored
         const bigToeGeom = new THREE.CylinderGeometry(0.07, 0.05, 0.35, 8);
         const bigToeMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const bigToe = new THREE.Mesh(bigToeGeom, bigToeMat);
-        bigToe.position.set(isRight ? -0.12 : 0.12, -7.5, 0.65);
+        bigToe.position.set(isRight ? -0.12 : 0.12, -0.2, 0.65);
         bigToe.rotation.x = Math.PI / 2;
-        legGroup.add(bigToe);
+        footGroup.add(bigToe);
         
         // 4 Toes - mirrored
         const toeLengths = [0.28, 0.26, 0.24, 0.22];
@@ -1963,18 +2033,20 @@
           const toe = new THREE.Mesh(toeGeom, toeMat);
           const toeXBase = isRight ? -0.05 : 0.05;
           const toeXOffset = isRight ? (i * 0.08) : -(i * 0.08);
-          toe.position.set(toeXBase + toeXOffset, -7.5, 0.65);
+          toe.position.set(toeXBase + toeXOffset, -0.2, 0.65);
           toe.rotation.x = Math.PI / 2;
-          legGroup.add(toe);
+          footGroup.add(toe);
           
           // Toe tip
           const toeTipGeom = new THREE.SphereGeometry(0.035 * (1 - i * 0.08), 8, 8);
           const toeTipMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
           const toeTip = new THREE.Mesh(toeTipGeom, toeTipMat);
-          toeTip.position.set(toeXBase + toeXOffset, -7.5, 0.65 + toeLengths[i] / 2);
-          legGroup.add(toeTip);
+          toeTip.position.set(toeXBase + toeXOffset, -0.2, 0.65 + toeLengths[i] / 2);
+          footGroup.add(toeTip);
         }
         
+        kneeGroup.add(footGroup);
+        legGroup.add(kneeGroup);
         legGroup.position.set(xOffset, 0, 0);
         
         // Tag leg group for selection
@@ -1983,28 +2055,28 @@
         legGroup.userData.controlGroup = legGroup;
         
         // Tag foot for separate control
-        if (foot) {
-          const footGroup = new THREE.Group();
-          footGroup.add(foot, bigToe, ...legGroup.children.slice(-8)); // Foot + toes
-          footGroup.userData.bodyPart = isRight ? 'rightFoot' : 'leftFoot';
-          footGroup.userData.partName = isRight ? 'Right Foot' : 'Left Foot';
-        }
+        footGroup.userData.bodyPart = isRight ? 'rightFoot' : 'leftFoot';
+        footGroup.userData.partName = isRight ? 'Right Foot' : 'Left Foot';
         
-        return legGroup;
+        return { legGroup, kneeGroup, footGroup };
       }
       
       // Create both legs
-      const leftLeg = createLeg(-0.4, false);
-      const rightLeg = createLeg(0.4, true);
-      legsGroup.add(leftLeg);
-      legsGroup.add(rightLeg);
+      const leftLegData = createLeg(-0.4, false);
+      const rightLegData = createLeg(0.4, true);
+      legsGroup.add(leftLegData.legGroup);
+      legsGroup.add(rightLegData.legGroup);
       legsGroup.position.set(0, 7.5, 0); // Feet on ground
       fullBodyGroup.add(legsGroup);
       totalVertices += 172; // 86V × 2
       
       // Store references for walking animation
-      leftLegGroup = leftLeg;
-      rightLegGroup = rightLeg;
+      leftLegGroup = leftLegData.legGroup;
+      rightLegGroup = rightLegData.legGroup;
+      leftKneeGroup = leftLegData.kneeGroup;
+      rightKneeGroup = rightLegData.kneeGroup;
+      leftFootGroup = leftLegData.footGroup;
+      rightFootGroup = rightLegData.footGroup;
       
       // ===== TORSO (120V) - Connects legs to arms =====
       const torsoGroup = new THREE.Group();
