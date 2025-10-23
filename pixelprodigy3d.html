@@ -283,7 +283,11 @@
             </button>
             <button class="tool-btn" onclick="loadHumanAnatomy(this)" style="grid-column: 1 / -1; background: rgba(102, 126, 234, 0.2);">
               <span class="tool-icon">🦾</span>
-              <span>Load Human Figure</span>
+              <span>Load Arm (86V)</span>
+            </button>
+            <button class="tool-btn" onclick="loadHumanLeg(this)" style="grid-column: 1 / -1; background: rgba(76, 175, 80, 0.2); border: 2px solid rgba(76, 175, 80, 0.4);">
+              <span class="tool-icon">🦵</span>
+              <span>Load Leg (86V)</span>
             </button>
             <button class="tool-btn" onclick="openAnatomyEditor()" style="grid-column: 1 / -1; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4);">
               <span class="tool-icon">✏️</span>
@@ -825,6 +829,106 @@
       document.getElementById('primitiveDisplay').textContent = `HUMAN ARM (${vertexCount}V)`;
       
       console.log(`✅ Anatomical arm loaded: ${vertexCount} vertices - shoulder, upper arm, elbow, forearm, wrist, hand, thumb, 4 fingers`);
+    }
+
+    // 🦵 HUMAN LEG LOADER (86-Vertex System)
+    function loadHumanLeg(btn) {
+      console.log('🦵 Loading 86-vertex leg anatomy...');
+      
+      // Clear primitive selection
+      document.querySelectorAll('.primitive-grid .tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Create anatomical leg with 86 vertices
+      const legGroup = new THREE.Group();
+      const vertexCount = 86;
+      
+      // Hip joint (origin point)
+      const hipGeom = new THREE.SphereGeometry(0.35, 8, 8);
+      const hipMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const hip = new THREE.Mesh(hipGeom, hipMat);
+      legGroup.add(hip);
+      
+      // Thigh (14" / 35cm extended cylinder)
+      const thighGeom = new THREE.CylinderGeometry(0.25, 0.22, 3.5, 16);
+      const thighMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const thigh = new THREE.Mesh(thighGeom, thighMat);
+      thigh.position.y = -1.75;
+      legGroup.add(thigh);
+      
+      // Knee joint (180° pivot capability)
+      const kneeGeom = new THREE.SphereGeometry(0.24, 8, 8);
+      const kneeMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+      const knee = new THREE.Mesh(kneeGeom, kneeMat);
+      knee.position.y = -3.5;
+      legGroup.add(knee);
+      
+      // Calf (14" / 35cm)
+      const calfGeom = new THREE.CylinderGeometry(0.22, 0.18, 3.5, 16);
+      const calfMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const calf = new THREE.Mesh(calfGeom, calfMat);
+      calf.position.y = -5.25;
+      legGroup.add(calf);
+      
+      // Ankle joint
+      const ankleGeom = new THREE.SphereGeometry(0.18, 8, 8);
+      const ankleMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+      const ankle = new THREE.Mesh(ankleGeom, ankleMat);
+      ankle.position.y = -7;
+      legGroup.add(ankle);
+      
+      // Ankle bone protrusion (malleolus)
+      const ankleBoneGeom = new THREE.SphereGeometry(0.012, 8, 8);
+      const ankleBoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+      const ankleBone = new THREE.Mesh(ankleBoneGeom, ankleBoneMat);
+      ankleBone.position.set(0.18, -7, 0);
+      legGroup.add(ankleBone);
+      
+      // Foot (elongated with 40% growth)
+      const footGeom = new THREE.BoxGeometry(0.35, 0.25, 0.8);
+      const footMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const foot = new THREE.Mesh(footGeom, footMat);
+      foot.position.set(0, -7.3, 0.3);
+      foot.rotation.x = -Math.PI / 16; // Slight arch
+      legGroup.add(foot);
+      
+      // Big toe (larger and separate)
+      const bigToeGeom = new THREE.CylinderGeometry(0.07, 0.05, 0.35, 8);
+      const bigToeMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const bigToe = new THREE.Mesh(bigToeGeom, bigToeMat);
+      bigToe.position.set(-0.12, -7.5, 0.65);
+      bigToe.rotation.x = Math.PI / 2;
+      legGroup.add(bigToe);
+      
+      // 4 Toes (progressive sizing: smaller than big toe, decreasing)
+      const toeLengths = [0.28, 0.26, 0.24, 0.22]; // Progressive reduction
+      for (let i = 0; i < 4; i++) {
+        const toeGeom = new THREE.CylinderGeometry(0.045 * (1 - i * 0.08), 0.03 * (1 - i * 0.08), toeLengths[i], 8);
+        const toeMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const toe = new THREE.Mesh(toeGeom, toeMat);
+        toe.position.set(-0.05 + (i * 0.08), -7.5, 0.65);
+        toe.rotation.x = Math.PI / 2;
+        legGroup.add(toe);
+        
+        // Toe tip (spherical)
+        const toeTipGeom = new THREE.SphereGeometry(0.035 * (1 - i * 0.08), 8, 8);
+        const toeTipMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+        const toeTip = new THREE.Mesh(toeTipGeom, toeTipMat);
+        toeTip.position.set(-0.05 + (i * 0.08), -7.5, 0.65 + toeLengths[i] / 2);
+        legGroup.add(toeTip);
+      }
+      
+      // Position the leg group so foot rests on ground (foot bottom is at ~Y=-7.5, so lift by 7.5)
+      legGroup.position.set(0, 7.5, 0);
+      scene.add(legGroup);
+      objects.push(legGroup);
+      
+      // Update UI
+      updateObjectCount();
+      updateVertexCount();
+      document.getElementById('primitiveDisplay').textContent = `HUMAN LEG (${vertexCount}V)`;
+      
+      console.log(`✅ Anatomical leg loaded: ${vertexCount} vertices - hip, thigh, knee, calf, ankle, foot, big toe, 4 toes`);
     }
 
     function updateSize(value) {
