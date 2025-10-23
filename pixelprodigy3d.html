@@ -312,6 +312,10 @@
               <span class="tool-icon">🧠</span>
               <span>Load Head (100V)</span>
             </button>
+            <button class="tool-btn" onclick="loadFullBody(this)" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(255, 64, 129, 0.3), rgba(63, 81, 181, 0.3)); border: 3px solid rgba(255, 255, 255, 0.6); box-shadow: 0 0 15px rgba(255, 64, 129, 0.4); font-weight: bold; font-size: 1.1em;">
+              <span class="tool-icon">🧍</span>
+              <span>FULL BODY (564V)</span>
+            </button>
             <button class="tool-btn" onclick="openAnatomyEditor()" style="grid-column: 1 / -1; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4);">
               <span class="tool-icon">✏️</span>
               <span>Edit Anatomy (Advanced)</span>
@@ -1582,6 +1586,411 @@
       document.getElementById('neckSwivelValue').textContent = angle + '°';
       
       console.log(`🔄 Neck swivel: ${angle}° (${swivelAngle.toFixed(2)} rad)`);
+    }
+
+    // 🧍 FULL BODY LOADER (564+ Vertices Total)
+    function loadFullBody(btn) {
+      console.log('🧍 Loading complete human body with all parts...');
+      
+      // Clear primitive selection
+      document.querySelectorAll('.primitive-grid .tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Create main body container
+      const fullBodyGroup = new THREE.Group();
+      let totalVertices = 0;
+      
+      // ===== LEGS (172V) - Ground Level =====
+      const legsGroup = new THREE.Group();
+      
+      function createLeg(xOffset, isRight) {
+        const legGroup = new THREE.Group();
+        
+        // Hip joint
+        const hipGeom = new THREE.SphereGeometry(0.35, 8, 8);
+        const hipMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const hip = new THREE.Mesh(hipGeom, hipMat);
+        legGroup.add(hip);
+        
+        // Thigh
+        const thighGeom = new THREE.CylinderGeometry(0.25, 0.22, 3.5, 16);
+        const thighMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const thigh = new THREE.Mesh(thighGeom, thighMat);
+        thigh.position.y = -1.75;
+        legGroup.add(thigh);
+        
+        // Knee joint
+        const kneeGeom = new THREE.SphereGeometry(0.24, 8, 8);
+        const kneeMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+        const knee = new THREE.Mesh(kneeGeom, kneeMat);
+        knee.position.y = -3.5;
+        legGroup.add(knee);
+        
+        // Calf
+        const calfGeom = new THREE.CylinderGeometry(0.22, 0.18, 3.5, 16);
+        const calfMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const calf = new THREE.Mesh(calfGeom, calfMat);
+        calf.position.y = -5.25;
+        legGroup.add(calf);
+        
+        // Ankle joint
+        const ankleGeom = new THREE.SphereGeometry(0.18, 8, 8);
+        const ankleMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+        const ankle = new THREE.Mesh(ankleGeom, ankleMat);
+        ankle.position.y = -7;
+        legGroup.add(ankle);
+        
+        // Ankle bone (malleolus) - mirrored
+        const ankleBoneGeom = new THREE.SphereGeometry(0.012, 8, 8);
+        const ankleBoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+        const ankleBone = new THREE.Mesh(ankleBoneGeom, ankleBoneMat);
+        ankleBone.position.set(isRight ? 0.18 : -0.18, -7, 0);
+        legGroup.add(ankleBone);
+        
+        // Foot
+        const footGeom = new THREE.BoxGeometry(0.35, 0.25, 0.8);
+        const footMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const foot = new THREE.Mesh(footGeom, footMat);
+        foot.position.set(0, -7.3, 0.3);
+        foot.rotation.x = -Math.PI / 16;
+        legGroup.add(foot);
+        
+        // Big toe - mirrored
+        const bigToeGeom = new THREE.CylinderGeometry(0.07, 0.05, 0.35, 8);
+        const bigToeMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const bigToe = new THREE.Mesh(bigToeGeom, bigToeMat);
+        bigToe.position.set(isRight ? -0.12 : 0.12, -7.5, 0.65);
+        bigToe.rotation.x = Math.PI / 2;
+        legGroup.add(bigToe);
+        
+        // 4 Toes - mirrored
+        const toeLengths = [0.28, 0.26, 0.24, 0.22];
+        for (let i = 0; i < 4; i++) {
+          const toeGeom = new THREE.CylinderGeometry(0.045 * (1 - i * 0.08), 0.03 * (1 - i * 0.08), toeLengths[i], 8);
+          const toeMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+          const toe = new THREE.Mesh(toeGeom, toeMat);
+          const toeXBase = isRight ? -0.05 : 0.05;
+          const toeXOffset = isRight ? (i * 0.08) : -(i * 0.08);
+          toe.position.set(toeXBase + toeXOffset, -7.5, 0.65);
+          toe.rotation.x = Math.PI / 2;
+          legGroup.add(toe);
+          
+          // Toe tip
+          const toeTipGeom = new THREE.SphereGeometry(0.035 * (1 - i * 0.08), 8, 8);
+          const toeTipMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+          const toeTip = new THREE.Mesh(toeTipGeom, toeTipMat);
+          toeTip.position.set(toeXBase + toeXOffset, -7.5, 0.65 + toeLengths[i] / 2);
+          legGroup.add(toeTip);
+        }
+        
+        legGroup.position.set(xOffset, 0, 0);
+        return legGroup;
+      }
+      
+      // Create both legs
+      legsGroup.add(createLeg(-0.4, false)); // Left leg
+      legsGroup.add(createLeg(0.4, true));   // Right leg
+      legsGroup.position.set(0, 7.5, 0); // Feet on ground
+      fullBodyGroup.add(legsGroup);
+      totalVertices += 172; // 86V × 2
+      
+      // ===== TORSO (120V) - Connects legs to arms =====
+      const torsoGroup = new THREE.Group();
+      
+      // Pelvis base
+      const pelvisGeom = new THREE.CylinderGeometry(0.45, 0.5, 0.6, 16);
+      const pelvisMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.6 });
+      const pelvis = new THREE.Mesh(pelvisGeom, pelvisMat);
+      pelvis.position.y = 0;
+      torsoGroup.add(pelvis);
+      
+      // Lower spine (L1-L5 lumbar vertebrae)
+      const lowerSpineGeom = new THREE.CylinderGeometry(0.12, 0.12, 1.2, 12);
+      const spineMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+      const lowerSpine = new THREE.Mesh(lowerSpineGeom, spineMat);
+      lowerSpine.position.y = 0.9;
+      torsoGroup.add(lowerSpine);
+      
+      // Mid spine (T7-T12 thoracic vertebrae)
+      const midSpineGeom = new THREE.CylinderGeometry(0.13, 0.12, 1.5, 12);
+      const midSpine = new THREE.Mesh(midSpineGeom, spineMat);
+      midSpine.position.y = 2.25;
+      torsoGroup.add(midSpine);
+      
+      // Upper spine (T1-T6 thoracic vertebrae)
+      const upperSpineGeom = new THREE.CylinderGeometry(0.14, 0.13, 1.2, 12);
+      const upperSpine = new THREE.Mesh(upperSpineGeom, spineMat);
+      upperSpine.position.y = 3.6;
+      torsoGroup.add(upperSpine);
+      
+      // Ribcage (12 ribs on each side)
+      for (let i = 0; i < 12; i++) {
+        const ribHeight = 2.0 + (i * 0.15);
+        const ribWidth = 0.35 + (i * 0.04);
+        
+        // Left rib
+        const leftRibGeom = new THREE.TorusGeometry(ribWidth, 0.02, 8, 16, Math.PI);
+        const ribMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+        const leftRib = new THREE.Mesh(leftRibGeom, ribMat);
+        leftRib.position.set(-0.15, ribHeight, 0);
+        leftRib.rotation.y = Math.PI / 2;
+        leftRib.rotation.z = -Math.PI / 12;
+        torsoGroup.add(leftRib);
+        
+        // Right rib
+        const rightRibGeom = new THREE.TorusGeometry(ribWidth, 0.02, 8, 16, Math.PI);
+        const rightRib = new THREE.Mesh(rightRibGeom, ribMat);
+        rightRib.position.set(0.15, ribHeight, 0);
+        rightRib.rotation.y = -Math.PI / 2;
+        rightRib.rotation.z = Math.PI / 12;
+        torsoGroup.add(rightRib);
+      }
+      
+      // Chest
+      const chestGeom = new THREE.CylinderGeometry(0.55, 0.45, 1.5, 16);
+      const chestMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.6 });
+      const chest = new THREE.Mesh(chestGeom, chestMat);
+      chest.position.y = 3.5;
+      torsoGroup.add(chest);
+      
+      // Shoulders
+      const shouldersGeom = new THREE.CylinderGeometry(0.65, 0.55, 0.5, 16);
+      const shouldersMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.6 });
+      const shoulders = new THREE.Mesh(shouldersGeom, shouldersMat);
+      shoulders.position.y = 4.5;
+      torsoGroup.add(shoulders);
+      
+      // Clavicles (collarbones)
+      const leftClavicleGeom = new THREE.CylinderGeometry(0.05, 0.05, 0.8, 8);
+      const clavicleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+      const leftClavicle = new THREE.Mesh(leftClavicleGeom, clavicleMat);
+      leftClavicle.position.set(-0.5, 4.6, 0);
+      leftClavicle.rotation.z = Math.PI / 6;
+      torsoGroup.add(leftClavicle);
+      
+      const rightClavicle = new THREE.Mesh(leftClavicleGeom, clavicleMat);
+      rightClavicle.position.set(0.5, 4.6, 0);
+      rightClavicle.rotation.z = -Math.PI / 6;
+      torsoGroup.add(rightClavicle);
+      
+      torsoGroup.position.set(0, 7.5, 0); // Align with legs at ground level
+      fullBodyGroup.add(torsoGroup);
+      totalVertices += 120;
+      
+      // ===== ARMS (172V) - At shoulder height =====
+      const armsGroup = new THREE.Group();
+      
+      function createArm(xOffset, isRight) {
+        const armGroup = new THREE.Group();
+        const forearmGroup = new THREE.Group(); // For elbow articulation
+        
+        // Shoulder joint
+        const shoulderGeom = new THREE.SphereGeometry(0.25, 8, 8);
+        const shoulderMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const shoulder = new THREE.Mesh(shoulderGeom, shoulderMat);
+        armGroup.add(shoulder);
+        
+        // Upper arm (bicep/tricep area)
+        const upperArmGeom = new THREE.CylinderGeometry(0.18, 0.15, 2.5, 16);
+        const upperArmMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const upperArm = new THREE.Mesh(upperArmGeom, upperArmMat);
+        upperArm.position.y = -1.25;
+        armGroup.add(upperArm);
+        
+        // Elbow joint
+        const elbowGeom = new THREE.SphereGeometry(0.16, 8, 8);
+        const elbowMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+        const elbow = new THREE.Mesh(elbowGeom, elbowMat);
+        elbow.position.y = -2.5;
+        armGroup.add(elbow);
+        
+        // === FOREARM GROUP (for articulation) ===
+        forearmGroup.position.y = -2.5; // Position at elbow
+        
+        // Forearm
+        const forearmGeom = new THREE.CylinderGeometry(0.14, 0.12, 2.3, 16);
+        const forearmMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const forearm = new THREE.Mesh(forearmGeom, forearmMat);
+        forearm.position.y = -1.15;
+        forearmGroup.add(forearm);
+        
+        // Wrist joint
+        const wristGeom = new THREE.SphereGeometry(0.12, 8, 8);
+        const wristMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+        const wrist = new THREE.Mesh(wristGeom, wristMat);
+        wrist.position.y = -2.3;
+        forearmGroup.add(wrist);
+        
+        // Wrist bone (styloid process) - mirrored
+        const wristBoneGeom = new THREE.SphereGeometry(0.008, 8, 8);
+        const wristBoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+        const wristBone = new THREE.Mesh(wristBoneGeom, wristBoneMat);
+        wristBone.position.set(isRight ? -0.15 : 0.15, -2.3, 0);
+        forearmGroup.add(wristBone);
+        
+        // Hand (palm)
+        const handGeom = new THREE.BoxGeometry(0.3, 0.12, 0.45);
+        const handMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const hand = new THREE.Mesh(handGeom, handMat);
+        hand.position.y = -2.65;
+        forearmGroup.add(hand);
+        
+        // Thumb - mirrored rotation
+        const thumbGeom = new THREE.CylinderGeometry(0.05, 0.04, 0.35, 8);
+        const thumbMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+        const thumb = new THREE.Mesh(thumbGeom, thumbMat);
+        thumb.position.set(isRight ? 0.25 : -0.25, -2.65, 0);
+        thumb.rotation.z = isRight ? Math.PI / 3 : -Math.PI / 3;
+        forearmGroup.add(thumb);
+        
+        // 4 Fingers - mirrored X positions
+        const fingerLengths = [0.45, 0.48, 0.46, 0.42];
+        for (let i = 0; i < 4; i++) {
+          const fingerGeom = new THREE.CylinderGeometry(0.035 * (1 - i * 0.05), 0.025 * (1 - i * 0.05), fingerLengths[i], 8);
+          const fingerMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+          const finger = new THREE.Mesh(fingerGeom, fingerMat);
+          const fingerXBase = isRight ? -0.12 : 0.12;
+          const fingerXOffset = isRight ? (i * 0.08) : -(i * 0.08);
+          finger.position.set(fingerXBase + fingerXOffset, -3.1, 0);
+          forearmGroup.add(finger);
+          
+          // Fingertip
+          const fingertipGeom = new THREE.SphereGeometry(0.03 * (1 - i * 0.05), 8, 8);
+          const fingertipMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+          const fingertip = new THREE.Mesh(fingertipGeom, fingertipMat);
+          fingertip.position.set(fingerXBase + fingerXOffset, -3.1 - fingerLengths[i] / 2, 0);
+          forearmGroup.add(fingertip);
+        }
+        
+        armGroup.add(forearmGroup);
+        armGroup.position.set(xOffset, 0, 0);
+        return armGroup;
+      }
+      
+      // Create both arms
+      armsGroup.add(createArm(-1.2, false)); // Left arm
+      armsGroup.add(createArm(1.2, true));   // Right arm
+      armsGroup.position.set(0, 12.25, 0); // At shoulder height (torso top ~4.5 + base 7.5)
+      fullBodyGroup.add(armsGroup);
+      totalVertices += 172; // 86V × 2
+      
+      // ===== HEAD (100V) - Top of torso =====
+      const headGroup = new THREE.Group();
+      const neckSwivelGroup = new THREE.Group(); // For head rotation
+      
+      // Cervical spine (C1-C7 vertebrae)
+      const cervicalSpineGeom = new THREE.CylinderGeometry(0.08, 0.08, 0.6, 12);
+      const cervicalSpineMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+      const cervicalSpine = new THREE.Mesh(cervicalSpineGeom, cervicalSpineMat);
+      cervicalSpine.position.y = 0.3;
+      headGroup.add(cervicalSpine);
+      
+      // Neck base
+      const neckBaseGeom = new THREE.CylinderGeometry(0.2, 0.18, 0.5, 16);
+      const neckBaseMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const neckBase = new THREE.Mesh(neckBaseGeom, neckBaseMat);
+      neckBase.position.y = 0.8;
+      headGroup.add(neckBase);
+      
+      // === NECK SWIVEL GROUP (for head rotation) ===
+      neckSwivelGroup.position.y = 1.1; // Position at top of neck
+      
+      // Skull base (occipital bone)
+      const skullBaseGeom = new THREE.SphereGeometry(0.25, 12, 12);
+      const skullBaseMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+      const skullBase = new THREE.Mesh(skullBaseGeom, skullBaseMat);
+      skullBase.position.y = 0.2;
+      neckSwivelGroup.add(skullBase);
+      
+      // Cranium (skull)
+      const craniumGeom = new THREE.SphereGeometry(0.45, 16, 16);
+      const craniumMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const cranium = new THREE.Mesh(craniumGeom, craniumMat);
+      cranium.position.y = 0.65;
+      neckSwivelGroup.add(cranium);
+      
+      // Jaw (mandible)
+      const jawGeom = new THREE.BoxGeometry(0.4, 0.2, 0.35);
+      const jawMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const jaw = new THREE.Mesh(jawGeom, jawMat);
+      jaw.position.set(0, 0.3, 0.25);
+      neckSwivelGroup.add(jaw);
+      
+      // Eyes
+      const eyeGeom = new THREE.SphereGeometry(0.08, 12, 12);
+      const eyeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+      const leftEye = new THREE.Mesh(eyeGeom, eyeMat);
+      leftEye.position.set(-0.15, 0.7, 0.4);
+      neckSwivelGroup.add(leftEye);
+      
+      const rightEye = new THREE.Mesh(eyeGeom, eyeMat);
+      rightEye.position.set(0.15, 0.7, 0.4);
+      neckSwivelGroup.add(rightEye);
+      
+      // Pupils
+      const pupilGeom = new THREE.SphereGeometry(0.04, 8, 8);
+      const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.2 });
+      const leftPupil = new THREE.Mesh(pupilGeom, pupilMat);
+      leftPupil.position.set(-0.15, 0.7, 0.48);
+      neckSwivelGroup.add(leftPupil);
+      
+      const rightPupil = new THREE.Mesh(pupilGeom, pupilMat);
+      rightPupil.position.set(0.15, 0.7, 0.48);
+      neckSwivelGroup.add(rightPupil);
+      
+      // Nose
+      const noseGeom = new THREE.ConeGeometry(0.08, 0.15, 8);
+      const noseMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
+      const nose = new THREE.Mesh(noseGeom, noseMat);
+      nose.position.set(0, 0.55, 0.45);
+      nose.rotation.x = Math.PI / 2;
+      neckSwivelGroup.add(nose);
+      
+      // Mouth
+      const mouthGeom = new THREE.BoxGeometry(0.25, 0.05, 0.1);
+      const mouthMat = new THREE.MeshStandardMaterial({ color: 0xff6666, roughness: 0.4 });
+      const mouth = new THREE.Mesh(mouthGeom, mouthMat);
+      mouth.position.set(0, 0.4, 0.42);
+      neckSwivelGroup.add(mouth);
+      
+      // Ears
+      const earGeom = new THREE.SphereGeometry(0.1, 8, 8);
+      const earMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
+      const leftEar = new THREE.Mesh(earGeom, earMat);
+      leftEar.position.set(-0.45, 0.65, 0);
+      leftEar.scale.set(0.4, 1, 0.6);
+      neckSwivelGroup.add(leftEar);
+      
+      const rightEar = new THREE.Mesh(earGeom, earMat);
+      rightEar.position.set(0.45, 0.65, 0);
+      rightEar.scale.set(0.4, 1, 0.6);
+      neckSwivelGroup.add(rightEar);
+      
+      headGroup.add(neckSwivelGroup);
+      headGroup.position.set(0, 12, 0); // At top of torso (4.5 + 7.5)
+      fullBodyGroup.add(headGroup);
+      totalVertices += 100;
+      
+      // ===== ADD TO SCENE =====
+      fullBodyGroup.position.set(0, 0, 0); // Standing upright at origin
+      scene.add(fullBodyGroup);
+      objects.push(fullBodyGroup);
+      
+      // Update UI
+      updateObjectCount();
+      updateVertexCount();
+      document.getElementById('primitiveDisplay').textContent = `FULL BODY (${totalVertices}V)`;
+      
+      // Show articulation controls
+      document.getElementById('armArticulationControls').style.display = 'block';
+      document.getElementById('neckSwivelControls').style.display = 'block';
+      
+      console.log(`🧍 ✅ FULL BODY loaded: ${totalVertices} vertices total`);
+      console.log(`  → Legs: 172V (86V × 2) at ground level`);
+      console.log(`  → Torso: 120V connecting legs to arms`);
+      console.log(`  → Arms: 172V (86V × 2) at shoulder height`);
+      console.log(`  → Head: 100V at top of torso`);
+      console.log(`  → All articulation controls enabled (elbow bend, neck swivel)`);
     }
 
     function updateSize(value) {
