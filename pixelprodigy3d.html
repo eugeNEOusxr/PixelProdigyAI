@@ -283,7 +283,11 @@
             </button>
             <button class="tool-btn" onclick="loadHumanAnatomy(this)" style="grid-column: 1 / -1; background: rgba(102, 126, 234, 0.2);">
               <span class="tool-icon">🦾</span>
-              <span>Human Figure (86 Vertices)</span>
+              <span>Load Human Figure</span>
+            </button>
+            <button class="tool-btn" onclick="openAnatomyEditor()" style="grid-column: 1 / -1; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4);">
+              <span class="tool-icon">✏️</span>
+              <span>Edit Anatomy (Advanced)</span>
             </button>
           </div>
         </div>
@@ -814,8 +818,7 @@
       updateVertexCount();
       document.getElementById('primitiveDisplay').textContent = `HUMAN ARM (${vertexCount}V)`;
       
-      console.log(`✅ Anatomical arm loaded: ${vertexCount} vertices`);
-      alert(`✅ 86-Vertex Anatomical Arm Loaded!\n\nFeatures:\n• Shoulder joint\n• Upper arm (14")\n• Elbow (180° pivot)\n• Forearm (14")\n• Wrist + styloid bone\n• Hand with 40% growth curl\n• Thumb (190° hump)\n• 4 progressive fingers\n\nUse transform tools to position!`);
+      console.log(`✅ Anatomical arm loaded: ${vertexCount} vertices - shoulder, upper arm, elbow, forearm, wrist, hand, thumb, 4 fingers`);
     }
 
     function updateSize(value) {
@@ -826,6 +829,16 @@
     function updateAngle(value) {
       rotationAngle = parseFloat(value);
       document.getElementById('angleValue').textContent = value + '°';
+    }
+
+    // Open anatomy editor in new window
+    function openAnatomyEditor() {
+      const editorWindow = window.open('anatomical_arm_builder_86vertex.html', 'AnatomyEditor', 'width=1200,height=800');
+      if (editorWindow) {
+        console.log('✅ Anatomy editor opened in new window');
+      } else {
+        alert('⚠️ Please allow pop-ups to open the anatomy editor');
+      }
     }
 
     function clearScene() {
