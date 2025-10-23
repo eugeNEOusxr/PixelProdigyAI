@@ -223,6 +223,9 @@
         <button id="orbitToggle" onclick="toggleOrbitControls()" style="padding: 8px 16px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
           🎥 Orbit: ON
         </button>
+        <button id="walkModeToggle" onclick="toggleWalkMode()" style="padding: 8px 16px; background: rgba(255,165,0,0.15); border: 2px solid rgba(255,165,0,0.3); color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+          🚶 Walk Mode: OFF
+        </button>
       </div>
     </div>
 
@@ -584,6 +587,7 @@
     let bodyPartControlMode = null; // 'shoulder', 'elbow', 'wrist', 'hip', 'knee', 'ankle', 'neck'
     
     // Walking/Running animation state
+    let walkModeEnabled = false; // Toggle between stationary animation and forward movement
     let walkCycleSpeed = 0; // 0 = stopped, 1-3 = walking, 4+ = running
     let walkCyclePhase = 0; // Current phase in walk cycle (0 to 2*PI)
     let lastWheelTime = 0;
@@ -699,12 +703,46 @@
       canvas.addEventListener('click', onCanvasClick);
       canvas.addEventListener('wheel', onMouseWheel, { passive: false });
       window.addEventListener('resize', onWindowResize);
+      window.addEventListener('keydown', onKeyDown);
 
       // Hide loading
       document.getElementById('loading').style.display = 'none';
 
       // Start animation
       animate();
+    }
+    
+    // Keyboard controls for body rotation in Walk Mode
+    function onKeyDown(event) {
+      if (!walkModeEnabled || !window.fullBodyGroup) return;
+      
+      const rotationSpeed = 0.05;
+      
+      switch(event.key.toLowerCase()) {
+        case 'a':
+        case 'arrowleft':
+          // Turn left
+          window.fullBodyGroup.rotation.y += rotationSpeed;
+          console.log('↶ Turning left');
+          break;
+        case 'd':
+        case 'arrowright':
+          // Turn right
+          window.fullBodyGroup.rotation.y -= rotationSpeed;
+          console.log('↷ Turning right');
+          break;
+        case 'w':
+        case 'arrowup':
+          // Speed up (simulate scroll)
+          walkCycleSpeed = Math.min(walkCycleSpeed + 0.5, 10);
+          lastWheelTime = Date.now();
+          break;
+        case 's':
+        case 'arrowdown':
+          // Slow down
+          walkCycleSpeed = Math.max(walkCycleSpeed - 0.5, 0);
+          break;
+      }
     }
 
     // Toggle orbit controls on/off
@@ -724,6 +762,36 @@
       }
       
       console.log(`🎥 Orbit controls: ${orbitEnabled ? 'ENABLED' : 'DISABLED'}`);
+    }
+    
+    // Toggle Walk Mode (stationary animation vs. forward movement)
+    function toggleWalkMode() {
+      walkModeEnabled = !walkModeEnabled;
+      
+      const btn = document.getElementById('walkModeToggle');
+      if (walkModeEnabled) {
+        btn.textContent = '🚶 Walk Mode: ON';
+        btn.style.background = 'rgba(255, 165, 0, 0.3)';
+        btn.style.borderColor = 'rgba(255, 165, 0, 0.6)';
+        console.log('🚶 WALK MODE ENABLED: Body will move forward when scrolling!');
+        console.log('   → Scroll mouse wheel to walk/run through the scene');
+        console.log('   → Camera follows body automatically');
+        
+        // Disable orbit controls in walk mode
+        if (orbitEnabled) {
+          toggleOrbitControls();
+        }
+      } else {
+        btn.textContent = '🚶 Walk Mode: OFF';
+        btn.style.background = 'rgba(255,165,0,0.15)';
+        btn.style.borderColor = 'rgba(255,165,0,0.3)';
+        console.log('🚶 Walk Mode DISABLED: Body stays in place (stationary animation)');
+        
+        // Re-enable orbit controls
+        if (!orbitEnabled) {
+          toggleOrbitControls();
+        }
+      }
     }
     
     // Procedural walking/running animation
@@ -778,6 +846,27 @@
         const bodyBob = Math.abs(Math.sin(walkCyclePhase * 2)) * bobAmount;
         if (window.fullBodyGroup) {
           window.fullBodyGroup.position.y = bodyBob;
+          
+          // If Walk Mode is enabled, move body forward
+          if (walkModeEnabled) {
+            const forwardSpeed = isRunning ? 0.08 : 0.04; // Running is 2x faster
+            const bodyRotation = window.fullBodyGroup.rotation.y; // Face direction
+            
+            // Move forward based on body's facing direction
+            window.fullBodyGroup.position.x += Math.sin(bodyRotation) * walkCycleSpeed * forwardSpeed;
+            window.fullBodyGroup.position.z += Math.cos(bodyRotation) * walkCycleSpeed * forwardSpeed;
+            
+            // Camera follows body
+            const cameraOffset = new THREE.Vector3(5, 5, 5); // Offset behind and above
+            const cameraTargetPos = window.fullBodyGroup.position.clone();
+            
+            // Rotate camera offset based on body rotation
+            cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), bodyRotation);
+            
+            // Smooth camera follow
+            camera.position.lerp(cameraTargetPos.clone().add(cameraOffset), 0.1);
+            camera.lookAt(cameraTargetPos);
+          }
         }
         
         // Log state transitions
@@ -2248,6 +2337,10 @@
       console.log(`  → 🚶 WALKING ANIMATION: Click body, then scroll mouse wheel!`);
       console.log(`     • Scroll slowly = walking | Scroll faster = running`);
       console.log(`     • Stop scrolling to slow down naturally`);
+      console.log(`  → 🚶 WALK MODE: Enable 'Walk Mode' button to move through scene!`);
+      console.log(`     • A/D or ←/→ = Turn body left/right`);
+      console.log(`     • W/S or ↑/↓ = Speed up/slow down`);
+      console.log(`     • Camera follows body automatically`);
     }
 
     function updateSize(value) {
