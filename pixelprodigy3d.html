@@ -506,6 +506,7 @@
     let rotationAngle = 0;
     let objects = [];
     let selectedObject = null;
+    let selectionBox = null; // Visual selection indicator
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
 
@@ -560,6 +561,13 @@
               objects = objects.filter(obj => obj !== selectedObject);
               transformControl.detach();
               selectedObject = null;
+              
+              // Remove selection box
+              if (selectionBox) {
+                scene.remove(selectionBox);
+                selectionBox = null;
+              }
+              
               updateObjectCount();
             }
             break;
@@ -609,6 +617,12 @@
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
+      
+      // Update selection box to follow selected object
+      if (selectionBox && selectedObject) {
+        selectionBox.update();
+      }
+      
       renderer.render(scene, camera);
     }
 
@@ -639,6 +653,14 @@
         
         selectedObject = clickedObject;
         transformControl.attach(selectedObject);
+        
+        // Add visual selection box
+        if (selectionBox) {
+          scene.remove(selectionBox);
+        }
+        selectionBox = new THREE.BoxHelper(selectedObject, 0x00ff88); // Bright green outline
+        scene.add(selectionBox);
+        
         console.log('✅ Object selected - Use W/E/R or buttons to manipulate');
         return;
       }
@@ -708,10 +730,15 @@
       btn.classList.add('active');
       document.getElementById('modeDisplay').textContent = mode.toUpperCase();
       
-      // Detach transform when switching to add mode
+      // Detach transform and remove selection box when switching to add mode
       if (mode === 'add' && selectedObject) {
         transformControl.detach();
         selectedObject = null;
+        
+        if (selectionBox) {
+          scene.remove(selectionBox);
+          selectionBox = null;
+        }
       }
     }
 
