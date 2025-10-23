@@ -831,13 +831,13 @@
       document.getElementById('angleValue').textContent = value + '°';
     }
 
-    // Open anatomy editor in new window
+    // Open 3D vertex matrix editor in new window
     function openAnatomyEditor() {
-      const editorWindow = window.open('anatomical_arm_builder_86vertex.html', 'AnatomyEditor', 'width=1200,height=800');
+      const editorWindow = window.open('3d_vertex_matrix_environment.html', 'VertexMatrixEditor', 'width=1400,height=900');
       if (editorWindow) {
-        console.log('✅ Anatomy editor opened in new window');
+        console.log('✅ 3D Vertex Matrix Editor opened in new window');
       } else {
-        alert('⚠️ Please allow pop-ups to open the anatomy editor');
+        alert('⚠️ Please allow pop-ups to open the vertex matrix editor');
       }
     }
 
