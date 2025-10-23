@@ -217,6 +217,13 @@
         <button class="workspace-tab" onclick="switchWorkspace('perfect', this)">Perfect</button>
       </div>
       <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Multi-Workspace Studio</div>
+      
+      <!-- Camera Controls -->
+      <div style="display: flex; gap: 8px; margin-left: auto;">
+        <button id="orbitToggle" onclick="toggleOrbitControls()" style="padding: 8px 16px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+          🎥 Orbit: ON
+        </button>
+      </div>
     </div>
 
     <div id="sidebar">
@@ -297,6 +304,24 @@
               <span class="tool-icon">✏️</span>
               <span>Edit Anatomy (Advanced)</span>
             </button>
+          </div>
+        </div>
+
+        <!-- ARM ARTICULATION -->
+        <div class="section" id="armArticulation" style="display: none;">
+          <div class="section-title">💪 Arm Articulation</div>
+          <div style="margin-bottom: 15px;">
+            <label style="font-size: 12px; color: #888; display: flex; justify-content: space-between; margin-bottom: 5px;">
+              <span>Elbow Angle</span>
+              <span id="elbowAngleValue" style="color: #00ff88;">180°</span>
+            </label>
+            <input type="range" id="elbowAngle" min="180" max="340" value="180" step="1" 
+                   oninput="updateElbowAngle(parseInt(this.value))"
+                   style="width: 100%; cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: 2px;">
+              <span>180° (straight)</span>
+              <span>340° (bent)</span>
+            </div>
           </div>
         </div>
 
@@ -511,6 +536,9 @@
     let objects = [];
     let selectedObject = null;
     let selectionBox = null; // Visual selection indicator
+    let orbitEnabled = true; // Camera orbit control state
+    let currentArmGroup = null; // Reference to loaded arm for articulation
+    let armForearmPart = null; // Reference to forearm+hand section
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
 
@@ -622,6 +650,25 @@
 
       // Start animation
       animate();
+    }
+
+    // Toggle orbit controls on/off
+    function toggleOrbitControls() {
+      orbitEnabled = !orbitEnabled;
+      controls.enabled = orbitEnabled;
+      
+      const btn = document.getElementById('orbitToggle');
+      if (orbitEnabled) {
+        btn.textContent = '🎥 Orbit: ON';
+        btn.style.background = 'rgba(76, 175, 80, 0.3)';
+        btn.style.borderColor = 'rgba(76, 175, 80, 0.6)';
+      } else {
+        btn.textContent = '🎥 Orbit: OFF';
+        btn.style.background = 'rgba(244, 67, 54, 0.3)';
+        btn.style.borderColor = 'rgba(244, 67, 54, 0.6)';
+      }
+      
+      console.log(`🎥 Orbit controls: ${orbitEnabled ? 'ENABLED' : 'DISABLED'}`);
     }
 
     function animate() {
@@ -751,6 +798,16 @@
         return;
       }
       
+      // Disable orbit controls when using transform
+      if (orbitEnabled) {
+        orbitEnabled = false;
+        controls.enabled = false;
+        const btn = document.getElementById('orbitToggle');
+        btn.textContent = '🎥 Orbit: OFF';
+        btn.style.background = 'rgba(244, 67, 54, 0.3)';
+        btn.style.borderColor = 'rgba(244, 67, 54, 0.6)';
+      }
+      
       transformControl.setMode(mode);
       
       // Show selection box when entering transform mode
@@ -800,72 +857,102 @@
       elbow.position.y = -3.5;
       armGroup.add(elbow);
       
-      // Forearm (14" / 35cm)
+      // Create forearm group for articulation (rotates at elbow)
+      const forearmGroup = new THREE.Group();
+      forearmGroup.position.y = -3.5; // At elbow position
+      armGroup.add(forearmGroup);
+      
+      // Forearm (14" / 35cm) - relative to elbow
       const forearmGeom = new THREE.CylinderGeometry(0.18, 0.15, 3.5, 16);
       const forearmMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
       const forearm = new THREE.Mesh(forearmGeom, forearmMat);
-      forearm.position.y = -5.25;
-      armGroup.add(forearm);
+      forearm.position.y = -1.75; // Relative to elbow
+      forearmGroup.add(forearm);
       
       // Wrist joint
       const wristGeom = new THREE.SphereGeometry(0.16, 8, 8);
       const wristMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
       const wrist = new THREE.Mesh(wristGeom, wristMat);
-      wrist.position.y = -7;
-      armGroup.add(wrist);
+      wrist.position.y = -3.5; // Relative to elbow
+      forearmGroup.add(wrist);
       
       // Wrist bone protrusion (270-300° styloid process)
       const wristBoneGeom = new THREE.SphereGeometry(0.01, 8, 8);
       const wristBoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
       const wristBone = new THREE.Mesh(wristBoneGeom, wristBoneMat);
-      wristBone.position.set(0.15, -7, 0);
-      armGroup.add(wristBone);
+      wristBone.position.set(0.15, -3.5, 0); // Relative to elbow
+      forearmGroup.add(wristBone);
       
       // Hand (oval with 40% growth + curl)
       const handGeom = new THREE.BoxGeometry(0.4, 0.6, 0.15);
       const handMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
       const hand = new THREE.Mesh(handGeom, handMat);
-      hand.position.y = -7.8;
+      hand.position.y = -4.3; // Relative to elbow
       hand.rotation.x = Math.PI / 8; // 45° curl
-      armGroup.add(hand);
+      forearmGroup.add(hand);
       
       // Thumb (190° hump alignment)
       const thumbGeom = new THREE.CylinderGeometry(0.08, 0.06, 0.5, 8);
       const thumbMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
       const thumb = new THREE.Mesh(thumbGeom, thumbMat);
-      thumb.position.set(-0.25, -7.6, 0.1);
+      thumb.position.set(-0.25, -4.1, 0.1); // Relative to elbow
       thumb.rotation.z = -Math.PI / 3;
-      armGroup.add(thumb);
+      forearmGroup.add(thumb);
       
       // 4 Fingers (progressive sizing: 3.5" base, -10% per finger)
-      const fingerLengths = [0.875, 0.7875, 0.7, 0.6125]; // 3.5" → 3.15" → 2.8" → 2.45" (in units)
+      const fingerLengths = [0.875, 0.7875, 0.7, 0.6125];
       for (let i = 0; i < 4; i++) {
         const fingerGeom = new THREE.CylinderGeometry(0.06 * (1 - i * 0.1), 0.04 * (1 - i * 0.1), fingerLengths[i], 8);
         const fingerMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const finger = new THREE.Mesh(fingerGeom, fingerMat);
-        finger.position.set(-0.15 + (i * 0.1), -8.3, 0);
-        finger.rotation.x = Math.PI / 12; // Slight curl
-        armGroup.add(finger);
+        finger.position.set(-0.15 + (i * 0.1), -4.8, 0); // Relative to elbow
+        finger.rotation.x = Math.PI / 12;
+        forearmGroup.add(finger);
         
         // Fingertip (spherical)
         const tipGeom = new THREE.SphereGeometry(0.05 * (1 - i * 0.1), 8, 8);
         const tipMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
         const tip = new THREE.Mesh(tipGeom, tipMat);
-        tip.position.set(-0.15 + (i * 0.1), -8.3 - fingerLengths[i] / 2, 0);
-        armGroup.add(tip);
+        tip.position.set(-0.15 + (i * 0.1), -4.8 - fingerLengths[i] / 2, 0); // Relative to elbow
+        forearmGroup.add(tip);
       }
       
-      // Position the arm group so hand rests on ground (fingertips are at ~Y=-8.75, so lift by 8.75)
+      // Store references for articulation
+      currentArmGroup = armGroup;
+      armForearmPart = forearmGroup;
+      
+      // Position the arm group so hand rests on ground
       armGroup.position.set(0, 8.75, 0);
       scene.add(armGroup);
       objects.push(armGroup);
+      
+      // Show articulation controls
+      document.getElementById('armArticulation').style.display = 'block';
       
       // Update UI
       updateObjectCount();
       updateVertexCount();
       document.getElementById('primitiveDisplay').textContent = `HUMAN ARM (${vertexCount}V)`;
       
-      console.log(`✅ Anatomical arm loaded: ${vertexCount} vertices - shoulder, upper arm, elbow, forearm, wrist, hand, thumb, 4 fingers`);
+      console.log(`✅ Anatomical arm loaded: ${vertexCount} vertices - shoulder, upper arm, elbow, forearm, wrist, hand, thumb, 4 fingers - ARTICULATION ENABLED`);
+    }
+    
+    // Update elbow angle (180° = straight, 340° = fully bent)
+    function updateElbowAngle(angle) {
+      if (!armForearmPart) {
+        console.warn('⚠️ No arm loaded for articulation');
+        return;
+      }
+      
+      // Convert angle to radians (180° = 0 rad, 340° = bent forward)
+      // Rotate around X axis to bend elbow
+      const bendAngle = (angle - 180) * (Math.PI / 180);
+      armForearmPart.rotation.x = bendAngle;
+      
+      // Update display
+      document.getElementById('elbowAngleValue').textContent = angle + '°';
+      
+      console.log(`💪 Elbow angle: ${angle}° (${bendAngle.toFixed(2)} rad)`);
     }
 
     // 🦵 HUMAN LEG LOADER (86-Vertex System)
