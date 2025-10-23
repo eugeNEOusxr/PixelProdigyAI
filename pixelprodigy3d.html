@@ -1041,15 +1041,34 @@
           rightKneeGroup.rotation.x = stanceProgress * 0.2;
         }
         
-        // Right foot heel-toe
-        if (rightPhase < Math.PI * 0.3) {
-          rightFootGroup.rotation.x = 0.3;
-        } else if (rightPhase < Math.PI * 0.7) {
-          rightFootGroup.rotation.x = 0;
-        } else if (rightPhase < Math.PI) {
-          rightFootGroup.rotation.x = -0.4;
+        // Right foot heel-toe (FORWARD) or ball-pivot (BACKWARD)
+        if (moveBackward) {
+          // BACKWARD WALKING: Ball of foot pivots first, toe stays down, swing back in arc
+          if (rightPhase < Math.PI * 0.2) {
+            // Initial pivot on ball of foot (toe down, heel starting to lift)
+            rightFootGroup.rotation.x = -0.5; // Plantarflexion - toe down
+          } else if (rightPhase < Math.PI * 0.5) {
+            // Swing phase: foot arcs back with toe pointed
+            const swingProgress = (rightPhase - Math.PI * 0.2) / (Math.PI * 0.3);
+            rightFootGroup.rotation.x = -0.5 + (swingProgress * 0.3); // Toe gradually comes up
+          } else if (rightPhase < Math.PI) {
+            // Landing: foot comes down flat for stance
+            rightFootGroup.rotation.x = -0.1; // Nearly flat
+          } else {
+            // Stance phase: foot flat on ground
+            rightFootGroup.rotation.x = 0;
+          }
         } else {
-          rightFootGroup.rotation.x = 0.1;
+          // FORWARD WALKING: Normal heel-toe pattern
+          if (rightPhase < Math.PI * 0.3) {
+            rightFootGroup.rotation.x = 0.3;
+          } else if (rightPhase < Math.PI * 0.7) {
+            rightFootGroup.rotation.x = 0;
+          } else if (rightPhase < Math.PI) {
+            rightFootGroup.rotation.x = -0.4;
+          } else {
+            rightFootGroup.rotation.x = 0.1;
+          }
         }
         
         // === LEFT LEG CYCLE ===
@@ -1066,15 +1085,34 @@
           leftKneeGroup.rotation.x = stanceProgress * 0.2;
         }
         
-        // Left foot heel-toe
-        if (leftPhase < Math.PI * 0.3) {
-          leftFootGroup.rotation.x = 0.3;
-        } else if (leftPhase < Math.PI * 0.7) {
-          leftFootGroup.rotation.x = 0;
-        } else if (leftPhase < Math.PI) {
-          leftFootGroup.rotation.x = -0.4;
+        // Left foot heel-toe (FORWARD) or ball-pivot (BACKWARD)
+        if (moveBackward) {
+          // BACKWARD WALKING: Ball of foot pivots first, toe stays down, swing back in arc
+          if (leftPhase < Math.PI * 0.2) {
+            // Initial pivot on ball of foot (toe down, heel starting to lift)
+            leftFootGroup.rotation.x = -0.5; // Plantarflexion - toe down
+          } else if (leftPhase < Math.PI * 0.5) {
+            // Swing phase: foot arcs back with toe pointed
+            const swingProgress = (leftPhase - Math.PI * 0.2) / (Math.PI * 0.3);
+            leftFootGroup.rotation.x = -0.5 + (swingProgress * 0.3); // Toe gradually comes up
+          } else if (leftPhase < Math.PI) {
+            // Landing: foot comes down flat for stance
+            leftFootGroup.rotation.x = -0.1; // Nearly flat
+          } else {
+            // Stance phase: foot flat on ground
+            leftFootGroup.rotation.x = 0;
+          }
         } else {
-          leftFootGroup.rotation.x = 0.1;
+          // FORWARD WALKING: Normal heel-toe pattern
+          if (leftPhase < Math.PI * 0.3) {
+            leftFootGroup.rotation.x = 0.3;
+          } else if (leftPhase < Math.PI * 0.7) {
+            leftFootGroup.rotation.x = 0;
+          } else if (leftPhase < Math.PI) {
+            leftFootGroup.rotation.x = -0.4;
+          } else {
+            leftFootGroup.rotation.x = 0.1;
+          }
         }
         
         // === ARM SWING ===
