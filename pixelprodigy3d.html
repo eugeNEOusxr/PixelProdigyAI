@@ -551,9 +551,15 @@
       // Keyboard: W=move, E=rotate, R=scale, Delete=remove
       window.addEventListener('keydown', function(event) {
         switch(event.key.toLowerCase()) {
-          case 'w': transformControl.setMode('translate'); break;
-          case 'e': transformControl.setMode('rotate'); break;
-          case 'r': transformControl.setMode('scale'); break;
+          case 'w': 
+            if (selectedObject) setTransformMode('translate');
+            break;
+          case 'e': 
+            if (selectedObject) setTransformMode('rotate');
+            break;
+          case 'r': 
+            if (selectedObject) setTransformMode('scale');
+            break;
           case 'delete':
           case 'backspace':
             if (selectedObject) {
@@ -644,7 +650,7 @@
       // Check if clicking existing object to select it
       const intersects = raycaster.intersectObjects(objects, true);
       
-      if (intersects.length > 0 && currentMode === 'add') {
+      if (intersects.length > 0) {
         // Find the root object (in case of groups like anatomical arm)
         let clickedObject = intersects[0].object;
         while (clickedObject.parent && !objects.includes(clickedObject)) {
@@ -652,16 +658,9 @@
         }
         
         selectedObject = clickedObject;
-        transformControl.attach(selectedObject);
         
-        // Add visual selection box
-        if (selectionBox) {
-          scene.remove(selectionBox);
-        }
-        selectionBox = new THREE.BoxHelper(selectedObject, 0x00ff88); // Bright green outline
-        scene.add(selectionBox);
-        
-        console.log('✅ Object selected - Use W/E/R or buttons to manipulate');
+        // Don't auto-attach transform, just select
+        console.log('✅ Object selected - Click Move/Rotate/Scale or press W/E/R');
         return;
       }
       
@@ -747,7 +746,14 @@
         alert('⚠️ Click an object first to select it!\n\n1. Click any object in the scene\n2. Then use Move/Rotate/Scale buttons\n3. Or press W/E/R keys');
         return;
       }
+      
       transformControl.setMode(mode);
+      
+      // Show selection box when entering transform mode
+      if (!selectionBox && selectedObject) {
+        selectionBox = new THREE.BoxHelper(selectedObject, 0x00ff88);
+        scene.add(selectionBox);
+      }
       console.log(`🎨 Transform mode: ${mode.toUpperCase()}`);
     }
 
