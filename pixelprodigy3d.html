@@ -576,6 +576,23 @@
     let armForearmPart = null; // Reference to forearm+hand section
     let currentHeadGroup = null; // Reference to loaded head
     let headNeckSwivel = null; // Reference to neck swivel group
+    
+    // Full body part references (for hierarchical selection)
+    let fullBodyGroup = null;
+    let bodyPartMap = new Map(); // Maps mesh objects to their body part names and control groups
+    let selectedBodyPart = null; // Currently selected body part
+    let bodyPartControlMode = null; // 'shoulder', 'elbow', 'wrist', 'hip', 'knee', 'ankle', 'neck'
+    
+    // Walking/Running animation state
+    let walkCycleSpeed = 0; // 0 = stopped, 1-3 = walking, 4+ = running
+    let walkCyclePhase = 0; // Current phase in walk cycle (0 to 2*PI)
+    let lastWheelTime = 0;
+    let walkDecayRate = 0.95; // How quickly walking slows down
+    let leftLegGroup = null; // Reference to left leg for animation
+    let rightLegGroup = null; // Reference to right leg for animation
+    let leftArmGroupRef = null; // Reference to left arm for swing
+    let rightArmGroupRef = null; // Reference to right arm for swing
+    
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
 
@@ -680,6 +697,7 @@
 
       // Events
       canvas.addEventListener('click', onCanvasClick);
+      canvas.addEventListener('wheel', onMouseWheel, { passive: false });
       window.addEventListener('resize', onWindowResize);
 
       // Hide loading
@@ -707,10 +725,76 @@
       
       console.log(`🎥 Orbit controls: ${orbitEnabled ? 'ENABLED' : 'DISABLED'}`);
     }
+    
+    // Procedural walking/running animation
+    function updateWalkingAnimation() {
+      // Decay walk speed over time if no wheel input
+      const timeSinceWheel = Date.now() - lastWheelTime;
+      if (timeSinceWheel > 100) { // Start decaying after 100ms
+        walkCycleSpeed *= walkDecayRate;
+        if (walkCycleSpeed < 0.01) {
+          walkCycleSpeed = 0;
+          walkCyclePhase = 0; // Reset phase when stopped
+        }
+      }
+      
+      // Only animate if walking/running
+      if (walkCycleSpeed > 0 && leftLegGroup && rightLegGroup) {
+        // Determine animation speed based on walk/run state
+        const isRunning = walkCycleSpeed > 4;
+        const cycleSpeedMultiplier = isRunning ? 0.15 : 0.08;
+        walkCyclePhase += walkCycleSpeed * cycleSpeedMultiplier;
+        
+        // Walking: smooth sine wave
+        // Running: faster, more exaggerated motion
+        const legSwingAmplitude = isRunning ? 0.6 : 0.4;
+        const armSwingAmplitude = isRunning ? 0.5 : 0.3;
+        
+        // Leg motion (opposite legs swing opposite directions)
+        const leftLegSwing = Math.sin(walkCyclePhase) * legSwingAmplitude;
+        const rightLegSwing = Math.sin(walkCyclePhase + Math.PI) * legSwingAmplitude;
+        
+        // Apply leg rotations at hip
+        if (leftLegGroup) {
+          leftLegGroup.rotation.x = leftLegSwing;
+        }
+        if (rightLegGroup) {
+          rightLegGroup.rotation.x = rightLegSwing;
+        }
+        
+        // Arm motion (opposite to legs - left arm swings with right leg)
+        const leftArmSwing = Math.sin(walkCyclePhase + Math.PI) * armSwingAmplitude;
+        const rightArmSwing = Math.sin(walkCyclePhase) * armSwingAmplitude;
+        
+        if (leftArmGroupRef) {
+          leftArmGroupRef.rotation.x = leftArmSwing;
+        }
+        if (rightArmGroupRef) {
+          rightArmGroupRef.rotation.x = rightArmSwing;
+        }
+        
+        // Body bob (vertical movement for realism)
+        const bobAmount = isRunning ? 0.15 : 0.08;
+        const bodyBob = Math.abs(Math.sin(walkCyclePhase * 2)) * bobAmount;
+        if (window.fullBodyGroup) {
+          window.fullBodyGroup.position.y = bodyBob;
+        }
+        
+        // Log state transitions
+        if (walkCycleSpeed < 1 && walkCycleSpeed > 0.1) {
+          // Slowing down
+        } else if (walkCycleSpeed < 0.1 && walkCycleSpeed > 0.01) {
+          console.log('🛑 Coming to a stop...');
+        }
+      }
+    }
 
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
+      
+      // Update walking/running animation
+      updateWalkingAnimation();
       
       // Update selection box to follow selected object
       if (selectionBox && selectedObject) {
@@ -739,6 +823,15 @@
       const intersects = raycaster.intersectObjects(objects, true);
       
       if (intersects.length > 0) {
+        // Check if this is a body part (for hierarchical control)
+        const clickedMesh = intersects[0].object;
+        const bodyPartInfo = getBodyPartFromMesh(clickedMesh);
+        
+        if (bodyPartInfo) {
+          handleBodyPartSelection(bodyPartInfo, clickedMesh);
+          return;
+        }
+        
         // Find the root object (in case of groups like anatomical arm)
         let clickedObject = intersects[0].object;
         while (clickedObject.parent && !objects.includes(clickedObject)) {
@@ -746,6 +839,8 @@
         }
         
         selectedObject = clickedObject;
+        selectedBodyPart = null; // Clear body part selection when selecting whole object
+        bodyPartControlMode = null;
         
         // Don't auto-attach transform, just select
         console.log('✅ Object selected - Click Move/Rotate/Scale or press W/E/R');
@@ -761,6 +856,114 @@
         if (intersectPoint) {
           placePrimitive(intersectPoint);
         }
+      }
+    }
+    
+    // Detect which body part was clicked
+    function getBodyPartFromMesh(mesh) {
+      // Traverse up to find labeled groups
+      let current = mesh;
+      while (current) {
+        if (current.userData && current.userData.bodyPart) {
+          return {
+            part: current.userData.bodyPart,
+            group: current.userData.controlGroup || current,
+            name: current.userData.partName || current.userData.bodyPart
+          };
+        }
+        current = current.parent;
+      }
+      return null;
+    }
+    
+    // Handle body part selection and enable specific controls
+    function handleBodyPartSelection(bodyPartInfo, mesh) {
+      selectedBodyPart = bodyPartInfo.group;
+      bodyPartControlMode = bodyPartInfo.part;
+      
+      console.log(`🎯 Selected: ${bodyPartInfo.name}`);
+      
+      // Enable specific controls based on body part
+      switch(bodyPartInfo.part) {
+        case 'leftArm':
+        case 'rightArm':
+          console.log('💪 ARM CONTROL: Click and drag to rotate at shoulder');
+          console.log('   Hold SHIFT + drag for elbow bend');
+          attachTransformControl(bodyPartInfo.group, 'rotate');
+          break;
+          
+        case 'leftHand':
+        case 'rightHand':
+          console.log('✋ HAND CONTROL: Mouse wheel to rotate wrist');
+          console.log('   Click and drag to move hand position');
+          attachTransformControl(bodyPartInfo.group, 'rotate');
+          break;
+          
+        case 'head':
+          console.log('🧠 HEAD CONTROL: Click and drag to swivel neck');
+          console.log('   Or use neck swivel slider');
+          attachTransformControl(bodyPartInfo.group, 'rotate');
+          document.getElementById('neckSwivelControls').style.display = 'block';
+          break;
+          
+        case 'leftLeg':
+        case 'rightLeg':
+          console.log('🦵 LEG CONTROL: Click and drag to rotate at hip');
+          console.log('   Hold SHIFT + drag for knee bend');
+          attachTransformControl(bodyPartInfo.group, 'rotate');
+          break;
+          
+        case 'torso':
+          console.log('🦴 TORSO CONTROL: Click and drag to bend/twist spine');
+          attachTransformControl(bodyPartInfo.group, 'rotate');
+          break;
+          
+        case 'leftFoot':
+        case 'rightFoot':
+          console.log('👟 FOOT CONTROL: Click and drag to rotate ankle');
+          attachTransformControl(bodyPartInfo.group, 'rotate');
+          break;
+          
+        default:
+          console.log('✅ Body part selected');
+          break;
+      }
+      
+      // Select the root object for whole-body movement
+      selectedObject = fullBodyGroup || objects.find(obj => obj.children.length > 0);
+    }
+    
+    // Mouse wheel handler for wrist/hand rotation OR walking animation
+    function onMouseWheel(event) {
+      // If hand is selected, rotate wrist
+      if (selectedBodyPart && (bodyPartControlMode === 'leftHand' || bodyPartControlMode === 'rightHand')) {
+        event.preventDefault();
+        const rotationSpeed = 0.002;
+        const delta = event.deltaY * rotationSpeed;
+        selectedBodyPart.rotation.z += delta;
+        console.log(`✋ Wrist rotation: ${(selectedBodyPart.rotation.z * 180 / Math.PI).toFixed(1)}°`);
+        return;
+      }
+      
+      // If whole body is selected (no specific body part), control walking/running
+      if (selectedObject === window.fullBodyGroup && !selectedBodyPart) {
+        event.preventDefault();
+        
+        // Update walk speed based on wheel delta
+        const wheelSpeed = Math.abs(event.deltaY) / 100;
+        walkCycleSpeed = Math.min(walkCycleSpeed + wheelSpeed, 10); // Cap at 10 (full sprint)
+        lastWheelTime = Date.now();
+        
+        // Log state changes
+        if (walkCycleSpeed < 1) {
+          console.log('🚶 Starting to walk...');
+        } else if (walkCycleSpeed > 4 && walkCycleSpeed < 5) {
+          console.log('🏃 Breaking into a run!');
+        } else if (walkCycleSpeed > 7) {
+          console.log('💨 Full sprint!');
+        }
+        
+        return;
       }
     }
 
@@ -1684,15 +1887,35 @@
         }
         
         legGroup.position.set(xOffset, 0, 0);
+        
+        // Tag leg group for selection
+        legGroup.userData.bodyPart = isRight ? 'rightLeg' : 'leftLeg';
+        legGroup.userData.partName = isRight ? 'Right Leg' : 'Left Leg';
+        legGroup.userData.controlGroup = legGroup;
+        
+        // Tag foot for separate control
+        if (foot) {
+          const footGroup = new THREE.Group();
+          footGroup.add(foot, bigToe, ...legGroup.children.slice(-8)); // Foot + toes
+          footGroup.userData.bodyPart = isRight ? 'rightFoot' : 'leftFoot';
+          footGroup.userData.partName = isRight ? 'Right Foot' : 'Left Foot';
+        }
+        
         return legGroup;
       }
       
       // Create both legs
-      legsGroup.add(createLeg(-0.4, false)); // Left leg
-      legsGroup.add(createLeg(0.4, true));   // Right leg
+      const leftLeg = createLeg(-0.4, false);
+      const rightLeg = createLeg(0.4, true);
+      legsGroup.add(leftLeg);
+      legsGroup.add(rightLeg);
       legsGroup.position.set(0, 7.5, 0); // Feet on ground
       fullBodyGroup.add(legsGroup);
       totalVertices += 172; // 86V × 2
+      
+      // Store references for walking animation
+      leftLegGroup = leftLeg;
+      rightLegGroup = rightLeg;
       
       // ===== TORSO (120V) - Connects legs to arms =====
       const torsoGroup = new THREE.Group();
@@ -1772,6 +1995,11 @@
       rightClavicle.position.set(0.5, 4.6, 0);
       rightClavicle.rotation.z = -Math.PI / 6;
       torsoGroup.add(rightClavicle);
+      
+      // Tag torso for selection
+      torsoGroup.userData.bodyPart = 'torso';
+      torsoGroup.userData.partName = 'Torso';
+      torsoGroup.userData.controlGroup = torsoGroup;
       
       torsoGroup.position.set(0, 7.5, 0); // Align with legs at ground level
       fullBodyGroup.add(torsoGroup);
@@ -1864,15 +2092,32 @@
         
         armGroup.add(forearmGroup);
         armGroup.position.set(xOffset, 0, 0);
-        return armGroup;
+        
+        // Tag arm group for selection
+        armGroup.userData.bodyPart = isRight ? 'rightArm' : 'leftArm';
+        armGroup.userData.partName = isRight ? 'Right Arm' : 'Left Arm';
+        armGroup.userData.controlGroup = armGroup;
+        
+        // Tag forearm/hand group for wrist control
+        forearmGroup.userData.bodyPart = isRight ? 'rightHand' : 'leftHand';
+        forearmGroup.userData.partName = isRight ? 'Right Hand' : 'Left Hand';
+        forearmGroup.userData.controlGroup = forearmGroup;
+        
+        return { armGroup, forearmGroup };
       }
       
       // Create both arms
-      armsGroup.add(createArm(-1.2, false)); // Left arm
-      armsGroup.add(createArm(1.2, true));   // Right arm
+      const leftArmData = createArm(-1.2, false);
+      const rightArmData = createArm(1.2, true);
+      armsGroup.add(leftArmData.armGroup);
+      armsGroup.add(rightArmData.armGroup);
       armsGroup.position.set(0, 12.25, 0); // At shoulder height (torso top ~4.5 + base 7.5)
       fullBodyGroup.add(armsGroup);
       totalVertices += 172; // 86V × 2
+      
+      // Store references for walking animation (arm swing)
+      leftArmGroupRef = leftArmData.armGroup;
+      rightArmGroupRef = rightArmData.armGroup;
       
       // ===== HEAD (100V) - Top of torso =====
       const headGroup = new THREE.Group();
@@ -1966,6 +2211,11 @@
       rightEar.scale.set(0.4, 1, 0.6);
       neckSwivelGroup.add(rightEar);
       
+      // Tag head group for selection
+      neckSwivelGroup.userData.bodyPart = 'head';
+      neckSwivelGroup.userData.partName = 'Head';
+      neckSwivelGroup.userData.controlGroup = neckSwivelGroup;
+      
       headGroup.add(neckSwivelGroup);
       headGroup.position.set(0, 12, 0); // At top of torso (4.5 + 7.5)
       fullBodyGroup.add(headGroup);
@@ -1973,6 +2223,10 @@
       
       // ===== ADD TO SCENE =====
       fullBodyGroup.position.set(0, 0, 0); // Standing upright at origin
+      
+      // Store global reference for body part selection
+      window.fullBodyGroup = fullBodyGroup;
+      
       scene.add(fullBodyGroup);
       objects.push(fullBodyGroup);
       
@@ -1991,6 +2245,9 @@
       console.log(`  → Arms: 172V (86V × 2) at shoulder height`);
       console.log(`  → Head: 100V at top of torso`);
       console.log(`  → All articulation controls enabled (elbow bend, neck swivel)`);
+      console.log(`  → 🚶 WALKING ANIMATION: Click body, then scroll mouse wheel!`);
+      console.log(`     • Scroll slowly = walking | Scroll faster = running`);
+      console.log(`     • Stop scrolling to slow down naturally`);
     }
 
     function updateSize(value) {
