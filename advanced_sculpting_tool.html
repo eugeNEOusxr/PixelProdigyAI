@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Sculpting Tool - Mathematical Geometry</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    #ui-panel {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 320px;
+      max-height: calc(100vh - 40px);
+      background: rgba(20, 20, 40, 0.95);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      z-index: 100;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+
+    #ui-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #ui-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    #ui-panel::-webkit-scrollbar-thumb {
+      background: rgba(102, 126, 234, 0.5);
+      border-radius: 4px;
+    }
+
+    .panel-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #667eea;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .tool-btn {
+      padding: 12px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tool-btn:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.4));
+      border-color: rgba(102, 126, 234, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .tool-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: #667eea;
+    }
+
+    .tool-icon {
+      font-size: 20px;
+    }
+
+    .slider-control {
+      margin-bottom: 12px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    }
+
+    .info-box {
+      padding: 12px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .info-box strong {
+      color: #00ff88;
+    }
+
+    #stats {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(20, 20, 40, 0.95);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .stat-value {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .full-width-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 8px;
+    }
+
+    .full-width-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .full-width-btn.danger {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    select option {
+      background: #1a1a2e;
+      color: white;
+    }
+
+    .preset-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+
+    .preset-item:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .preset-info {
+      flex: 1;
+    }
+
+    .preset-name {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 2px;
+    }
+
+    .preset-meta {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .preset-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      padding: 6px 10px;
+      background: rgba(102, 126, 234, 0.3);
+      border: 1px solid rgba(102, 126, 234, 0.4);
+      border-radius: 4px;
+      color: white;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: rgba(102, 126, 234, 0.5);
+    }
+
+    .preset-btn.delete {
+      background: rgba(245, 87, 108, 0.3);
+      border-color: rgba(245, 87, 108, 0.4);
+    }
+
+    .preset-btn.delete:hover {
+      background: rgba(245, 87, 108, 0.5);
+    }
+
+    #codeModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .code-container {
+      background: #1a1a2e;
+      border: 2px solid #667eea;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .code-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .code-close {
+      background: rgba(245, 87, 108, 0.3);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #00ff88;
+    }
+
+    .copy-code-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <div id="ui-panel">
+    <div class="panel-title">🎨 Sculpting Studio</div>
+
+    <!-- Mathematical Shapes -->
+    <div class="section">
+      <div class="section-title">📐 Mathematical Shapes</div>
+      <div class="tool-grid">
+        <button class="tool-btn" onclick="createSequenceShape('fibonacci')">
+          <span class="tool-icon">🌀</span>
+          <span>Fibonacci</span>
+        </button>
+        <button class="tool-btn" onclick="createSequenceShape('golden')">
+          <span class="tool-icon">✨</span>
+          <span>Golden Spiral</span>
+        </button>
+        <button class="tool-btn" onclick="createSequenceShape('catalan')">
+          <span class="tool-icon">💎</span>
+          <span>Catalan</span>
+        </button>
+        <button class="tool-btn" onclick="createSequenceShape('tribonacci')">
+          <span class="tool-icon">🔷</span>
+          <span>Tribonacci</span>
+        </button>
+      </div>
+      
+      <div class="slider-control" style="margin-top: 16px;">
+        <div class="slider-label">
+          <span>Complexity</span>
+          <span id="complexityValue">5</span>
+        </div>
+        <input type="range" id="complexity" min="3" max="10" value="5" oninput="updateComplexity(this.value)">
+      </div>
+    </div>
+
+    <!-- Sculpting Tools -->
+    <div class="section">
+      <div class="section-title">🔨 Sculpting Tools</div>
+      <div class="tool-grid">
+        <button class="tool-btn" id="tool-move" onclick="setTool('move')">
+          <span class="tool-icon">✋</span>
+          <span>Move</span>
+        </button>
+        <button class="tool-btn" id="tool-scale" onclick="setTool('scale')">
+          <span class="tool-icon">↔️</span>
+          <span>Scale</span>
+        </button>
+        <button class="tool-btn" id="tool-extrude" onclick="setTool('extrude')">
+          <span class="tool-icon">⬆️</span>
+          <span>Extrude</span>
+        </button>
+        <button class="tool-btn" id="tool-smooth" onclick="setTool('smooth')">
+          <span class="tool-icon">〰️</span>
+          <span>Smooth</span>
+        </button>
+      </div>
+
+      <div class="slider-control" style="margin-top: 16px;">
+        <div class="slider-label">
+          <span>Brush Size</span>
+          <span id="brushSizeValue">1.0</span>
+        </div>
+        <input type="range" id="brushSize" min="0.5" max="5" step="0.1" value="1.0" oninput="updateBrushSize(this.value)">
+      </div>
+
+      <div class="slider-control">
+        <div class="slider-label">
+          <span>Strength</span>
+          <span id="strengthValue">0.5</span>
+        </div>
+        <input type="range" id="strength" min="0.1" max="1" step="0.1" value="0.5" oninput="updateStrength(this.value)">
+      </div>
+    </div>
+
+    <!-- Materials -->
+    <div class="section">
+      <div class="section-title">🎨 Material</div>
+      <select id="materialSelect" onchange="changeMaterial(this.value)">
+        <option value="standard">Standard (PBR)</option>
+        <option value="metallic">Metallic</option>
+        <option value="glass">Glass</option>
+        <option value="clay">Clay</option>
+        <option value="marble">Marble</option>
+        <option value="wireframe">Wireframe</option>
+      </select>
+
+      <div class="slider-control" style="margin-top: 12px;">
+        <div class="slider-label">
+          <span>Roughness</span>
+          <span id="roughnessValue">0.5</span>
+        </div>
+        <input type="range" id="roughness" min="0" max="1" step="0.1" value="0.5" oninput="updateRoughness(this.value)">
+      </div>
+
+      <div class="slider-control">
+        <div class="slider-label">
+          <span>Metalness</span>
+          <span id="metalnessValue">0.0</span>
+        </div>
+        <input type="range" id="metalness" min="0" max="1" step="0.1" value="0.0" oninput="updateMetalness(this.value)">
+      </div>
+    </div>
+
+    <!-- Shape Library -->
+    <div class="section">
+      <div class="section-title">📚 Shape Library</div>
+      
+      <div style="margin-bottom: 12px;">
+        <input type="text" id="presetName" placeholder="Preset name..." style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; font-size: 12px; margin-bottom: 8px;">
+      </div>
+
+      <button class="full-width-btn" onclick="saveCurrentShape()">
+        <span>💾 Save Current Shape</span>
+      </button>
+
+      <div id="presetList" style="margin-top: 12px; max-height: 200px; overflow-y: auto;">
+        <!-- Presets will appear here -->
+      </div>
+
+      <button class="full-width-btn" onclick="exportLibrary()" style="margin-top: 8px; background: linear-gradient(135deg, #00c9ff, #92fe9d);">
+        <span>📦 Export Library (JSON)</span>
+      </button>
+
+      <button class="full-width-btn" onclick="document.getElementById('importFile').click()" style="margin-top: 8px; background: linear-gradient(135deg, #ff9a56, #ffcc67);">
+        <span>📥 Import Library</span>
+      </button>
+      <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importLibrary(event)">
+    </div>
+
+    <!-- Actions -->
+    <div class="section">
+      <div class="section-title">⚡ Actions</div>
+      <button class="full-width-btn" onclick="subdivide()">
+        <span>🔺 Subdivide Mesh</span>
+      </button>
+      <button class="full-width-btn" onclick="showShapeCode()">
+        <span>📜 View Shape Code</span>
+      </button>
+      <button class="full-width-btn" onclick="exportModel()">
+        <span>💾 Export (OBJ)</span>
+      </button>
+      <button class="full-width-btn danger" onclick="clearScene()">
+        <span>🗑️ Clear Scene</span>
+      </button>
+    </div>
+
+    <!-- Info -->
+    <div class="info-box">
+      <strong>🎯 Quick Start:</strong><br>
+      1. Click a mathematical shape to generate<br>
+      2. Select a sculpting tool<br>
+      3. Click and drag on the mesh<br>
+      4. Adjust material properties<br>
+      5. Export when ready!
+    </div>
+  </div>
+
+  <div id="stats">
+    <div class="stat-row">
+      <span class="stat-label">Vertices:</span>
+      <span class="stat-value" id="vertexCount">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Faces:</span>
+      <span class="stat-value" id="faceCount">0</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Tool:</span>
+      <span class="stat-value" id="currentTool">None</span>
+    </div>
+  </div>
+
+  <!-- Code Modal -->
+  <div id="codeModal">
+    <div class="code-container">
+      <div class="code-header">
+        <div class="code-title">📜 Shape Generation Code</div>
+        <button class="code-close" onclick="closeCodeModal()">Close</button>
+      </div>
+      <pre id="codeDisplay"></pre>
+      <button class="copy-code-btn" onclick="copyCode()">📋 Copy Code</button>
+    </div>
+  </div>
+
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/js/exporters/OBJExporter.js"></script>
+
+  <script>
+    // Scene setup
+    let scene, camera, renderer, controls;
+    let currentMesh = null;
+    let currentTool = 'move';
+    let brushSize = 1.0;
+    let strength = 0.5;
+    let complexity = 5;
+    let currentShapeType = null;
+    let currentShapeParams = {};
+    let shapeLibrary = [];
+
+    function init() {
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1a1a2e);
+      scene.fog = new THREE.FogExp2(0x1a1a2e, 0.02);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(5, 5, 5);
+
+      // Renderer
+      const container = document.getElementById('canvas-container');
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(5, 10, 5);
+      directionalLight.castShadow = true;
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
+      scene.add(directionalLight);
+
+      const fillLight = new THREE.DirectionalLight(0x667eea, 0.3);
+      fillLight.position.set(-5, 5, -5);
+      scene.add(fillLight);
+
+      // Ground
+      const groundGeometry = new THREE.PlaneGeometry(20, 20);
+      const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x0f0f1e,
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // Grid helper
+      const gridHelper = new THREE.GridHelper(20, 20, 0x667eea, 0x333344);
+      gridHelper.position.y = -1.99;
+      scene.add(gridHelper);
+
+      // Event listeners
+      window.addEventListener('resize', onWindowResize);
+      renderer.domElement.addEventListener('mousedown', onMouseDown);
+      renderer.domElement.addEventListener('mousemove', onMouseMove);
+      renderer.domElement.addEventListener('mouseup', onMouseUp);
+
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // Mathematical sequence generators
+    const sequences = {
+      fibonacci: (n) => {
+        const seq = [0, 1];
+        for (let i = 2; i < n; i++) {
+          seq.push(seq[i-1] + seq[i-2]);
+        }
+        return seq;
+      },
+      lucas: (n) => {
+        const seq = [2, 1];
+        for (let i = 2; i < n; i++) {
+          seq.push(seq[i-1] + seq[i-2]);
+        }
+        return seq;
+      },
+      catalan: (n) => {
+        const seq = [1];
+        for (let i = 1; i < n; i++) {
+          seq.push(seq[i-1] * 2 * (2*i - 1) / (i + 1));
+        }
+        return seq;
+      },
+      tribonacci: (n) => {
+        const seq = [0, 1, 1];
+        for (let i = 3; i < n; i++) {
+          seq.push(seq[i-1] + seq[i-2] + seq[i-3]);
+        }
+        return seq;
+      }
+    };
+
+    function createSequenceShape(type) {
+      // Remove existing mesh
+      if (currentMesh) {
+        scene.remove(currentMesh);
+      }
+
+      let geometry;
+      const seq = sequences.fibonacci(complexity + 10);
+
+      switch(type) {
+        case 'fibonacci':
+          geometry = createFibonacciSpiral(seq);
+          break;
+        case 'golden':
+          geometry = createGoldenSpiral(seq);
+          break;
+        case 'catalan':
+          geometry = createCatalanPolyhedra();
+          break;
+        case 'tribonacci':
+          geometry = createTribonacciTwist();
+          break;
+      }
+
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x667eea,
+        roughness: parseFloat(document.getElementById('roughness').value),
+        metalness: parseFloat(document.getElementById('metalness').value),
+        flatShading: false
+      });
+
+      currentMesh = new THREE.Mesh(geometry, material);
+      currentMesh.castShadow = true;
+      currentMesh.receiveShadow = true;
+      scene.add(currentMesh);
+
+      // Record shape parameters
+      currentShapeType = type;
+      currentShapeParams = {
+        type: type,
+        complexity: complexity,
+        material: {
+          color: 0x667eea,
+          roughness: material.roughness,
+          metalness: material.metalness
+        },
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 }
+      };
+
+      updateStats();
+      console.log(`Created ${type} shape with complexity ${complexity}`);
+      console.log('Shape parameters recorded:', currentShapeParams);
+    }
+
+    function createFibonacciSpiral(seq) {
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      const indices = [];
+
+      // Create spiral based on Fibonacci sequence
+      for (let i = 0; i < complexity; i++) {
+        const radius = seq[i] / seq[complexity - 1] * 2;
+        const angle = i * Math.PI * 0.5;
+        const height = i * 0.3;
+
+        // Create ring of vertices
+        for (let j = 0; j <= 8; j++) {
+          const theta = (j / 8) * Math.PI * 2;
+          vertices.push(
+            Math.cos(angle + theta) * radius,
+            height,
+            Math.sin(angle + theta) * radius
+          );
+        }
+      }
+
+      // Create faces
+      for (let i = 0; i < complexity - 1; i++) {
+        for (let j = 0; j < 8; j++) {
+          const a = i * 9 + j;
+          const b = i * 9 + j + 1;
+          const c = (i + 1) * 9 + j + 1;
+          const d = (i + 1) * 9 + j;
+
+          indices.push(a, b, c);
+          indices.push(a, c, d);
+        }
+      }
+
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+
+      return geometry;
+    }
+
+    function createGoldenSpiral(seq) {
+      const phi = (1 + Math.sqrt(5)) / 2;
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      const indices = [];
+
+      for (let i = 0; i < complexity * 2; i++) {
+        const t = i / (complexity * 2) * Math.PI * 4;
+        const radius = Math.pow(phi, t / Math.PI);
+        
+        for (let j = 0; j <= 6; j++) {
+          const theta = (j / 6) * Math.PI * 2;
+          const r = 0.2 * (1 + i / (complexity * 2));
+          
+          vertices.push(
+            Math.cos(t) * radius + Math.cos(theta) * r,
+            i * 0.1,
+            Math.sin(t) * radius + Math.sin(theta) * r
+          );
+        }
+      }
+
+      for (let i = 0; i < complexity * 2 - 1; i++) {
+        for (let j = 0; j < 6; j++) {
+          const a = i * 7 + j;
+          const b = i * 7 + j + 1;
+          const c = (i + 1) * 7 + j + 1;
+          const d = (i + 1) * 7 + j;
+
+          indices.push(a, b, c);
+          indices.push(a, c, d);
+        }
+      }
+
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+
+      return geometry;
+    }
+
+    function createCatalanPolyhedra() {
+      const geometry = new THREE.IcosahedronGeometry(2, complexity - 3);
+      return geometry;
+    }
+
+    function createTribonacciTwist() {
+      const seq = sequences.tribonacci(complexity + 10);
+      const geometry = new THREE.CylinderGeometry(1, 1, 4, 8, complexity * 2, false);
+      
+      const positions = geometry.attributes.position;
+      for (let i = 0; i < positions.count; i++) {
+        const y = positions.getY(i);
+        const twist = (y / 4 + 0.5) * Math.PI * 2;
+        const scale = 1 + Math.sin(twist) * 0.3;
+        
+        positions.setX(i, positions.getX(i) * scale);
+        positions.setZ(i, positions.getZ(i) * scale);
+      }
+      
+      geometry.attributes.position.needsUpdate = true;
+      geometry.computeVertexNormals();
+      
+      return geometry;
+    }
+
+    // Tool functions
+    function setTool(tool) {
+      currentTool = tool;
+      document.querySelectorAll('[id^="tool-"]').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('tool-' + tool).classList.add('active');
+      document.getElementById('currentTool').textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
+    }
+
+    function updateComplexity(value) {
+      complexity = parseInt(value);
+      document.getElementById('complexityValue').textContent = value;
+    }
+
+    function updateBrushSize(value) {
+      brushSize = parseFloat(value);
+      document.getElementById('brushSizeValue').textContent = value;
+    }
+
+    function updateStrength(value) {
+      strength = parseFloat(value);
+      document.getElementById('strengthValue').textContent = value;
+    }
+
+    function updateRoughness(value) {
+      if (currentMesh) {
+        currentMesh.material.roughness = parseFloat(value);
+        document.getElementById('roughnessValue').textContent = value;
+      }
+    }
+
+    function updateMetalness(value) {
+      if (currentMesh) {
+        currentMesh.material.metalness = parseFloat(value);
+        document.getElementById('metalnessValue').textContent = value;
+      }
+    }
+
+    function changeMaterial(type) {
+      if (!currentMesh) return;
+
+      const materials = {
+        standard: { color: 0x667eea, roughness: 0.5, metalness: 0.0 },
+        metallic: { color: 0xcccccc, roughness: 0.2, metalness: 1.0 },
+        glass: { color: 0x88ccff, roughness: 0.0, metalness: 0.0, transparent: true, opacity: 0.6 },
+        clay: { color: 0xcc8866, roughness: 0.9, metalness: 0.0 },
+        marble: { color: 0xffffff, roughness: 0.3, metalness: 0.1 },
+        wireframe: { color: 0x667eea, wireframe: true }
+      };
+
+      const props = materials[type];
+      Object.assign(currentMesh.material, props);
+      currentMesh.material.needsUpdate = true;
+
+      // Update sliders
+      if (!props.wireframe) {
+        document.getElementById('roughness').value = props.roughness;
+        document.getElementById('metalness').value = props.metalness || 0;
+        document.getElementById('roughnessValue').textContent = props.roughness;
+        document.getElementById('metalnessValue').textContent = props.metalness || 0;
+      }
+    }
+
+    function subdivide() {
+      if (!currentMesh) {
+        alert('Create a shape first!');
+        return;
+      }
+
+      // Simple subdivision (duplicate and smooth)
+      const geometry = currentMesh.geometry;
+      const newGeometry = geometry.clone();
+      
+      // This is a placeholder - real subdivision would use Loop or Catmull-Clark
+      currentMesh.geometry.dispose();
+      currentMesh.geometry = newGeometry;
+      
+      updateStats();
+      console.log('Mesh subdivided');
+    }
+
+    function exportModel() {
+      if (!currentMesh) {
+        alert('Create a shape first!');
+        return;
+      }
+
+      const exporter = new THREE.OBJExporter();
+      const result = exporter.parse(currentMesh);
+      
+      const blob = new Blob([result], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'sculpt_' + Date.now() + '.obj';
+      link.click();
+      
+      console.log('Model exported');
+    }
+
+    function clearScene() {
+      if (currentMesh && confirm('Clear the scene?')) {
+        scene.remove(currentMesh);
+        currentMesh = null;
+        updateStats();
+      }
+    }
+
+    function updateStats() {
+      if (currentMesh) {
+        const geometry = currentMesh.geometry;
+        const vertexCount = geometry.attributes.position.count;
+        const faceCount = geometry.index ? geometry.index.count / 3 : vertexCount / 3;
+        
+        document.getElementById('vertexCount').textContent = vertexCount;
+        document.getElementById('faceCount').textContent = Math.floor(faceCount);
+      } else {
+        document.getElementById('vertexCount').textContent = '0';
+        document.getElementById('faceCount').textContent = '0';
+      }
+    }
+
+    // Mouse interaction (placeholder for sculpting)
+    let isDragging = false;
+
+    function onMouseDown(event) {
+      if (currentMesh && currentTool !== 'move') {
+        isDragging = true;
+        // Sculpting logic would go here
+      }
+    }
+
+    function onMouseMove(event) {
+      if (isDragging) {
+        // Apply sculpting transformation based on currentTool
+      }
+    }
+
+    function onMouseUp(event) {
+      isDragging = false;
+    }
+
+    // ==========================================
+    // SHAPE LIBRARY SYSTEM
+    // ==========================================
+
+    function saveCurrentShape() {
+      if (!currentMesh || !currentShapeType) {
+        alert('Create a shape first!');
+        return;
+      }
+
+      const presetName = document.getElementById('presetName').value.trim() || `Shape_${Date.now()}`;
+      
+      const preset = {
+        name: presetName,
+        timestamp: Date.now(),
+        params: JSON.parse(JSON.stringify(currentShapeParams)),
+        stats: {
+          vertices: currentMesh.geometry.attributes.position.count,
+          faces: currentMesh.geometry.index ? currentMesh.geometry.index.count / 3 : currentMesh.geometry.attributes.position.count / 3
+        }
+      };
+
+      shapeLibrary.push(preset);
+      saveLibraryToStorage();
+      renderPresetList();
+      
+      document.getElementById('presetName').value = '';
+      console.log('Shape saved to library:', preset);
+      alert(`"${presetName}" saved to library!`);
+    }
+
+    function loadPreset(index) {
+      const preset = shapeLibrary[index];
+      if (!preset) return;
+
+      // Restore parameters
+      complexity = preset.params.complexity;
+      document.getElementById('complexity').value = complexity;
+      document.getElementById('complexityValue').textContent = complexity;
+
+      document.getElementById('roughness').value = preset.params.material.roughness;
+      document.getElementById('roughnessValue').textContent = preset.params.material.roughness;
+      
+      document.getElementById('metalness').value = preset.params.material.metalness;
+      document.getElementById('metalnessValue').textContent = preset.params.material.metalness;
+
+      // Recreate shape
+      createSequenceShape(preset.params.type);
+
+      console.log('Loaded preset:', preset.name);
+      alert(`"${preset.name}" loaded!`);
+    }
+
+    function deletePreset(index) {
+      const preset = shapeLibrary[index];
+      if (confirm(`Delete "${preset.name}"?`)) {
+        shapeLibrary.splice(index, 1);
+        saveLibraryToStorage();
+        renderPresetList();
+        console.log('Preset deleted');
+      }
+    }
+
+    function renderPresetList() {
+      const container = document.getElementById('presetList');
+      
+      if (shapeLibrary.length === 0) {
+        container.innerHTML = '<div style="padding: 12px; text-align: center; color: rgba(255,255,255,0.5); font-size: 11px;">No saved shapes yet</div>';
+        return;
+      }
+
+      container.innerHTML = shapeLibrary.map((preset, index) => `
+        <div class="preset-item">
+          <div class="preset-info">
+            <div class="preset-name">${preset.name}</div>
+            <div class="preset-meta">
+              ${preset.params.type.toUpperCase()} | 
+              Complexity: ${preset.params.complexity} | 
+              ${Math.floor(preset.stats.vertices)} verts
+            </div>
+          </div>
+          <div class="preset-actions">
+            <button class="preset-btn" onclick="loadPreset(${index})">Load</button>
+            <button class="preset-btn delete" onclick="deletePreset(${index})">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveLibraryToStorage() {
+      try {
+        localStorage.setItem('shapeLibrary', JSON.stringify(shapeLibrary));
+      } catch (e) {
+        console.error('Failed to save to localStorage:', e);
+      }
+    }
+
+    function loadLibraryFromStorage() {
+      try {
+        const stored = localStorage.getItem('shapeLibrary');
+        if (stored) {
+          shapeLibrary = JSON.parse(stored);
+          renderPresetList();
+          console.log(`Loaded ${shapeLibrary.length} shapes from library`);
+        }
+      } catch (e) {
+        console.error('Failed to load from localStorage:', e);
+      }
+    }
+
+    function exportLibrary() {
+      if (shapeLibrary.length === 0) {
+        alert('Library is empty!');
+        return;
+      }
+
+      const dataStr = JSON.stringify(shapeLibrary, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `shape_library_${Date.now()}.json`;
+      link.click();
+      
+      console.log(`Exported ${shapeLibrary.length} shapes`);
+      alert(`Library exported! (${shapeLibrary.length} shapes)`);
+    }
+
+    function importLibrary(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            if (confirm(`Import ${imported.length} shapes? This will add to your current library.`)) {
+              shapeLibrary = shapeLibrary.concat(imported);
+              saveLibraryToStorage();
+              renderPresetList();
+              console.log(`Imported ${imported.length} shapes`);
+              alert(`Imported ${imported.length} shapes!`);
+            }
+          } else {
+            alert('Invalid library file format');
+          }
+        } catch (err) {
+          alert('Failed to import library: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function showShapeCode() {
+      if (!currentMesh || !currentShapeType) {
+        alert('Create a shape first!');
+        return;
+      }
+
+      const code = generateShapeCode(currentShapeParams);
+      document.getElementById('codeDisplay').textContent = code;
+      document.getElementById('codeModal').style.display = 'flex';
+    }
+
+    function closeCodeModal() {
+      document.getElementById('codeModal').style.display = 'none';
+    }
+
+    function generateShapeCode(params) {
+      return `// Auto-generated shape code
+// Shape: ${params.type.toUpperCase()}
+// Complexity: ${params.complexity}
+// Generated: ${new Date().toLocaleString()}
+
+function create${params.type.charAt(0).toUpperCase() + params.type.slice(1)}Shape() {
+  // Mathematical sequence generator
+  const sequences = {
+    fibonacci: (n) => {
+      const seq = [0, 1];
+      for (let i = 2; i < n; i++) {
+        seq.push(seq[i-1] + seq[i-2]);
+      }
+      return seq;
+    }
+  };
+
+  // Generate sequence
+  const seq = sequences.fibonacci(${params.complexity + 10});
+
+  // Create geometry based on type
+  let geometry;
+  ${getGeometryCreationCode(params.type, params.complexity)}
+
+  // Create material
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x${params.material.color.toString(16)},
+    roughness: ${params.material.roughness},
+    metalness: ${params.material.metalness},
+    flatShading: false
+  });
+
+  // Create mesh
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(${params.position.x}, ${params.position.y}, ${params.position.z});
+  mesh.rotation.set(${params.rotation.x}, ${params.rotation.y}, ${params.rotation.z});
+  mesh.scale.set(${params.scale.x}, ${params.scale.y}, ${params.scale.z});
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+
+  return mesh;
+}
+
+// Usage:
+// const myShape = create${params.type.charAt(0).toUpperCase() + params.type.slice(1)}Shape();
+// scene.add(myShape);`;
+    }
+
+    function getGeometryCreationCode(type, complexity) {
+      switch(type) {
+        case 'fibonacci':
+          return `// Fibonacci Spiral
+  geometry = new THREE.BufferGeometry();
+  const vertices = [];
+  const indices = [];
+  
+  for (let i = 0; i < ${complexity}; i++) {
+    const radius = seq[i] / seq[${complexity - 1}] * 2;
+    const angle = i * Math.PI * 0.5;
+    const height = i * 0.3;
+    
+    for (let j = 0; j <= 8; j++) {
+      const theta = (j / 8) * Math.PI * 2;
+      vertices.push(
+        Math.cos(angle + theta) * radius,
+        height,
+        Math.sin(angle + theta) * radius
+      );
+    }
+  }
+  
+  for (let i = 0; i < ${complexity - 1}; i++) {
+    for (let j = 0; j < 8; j++) {
+      const a = i * 9 + j;
+      const b = i * 9 + j + 1;
+      const c = (i + 1) * 9 + j + 1;
+      const d = (i + 1) * 9 + j;
+      indices.push(a, b, c);
+      indices.push(a, c, d);
+    }
+  }
+  
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();`;
+
+        case 'golden':
+          return `// Golden Spiral
+  const phi = (1 + Math.sqrt(5)) / 2;
+  geometry = new THREE.BufferGeometry();
+  const vertices = [];
+  const indices = [];
+  
+  for (let i = 0; i < ${complexity * 2}; i++) {
+    const t = i / (${complexity * 2}) * Math.PI * 4;
+    const radius = Math.pow(phi, t / Math.PI);
+    
+    for (let j = 0; j <= 6; j++) {
+      const theta = (j / 6) * Math.PI * 2;
+      const r = 0.2 * (1 + i / (${complexity * 2}));
+      
+      vertices.push(
+        Math.cos(t) * radius + Math.cos(theta) * r,
+        i * 0.1,
+        Math.sin(t) * radius + Math.sin(theta) * r
+      );
+    }
+  }
+  
+  for (let i = 0; i < ${complexity * 2 - 1}; i++) {
+    for (let j = 0; j < 6; j++) {
+      const a = i * 7 + j;
+      const b = i * 7 + j + 1;
+      const c = (i + 1) * 7 + j + 1;
+      const d = (i + 1) * 7 + j;
+      indices.push(a, b, c);
+      indices.push(a, c, d);
+    }
+  }
+  
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();`;
+
+        case 'catalan':
+          return `// Catalan Polyhedra (Icosahedron)
+  geometry = new THREE.IcosahedronGeometry(2, ${complexity - 3});`;
+
+        case 'tribonacci':
+          return `// Tribonacci Twist
+  geometry = new THREE.CylinderGeometry(1, 1, 4, 8, ${complexity * 2}, false);
+  const positions = geometry.attributes.position;
+  for (let i = 0; i < positions.count; i++) {
+    const y = positions.getY(i);
+    const twist = (y / 4 + 0.5) * Math.PI * 2;
+    const scale = 1 + Math.sin(twist) * 0.3;
+    positions.setX(i, positions.getX(i) * scale);
+    positions.setZ(i, positions.getZ(i) * scale);
+  }
+  geometry.attributes.position.needsUpdate = true;
+  geometry.computeVertexNormals();`;
+
+        default:
+          return `geometry = new THREE.BoxGeometry(1, 1, 1);`;
+      }
+    }
+
+    function copyCode() {
+      const code = document.getElementById('codeDisplay').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Code copied to clipboard!');
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+
+    // Initialize library on load
+    loadLibraryFromStorage();
+
+    // Initialize
+    init();
+    console.log('Advanced Sculpting Tool initialized');
+    console.log('Mathematical sequences ready: Fibonacci, Lucas, Catalan, Tribonacci');
+    console.log('Shape Library System active - save and reload perfect shapes!');
+  </script>
+</body>
+</html>
