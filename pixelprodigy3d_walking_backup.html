@@ -227,16 +227,6 @@
           🚶 Walk Mode: OFF
         </button>
       </div>
-      
-      <!-- Movement Info -->
-      <div style="position: absolute; top: 70px; left: 20px; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 8px; font-size: 12px; color: #fff; font-family: monospace;">
-        <div style="margin-bottom: 4px;">🎮 <strong>CONTROLS:</strong></div>
-        <div>W/S - Forward/Back</div>
-        <div>A/D - Turn Left/Right</div>
-        <div>SPACE - Jump</div>
-        <div>F - Flight Mode (Superman)</div>
-        <div style="margin-top: 4px; font-size: 11px; opacity: 0.7;">Flight: SHIFT=Up, CTRL=Down</div>
-      </div>
     </div>
 
     <div id="sidebar">
@@ -613,22 +603,6 @@
     let leftFootGroup = null; // Reference to left foot (for heel-toe placement)
     let rightFootGroup = null; // Reference to right foot (for heel-toe placement)
     
-    // Advanced movement state
-    let isJumping = false;
-    let jumpVelocity = 0;
-    let gravity = -0.02;
-    let groundLevel = 0;
-    let flightModeEnabled = false;
-    let verticalVelocity = 0;
-    
-    // Movement input state (for smooth controls)
-    let moveForward = false;
-    let moveBackward = false;
-    let moveLeft = false;
-    let moveRight = false;
-    let moveUp = false;
-    let moveDown = false;
-    
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
 
@@ -736,7 +710,6 @@
       canvas.addEventListener('wheel', onMouseWheel, { passive: false });
       window.addEventListener('resize', onWindowResize);
       window.addEventListener('keydown', onKeyDown);
-      window.addEventListener('keyup', onKeyUp);
 
       // Hide loading
       document.getElementById('loading').style.display = 'none';
@@ -745,99 +718,35 @@
       animate();
     }
     
-    // Keyboard controls for body movement
+    // Keyboard controls for body rotation in Walk Mode
     function onKeyDown(event) {
-      if (!window.fullBodyGroup) return;
+      if (!walkModeEnabled || !window.fullBodyGroup) return;
       
-      // Prevent default for space (no page scroll)
-      if (event.key === ' ') {
-        event.preventDefault();
-      }
+      const rotationSpeed = 0.05;
       
       switch(event.key.toLowerCase()) {
-        case 'w':
-        case 'arrowup':
-          moveForward = true;
-          if (!walkModeEnabled) {
-            walkModeEnabled = true;
-            controls.enabled = false;
-            console.log('🚶 Walk Mode: ENABLED');
-          }
-          break;
-        case 's':
-        case 'arrowdown':
-          moveBackward = true;
-          if (!walkModeEnabled) {
-            walkModeEnabled = true;
-            controls.enabled = false;
-            console.log('🚶 Walk Mode: ENABLED');
-          }
-          break;
         case 'a':
         case 'arrowleft':
-          moveLeft = true;
+          // Turn left
+          window.fullBodyGroup.rotation.y += rotationSpeed;
+          console.log('↶ Turning left');
           break;
         case 'd':
         case 'arrowright':
-          moveRight = true;
+          // Turn right
+          window.fullBodyGroup.rotation.y -= rotationSpeed;
+          console.log('↷ Turning right');
           break;
-        case ' ':
-          // Jump (only if not in flight mode and on ground)
-          if (!flightModeEnabled && !isJumping && Math.abs(window.fullBodyGroup.position.y - groundLevel) < 0.1) {
-            isJumping = true;
-            jumpVelocity = 0.3;
-            console.log('⬆️ JUMP!');
-          }
-          break;
-        case 'f':
-          // Toggle flight mode
-          flightModeEnabled = !flightModeEnabled;
-          if (flightModeEnabled) {
-            console.log('✈️ FLIGHT MODE: ENABLED (Superman pose)');
-            isJumping = false;
-            jumpVelocity = 0;
-          } else {
-            console.log('✈️ FLIGHT MODE: DISABLED');
-          }
-          break;
-        case 'shift':
-          // Hold shift for ascend in flight mode
-          if (flightModeEnabled) {
-            moveUp = true;
-          }
-          break;
-        case 'control':
-          // Hold ctrl for descend in flight mode
-          if (flightModeEnabled) {
-            moveDown = true;
-          }
-          break;
-      }
-    }
-    
-    function onKeyUp(event) {
-      switch(event.key.toLowerCase()) {
         case 'w':
         case 'arrowup':
-          moveForward = false;
+          // Speed up (simulate scroll)
+          walkCycleSpeed = Math.min(walkCycleSpeed + 0.5, 10);
+          lastWheelTime = Date.now();
           break;
         case 's':
         case 'arrowdown':
-          moveBackward = false;
-          break;
-        case 'a':
-        case 'arrowleft':
-          moveLeft = false;
-          break;
-        case 'd':
-        case 'arrowright':
-          moveRight = false;
-          break;
-        case 'shift':
-          moveUp = false;
-          break;
-        case 'control':
-          moveDown = false;
+          // Slow down
+          walkCycleSpeed = Math.max(walkCycleSpeed - 0.5, 0);
           break;
       }
     }
@@ -891,238 +800,157 @@
       }
     }
     
-    // Procedural walking/running animation with realistic biomechanics + WASD movement + Jump + Flight
+    // Procedural walking/running animation with realistic biomechanics
     function updateWalkingAnimation() {
-      if (!window.fullBodyGroup) return;
-      
-      // === MOVEMENT PROCESSING ===
-      const moveSpeed = 0.1;
-      const turnSpeed = 0.03;
-      let isMoving = moveForward || moveBackward || moveLeft || moveRight;
-      
-      // Update rotation based on left/right
-      if (moveLeft) {
-        window.fullBodyGroup.rotation.y += turnSpeed;
-      }
-      if (moveRight) {
-        window.fullBodyGroup.rotation.y -= turnSpeed;
-      }
-      
-      // === FLIGHT MODE ===
-      if (flightModeEnabled) {
-        // Superman pose: Arms extended forward, legs straight back
-        if (leftArmGroupRef && rightArmGroupRef) {
-          leftArmGroupRef.rotation.x = -Math.PI / 2; // Forward
-          rightArmGroupRef.rotation.x = -Math.PI / 2;
-          
-          // Straighten elbows
-          if (leftForearmGroup) leftForearmGroup.rotation.x = 0;
-          if (rightForearmGroup) rightForearmGroup.rotation.x = 0;
-        }
-        
-        // Legs straight back
-        if (leftLegGroup && rightLegGroup) {
-          leftLegGroup.rotation.x = Math.PI / 6; // Slight back angle
-          rightLegGroup.rotation.x = Math.PI / 6;
-          
-          // Straight knees
-          if (leftKneeGroup) leftKneeGroup.rotation.x = 0;
-          if (rightKneeGroup) rightKneeGroup.rotation.x = 0;
-          
-          // Point toes
-          if (leftFootGroup) leftFootGroup.rotation.x = -0.3;
-          if (rightFootGroup) rightFootGroup.rotation.x = -0.3;
-        }
-        
-        // Flight movement
-        const bodyRotation = window.fullBodyGroup.rotation.y;
-        if (moveForward) {
-          window.fullBodyGroup.position.x += Math.sin(bodyRotation) * moveSpeed;
-          window.fullBodyGroup.position.z += Math.cos(bodyRotation) * moveSpeed;
-        }
-        if (moveBackward) {
-          window.fullBodyGroup.position.x -= Math.sin(bodyRotation) * moveSpeed * 0.5;
-          window.fullBodyGroup.position.z -= Math.cos(bodyRotation) * moveSpeed * 0.5;
-        }
-        if (moveUp) {
-          window.fullBodyGroup.position.y += moveSpeed * 0.5;
-        }
-        if (moveDown) {
-          window.fullBodyGroup.position.y -= moveSpeed * 0.5;
-          if (window.fullBodyGroup.position.y < groundLevel) {
-            window.fullBodyGroup.position.y = groundLevel;
-          }
-        }
-        
-        // Smooth camera follow for flight
-        const cameraOffset = new THREE.Vector3(0, 3, -8);
-        cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), bodyRotation);
-        const cameraTargetPos = window.fullBodyGroup.position.clone();
-        camera.position.lerp(cameraTargetPos.clone().add(cameraOffset), 0.05);
-        camera.lookAt(cameraTargetPos);
-        
-        return; // Skip walking animation
-      }
-      
-      // === JUMP PHYSICS ===
-      if (isJumping) {
-        // Squat pose before/during jump
-        if (leftLegGroup && rightLegGroup && leftKneeGroup && rightKneeGroup) {
-          const squatAmount = Math.max(0, 1 - jumpVelocity * 3); // Squat more at start
-          leftKneeGroup.rotation.x = squatAmount * 1.2; // Bend knees back
-          rightKneeGroup.rotation.x = squatAmount * 1.2;
-          leftLegGroup.rotation.x = -squatAmount * 0.3; // Lean forward slightly
-          rightLegGroup.rotation.x = -squatAmount * 0.3;
-        }
-        
-        // Arms swing up during jump
-        if (leftArmGroupRef && rightArmGroupRef) {
-          const armSwing = -jumpVelocity * 2;
-          leftArmGroupRef.rotation.x = armSwing;
-          rightArmGroupRef.rotation.x = armSwing;
-        }
-        
-        // Apply jump physics
-        window.fullBodyGroup.position.y += jumpVelocity;
-        jumpVelocity += gravity;
-        
-        // Land
-        if (window.fullBodyGroup.position.y <= groundLevel) {
-          window.fullBodyGroup.position.y = groundLevel;
-          isJumping = false;
-          jumpVelocity = 0;
-          console.log('🎯 Landed!');
-        }
-      }
-      
-      // === WALKING/RUNNING ANIMATION ===
-      if (isMoving && !isJumping && !flightModeEnabled) {
-        // Auto-set walk cycle speed based on movement
-        if (moveForward) {
-          walkCycleSpeed = Math.min(walkCycleSpeed + 0.5, 6);
-        } else if (moveBackward) {
-          walkCycleSpeed = Math.min(walkCycleSpeed + 0.3, 3); // Slower backward
-        }
-        lastWheelTime = Date.now();
-      }
-      
-      // Decay walk speed when not moving
-      if (!isMoving || isJumping) {
-        walkCycleSpeed *= 0.9;
+      // Decay walk speed over time if no wheel input
+      const timeSinceWheel = Date.now() - lastWheelTime;
+      if (timeSinceWheel > 100) { // Start decaying after 100ms
+        walkCycleSpeed *= walkDecayRate;
         if (walkCycleSpeed < 0.01) {
           walkCycleSpeed = 0;
-          walkCyclePhase = 0;
+          walkCyclePhase = 0; // Reset phase when stopped
         }
       }
       
-      // Only animate walking if speed > 0
+      // Only animate if walking/running
       if (walkCycleSpeed > 0 && leftLegGroup && rightLegGroup && leftKneeGroup && rightKneeGroup) {
-        // Determine animation speed
+        // Determine animation speed based on walk/run state
         const isRunning = walkCycleSpeed > 4;
         const cycleSpeedMultiplier = isRunning ? 0.15 : 0.08;
         walkCyclePhase += walkCycleSpeed * cycleSpeedMultiplier;
         
         // === BIOMECHANICAL WALKING CYCLE ===
-        const legSwingAmplitude = isRunning ? 0.6 : 0.4;
-        const kneeFlexionMax = isRunning ? 1.2 : 0.8;
+        // Phase 0-PI: Right leg forward (heel strike), left leg back (toe-off)
+        // Phase PI-2PI: Left leg forward (heel strike), right leg back (toe-off)
+        
+        const legSwingAmplitude = isRunning ? 0.6 : 0.4; // Hip swing
+        const kneeFlexionMax = isRunning ? 1.2 : 0.8; // Knee bend angle
         const armSwingAmplitude = isRunning ? 0.5 : 0.3;
         
         // === RIGHT LEG CYCLE ===
         const rightPhase = walkCyclePhase % (Math.PI * 2);
+        
+        // Right leg hip swing
         const rightHipSwing = Math.sin(rightPhase) * legSwingAmplitude;
         rightLegGroup.rotation.x = rightHipSwing;
         
-        // Right knee flexion
+        // Right knee flexion (bends during swing phase)
         if (rightPhase < Math.PI) {
-          const flexProgress = Math.sin(rightPhase);
-          rightKneeGroup.rotation.x = flexProgress * kneeFlexionMax;
+          // Swing phase: knee flexes to lift foot (BACKWARDS bend)
+          const flexProgress = Math.sin(rightPhase); // 0 to 1 to 0
+          rightKneeGroup.rotation.x = flexProgress * kneeFlexionMax; // POSITIVE = bend backwards!
         } else {
+          // Stance phase: knee mostly straight (slight flex for cushioning)
           const stanceProgress = Math.sin(rightPhase - Math.PI);
-          rightKneeGroup.rotation.x = stanceProgress * 0.2;
+          rightKneeGroup.rotation.x = stanceProgress * 0.2; // Slight backwards bend
         }
         
-        // Right foot heel-toe
+        // Right foot heel-toe placement
         if (rightPhase < Math.PI * 0.3) {
+          // Heel strike - dorsiflexion (toe up)
           rightFootGroup.rotation.x = 0.3;
         } else if (rightPhase < Math.PI * 0.7) {
+          // Mid-stance - foot flat
           rightFootGroup.rotation.x = 0;
         } else if (rightPhase < Math.PI) {
+          // Toe-off - plantarflexion (toe push)
           rightFootGroup.rotation.x = -0.4;
         } else {
+          // Swing phase - neutral
           rightFootGroup.rotation.x = 0.1;
         }
         
-        // === LEFT LEG CYCLE ===
+        // === LEFT LEG CYCLE (opposite phase) ===
         const leftPhase = (walkCyclePhase + Math.PI) % (Math.PI * 2);
+        
+        // Left leg hip swing
         const leftHipSwing = Math.sin(leftPhase) * legSwingAmplitude;
         leftLegGroup.rotation.x = leftHipSwing;
         
         // Left knee flexion
         if (leftPhase < Math.PI) {
+          // Swing phase: knee flexes (BACKWARDS bend)
           const flexProgress = Math.sin(leftPhase);
-          leftKneeGroup.rotation.x = flexProgress * kneeFlexionMax;
+          leftKneeGroup.rotation.x = flexProgress * kneeFlexionMax; // POSITIVE = bend backwards!
         } else {
+          // Stance phase: knee mostly straight
           const stanceProgress = Math.sin(leftPhase - Math.PI);
-          leftKneeGroup.rotation.x = stanceProgress * 0.2;
+          leftKneeGroup.rotation.x = stanceProgress * 0.2; // Slight backwards bend
         }
         
-        // Left foot heel-toe
+        // Left foot heel-toe placement
         if (leftPhase < Math.PI * 0.3) {
+          // Heel strike
           leftFootGroup.rotation.x = 0.3;
         } else if (leftPhase < Math.PI * 0.7) {
+          // Mid-stance
           leftFootGroup.rotation.x = 0;
         } else if (leftPhase < Math.PI) {
+          // Toe-off
           leftFootGroup.rotation.x = -0.4;
         } else {
+          // Swing phase
           leftFootGroup.rotation.x = 0.1;
         }
         
-        // === ARM SWING ===
+        // === ARM SWING (opposite to legs) ===
         const leftArmSwing = Math.sin(leftPhase) * armSwingAmplitude;
         const rightArmSwing = Math.sin(rightPhase) * armSwingAmplitude;
         
         if (leftArmGroupRef) {
           leftArmGroupRef.rotation.x = leftArmSwing;
+          
+          // Elbow bend: flex when arm swings forward
           if (leftForearmGroup) {
             const elbowBendAmplitude = isRunning ? 0.4 : 0.25;
-            const elbowBend = Math.max(0, -leftArmSwing) * elbowBendAmplitude;
+            const elbowBend = Math.max(0, -leftArmSwing) * elbowBendAmplitude; // Negative swing = forward = bend
             leftForearmGroup.rotation.x = elbowBend;
           }
         }
         if (rightArmGroupRef) {
           rightArmGroupRef.rotation.x = rightArmSwing;
+          
+          // Elbow bend: flex when arm swings forward
           if (rightForearmGroup) {
             const elbowBendAmplitude = isRunning ? 0.4 : 0.25;
-            const elbowBend = Math.max(0, -rightArmSwing) * elbowBendAmplitude;
+            const elbowBend = Math.max(0, -rightArmSwing) * elbowBendAmplitude; // Negative swing = forward = bend
             rightForearmGroup.rotation.x = elbowBend;
           }
         }
         
-        // === BODY BOB ===
+        // === BODY BOB (vertical center of mass movement) ===
         const bobAmount = isRunning ? 0.15 : 0.08;
         const bodyBob = Math.abs(Math.sin(walkCyclePhase * 2)) * bobAmount;
-        window.fullBodyGroup.position.y = groundLevel + bodyBob;
-        
-        // === FORWARD/BACKWARD MOVEMENT ===
-        const bodyRotation = window.fullBodyGroup.rotation.y;
-        if (moveForward) {
-          const forwardSpeed = isRunning ? 0.08 : 0.04;
-          window.fullBodyGroup.position.x += Math.sin(bodyRotation) * walkCycleSpeed * forwardSpeed;
-          window.fullBodyGroup.position.z += Math.cos(bodyRotation) * walkCycleSpeed * forwardSpeed;
+        if (window.fullBodyGroup) {
+          window.fullBodyGroup.position.y = bodyBob;
+          
+          // If Walk Mode is enabled, move body forward
+          if (walkModeEnabled) {
+            const forwardSpeed = isRunning ? 0.08 : 0.04; // Running is 2x faster
+            const bodyRotation = window.fullBodyGroup.rotation.y; // Face direction
+            
+            // Move forward based on body's facing direction
+            window.fullBodyGroup.position.x += Math.sin(bodyRotation) * walkCycleSpeed * forwardSpeed;
+            window.fullBodyGroup.position.z += Math.cos(bodyRotation) * walkCycleSpeed * forwardSpeed;
+            
+            // Camera follows body
+            const cameraOffset = new THREE.Vector3(5, 5, 5); // Offset behind and above
+            const cameraTargetPos = window.fullBodyGroup.position.clone();
+            
+            // Rotate camera offset based on body rotation
+            cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), bodyRotation);
+            
+            // Smooth camera follow
+            camera.position.lerp(cameraTargetPos.clone().add(cameraOffset), 0.1);
+            camera.lookAt(cameraTargetPos);
+          }
         }
-        if (moveBackward) {
-          const backwardSpeed = 0.02; // Slower backward walk
-          window.fullBodyGroup.position.x -= Math.sin(bodyRotation) * walkCycleSpeed * backwardSpeed;
-          window.fullBodyGroup.position.z -= Math.cos(bodyRotation) * walkCycleSpeed * backwardSpeed;
-        }
         
-        // Camera follows
-        if (walkModeEnabled) {
-          const cameraOffset = new THREE.Vector3(5, 5, 5);
-          cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), bodyRotation);
-          const cameraTargetPos = window.fullBodyGroup.position.clone();
-          camera.position.lerp(cameraTargetPos.clone().add(cameraOffset), 0.1);
-          camera.lookAt(cameraTargetPos);
+        // Log state transitions
+        if (walkCycleSpeed < 1 && walkCycleSpeed > 0.1) {
+          // Slowing down
+        } else if (walkCycleSpeed < 0.1 && walkCycleSpeed > 0.01) {
+          console.log('🛑 Coming to a stop...');
         }
       }
     }
