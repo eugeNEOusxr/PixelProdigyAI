@@ -627,7 +627,13 @@
       const intersects = raycaster.intersectObjects(objects, true);
       
       if (intersects.length > 0 && currentMode === 'add') {
-        selectedObject = intersects[0].object;
+        // Find the root object (in case of groups like anatomical arm)
+        let clickedObject = intersects[0].object;
+        while (clickedObject.parent && !objects.includes(clickedObject)) {
+          clickedObject = clickedObject.parent;
+        }
+        
+        selectedObject = clickedObject;
         transformControl.attach(selectedObject);
         console.log('✅ Object selected - Use W/E/R or buttons to manipulate');
         return;
@@ -808,8 +814,8 @@
         armGroup.add(tip);
       }
       
-      // Position the arm group in the scene
-      armGroup.position.set(0, 0, 0);
+      // Position the arm group so hand rests on ground (fingertips are at ~Y=-8.75, so lift by 8.75)
+      armGroup.position.set(0, 8.75, 0);
       scene.add(armGroup);
       objects.push(armGroup);
       
