@@ -68,6 +68,59 @@
       color: #fff;
       box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
     }
+    
+    /* Dropdown Menu for SkyRelics */
+    .tab-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .dropdown-trigger {
+      cursor: pointer;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #1a1a1a;
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      border-radius: 4px;
+      margin-top: 2px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .dropdown-content button {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.8);
+      padding: 10px 16px;
+      text-align: left;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+      border-radius: 0;
+    }
+    
+    .dropdown-content button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .dropdown-content button:first-child {
+      border-radius: 4px 4px 0 0;
+    }
+    
+    .dropdown-content button:last-child {
+      border-radius: 0 0 4px 4px;
+    }
+    
+    .tab-dropdown:hover .dropdown-content {
+      display: block;
+    }
 
     #sidebar {
       background: #1a1a1a;
@@ -332,10 +385,34 @@
     <div id="header">
       <h1>⚡ PixelProdigy Universe</h1>
       <div class="workspace-tabs">
-        <button class="workspace-tab active" onclick="switchDimensionUI('skyrelics', this)" data-dimension="skyrelics">🏰 SkyRelics</button>
+        <button class="workspace-tab" onclick="switchDimensionUI('navigator', this)" data-dimension="navigator" title="3D Dimension Navigator">🎯 Navigator</button>
+        
+        <!-- SkyRelics Dropdown Menu -->
+        <div class="tab-dropdown">
+          <button class="workspace-tab active dropdown-trigger" data-dimension="skyrelics">🏰 SkyRelics ▼</button>
+          <div class="dropdown-content">
+            <button onclick="switchDimensionUI('skyrelics', this)" data-dimension="skyrelics">🏰 Main Plaza</button>
+            <button onclick="switchDimensionUI('skyrelics_forge', this)" data-dimension="skyrelics_forge">🔥 The Forge</button>
+            <button onclick="switchDimensionUI('skyrelics_sanctuary', this)" data-dimension="skyrelics_sanctuary">💎 Crystal Sanctuary</button>
+            <button onclick="switchDimensionUI('skyrelics_observatory', this)" data-dimension="skyrelics_observatory">� Sky Observatory</button>
+            <hr style="border-color: rgba(255,255,255,0.2); margin: 4px 0;">
+            <button onclick="switchDimensionUI('skyrelics_mirror', this)" data-dimension="skyrelics_mirror">🪞 Mirror Dimension</button>
+            <button onclick="switchDimensionUI('skyrelics_desert', this)" data-dimension="skyrelics_desert">🏜️ Desert Oasis</button>
+            <button onclick="switchDimensionUI('skyrelics_tundra', this)" data-dimension="skyrelics_tundra">❄️ Frozen Tundra</button>
+            <button onclick="switchDimensionUI('skyrelics_monsoon', this)" data-dimension="skyrelics_monsoon">🌧️ Monsoon Temple</button>
+            <button onclick="switchDimensionUI('skyrelics_mountain', this)" data-dimension="skyrelics_mountain">⛰️ Mountain Peak</button>
+            <button onclick="switchDimensionUI('skyrelics_space', this)" data-dimension="skyrelics_space">🌌 Deep Space</button>
+            <button onclick="switchDimensionUI('skyrelics_underwater', this)" data-dimension="skyrelics_underwater">🐠 Coral Reef</button>
+            <button onclick="switchDimensionUI('skyrelics_volcanic', this)" data-dimension="skyrelics_volcanic">🌋 Volcanic Forge</button>
+            <button onclick="switchDimensionUI('skyrelics_crystal_cave', this)" data-dimension="skyrelics_crystal_cave">� Crystal Cavern</button>
+            <button onclick="switchDimensionUI('skyrelics_cyberpunk', this)" data-dimension="skyrelics_cyberpunk">🌃 Neon Nexus</button>
+          </div>
+        </div>
+        
         <button class="workspace-tab" onclick="switchDimensionUI('wordweaver', this)" data-dimension="wordweaver">✍️ WordWeaver</button>
         <button class="workspace-tab" onclick="switchDimensionUI('anatomy', this)" data-dimension="anatomy">🦴 Anatomy</button>
         <button class="workspace-tab" onclick="switchDimensionUI('perfect', this)" data-dimension="perfect">✨ Perfect</button>
+        <button class="workspace-tab" onclick="switchDimensionUI('skeletor_land', this)" data-dimension="skeletor_land" title="Chase Skeletor!">💀 Skeletor Land</button>
       </div>
       <div style="color: rgba(255,255,255,0.8); font-size: 14px;">
         🌌 Dimensional Workspace System
@@ -1632,10 +1709,14 @@
      * Each workspace is an isolated 3D universe with custom settings
      */
     const DIMENSIONAL_CONFIGS = {
+      // ========================================
+      // 🏰 SKYRELICS DIMENSIONS
+      // ========================================
+      
       skyrelics: {
-        name: 'SkyRelics Universe',
+        name: 'SkyRelics Main Plaza',
         icon: '🏰',
-        description: 'Primitive 3D object creation and Sky Relics civilization',
+        description: 'Main hub - primitive 3D object creation',
         backgroundColor: 0x0a0a0a,
         fogColor: 0x0a0a0a,
         fogNear: 10,
@@ -1656,8 +1737,104 @@
           ambient: { color: 0x404040, intensity: 0.5 },
           directional: { color: 0xffffff, intensity: 0.8, position: { x: 10, y: 20, z: 10 } },
           point: { color: 0x667eea, intensity: 0.5, position: { x: 0, y: 10, z: 0 } }
-        }
+        },
+        previewText: 'Main creative workspace for building 3D primitives and structures'
       },
+      
+      skyrelics_forge: {
+        name: 'The Forge',
+        icon: '🔥',
+        description: 'Advanced object manipulation and material crafting',
+        backgroundColor: 0x1a0a00,
+        fogColor: 0x1a0a00,
+        fogNear: 8,
+        fogFar: 40,
+        cameraPosition: { x: 6, y: 4, z: 6 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 30,
+          divisions: 30,
+          centerColor: 0xff6600,
+          gridColor: 0x884422,
+          wallColor: 0x2a1a0e,
+          showWalls: true,
+          wallHeight: 18,
+          wallOpacity: 0.4
+        },
+        lighting: {
+          ambient: { color: 0x603020, intensity: 0.6 },
+          directional: { color: 0xffaa66, intensity: 0.9, position: { x: 8, y: 15, z: 8 } },
+          point: [
+            { color: 0xff6600, intensity: 0.8, position: { x: 0, y: 5, z: 0 } },
+            { color: 0xff3300, intensity: 0.5, position: { x: -5, y: 3, z: -5 } }
+          ]
+        },
+        previewText: 'Craft and refine materials with intense focused lighting'
+      },
+      
+      skyrelics_sanctuary: {
+        name: 'Crystal Sanctuary',
+        icon: '💎',
+        description: 'Precision modeling with crystalline grid structure',
+        backgroundColor: 0x0a1a2a,
+        fogColor: 0x0a1a2a,
+        fogNear: 12,
+        fogFar: 55,
+        cameraPosition: { x: 7, y: 6, z: 7 },
+        cameraTarget: { x: 0, y: 3, z: 0 },
+        gridConfig: {
+          size: 35,
+          divisions: 45,
+          centerColor: 0x00ffff,
+          gridColor: 0x4488cc,
+          wallColor: 0x0a1a2a,
+          showWalls: true,
+          wallHeight: 22,
+          wallOpacity: 0.5,
+          crystalline: true
+        },
+        lighting: {
+          ambient: { color: 0x304050, intensity: 0.7 },
+          directional: { color: 0xccffff, intensity: 0.7, position: { x: 12, y: 18, z: 12 } },
+          point: [
+            { color: 0x00ffff, intensity: 0.6, position: { x: 0, y: 8, z: 0 } },
+            { color: 0x4488cc, intensity: 0.4, position: { x: 5, y: 6, z: 5 } }
+          ]
+        },
+        previewText: 'High-precision workspace with crystalline reference grid'
+      },
+      
+      skyrelics_observatory: {
+        name: 'Sky Observatory',
+        icon: '🔭',
+        description: 'Large-scale construction with elevated perspective',
+        backgroundColor: 0x0a0a1a,
+        fogColor: 0x0a0a1a,
+        fogNear: 20,
+        fogFar: 100,
+        cameraPosition: { x: 15, y: 15, z: 15 },
+        cameraTarget: { x: 0, y: 5, z: 0 },
+        gridConfig: {
+          size: 60,
+          divisions: 60,
+          centerColor: 0xffdd66,
+          gridColor: 0x4466aa,
+          wallColor: 0x0a0a1a,
+          showWalls: true,
+          wallHeight: 30,
+          wallOpacity: 0.2
+        },
+        lighting: {
+          ambient: { color: 0x303050, intensity: 0.4 },
+          directional: { color: 0xffffee, intensity: 1.0, position: { x: 20, y: 30, z: 20 } },
+          point: { color: 0xffdd66, intensity: 0.7, position: { x: 0, y: 20, z: 0 } }
+        },
+        previewText: 'Massive workspace for large-scale architectural projects'
+      },
+      
+      // ========================================
+      // ✍️ WORDWEAVER DIMENSIONS
+      // ========================================
       
       wordweaver: {
         name: 'WordWeaver Studio',
@@ -1684,8 +1861,13 @@
           ambient: { color: 0x606060, intensity: 0.7 },
           directional: { color: 0xffffff, intensity: 0.6, position: { x: 5, y: 15, z: 10 } },
           point: { color: 0x667eea, intensity: 0.3, position: { x: 0, y: 8, z: -5 } }
-        }
+        },
+        previewText: 'Letters materialize from center outward. Matrix walls adapt to material type.'
       },
+      
+      // ========================================
+      // 🦴 ANATOMY DIMENSIONS
+      // ========================================
       
       anatomy: {
         name: 'Anatomical Explorer',
@@ -1715,13 +1897,18 @@
             { color: 0xff6b6b, intensity: 0.4, position: { x: -5, y: 5, z: 5 } },
             { color: 0x6bcfff, intensity: 0.4, position: { x: 5, y: 5, z: -5 } }
           ]
-        }
+        },
+        previewText: 'Explore skeletal system, muscles, organs. Search anatomical structures.'
       },
+      
+      // ========================================
+      // ✨ PERFECT & SPECIAL DIMENSIONS
+      // ========================================
       
       perfect: {
         name: 'Perfect Universe',
         icon: '✨',
-        description: 'Placeholder for perfect world creation',
+        description: 'Ideal world creation and procedural generation',
         backgroundColor: 0x1a0a2e,
         fogColor: 0x1a0a2e,
         fogNear: 10,
@@ -1742,7 +1929,405 @@
           ambient: { color: 0x404040, intensity: 0.5 },
           directional: { color: 0xffd700, intensity: 0.7, position: { x: 15, y: 20, z: 15 } },
           point: { color: 0x8b00ff, intensity: 0.6, position: { x: 0, y: 15, z: 0 } }
+        },
+        previewText: 'Procedural world generation. Golden ratio proportions. Purple-gold aesthetic.'
+      },
+      
+      // ========================================
+      // 🌍 SKYRELICS ENVIRONMENTAL VARIANTS
+      // ========================================
+      
+      skyrelics_mirror: {
+        name: 'Mirror Dimension',
+        icon: '🪞',
+        description: 'Reflective kaleidoscope reality - symmetry exploration',
+        backgroundColor: 0x0f0f1f,
+        fogColor: 0x1a1a2e,
+        fogNear: 5,
+        fogFar: 45,
+        cameraPosition: { x: 6, y: 6, z: 6 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 40,
+          divisions: 40,
+          centerColor: 0xccffff,
+          gridColor: 0x4488ff,
+          wallColor: 0x1a1a3e,
+          showWalls: true,
+          wallHeight: 20,
+          wallOpacity: 0.7,
+          reflective: true
+        },
+        lighting: {
+          ambient: { color: 0x606080, intensity: 0.8 },
+          directional: { color: 0xffffff, intensity: 1.2, position: { x: 10, y: 20, z: 10 } },
+          point: [
+            { color: 0xccffff, intensity: 0.9, position: { x: 0, y: 10, z: 0 } },
+            { color: 0xff88ff, intensity: 0.6, position: { x: -8, y: 5, z: -8 } }
+          ]
+        },
+        previewText: 'Everything reflects. Create symmetrical designs with kaleidoscope effects.'
+      },
+      
+      skyrelics_desert: {
+        name: 'Desert Oasis',
+        icon: '🏜️',
+        description: 'Vast sandy expanse with heat shimmer effects',
+        backgroundColor: 0x2a1a0a,
+        fogColor: 0x4a3a2a,
+        fogNear: 15,
+        fogFar: 70,
+        cameraPosition: { x: 8, y: 5, z: 8 },
+        cameraTarget: { x: 0, y: 0, z: 0 },
+        gridConfig: {
+          size: 50,
+          divisions: 50,
+          centerColor: 0xffdd88,
+          gridColor: 0xaa8844,
+          wallColor: 0x3a2a1a,
+          showWalls: false,
+          wallHeight: 0,
+          wallOpacity: 0
+        },
+        lighting: {
+          ambient: { color: 0x8a6a4a, intensity: 0.9 },
+          directional: { color: 0xffffcc, intensity: 1.5, position: { x: 20, y: 40, z: 10 } },
+          point: { color: 0xffaa44, intensity: 0.7, position: { x: 0, y: 2, z: 0 } }
+        },
+        previewText: 'Build sand castles, pyramids, and desert monuments under harsh sun.'
+      },
+      
+      skyrelics_tundra: {
+        name: 'Frozen Tundra',
+        icon: '❄️',
+        description: 'Icy wasteland with aurora borealis and crystalline structures',
+        backgroundColor: 0x0a1a2a,
+        fogColor: 0x1a2a3a,
+        fogNear: 10,
+        fogFar: 80,
+        cameraPosition: { x: 7, y: 6, z: 7 },
+        cameraTarget: { x: 0, y: 1, z: 0 },
+        gridConfig: {
+          size: 45,
+          divisions: 45,
+          centerColor: 0xaaffff,
+          gridColor: 0x4488cc,
+          wallColor: 0x1a2a3a,
+          showWalls: true,
+          wallHeight: 18,
+          wallOpacity: 0.5,
+          icy: true
+        },
+        lighting: {
+          ambient: { color: 0x4a6a8a, intensity: 0.6 },
+          directional: { color: 0xeeffff, intensity: 0.8, position: { x: 15, y: 25, z: 15 } },
+          point: [
+            { color: 0x00ffaa, intensity: 0.7, position: { x: -10, y: 15, z: 0 } }, // Aurora green
+            { color: 0xff00ff, intensity: 0.5, position: { x: 10, y: 15, z: 0 } }  // Aurora magenta
+          ]
+        },
+        previewText: 'Sculpt ice formations and igloos. Watch aurora lights dance overhead.'
+      },
+      
+      skyrelics_monsoon: {
+        name: 'Monsoon Temple',
+        icon: '🌧️',
+        description: 'Ancient ruins in perpetual rainfall with thunder effects',
+        backgroundColor: 0x1a1a2a,
+        fogColor: 0x2a2a3a,
+        fogNear: 8,
+        fogFar: 50,
+        cameraPosition: { x: 6, y: 5, z: 6 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 35,
+          divisions: 35,
+          centerColor: 0x6699ff,
+          gridColor: 0x334466,
+          wallColor: 0x1a1a2a,
+          showWalls: true,
+          wallHeight: 20,
+          wallOpacity: 0.6,
+          wet: true
+        },
+        lighting: {
+          ambient: { color: 0x404060, intensity: 0.5 },
+          directional: { color: 0x8899cc, intensity: 0.7, position: { x: 10, y: 20, z: 10 } },
+          point: { color: 0x6699ff, intensity: 0.8, position: { x: 0, y: 12, z: 0 } }
+        },
+        previewText: 'Build in the rain. Wet surfaces glisten. Thunder rumbles in distance.'
+      },
+      
+      skyrelics_mountain: {
+        name: 'Mountain Peak',
+        icon: '⛰️',
+        description: 'High-altitude construction above the clouds',
+        backgroundColor: 0x1a2a3a,
+        fogColor: 0x3a4a5a,
+        fogNear: 20,
+        fogFar: 90,
+        cameraPosition: { x: 12, y: 12, z: 12 },
+        cameraTarget: { x: 0, y: 3, z: 0 },
+        gridConfig: {
+          size: 50,
+          divisions: 50,
+          centerColor: 0xccddff,
+          gridColor: 0x778899,
+          wallColor: 0x2a3a4a,
+          showWalls: true,
+          wallHeight: 25,
+          wallOpacity: 0.4
+        },
+        lighting: {
+          ambient: { color: 0x7788aa, intensity: 0.7 },
+          directional: { color: 0xffffee, intensity: 1.3, position: { x: 25, y: 40, z: 15 } },
+          point: { color: 0xccddff, intensity: 0.5, position: { x: 0, y: 20, z: 0 } }
+        },
+        previewText: 'Build mountain temples. Thin air, crisp lighting, clouds below you.'
+      },
+      
+      skyrelics_space: {
+        name: 'Deep Space Station',
+        icon: '🌌',
+        description: 'Zero-gravity construction in the void between stars',
+        backgroundColor: 0x000005,
+        fogColor: 0x000000,
+        fogNear: 30,
+        fogFar: 150,
+        cameraPosition: { x: 10, y: 8, z: 10 },
+        cameraTarget: { x: 0, y: 0, z: 0 },
+        gridConfig: {
+          size: 60,
+          divisions: 60,
+          centerColor: 0x6666ff,
+          gridColor: 0x222244,
+          wallColor: 0x000011,
+          showWalls: false,
+          wallHeight: 0,
+          wallOpacity: 0
+        },
+        lighting: {
+          ambient: { color: 0x0a0a1a, intensity: 0.2 },
+          directional: { color: 0xffffff, intensity: 0.6, position: { x: 30, y: 20, z: 30 } },
+          point: [
+            { color: 0x6666ff, intensity: 1.0, position: { x: 0, y: 0, z: 0 } }, // Star nearby
+            { color: 0xff6666, intensity: 0.4, position: { x: -20, y: 10, z: -20 } } // Distant star
+          ]
+        },
+        previewText: 'Construct space stations. Stars twinkle. Nebula clouds drift past.'
+      },
+      
+      skyrelics_underwater: {
+        name: 'Coral Reef Cathedral',
+        icon: '🐠',
+        description: 'Sunken world with caustic light rays and aquatic life',
+        backgroundColor: 0x0a1a2a,
+        fogColor: 0x1a3a5a,
+        fogNear: 5,
+        fogFar: 40,
+        cameraPosition: { x: 6, y: 5, z: 6 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 35,
+          divisions: 35,
+          centerColor: 0x00ffdd,
+          gridColor: 0x4488aa,
+          wallColor: 0x1a2a3a,
+          showWalls: true,
+          wallHeight: 18,
+          wallOpacity: 0.7,
+          underwater: true
+        },
+        lighting: {
+          ambient: { color: 0x2a4a6a, intensity: 0.8 },
+          directional: { color: 0x88ccff, intensity: 0.9, position: { x: 10, y: 25, z: 10 } }, // Sunlight from above
+          point: [
+            { color: 0x00ffdd, intensity: 0.6, position: { x: 0, y: 8, z: 0 } },
+            { color: 0xff6699, intensity: 0.4, position: { x: -6, y: 4, z: -6 } } // Bioluminescence
+          ]
+        },
+        previewText: 'Build coral structures. Caustic light dances. Bubbles float upward.'
+      },
+      
+      skyrelics_volcanic: {
+        name: 'Volcanic Forge',
+        icon: '🌋',
+        description: 'Active lava flows and intense heat - extreme crafting',
+        backgroundColor: 0x2a0a0a,
+        fogColor: 0x4a1a0a,
+        fogNear: 5,
+        fogFar: 35,
+        cameraPosition: { x: 7, y: 6, z: 7 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 32,
+          divisions: 32,
+          centerColor: 0xff3300,
+          gridColor: 0x883311,
+          wallColor: 0x331100,
+          showWalls: true,
+          wallHeight: 16,
+          wallOpacity: 0.5,
+          molten: true
+        },
+        lighting: {
+          ambient: { color: 0x6a2a1a, intensity: 0.7 },
+          directional: { color: 0xffaa44, intensity: 0.8, position: { x: 12, y: 18, z: 12 } },
+          point: [
+            { color: 0xff3300, intensity: 1.2, position: { x: 0, y: 0, z: 0 } }, // Lava pool center
+            { color: 0xff6600, intensity: 0.9, position: { x: 5, y: 2, z: 5 } },
+            { color: 0xff9933, intensity: 0.7, position: { x: -5, y: 3, z: -5 } }
+          ]
+        },
+        previewText: 'Forge in extreme heat. Lava glows, embers float, obsidian forms.'
+      },
+      
+      skyrelics_crystal_cave: {
+        name: 'Bioluminescent Cavern',
+        icon: '💠',
+        description: 'Underground crystal cave with glowing minerals',
+        backgroundColor: 0x0a0a1a,
+        fogColor: 0x1a1a2a,
+        fogNear: 8,
+        fogFar: 45,
+        cameraPosition: { x: 8, y: 5, z: 8 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 38,
+          divisions: 38,
+          centerColor: 0x00ff88,
+          gridColor: 0x4488cc,
+          wallColor: 0x1a1a2a,
+          showWalls: true,
+          wallHeight: 20,
+          wallOpacity: 0.6,
+          bioluminescent: true
+        },
+        lighting: {
+          ambient: { color: 0x2a3a4a, intensity: 0.4 },
+          directional: { color: 0x6688aa, intensity: 0.3, position: { x: 8, y: 12, z: 8 } },
+          point: [
+            { color: 0x00ff88, intensity: 0.8, position: { x: 0, y: 5, z: 0 } },    // Green glow
+            { color: 0xff00ff, intensity: 0.6, position: { x: 6, y: 4, z: 6 } },    // Magenta crystal
+            { color: 0x00ffff, intensity: 0.7, position: { x: -6, y: 6, z: -6 } }   // Cyan mineral
+          ]
+        },
+        previewText: 'Deep underground. Crystals glow with inner light. Minerals shimmer.'
+      },
+      
+      skyrelics_cyberpunk: {
+        name: 'Neon Nexus',
+        icon: '🌃',
+        description: 'Futuristic cityscape with holographic advertisements',
+        backgroundColor: 0x0a0a1a,
+        fogColor: 0x1a1a3a,
+        fogNear: 10,
+        fogFar: 60,
+        cameraPosition: { x: 8, y: 7, z: 8 },
+        cameraTarget: { x: 0, y: 3, z: 0 },
+        gridConfig: {
+          size: 42,
+          divisions: 42,
+          centerColor: 0xff00ff,
+          gridColor: 0x00ffff,
+          wallColor: 0x1a1a3a,
+          showWalls: true,
+          wallHeight: 24,
+          wallOpacity: 0.5,
+          neon: true
+        },
+        lighting: {
+          ambient: { color: 0x3a2a4a, intensity: 0.6 },
+          directional: { color: 0x8888ff, intensity: 0.5, position: { x: 10, y: 20, z: 10 } },
+          point: [
+            { color: 0xff00ff, intensity: 0.9, position: { x: -5, y: 8, z: 0 } },  // Magenta neon
+            { color: 0x00ffff, intensity: 0.9, position: { x: 5, y: 6, z: 0 } },   // Cyan neon
+            { color: 0xffff00, intensity: 0.7, position: { x: 0, y: 10, z: -5 } }  // Yellow holo
+          ]
+        },
+        previewText: 'High-tech urban jungle. Neon lights pulse. Holograms flicker.'
+      },
+      
+      // ========================================
+      // 💀 SKELETOR LAND (Special Game Dimension)
+      // ========================================
+      
+      skeletor_land: {
+        name: 'Skeletor\'s Domain',
+        icon: '💀',
+        description: 'Chase Skeletor for rewards! Comedy gold mine with AI banter',
+        backgroundColor: 0x1a0a2a,
+        fogColor: 0x2a1a3a,
+        fogNear: 10,
+        fogFar: 60,
+        cameraPosition: { x: 8, y: 4, z: 8 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 50,
+          divisions: 50,
+          centerColor: 0xaa00ff,
+          gridColor: 0x440066,
+          wallColor: 0x1a0a2a,
+          showWalls: true,
+          wallHeight: 22,
+          wallOpacity: 0.4,
+          haunted: true
+        },
+        lighting: {
+          ambient: { color: 0x3a2a4a, intensity: 0.5 },
+          directional: { color: 0xaa88ff, intensity: 0.7, position: { x: 12, y: 18, z: 12 } },
+          point: [
+            { color: 0xaa00ff, intensity: 0.9, position: { x: 0, y: 5, z: 0 } },   // Purple evil glow
+            { color: 0xff0066, intensity: 0.6, position: { x: -8, y: 4, z: 8 } },  // Magenta mystery
+            { color: 0x00ff00, intensity: 0.4, position: { x: 8, y: 3, z: -8 } }   // Toxic green
+          ]
+        },
+        previewText: 'NYAH! Catch me for rewards! Blockchain tokenomics, legendary loot drops!',
+        isGameMode: true,
+        gameConfig: {
+          type: 'chase',
+          target: 'skeletor',
+          aiPersonality: 'skeletor_comedian',
+          rewards: {
+            tokens: true,
+            health: true,
+            powerups: true,
+            skins: true,
+            rarities: ['common', 'rare', 'epic', 'legendary']
+          }
         }
+      },
+      
+      navigator: {
+        name: 'Matrix Prism Navigator',
+        icon: '🎯',
+        description: '3D navigation hub - visual dimension selection',
+        backgroundColor: 0x000000,
+        fogColor: 0x000000,
+        fogNear: 5,
+        fogFar: 30,
+        cameraPosition: { x: 0, y: 8, z: 20 },
+        cameraTarget: { x: 0, y: 0, z: 0 },
+        gridConfig: {
+          size: 60,
+          divisions: 60,
+          centerColor: 0x00ffff,
+          gridColor: 0x00aaaa,
+          wallColor: 0x001a1a,
+          showWalls: false,
+          wallHeight: 0,
+          wallOpacity: 0
+        },
+        lighting: {
+          ambient: { color: 0x202020, intensity: 0.3 },
+          directional: { color: 0xffffff, intensity: 0.5, position: { x: 10, y: 20, z: 10 } },
+          point: [
+            { color: 0x00ffff, intensity: 0.8, position: { x: 0, y: 0, z: 0 } },
+            { color: 0xff00ff, intensity: 0.6, position: { x: 10, y: 5, z: 10 } }
+          ]
+        },
+        previewText: 'Navigate dimensions spatially. Click preview cubes to enter worlds.',
+        isNavigator: true
       }
     };
 
@@ -1866,6 +2451,7 @@
 
       // Events
       canvas.addEventListener('click', onCanvasClick);
+      canvas.addEventListener('mousemove', onCanvasMouseMove);
       canvas.addEventListener('wheel', onMouseWheel, { passive: false });
       window.addEventListener('resize', onWindowResize);
       window.addEventListener('keydown', onKeyDown);
@@ -2427,6 +3013,12 @@
     // =====================================
     
     let sidebarCollapsed = false;
+    
+    // =====================================
+    // 🎯 NAVIGATOR CUBE HOVER STATE
+    // =====================================
+    
+    let hoveredNavigatorCube = null;
     
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
@@ -3592,7 +4184,7 @@
         animateSkyRelics();
         
         // Update matrix grid backwall animation (WordWeaver)
-        if (documentCanvas) {
+        if (documentCanvas && typeof documentCanvas.updateMatrixGridBackwall === 'function') {
           documentCanvas.updateMatrixGridBackwall();
         }
         
@@ -3622,6 +4214,43 @@
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
+      
+      // 🎯 Matrix Prism Navigator: Check if clicking preview cube to switch dimensions
+      if (currentDimension === 'navigator') {
+        const navigatorGroup = dimensionalSpaces['navigator'].objects.find(
+          obj => obj.name === 'MatrixPrismNavigator'
+        );
+        
+        if (navigatorGroup) {
+          const navigatorIntersects = raycaster.intersectObjects(navigatorGroup.children, true);
+          
+          if (navigatorIntersects.length > 0) {
+            // Find the cube group (traverse up from intersected mesh)
+            let cubeGroup = navigatorIntersects[0].object;
+            while (cubeGroup && !cubeGroup.userData.isNavigatorCube) {
+              cubeGroup = cubeGroup.parent;
+            }
+            
+            if (cubeGroup && cubeGroup.userData.dimensionKey) {
+              const targetDimension = cubeGroup.userData.dimensionKey;
+              console.log(`🎯 Navigator: Entering ${DIMENSIONAL_CONFIGS[targetDimension].name}`);
+              
+              // Switch to target dimension
+              switchDimension(targetDimension);
+              
+              // Update UI tabs
+              const targetTab = document.querySelector(
+                `.workspace-tab[data-dimension="${targetDimension}"]`
+              );
+              if (targetTab) {
+                switchDimensionUI(targetDimension, targetTab);
+              }
+              
+              return; // Don't process regular object clicks
+            }
+          }
+        }
+      }
       
       // Check if clicking existing object to select it
       const intersects = raycaster.intersectObjects(objects, true);
@@ -3664,6 +4293,64 @@
 
         if (intersectPoint) {
           placePrimitive(intersectPoint);
+        }
+      }
+    }
+    
+    // 🎯 Matrix Prism Navigator: Handle mouse hover over preview cubes
+    function onCanvasMouseMove(event) {
+      if (currentDimension !== 'navigator') {
+        // Reset hover state if not in navigator
+        if (hoveredNavigatorCube) {
+          hoveredNavigatorCube.scale.set(1, 1, 1);
+          const glow = hoveredNavigatorCube.getObjectByName('dimensionGlow');
+          if (glow) glow.material.opacity = 0.1;
+          hoveredNavigatorCube = null;
+          canvas.style.cursor = 'default';
+        }
+        return;
+      }
+      
+      const canvas = document.getElementById('canvas');
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+      
+      const navigatorGroup = dimensionalSpaces['navigator'].objects.find(
+        obj => obj.name === 'MatrixPrismNavigator'
+      );
+      
+      if (navigatorGroup) {
+        const intersects = raycaster.intersectObjects(navigatorGroup.children, true);
+        
+        // Reset previous hover
+        if (hoveredNavigatorCube) {
+          hoveredNavigatorCube.scale.set(1, 1, 1);
+          const glow = hoveredNavigatorCube.getObjectByName('dimensionGlow');
+          if (glow) glow.material.opacity = 0.1;
+          hoveredNavigatorCube = null;
+          canvas.style.cursor = 'default';
+        }
+        
+        if (intersects.length > 0) {
+          // Find the cube group (traverse up from intersected mesh)
+          let cubeGroup = intersects[0].object;
+          while (cubeGroup && !cubeGroup.userData.isNavigatorCube) {
+            cubeGroup = cubeGroup.parent;
+          }
+          
+          if (cubeGroup) {
+            hoveredNavigatorCube = cubeGroup;
+            cubeGroup.scale.set(1.2, 1.2, 1.2);
+            const glow = cubeGroup.getObjectByName('dimensionGlow');
+            if (glow) glow.material.opacity = 0.3;
+            canvas.style.cursor = 'pointer';
+            
+            // Optional: Show tooltip with dimension name
+            canvas.title = cubeGroup.userData.config.name;
+          }
         }
       }
     }
@@ -8737,13 +9424,164 @@
       // Create master matrix grid (universal boundary)
       createMasterMatrixGrid();
       
+      // Create Matrix Prism Navigator
+      createMatrixPrismNavigator();
+      
       // Load initial dimension (SkyRelics)
       switchDimension('skyrelics');
       
       console.log('\n✅ Dimensional Workspace System initialized!');
       console.log(`   → ${Object.keys(dimensionalSpaces).length} dimensions active`);
       console.log(`   → Master Matrix Grid: Universal boundary system`);
+      console.log(`   → Matrix Prism Navigator: 3D dimension selection`);
       console.log(`   → Current dimension: ${currentDimension}\n`);
+    }
+    
+    /**
+     * 🎯 Create 3D Matrix Prism Navigator
+     * Visual 3D menu system with preview cubes for each dimension
+     */
+    function createMatrixPrismNavigator() {
+      console.log('\n🎯 Creating Matrix Prism Navigator...\n');
+      
+      // Navigator group (only visible in navigator dimension)
+      const navigatorGroup = new THREE.Group();
+      navigatorGroup.name = 'MatrixPrismNavigator';
+      
+      // Get all dimensions except navigator itself
+      const dimensions = Object.keys(DIMENSIONAL_CONFIGS).filter(key => key !== 'navigator');
+      
+      // Arrange in 3D grid pattern
+      const gridSize = Math.ceil(Math.sqrt(dimensions.length));
+      const spacing = 8; // Space between preview cubes
+      
+      dimensions.forEach((key, index) => {
+        const config = DIMENSIONAL_CONFIGS[key];
+        
+        // Calculate position in 3D grid
+        const row = Math.floor(index / gridSize);
+        const col = index % gridSize;
+        const x = (col - gridSize / 2) * spacing;
+        const z = (row - gridSize / 2) * spacing;
+        const yPos = 0;
+        
+        // Create preview cube (room representation)
+        const cubeGroup = new THREE.Group();
+        cubeGroup.position.set(x, yPos, z);
+        cubeGroup.userData.dimensionKey = key;
+        cubeGroup.userData.config = config;
+        
+        // 1. Main cube (frosted glass look)
+        const cubeGeometry = new THREE.BoxGeometry(5, 5, 5);
+        const cubeMaterial = new THREE.MeshPhysicalMaterial({
+          color: config.backgroundColor,
+          transparent: true,
+          opacity: 0.3,
+          roughness: 0.1,
+          metalness: 0.1,
+          clearcoat: 1.0,
+          side: THREE.DoubleSide
+        });
+        const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cubeGroup.add(cube);
+        
+        // 2. Edge wireframe (dimension color)
+        const edgesGeometry = new THREE.EdgesGeometry(cubeGeometry);
+        const edgesMaterial = new THREE.LineBasicMaterial({
+          color: config.gridConfig.centerColor,
+          linewidth: 2
+        });
+        const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+        cubeGroup.add(edges);
+        
+        // 3. Icon sprite (floating above cube)
+        const iconCanvas = document.createElement('canvas');
+        iconCanvas.width = 256;
+        iconCanvas.height = 256;
+        const iconCtx = iconCanvas.getContext('2d');
+        iconCtx.fillStyle = '#ffffff';
+        iconCtx.font = 'bold 180px Arial';
+        iconCtx.textAlign = 'center';
+        iconCtx.textBaseline = 'middle';
+        iconCtx.fillText(config.icon, 128, 128);
+        
+        const iconTexture = new THREE.CanvasTexture(iconCanvas);
+        const iconMaterial = new THREE.SpriteMaterial({ map: iconTexture });
+        const iconSprite = new THREE.Sprite(iconMaterial);
+        iconSprite.position.y = 4;
+        iconSprite.scale.set(2, 2, 1);
+        cubeGroup.add(iconSprite);
+        
+        // 4. Preview text (3D text with dimension description)
+        const textCanvas = document.createElement('canvas');
+        textCanvas.width = 512;
+        textCanvas.height = 256;
+        const textCtx = textCanvas.getContext('2d');
+        textCtx.fillStyle = 'rgba(0,0,0,0.8)';
+        textCtx.fillRect(0, 0, 512, 256);
+        textCtx.fillStyle = '#ffffff';
+        textCtx.font = 'bold 28px Arial';
+        textCtx.textAlign = 'center';
+        textCtx.fillText(config.name, 256, 60);
+        textCtx.font = '18px Arial';
+        textCtx.fillStyle = '#aaaaaa';
+        
+        // Word wrap preview text
+        const words = config.previewText.split(' ');
+        let line = '';
+        let textY = 110;
+        words.forEach(word => {
+          const testLine = line + word + ' ';
+          const metrics = textCtx.measureText(testLine);
+          if (metrics.width > 480 && line !== '') {
+            textCtx.fillText(line, 256, textY);
+            line = word + ' ';
+            textY += 25;
+          } else {
+            line = testLine;
+          }
+        });
+        textCtx.fillText(line, 256, textY);
+        
+        const textTexture = new THREE.CanvasTexture(textCanvas);
+        const textGeometry = new THREE.PlaneGeometry(5, 2.5);
+        const textMaterial = new THREE.MeshBasicMaterial({
+          map: textTexture,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+        const textPlane = new THREE.Mesh(textGeometry, textMaterial);
+        textPlane.position.y = -4;
+        cubeGroup.add(textPlane);
+        
+        // 5. Glow effect (pulsing light)
+        const glowGeometry = new THREE.SphereGeometry(3, 32, 32);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+          color: config.gridConfig.centerColor,
+          transparent: true,
+          opacity: 0.1,
+          side: THREE.BackSide
+        });
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        glow.name = 'dimensionGlow';
+        cubeGroup.add(glow);
+        
+        // 6. Make clickable
+        cubeGroup.userData.isNavigatorCube = true;
+        
+        navigatorGroup.add(cubeGroup);
+        
+        console.log(`  ✓ ${config.icon} ${config.name} preview cube created at (${x}, ${yPos}, ${z})`);
+      });
+      
+      // Add navigator group to navigator dimension
+      if (dimensionalSpaces['navigator']) {
+        dimensionalSpaces['navigator'].objects.push(navigatorGroup);
+        scene.add(navigatorGroup);
+        navigatorGroup.visible = false; // Hidden until navigator is active
+        
+        console.log(`\n✅ Matrix Prism Navigator created with ${dimensions.length} dimension previews`);
+      }
     }
     
     /**
@@ -8783,6 +9621,7 @@
       group.name = `MatrixGrid_${dimensionKey}`;
       
       const { size, divisions, centerColor, gridColor, wallColor, showWalls, wallHeight, wallOpacity, backwallZ, circular } = gridConfig;
+      const halfSize = size / 2;
       
       // 1. Floor grid
       const gridHelper = new THREE.GridHelper(size, divisions, centerColor, gridColor);
@@ -9142,11 +9981,11 @@
       if (!dimensionalSpaces[currentDimension]) return;
       
       const space = dimensionalSpaces[currentDimension];
+      const time = Date.now() * 0.001;
       
       // Animate pulsing glow
       const glow = space.matrixGrid.getObjectByName('dimensionGlow');
       if (glow) {
-        const time = Date.now() * 0.001;
         const scale = 1 + Math.sin(time * 2) * 0.2;
         glow.scale.set(scale, 1, scale);
         glow.material.opacity = 0.2 + Math.sin(time * 2) * 0.1;
@@ -9156,8 +9995,33 @@
       const marker = space.matrixGrid.getObjectByName('dimensionOrigin');
       if (marker) {
         marker.rotation.y += 0.02;
-        const time = Date.now() * 0.001;
         marker.position.y = 0.2 + Math.sin(time * 3) * 0.1;
+      }
+      
+      // 🎯 Animate Matrix Prism Navigator cubes
+      if (currentDimension === 'navigator') {
+        const navigatorGroup = space.objects.find(obj => obj.name === 'MatrixPrismNavigator');
+        
+        if (navigatorGroup) {
+          navigatorGroup.children.forEach((cubeGroup, index) => {
+            if (cubeGroup.userData.isNavigatorCube) {
+              // Pulsing glow with phase offset per cube
+              const glow = cubeGroup.getObjectByName('dimensionGlow');
+              if (glow && cubeGroup !== hoveredNavigatorCube) {
+                const baseOpacity = 0.1;
+                const pulseAmount = Math.sin(time * 2 + index * 0.5) * 0.05;
+                glow.material.opacity = baseOpacity + pulseAmount;
+              }
+              
+              // Gentle rotation
+              cubeGroup.rotation.y += 0.002;
+              
+              // Subtle floating motion
+              const floatAmount = Math.sin(time * 1.5 + index * 0.3) * 0.1;
+              cubeGroup.position.y = floatAmount;
+            }
+          });
+        }
       }
     }
 
