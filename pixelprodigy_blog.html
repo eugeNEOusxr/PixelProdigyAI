@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelProdigy Blog — Write-It / Share-It / Post-It / Read-It</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a1f3a 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Header Navigation */
+    .header {
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      cursor: pointer;
+    }
+    
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .nav-btn {
+      padding: 0.7rem 1.5rem;
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+    
+    .nav-btn:hover {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .nav-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: transparent;
+    }
+    
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      display: none;
+    }
+    
+    .container.active {
+      display: block;
+    }
+    
+    /* Write-It Section */
+    .write-section {
+      background: rgba(26, 31, 58, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #b0b0b0;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(10, 14, 39, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+    
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-textarea {
+      min-height: 300px;
+      resize: vertical;
+      font-family: 'Monaco', 'Courier New', monospace;
+      line-height: 1.6;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(10, 14, 39, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .switch {
+      position: relative;
+      width: 60px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .switch.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .switch-slider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+    
+    .switch.active .switch-slider {
+      left: 33px;
+    }
+    
+    .toggle-label {
+      font-weight: 600;
+      color: #b0b0b0;
+    }
+    
+    .switch.active + .toggle-label {
+      color: #667eea;
+    }
+    
+    .tag-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      background: rgba(10, 14, 39, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      min-height: 50px;
+    }
+    
+    .tag {
+      padding: 0.4rem 0.8rem;
+      background: rgba(102, 126, 234, 0.2);
+      border: 1px solid rgba(102, 126, 234, 0.4);
+      border-radius: 6px;
+      color: #667eea;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tag-remove {
+      cursor: pointer;
+      font-weight: bold;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    
+    .tag-remove:hover {
+      opacity: 1;
+    }
+    
+    .tag-input-field {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #e0e0e0;
+      outline: none;
+      min-width: 150px;
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    
+    .btn-secondary {
+      padding: 1rem 2.5rem;
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    /* Read-It / Post-It Section */
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .post-card {
+      background: rgba(26, 31, 58, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .post-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      border-color: rgba(102, 126, 234, 0.5);
+    }
+    
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+    
+    .post-grade {
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .grade-beginner {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4caf50;
+      border: 1px solid rgba(76, 175, 80, 0.4);
+    }
+    
+    .grade-intermediate {
+      background: rgba(255, 152, 0, 0.2);
+      color: #ff9800;
+      border: 1px solid rgba(255, 152, 0, 0.4);
+    }
+    
+    .grade-advanced {
+      background: rgba(244, 67, 54, 0.2);
+      color: #f44336;
+      border: 1px solid rgba(244, 67, 54, 0.4);
+    }
+    
+    .grade-expert {
+      background: rgba(156, 39, 176, 0.2);
+      color: #9c27b0;
+      border: 1px solid rgba(156, 39, 176, 0.4);
+    }
+    
+    .post-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+    
+    .post-excerpt {
+      color: #b0b0b0;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .post-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #808080;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .post-tag {
+      padding: 0.3rem 0.6rem;
+      background: rgba(102, 126, 234, 0.15);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: #667eea;
+    }
+    
+    .post-stats {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    /* Dashboard Section */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .dashboard-card {
+      background: rgba(26, 31, 58, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    
+    .dashboard-card-title {
+      font-size: 0.9rem;
+      color: #808080;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .dashboard-card-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .dashboard-card-change {
+      font-size: 0.85rem;
+      color: #4caf50;
+      margin-top: 0.5rem;
+    }
+    
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 0.6rem 1.2rem;
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      color: #667eea;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+    }
+    
+    .search-bar {
+      flex: 1;
+      min-width: 250px;
+      padding: 0.6rem 1.2rem;
+      background: rgba(10, 14, 39, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 0.9rem;
+    }
+    
+    .search-bar:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: rgba(26, 31, 58, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      width: 100%;
+    }
+    
+    .modal-close {
+      float: right;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #808080;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+    
+    .modal-close:hover {
+      color: #667eea;
+    }
+    
+    .modal-body {
+      margin-top: 2rem;
+    }
+    
+    .full-post-content {
+      line-height: 1.8;
+      color: #d0d0d0;
+      font-size: 1.05rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .nav-buttons {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .post-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+    }
+    
+    /* Success Message */
+    .success-message {
+      position: fixed;
+      top: 100px;
+      right: 2rem;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      z-index: 3000;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+    
+    .success-message.show {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Navigation -->
+  <div class="header">
+    <div class="logo">🪩 PixelProdigy Blog</div>
+    <div class="nav-buttons">
+      <button class="nav-btn active" data-view="write">✍️ Write-It</button>
+      <button class="nav-btn" data-view="read">📖 Read-It</button>
+      <button class="nav-btn" data-view="dashboard">📊 Dashboard</button>
+      <button class="nav-btn" data-view="universe">🌌 3D Universe</button>
+    </div>
+  </div>
+
+  <!-- Write-It Section -->
+  <div class="container active" id="write-section">
+    <div class="write-section">
+      <h1 class="section-title">✍️ Write Your Story</h1>
+      
+      <form id="post-form">
+        <div class="form-group">
+          <label class="form-label">Post Title</label>
+          <input type="text" class="form-input" id="post-title" placeholder="Give your post a compelling title..." required>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Audience Grade</label>
+            <select class="form-select" id="post-grade">
+              <option value="beginner">Beginner — Accessible to everyone</option>
+              <option value="intermediate">Intermediate — Some background helpful</option>
+              <option value="advanced">Advanced — Expert-level content</option>
+              <option value="expert">Expert — Specialized knowledge required</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Visibility</label>
+            <div class="toggle-switch">
+              <div class="switch" id="visibility-toggle">
+                <div class="switch-slider"></div>
+              </div>
+              <span class="toggle-label" id="visibility-label">🔒 Private</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Content</label>
+          <textarea class="form-textarea" id="post-content" placeholder="Share your thoughts, ideas, and stories here...&#10;&#10;Use markdown formatting:&#10;**bold** for emphasis&#10;*italic* for subtlety&#10;# Heading for structure" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Tags (Press Enter to add)</label>
+          <div class="tag-input" id="tag-container">
+            <input type="text" class="tag-input-field" id="tag-input" placeholder="Add tags...">
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button type="submit" class="btn-primary">🚀 Publish Post</button>
+          <button type="button" class="btn-secondary" id="save-draft-btn">💾 Save as Draft</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Read-It Section -->
+  <div class="container" id="read-section">
+    <h1 class="section-title">📖 Discover Stories</h1>
+    
+    <div class="filter-bar">
+      <input type="text" class="search-bar" id="search-input" placeholder="🔍 Search posts...">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="beginner">Beginner</button>
+      <button class="filter-btn" data-filter="intermediate">Intermediate</button>
+      <button class="filter-btn" data-filter="advanced">Advanced</button>
+      <button class="filter-btn" data-filter="expert">Expert</button>
+    </div>
+    
+    <div class="post-grid" id="post-grid">
+      <!-- Posts will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- Dashboard Section -->
+  <div class="container" id="dashboard-section">
+    <h1 class="section-title">📊 Creator Dashboard</h1>
+    
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <div class="dashboard-card-title">Total Posts</div>
+        <div class="dashboard-card-value" id="total-posts">0</div>
+        <div class="dashboard-card-change">+0 this week</div>
+      </div>
+      
+      <div class="dashboard-card">
+        <div class="dashboard-card-title">Total Views</div>
+        <div class="dashboard-card-value" id="total-views">0</div>
+        <div class="dashboard-card-change">+0% from last week</div>
+      </div>
+      
+      <div class="dashboard-card">
+        <div class="dashboard-card-title">Engagement Rate</div>
+        <div class="dashboard-card-value" id="engagement-rate">0%</div>
+        <div class="dashboard-card-change">Excellent!</div>
+      </div>
+      
+      <div class="dashboard-card">
+        <div class="dashboard-card-title">Followers</div>
+        <div class="dashboard-card-value" id="followers">0</div>
+        <div class="dashboard-card-change">+0 this month</div>
+      </div>
+    </div>
+    
+    <h2 class="section-title" style="margin-top: 2rem;">Your Posts</h2>
+    <div class="post-grid" id="my-posts-grid">
+      <!-- User's posts will be shown here -->
+    </div>
+  </div>
+
+  <!-- Post Modal -->
+  <div class="modal" id="post-modal">
+    <div class="modal-content">
+      <span class="modal-close" id="modal-close">&times;</span>
+      <div class="modal-body" id="modal-body">
+        <!-- Full post content will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-message" id="success-message">
+    ✅ Post published successfully!
+  </div>
+
+  <script>
+    // Data Storage
+    let posts = JSON.parse(localStorage.getItem('pixelprodigy_posts')) || [];
+    let currentUser = 'user_' + Math.random().toString(36).substr(2, 9);
+    let currentTags = [];
+    let isPublic = false;
+    
+    // Navigation
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        
+        // Update button states
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update container visibility
+        document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+        
+        if (view === 'write') {
+          document.getElementById('write-section').classList.add('active');
+        } else if (view === 'read') {
+          document.getElementById('read-section').classList.add('active');
+          renderPosts();
+        } else if (view === 'dashboard') {
+          document.getElementById('dashboard-section').classList.add('active');
+          updateDashboard();
+        } else if (view === 'universe') {
+          window.location.href = 'pixelprodigy3d.html';
+        }
+      });
+    });
+    
+    // Visibility Toggle
+    const visibilityToggle = document.getElementById('visibility-toggle');
+    const visibilityLabel = document.getElementById('visibility-label');
+    
+    visibilityToggle.addEventListener('click', () => {
+      isPublic = !isPublic;
+      visibilityToggle.classList.toggle('active');
+      visibilityLabel.textContent = isPublic ? '🌍 Public' : '🔒 Private';
+    });
+    
+    // Tag System
+    const tagInput = document.getElementById('tag-input');
+    const tagContainer = document.getElementById('tag-container');
+    
+    tagInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && tagInput.value.trim()) {
+        e.preventDefault();
+        addTag(tagInput.value.trim());
+        tagInput.value = '';
+      }
+    });
+    
+    function addTag(tagText) {
+      if (currentTags.includes(tagText)) return;
+      
+      currentTags.push(tagText);
+      
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.innerHTML = `
+        ${tagText}
+        <span class="tag-remove" onclick="removeTag('${tagText}')">&times;</span>
+      `;
+      
+      tagContainer.insertBefore(tag, tagInput);
+    }
+    
+    function removeTag(tagText) {
+      currentTags = currentTags.filter(t => t !== tagText);
+      renderTags();
+    }
+    
+    function renderTags() {
+      tagContainer.querySelectorAll('.tag').forEach(tag => tag.remove());
+      currentTags.forEach(tag => addTag(tag));
+    }
+    
+    // Form Submission
+    document.getElementById('post-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const post = {
+        id: 'post_' + Date.now(),
+        title: document.getElementById('post-title').value,
+        content: document.getElementById('post-content').value,
+        grade: document.getElementById('post-grade').value,
+        isPublic: isPublic,
+        tags: [...currentTags],
+        author: currentUser,
+        date: new Date().toISOString(),
+        views: 0,
+        likes: 0,
+        comments: 0
+      };
+      
+      posts.push(post);
+      localStorage.setItem('pixelprodigy_posts', JSON.stringify(posts));
+      
+      // Show success message
+      const successMsg = document.getElementById('success-message');
+      successMsg.classList.add('show');
+      setTimeout(() => successMsg.classList.remove('show'), 3000);
+      
+      // Reset form
+      document.getElementById('post-form').reset();
+      currentTags = [];
+      tagContainer.querySelectorAll('.tag').forEach(tag => tag.remove());
+      isPublic = false;
+      visibilityToggle.classList.remove('active');
+      visibilityLabel.textContent = '🔒 Private';
+      
+      // Update dashboard
+      updateDashboard();
+    });
+    
+    // Save Draft
+    document.getElementById('save-draft-btn').addEventListener('click', () => {
+      const draft = {
+        title: document.getElementById('post-title').value,
+        content: document.getElementById('post-content').value,
+        grade: document.getElementById('post-grade').value,
+        tags: [...currentTags]
+      };
+      
+      localStorage.setItem('pixelprodigy_draft', JSON.stringify(draft));
+      
+      const successMsg = document.getElementById('success-message');
+      successMsg.textContent = '💾 Draft saved!';
+      successMsg.classList.add('show');
+      setTimeout(() => {
+        successMsg.classList.remove('show');
+        successMsg.textContent = '✅ Post published successfully!';
+      }, 3000);
+    });
+    
+    // Render Posts
+    function renderPosts(filter = 'all', searchTerm = '') {
+      const postGrid = document.getElementById('post-grid');
+      postGrid.innerHTML = '';
+      
+      const filteredPosts = posts.filter(post => {
+        const matchesFilter = filter === 'all' || post.grade === filter;
+        const matchesSearch = !searchTerm || 
+          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+        const isVisible = post.isPublic || post.author === currentUser;
+        
+        return matchesFilter && matchesSearch && isVisible;
+      });
+      
+      filteredPosts.reverse().forEach(post => {
+        const postCard = document.createElement('div');
+        postCard.className = 'post-card';
+        postCard.innerHTML = `
+          <div class="post-header">
+            <div class="post-grade grade-${post.grade}">${post.grade}</div>
+            ${post.isPublic ? '🌍' : '🔒'}
+          </div>
+          <h2 class="post-title">${post.title}</h2>
+          <p class="post-excerpt">${post.content.substring(0, 150)}...</p>
+          <div class="post-tags">
+            ${post.tags.map(tag => `<span class="post-tag">${tag}</span>`).join('')}
+          </div>
+          <div class="post-meta">
+            <span>${new Date(post.date).toLocaleDateString()}</span>
+            <div class="post-stats">
+              <span class="stat">👁️ ${post.views}</span>
+              <span class="stat">❤️ ${post.likes}</span>
+              <span class="stat">💬 ${post.comments}</span>
+            </div>
+          </div>
+        `;
+        
+        postCard.addEventListener('click', () => openPostModal(post));
+        postGrid.appendChild(postCard);
+      });
+      
+      if (filteredPosts.length === 0) {
+        postGrid.innerHTML = '<p style="text-align: center; color: #808080; grid-column: 1/-1; padding: 3rem;">No posts found. Start writing to share your ideas!</p>';
+      }
+    }
+    
+    // Post Modal
+    function openPostModal(post) {
+      const modal = document.getElementById('post-modal');
+      const modalBody = document.getElementById('modal-body');
+      
+      // Increment views
+      post.views++;
+      localStorage.setItem('pixelprodigy_posts', JSON.stringify(posts));
+      
+      modalBody.innerHTML = `
+        <div class="post-header">
+          <div class="post-grade grade-${post.grade}">${post.grade}</div>
+          ${post.isPublic ? '🌍 Public' : '🔒 Private'}
+        </div>
+        <h1 class="post-title" style="font-size: 2rem; margin: 1rem 0;">${post.title}</h1>
+        <div class="post-meta" style="border: none; padding: 0;">
+          <span>Published ${new Date(post.date).toLocaleDateString()}</span>
+          <div class="post-stats">
+            <span class="stat">👁️ ${post.views}</span>
+            <span class="stat">❤️ ${post.likes}</span>
+            <span class="stat">💬 ${post.comments}</span>
+          </div>
+        </div>
+        <div class="post-tags" style="margin: 1rem 0;">
+          ${post.tags.map(tag => `<span class="post-tag">${tag}</span>`).join('')}
+        </div>
+        <div class="full-post-content" style="margin-top: 2rem;">
+          ${formatContent(post.content)}
+        </div>
+      `;
+      
+      modal.classList.add('active');
+    }
+    
+    // Close Modal
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('post-modal').classList.remove('active');
+      renderPosts();
+    });
+    
+    // Click outside modal to close
+    document.getElementById('post-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('post-modal')) {
+        document.getElementById('post-modal').classList.remove('active');
+        renderPosts();
+      }
+    });
+    
+    // Format Content (basic markdown support)
+    function formatContent(content) {
+      return content
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+    }
+    
+    // Filter Posts
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderPosts(btn.dataset.filter, document.getElementById('search-input').value);
+      });
+    });
+    
+    // Search Posts
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const activeFilter = document.querySelector('[data-filter].active').dataset.filter;
+      renderPosts(activeFilter, e.target.value);
+    });
+    
+    // Update Dashboard
+    function updateDashboard() {
+      const myPosts = posts.filter(post => post.author === currentUser);
+      const totalViews = myPosts.reduce((sum, post) => sum + post.views, 0);
+      const totalLikes = myPosts.reduce((sum, post) => sum + post.likes, 0);
+      const engagementRate = myPosts.length > 0 ? 
+        ((totalLikes / Math.max(totalViews, 1)) * 100).toFixed(1) : 0;
+      
+      document.getElementById('total-posts').textContent = myPosts.length;
+      document.getElementById('total-views').textContent = totalViews;
+      document.getElementById('engagement-rate').textContent = engagementRate + '%';
+      document.getElementById('followers').textContent = Math.floor(totalViews / 10);
+      
+      // Render my posts
+      const myPostsGrid = document.getElementById('my-posts-grid');
+      myPostsGrid.innerHTML = '';
+      
+      myPosts.reverse().forEach(post => {
+        const postCard = document.createElement('div');
+        postCard.className = 'post-card';
+        postCard.innerHTML = `
+          <div class="post-header">
+            <div class="post-grade grade-${post.grade}">${post.grade}</div>
+            ${post.isPublic ? '🌍' : '🔒'}
+          </div>
+          <h2 class="post-title">${post.title}</h2>
+          <p class="post-excerpt">${post.content.substring(0, 150)}...</p>
+          <div class="post-tags">
+            ${post.tags.map(tag => `<span class="post-tag">${tag}</span>`).join('')}
+          </div>
+          <div class="post-meta">
+            <span>${new Date(post.date).toLocaleDateString()}</span>
+            <div class="post-stats">
+              <span class="stat">👁️ ${post.views}</span>
+              <span class="stat">❤️ ${post.likes}</span>
+              <span class="stat">💬 ${post.comments}</span>
+            </div>
+          </div>
+        `;
+        
+        postCard.addEventListener('click', () => openPostModal(post));
+        myPostsGrid.appendChild(postCard);
+      });
+      
+      if (myPosts.length === 0) {
+        myPostsGrid.innerHTML = '<p style="text-align: center; color: #808080; grid-column: 1/-1; padding: 3rem;">You haven\'t created any posts yet. Start writing!</p>';
+      }
+    }
+    
+    // Initialize
+    renderPosts();
+  </script>
+</body>
+</html>
