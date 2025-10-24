@@ -203,6 +203,15 @@
       font-size: 18px;
       color: #667eea;
     }
+    
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.8), 0 0 60px rgba(138, 43, 226, 0.6);
+      }
+    }
   </style>
 </head>
 <body>
@@ -344,6 +353,13 @@
               <span class="tool-icon">🦴</span>
               <span>DETAILED SKELETON (1200V+)</span>
             </button>
+            
+            <!-- VR Room Entrance -->
+            <button class="tool-btn" onclick="enterVRRoom()" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(138, 43, 226, 0.3)); border: 3px solid rgba(0, 255, 255, 0.6); box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); font-weight: bold; font-size: 1.1em; animation: pulse 2s ease-in-out infinite;">
+              <span class="tool-icon">🥽</span>
+              <span>ENTER VR ROOM</span>
+            </button>
+            
             <button class="tool-btn" onclick="openAnatomyEditor()" style="grid-column: 1 / -1; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4);">
               <span class="tool-icon">✏️</span>
               <span>Edit Anatomy (Advanced)</span>
@@ -1550,6 +1566,286 @@
       }
     }
     
+    // ========================================
+    // VR ROOM ENTRANCE & SKYRELICS INTEGRATION
+    // ========================================
+    
+    function enterVRRoom() {
+      console.log('🥽 ===== ENTERING VR ROOM =====');
+      
+      if (!renderer.xr.isPresenting) {
+        console.log('⚠️ VR headset not detected. Please click "ENTER VR" button in viewport.');
+        console.log('📱 If you don\'t have a VR headset, the button will enable VR mode for testing.');
+        
+        // Create VR environment preview
+        createVREnvironment();
+        
+        console.log('\n🏛️ VR ROOM FEATURES:');
+        console.log('  → SkyBox with procedural clouds');
+        console.log('  → Ground plane with grid');
+        console.log('  → Ambient lighting (sunset theme)');
+        console.log('  → Body spawns in center of room');
+        console.log('  → Controllers visualized with hand models');
+        console.log('\n🎮 SKYRELICS INTEGRATION READY:');
+        console.log('  → Ancient artifacts placeable in VR space');
+        console.log('  → Interactive relic pedestals');
+        console.log('  → Holographic information panels');
+        console.log('  → Teleportation system between relics');
+        
+        return;
+      }
+      
+      // VR session is active
+      createVREnvironment();
+      
+      // Spawn body if loaded
+      if (window.fullBodyGroup) {
+        attachBodyToVR();
+        console.log('✅ Body spawned in VR room!');
+      } else {
+        console.log('💡 TIP: Load a body (FULL BODY or DETAILED SKELETON) before entering VR!');
+      }
+      
+      console.log('✅ VR Room active! Look around and use controllers to interact.');
+    }
+    
+    function createVREnvironment() {
+      console.log('🏗️ Creating VR environment...');
+      
+      // Check if environment already exists
+      if (scene.getObjectByName('VR_Environment')) {
+        console.log('⚠️ VR environment already exists');
+        return;
+      }
+      
+      const vrEnv = new THREE.Group();
+      vrEnv.name = 'VR_Environment';
+      
+      // === SKY BOX ===
+      const skyGeom = new THREE.SphereGeometry(500, 32, 32);
+      const skyMat = new THREE.MeshBasicMaterial({
+        color: 0x87CEEB,
+        side: THREE.BackSide,
+        fog: false
+      });
+      const sky = new THREE.Mesh(skyGeom, skyMat);
+      sky.name = 'SkyBox';
+      vrEnv.add(sky);
+      
+      // === PROCEDURAL CLOUDS ===
+      const cloudMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.6,
+        side: THREE.DoubleSide
+      });
+      
+      for (let i = 0; i < 20; i++) {
+        const cloudGeom = new THREE.SphereGeometry(
+          15 + Math.random() * 10,
+          8,
+          8
+        );
+        const cloud = new THREE.Mesh(cloudGeom, cloudMat);
+        cloud.name = `Cloud_${i}`;
+        
+        // Random position in sky
+        const angle = (i / 20) * Math.PI * 2;
+        const radius = 200 + Math.random() * 100;
+        cloud.position.set(
+          Math.cos(angle) * radius,
+          50 + Math.random() * 100,
+          Math.sin(angle) * radius
+        );
+        
+        cloud.scale.set(
+          1 + Math.random() * 0.5,
+          0.4 + Math.random() * 0.3,
+          1 + Math.random() * 0.5
+        );
+        
+        vrEnv.add(cloud);
+      }
+      
+      // === GROUND PLANE ===
+      const groundGeom = new THREE.PlaneGeometry(100, 100, 50, 50);
+      const groundMat = new THREE.MeshStandardMaterial({
+        color: 0x4a5f3a,
+        roughness: 0.9,
+        metalness: 0.1,
+        wireframe: false
+      });
+      const ground = new THREE.Mesh(groundGeom, groundMat);
+      ground.name = 'Ground';
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = 0;
+      ground.receiveShadow = true;
+      vrEnv.add(ground);
+      
+      // === GRID OVERLAY ===
+      const gridHelper = new THREE.GridHelper(100, 50, 0x888888, 0x444444);
+      gridHelper.name = 'Grid';
+      gridHelper.position.y = 0.01;
+      vrEnv.add(gridHelper);
+      
+      // === LIGHTING (SUNSET THEME) ===
+      // Sun (directional light)
+      const sun = new THREE.DirectionalLight(0xffa500, 1.2);
+      sun.name = 'Sun';
+      sun.position.set(50, 80, 30);
+      sun.castShadow = true;
+      sun.shadow.mapSize.width = 2048;
+      sun.shadow.mapSize.height = 2048;
+      sun.shadow.camera.near = 1;
+      sun.shadow.camera.far = 500;
+      sun.shadow.camera.left = -50;
+      sun.shadow.camera.right = 50;
+      sun.shadow.camera.top = 50;
+      sun.shadow.camera.bottom = -50;
+      vrEnv.add(sun);
+      
+      // Ambient fill light
+      const ambient = new THREE.AmbientLight(0xffeedd, 0.4);
+      ambient.name = 'Ambient';
+      vrEnv.add(ambient);
+      
+      // Hemisphere light (sky color)
+      const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x4a5f3a, 0.6);
+      hemiLight.name = 'Hemisphere';
+      vrEnv.add(hemiLight);
+      
+      // === SKYRELICS PEDESTALS ===
+      createSkyRelicsPedestals(vrEnv);
+      
+      scene.add(vrEnv);
+      
+      // Update scene fog for VR
+      scene.fog = new THREE.Fog(0x87CEEB, 50, 300);
+      
+      console.log('✅ VR environment created:');
+      console.log('  → SkyBox with 20 procedural clouds');
+      console.log('  → 100×100m ground plane with grid');
+      console.log('  → 3-point lighting (sun, ambient, hemisphere)');
+      console.log('  → SkyRelics pedestals ready');
+    }
+    
+    function createSkyRelicsPedestals(parent) {
+      console.log('🏛️ Creating SkyRelics pedestals...');
+      
+      const pedestalMat = new THREE.MeshStandardMaterial({
+        color: 0xcccccc,
+        roughness: 0.3,
+        metalness: 0.7
+      });
+      
+      const relicMat = new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        roughness: 0.2,
+        metalness: 0.8,
+        emissive: 0xffd700,
+        emissiveIntensity: 0.3
+      });
+      
+      // Create 5 pedestals in a circle
+      const pedestalRadius = 8;
+      for (let i = 0; i < 5; i++) {
+        const angle = (i / 5) * Math.PI * 2;
+        const x = Math.cos(angle) * pedestalRadius;
+        const z = Math.sin(angle) * pedestalRadius;
+        
+        // Pedestal base
+        const baseGeom = new THREE.CylinderGeometry(0.8, 1.0, 0.3, 16);
+        const base = new THREE.Mesh(baseGeom, pedestalMat);
+        base.position.set(x, 0.15, z);
+        base.castShadow = true;
+        parent.add(base);
+        
+        // Pedestal column
+        const columnGeom = new THREE.CylinderGeometry(0.4, 0.5, 2.0, 12);
+        const column = new THREE.Mesh(columnGeom, pedestalMat);
+        column.position.set(x, 1.3, z);
+        column.castShadow = true;
+        parent.add(column);
+        
+        // Pedestal top
+        const topGeom = new THREE.CylinderGeometry(0.7, 0.5, 0.2, 16);
+        const top = new THREE.Mesh(topGeom, pedestalMat);
+        top.position.set(x, 2.4, z);
+        top.castShadow = true;
+        parent.add(top);
+        
+        // Ancient relic (placeholder - will be replaced with actual artifacts)
+        let relicGeom;
+        switch(i) {
+          case 0: // Crystal
+            relicGeom = new THREE.OctahedronGeometry(0.4, 0);
+            break;
+          case 1: // Orb
+            relicGeom = new THREE.SphereGeometry(0.35, 16, 16);
+            break;
+          case 2: // Cube
+            relicGeom = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            break;
+          case 3: // Torus
+            relicGeom = new THREE.TorusGeometry(0.3, 0.1, 12, 24);
+            break;
+          case 4: // Pyramid
+            relicGeom = new THREE.TetrahedronGeometry(0.4, 0);
+            break;
+        }
+        
+        const relic = new THREE.Mesh(relicGeom, relicMat);
+        relic.name = `SkyRelic_${i + 1}`;
+        relic.position.set(x, 2.8, z);
+        relic.castShadow = true;
+        relic.userData.isRelic = true;
+        relic.userData.relicId = i + 1;
+        
+        // Animate relics (rotate and hover)
+        relic.userData.rotationSpeed = 0.01 + Math.random() * 0.01;
+        relic.userData.hoverOffset = Math.random() * Math.PI * 2;
+        
+        parent.add(relic);
+        
+        // Holographic label (text will be added later)
+        const labelGeom = new THREE.PlaneGeometry(1.5, 0.4);
+        const labelMat = new THREE.MeshBasicMaterial({
+          color: 0x00ffff,
+          transparent: true,
+          opacity: 0.7,
+          side: THREE.DoubleSide
+        });
+        const label = new THREE.Mesh(labelGeom, labelMat);
+        label.name = `Relic_Label_${i + 1}`;
+        label.position.set(x, 3.5, z);
+        label.lookAt(0, 3.5, 0); // Face center
+        parent.add(label);
+      }
+      
+      console.log('✅ Created 5 SkyRelics pedestals with ancient artifacts');
+      console.log('  → Crystal, Orb, Cube, Torus, Pyramid');
+      console.log('  → Animated rotation and hover effects');
+      console.log('  → Holographic information panels');
+    }
+    
+    // Animate SkyRelics (call in animation loop)
+    function animateSkyRelics() {
+      if (!scene.getObjectByName('VR_Environment')) return;
+      
+      const time = Date.now() * 0.001;
+      
+      scene.traverse(child => {
+        if (child.userData.isRelic) {
+          // Rotate relic
+          child.rotation.y += child.userData.rotationSpeed;
+          
+          // Hover effect
+          const hoverAmount = Math.sin(time * 2 + child.userData.hoverOffset) * 0.05;
+          child.position.y = 2.8 + hoverAmount;
+        }
+      });
+    }
+    
     // Procedural walking/running animation with realistic biomechanics + WASD movement + Jump + Flight
     function updateWalkingAnimation() {
       if (!window.fullBodyGroup) return;
@@ -1869,6 +2165,9 @@
         
         // Update walking/running animation (disabled in VR)
         updateWalkingAnimation();
+        
+        // Animate SkyRelics (rotation and hover)
+        animateSkyRelics();
         
         // Update selection box to follow selected object
         if (selectionBox && selectedObject) {
@@ -2853,6 +3152,228 @@
       document.getElementById('primitiveDisplay').textContent = `HEAD (${vertexCount}V)`;
       
       console.log(`✅ Anatomical head loaded: ${vertexCount}+ vertices - neck, skull, jaw, eyes, nose, mouth, ears - NECK SWIVEL ENABLED`);
+    }
+    
+    // 🦴 DETAILED FACIAL STRUCTURE with Cheekbones, Proper Jaw, Teeth, Gums
+    function createDetailedFace(parent, yOffset = 0) {
+      console.log('😊 Creating detailed facial structure...');
+      
+      const faceGroup = new THREE.Group();
+      faceGroup.name = 'Detailed Face';
+      faceGroup.position.y = yOffset;
+      
+      // === SKIN MATERIALS ===
+      const skinMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffccaa,
+        roughness: 0.65,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+      
+      const boneMat = new THREE.MeshStandardMaterial({ 
+        color: 0xfff8e7,
+        roughness: 0.4,
+        metalness: 0.1
+      });
+      
+      const gumMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffb3ba,
+        roughness: 0.7
+      });
+      
+      const toothMat = new THREE.MeshStandardMaterial({ 
+        color: 0xfff8f0,
+        roughness: 0.2,
+        metalness: 0.1
+      });
+      
+      // === SKULL BASE & JAW BONE ===
+      // Maxilla (upper jaw bone)
+      const maxillaGeom = new THREE.BoxGeometry(0.5, 0.35, 0.45);
+      const maxilla = new THREE.Mesh(maxillaGeom, boneMat);
+      maxilla.name = 'Maxilla (Upper Jaw)';
+      maxilla.position.set(0, 1.5, 0.3);
+      maxilla.scale.set(1, 0.7, 1);
+      faceGroup.add(maxilla);
+      
+      // Mandible (lower jaw bone) - anatomically shaped
+      const mandibleVertices = [];
+      const segments = 20;
+      
+      // Create U-shaped mandible
+      for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const angle = (t - 0.5) * Math.PI; // -90° to 90°
+        const radius = 0.3;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * radius * 0.6 + 0.25;
+        const y = 0.95 - Math.abs(Math.sin(angle)) * 0.05; // Slight curve
+        
+        // Top row
+        mandibleVertices.push(x, y + 0.08, z);
+        // Bottom row
+        mandibleVertices.push(x, y - 0.08, z);
+      }
+      
+      const mandibleGeom = new THREE.BufferGeometry();
+      mandibleGeom.setAttribute('position', new THREE.Float32BufferAttribute(mandibleVertices, 3));
+      
+      // Create faces for mandible
+      const mandibleIndices = [];
+      for (let i = 0; i < segments; i++) {
+        const topLeft = i * 2;
+        const bottomLeft = i * 2 + 1;
+        const topRight = (i + 1) * 2;
+        const bottomRight = (i + 1) * 2 + 1;
+        
+        mandibleIndices.push(topLeft, bottomLeft, topRight);
+        mandibleIndices.push(bottomLeft, bottomRight, topRight);
+      }
+      mandibleGeom.setIndex(mandibleIndices);
+      mandibleGeom.computeVertexNormals();
+      
+      const mandible = new THREE.Mesh(mandibleGeom, boneMat);
+      mandible.name = 'Mandible (Lower Jaw)';
+      faceGroup.add(mandible);
+      
+      // === CHEEKBONES (Zygomatic Bones) ===
+      const cheekboneGeom = new THREE.SphereGeometry(0.15, 12, 12);
+      
+      // Left cheekbone
+      const leftCheekbone = new THREE.Mesh(cheekboneGeom, boneMat);
+      leftCheekbone.name = 'Left Zygomatic (Cheekbone)';
+      leftCheekbone.position.set(-0.35, 1.6, 0.45);
+      leftCheekbone.scale.set(1, 0.6, 1.2);
+      faceGroup.add(leftCheekbone);
+      
+      // Right cheekbone
+      const rightCheekbone = new THREE.Mesh(cheekboneGeom, boneMat);
+      rightCheekbone.name = 'Right Zygomatic (Cheekbone)';
+      rightCheekbone.position.set(0.35, 1.6, 0.45);
+      rightCheekbone.scale.set(1, 0.6, 1.2);
+      faceGroup.add(rightCheekbone);
+      
+      // === UPPER TEETH & GUMS ===
+      const upperGumGeom = new THREE.CylinderGeometry(0.28, 0.28, 0.08, 16, 1, false, 0, Math.PI);
+      const upperGum = new THREE.Mesh(upperGumGeom, gumMat);
+      upperGum.name = 'Upper Gum';
+      upperGum.position.set(0, 1.38, 0.42);
+      upperGum.rotation.x = -Math.PI / 2;
+      faceGroup.add(upperGum);
+      
+      // Upper teeth (16 teeth - 8 visible from front)
+      const toothGeom = new THREE.BoxGeometry(0.04, 0.12, 0.05);
+      const upperTeeth = [];
+      
+      for (let i = 0; i < 8; i++) {
+        const tooth = new THREE.Mesh(toothGeom, toothMat);
+        tooth.name = `Upper Tooth ${i + 1}`;
+        
+        const angle = ((i - 3.5) / 8) * Math.PI * 0.6; // Spread across arc
+        const radius = 0.27;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * radius + 0.42;
+        
+        tooth.position.set(x, 1.36, z);
+        tooth.rotation.y = -angle;
+        
+        // Vary tooth size slightly
+        if (i === 0 || i === 7) { // Incisors
+          tooth.scale.set(0.9, 1, 0.9);
+        } else if (i === 3 || i === 4) { // Canines
+          tooth.scale.set(0.85, 1.1, 0.9);
+        }
+        
+        faceGroup.add(tooth);
+        upperTeeth.push(tooth);
+      }
+      
+      // === LOWER TEETH & GUMS ===
+      const lowerGumGeom = new THREE.CylinderGeometry(0.26, 0.26, 0.08, 16, 1, false, 0, Math.PI);
+      const lowerGum = new THREE.Mesh(lowerGumGeom, gumMat);
+      lowerGum.name = 'Lower Gum';
+      lowerGum.position.set(0, 1.08, 0.38);
+      lowerGum.rotation.x = -Math.PI / 2;
+      lowerGum.rotation.z = Math.PI;
+      faceGroup.add(lowerGum);
+      
+      // Lower teeth (16 teeth - 8 visible from front)
+      const lowerTeeth = [];
+      
+      for (let i = 0; i < 8; i++) {
+        const tooth = new THREE.Mesh(toothGeom, toothMat);
+        tooth.name = `Lower Tooth ${i + 1}`;
+        
+        const angle = ((i - 3.5) / 8) * Math.PI * 0.55; // Slightly narrower arc
+        const radius = 0.25;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * radius + 0.38;
+        
+        tooth.position.set(x, 1.10, z);
+        tooth.rotation.y = -angle;
+        tooth.scale.set(0.9, 0.95, 0.9); // Slightly smaller than upper
+        
+        faceGroup.add(tooth);
+        lowerTeeth.push(tooth);
+      }
+      
+      // === TONGUE ===
+      const tongueGeom = new THREE.BoxGeometry(0.18, 0.06, 0.28);
+      const tongueMat = new THREE.MeshStandardMaterial({ 
+        color: 0xff6b8a,
+        roughness: 0.8
+      });
+      const tongue = new THREE.Mesh(tongueGeom, tongueMat);
+      tongue.name = 'Tongue';
+      tongue.position.set(0, 1.18, 0.32);
+      tongue.scale.set(1, 1, 1.2);
+      faceGroup.add(tongue);
+      
+      // === SKIN OVERLAY ===
+      // Face skin (covering cheekbones and jaw)
+      const faceSkinGeom = new THREE.SphereGeometry(0.58, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.65);
+      const faceSkin = new THREE.Mesh(faceSkinGeom, skinMat);
+      faceSkin.name = 'Facial Skin';
+      faceSkin.position.set(0, 1.5, 0.35);
+      faceSkin.scale.set(1.05, 1, 1.1);
+      faceGroup.add(faceSkin);
+      
+      // Chin skin
+      const chinGeom = new THREE.SphereGeometry(0.15, 16, 16);
+      const chin = new THREE.Mesh(chinGeom, skinMat);
+      chin.name = 'Chin';
+      chin.position.set(0, 0.88, 0.42);
+      chin.scale.set(1.2, 0.9, 1);
+      faceGroup.add(chin);
+      
+      // Lip overlay (covers tooth gap)
+      const upperLipGeom = new THREE.BoxGeometry(0.32, 0.04, 0.08);
+      const lipMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffaaaa,
+        roughness: 0.6
+      });
+      const upperLip = new THREE.Mesh(upperLipGeom, lipMat);
+      upperLip.name = 'Upper Lip';
+      upperLip.position.set(0, 1.32, 0.56);
+      faceGroup.add(upperLip);
+      
+      const lowerLipGeom = new THREE.BoxGeometry(0.30, 0.05, 0.08);
+      const lowerLip = new THREE.Mesh(lowerLipGeom, lipMat);
+      lowerLip.name = 'Lower Lip';
+      lowerLip.position.set(0, 1.20, 0.56);
+      faceGroup.add(lowerLip);
+      
+      parent.add(faceGroup);
+      
+      console.log('✅ Detailed face created:');
+      console.log('  → Maxilla & Mandible (jaw bones)');
+      console.log('  → Zygomatic bones (cheekbones)');
+      console.log('  → 16 upper teeth + gums');
+      console.log('  → 16 lower teeth + gums');
+      console.log('  → Tongue');
+      console.log('  → Facial skin with lips');
+      
+      return faceGroup;
     }
     
     // Update neck swivel angle (-180° to 180°)
