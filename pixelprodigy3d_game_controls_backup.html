@@ -333,119 +333,10 @@
               <span class="tool-icon">🧍</span>
               <span>FULL BODY (564V)</span>
             </button>
-            <button class="tool-btn" onclick="loadSkeletonBody(this)" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(200, 200, 200, 0.3), rgba(100, 100, 100, 0.3)); border: 3px solid rgba(200, 200, 200, 0.6); box-shadow: 0 0 15px rgba(200, 200, 200, 0.4); font-weight: bold; font-size: 1.1em;">
-              <span class="tool-icon">💀</span>
-              <span>BONES BODY (564V)</span>
-            </button>
             <button class="tool-btn" onclick="openAnatomyEditor()" style="grid-column: 1 / -1; background: rgba(255, 165, 0, 0.2); border: 2px solid rgba(255, 165, 0, 0.4);">
               <span class="tool-icon">✏️</span>
               <span>Edit Anatomy (Advanced)</span>
             </button>
-            <button class="tool-btn" onclick="toggleVertexEngine()" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(138, 43, 226, 0.3)); border: 3px solid rgba(0, 255, 255, 0.6); box-shadow: 0 0 15px rgba(138, 43, 226, 0.4); font-weight: bold; font-size: 1.1em;">
-              <span class="tool-icon">🔬</span>
-              <span>VERTEX ENGINE</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- VERTEX ENGINE PANEL -->
-        <div class="section" id="vertexEnginePanel" style="display: none;">
-          <div class="section-title">🔬 Vertex Engine - Microscopic Detail</div>
-          
-          <div style="background: rgba(0, 255, 255, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            <div style="font-size: 0.9em; color: #0ff; margin-bottom: 5px;">
-              <strong>Selected Object:</strong> <span id="vertexObjectName">None</span>
-            </div>
-            <div style="font-size: 0.9em; color: #0ff;">
-              <strong>Total Vertices:</strong> <span id="vertexTotalCount">0</span>
-            </div>
-            <div style="font-size: 0.9em; color: #0ff;">
-              <strong>Selected Vertex:</strong> <span id="vertexSelectedIndex">None</span>
-            </div>
-          </div>
-
-          <!-- Vertex Visualization -->
-          <div style="margin-bottom: 15px;">
-            <label style="display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 8px;">
-              <input type="checkbox" id="showVertexPoints" onchange="toggleVertexVisualization(this.checked)" style="width: 18px; height: 18px;">
-              <span>Show All Vertices (as points)</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 8px;">
-              <input type="checkbox" id="showVertexNumbers" onchange="toggleVertexNumbers(this.checked)" style="width: 18px; height: 18px;">
-              <span>Show Vertex Numbers</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 10px; color: #fff;">
-              <input type="checkbox" id="showWireframe" onchange="toggleWireframe(this.checked)" style="width: 18px; height: 18px;">
-              <span>Wireframe Mode</span>
-            </label>
-          </div>
-
-          <!-- Vertex Position Editor -->
-          <div style="background: rgba(138, 43, 226, 0.2); padding: 12px; border-radius: 5px; margin-bottom: 10px;">
-            <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">📍 Vertex Position (XYZ)</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-              <div>
-                <label style="color: #f00; font-size: 0.85em;">X</label>
-                <input type="number" id="vertexPosX" step="0.01" onchange="updateVertexPosition()" 
-                       style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); color: #f00; border: 1px solid #f00; border-radius: 3px;">
-              </div>
-              <div>
-                <label style="color: #0f0; font-size: 0.85em;">Y</label>
-                <input type="number" id="vertexPosY" step="0.01" onchange="updateVertexPosition()" 
-                       style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); color: #0f0; border: 1px solid #0f0; border-radius: 3px;">
-              </div>
-              <div>
-                <label style="color: #00f; font-size: 0.85em;">Z</label>
-                <input type="number" id="vertexPosZ" step="0.01" onchange="updateVertexPosition()" 
-                       style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); color: #00f; border: 1px solid #00f; border-radius: 3px;">
-              </div>
-            </div>
-          </div>
-
-          <!-- Sculpting Tools -->
-          <div style="margin-bottom: 10px;">
-            <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">🎨 Sculpt Mode</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-              <button onclick="setSculptMode('push')" style="padding: 8px; background: rgba(255, 100, 100, 0.3); border: 2px solid rgba(255, 100, 100, 0.5); border-radius: 5px; color: #fff; cursor: pointer;">
-                ⬆️ Push
-              </button>
-              <button onclick="setSculptMode('pull')" style="padding: 8px; background: rgba(100, 100, 255, 0.3); border: 2px solid rgba(100, 100, 255, 0.5); border-radius: 5px; color: #fff; cursor: pointer;">
-                ⬇️ Pull
-              </button>
-              <button onclick="setSculptMode('smooth')" style="padding: 8px; background: rgba(255, 255, 100, 0.3); border: 2px solid rgba(255, 255, 100, 0.5); border-radius: 5px; color: #fff; cursor: pointer;">
-                ✨ Smooth
-              </button>
-              <button onclick="setSculptMode('inflate')" style="padding: 8px; background: rgba(100, 255, 100, 0.3); border: 2px solid rgba(100, 255, 100, 0.5); border-radius: 5px; color: #fff; cursor: pointer;">
-                💨 Inflate
-              </button>
-            </div>
-          </div>
-
-          <!-- Brush Settings -->
-          <div style="margin-bottom: 10px;">
-            <label style="color: #fff; font-size: 0.9em; display: block; margin-bottom: 5px;">
-              🖌️ Brush Size: <span id="brushSizeValue">1.0</span>
-            </label>
-            <input type="range" id="brushSize" min="0.1" max="5.0" step="0.1" value="1.0" 
-                   oninput="document.getElementById('brushSizeValue').textContent = this.value; updateBrushSize(this.value)"
-                   style="width: 100%;">
-            
-            <label style="color: #fff; font-size: 0.9em; display: block; margin-bottom: 5px; margin-top: 8px;">
-              💪 Strength: <span id="sculptStrengthValue">0.5</span>
-            </label>
-            <input type="range" id="sculptStrength" min="0.1" max="2.0" step="0.1" value="0.5" 
-                   oninput="document.getElementById('sculptStrengthValue').textContent = this.value; updateSculptStrength(this.value)"
-                   style="width: 100%;">
-          </div>
-
-          <!-- Export Vertex Data -->
-          <button onclick="exportVertexData()" style="width: 100%; padding: 10px; background: rgba(0, 200, 0, 0.3); border: 2px solid rgba(0, 200, 0, 0.5); border-radius: 5px; color: #fff; cursor: pointer; margin-bottom: 8px;">
-            💾 Export Vertex Coordinates (JSON)
-          </button>
-
-          <!-- Vertex Info Display -->
-          <div id="vertexInfoDisplay" style="background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 5px; font-family: monospace; font-size: 0.75em; color: #0ff; max-height: 200px; overflow-y: auto; display: none;">
-            <!-- Vertex data will be displayed here -->
           </div>
         </div>
 
@@ -1390,11 +1281,6 @@
         selectedObject = clickedObject;
         selectedBodyPart = null; // Clear body part selection when selecting whole object
         bodyPartControlMode = null;
-        
-        // If Vertex Engine is active, analyze this object's vertices
-        if (vertexEngineActive) {
-          analyzeObjectVertices(clickedObject);
-        }
         
         // Don't auto-attach transform, just select
         console.log('✅ Object selected - Click Move/Rotate/Scale or press W/E/R');
@@ -2363,20 +2249,17 @@
       
       function createLeg(xOffset, isRight) {
         const legGroup = new THREE.Group();
-        const sideName = isRight ? 'Right' : 'Left';
         
-        // Hip joint (Acetabulum - socket in pelvis)
+        // Hip joint
         const hipGeom = new THREE.SphereGeometry(0.35, 8, 8);
         const hipMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const hip = new THREE.Mesh(hipGeom, hipMat);
-        hip.name = `${sideName} Hip Joint (Acetabulum)`;
         legGroup.add(hip);
         
-        // Thigh (Femur - longest bone in body)
+        // Thigh (femur)
         const thighGeom = new THREE.CylinderGeometry(0.25, 0.22, 3.5, 16);
         const thighMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const thigh = new THREE.Mesh(thighGeom, thighMat);
-        thigh.name = `${sideName} Femur (Thigh Bone)`;
         thigh.position.y = -1.75;
         legGroup.add(thigh);
         
@@ -2384,35 +2267,31 @@
         const kneeGroup = new THREE.Group();
         kneeGroup.position.y = -3.5; // Position at knee joint
         
-        // Knee joint (Patella - kneecap)
+        // Knee joint
         const kneeGeom = new THREE.SphereGeometry(0.24, 8, 8);
         const kneeMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
         const knee = new THREE.Mesh(kneeGeom, kneeMat);
-        knee.name = `${sideName} Patella (Kneecap)`;
         knee.position.y = 0; // Relative to kneeGroup
         kneeGroup.add(knee);
         
-        // Calf (Tibia - shinbone, Fibula - smaller lateral bone) - part of knee group so it bends with knee
+        // Calf (tibia/fibula) - part of knee group so it bends with knee
         const calfGeom = new THREE.CylinderGeometry(0.22, 0.18, 3.5, 16);
         const calfMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const calf = new THREE.Mesh(calfGeom, calfMat);
-        calf.name = `${sideName} Tibia & Fibula (Shin Bones)`;
         calf.position.y = -1.75; // Relative to knee
         kneeGroup.add(calf);
         
-        // Ankle joint (Talus - ankle bone)
+        // Ankle joint - part of knee group
         const ankleGeom = new THREE.SphereGeometry(0.18, 8, 8);
         const ankleMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, roughness: 0.6 });
         const ankle = new THREE.Mesh(ankleGeom, ankleMat);
-        ankle.name = `${sideName} Talus (Ankle Joint)`;
         ankle.position.y = -3.5; // Relative to knee
         kneeGroup.add(ankle);
         
-        // Ankle bone protrusion (Medial/Lateral Malleolus) - mirrored
+        // Ankle bone (malleolus) - mirrored
         const ankleBoneGeom = new THREE.SphereGeometry(0.012, 8, 8);
         const ankleBoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
         const ankleBone = new THREE.Mesh(ankleBoneGeom, ankleBoneMat);
-        ankleBone.name = `${sideName} ${isRight ? 'Lateral' : 'Medial'} Malleolus`;
         ankleBone.position.set(isRight ? 0.18 : -0.18, -3.5, 0);
         kneeGroup.add(ankleBone);
         
@@ -2420,32 +2299,28 @@
         const footGroup = new THREE.Group();
         footGroup.position.y = -3.8; // Relative to knee
         
-        // Foot (Metatarsals & Tarsals - foot bones)
+        // Foot
         const footGeom = new THREE.BoxGeometry(0.35, 0.25, 0.8);
         const footMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const foot = new THREE.Mesh(footGeom, footMat);
-        foot.name = `${sideName} Metatarsals & Tarsals (Foot Bones)`;
         foot.position.set(0, 0, 0.3);
         foot.rotation.x = -Math.PI / 16;
         footGroup.add(foot);
         
-        // Big toe (Hallux - 1st Phalanx) - mirrored
+        // Big toe - mirrored
         const bigToeGeom = new THREE.CylinderGeometry(0.07, 0.05, 0.35, 8);
         const bigToeMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
         const bigToe = new THREE.Mesh(bigToeGeom, bigToeMat);
-        bigToe.name = `${sideName} Hallux (Big Toe - 1st Phalanx)`;
         bigToe.position.set(isRight ? -0.12 : 0.12, -0.2, 0.65);
         bigToe.rotation.x = Math.PI / 2;
         footGroup.add(bigToe);
         
-        // 4 Toes (2nd-5th Phalanges) - mirrored
+        // 4 Toes - mirrored
         const toeLengths = [0.28, 0.26, 0.24, 0.22];
-        const toeNames = ['2nd', '3rd', '4th', '5th'];
         for (let i = 0; i < 4; i++) {
           const toeGeom = new THREE.CylinderGeometry(0.045 * (1 - i * 0.08), 0.03 * (1 - i * 0.08), toeLengths[i], 8);
           const toeMat = new THREE.MeshStandardMaterial({ color: 0xffccaa, roughness: 0.7 });
           const toe = new THREE.Mesh(toeGeom, toeMat);
-          toe.name = `${sideName} ${toeNames[i]} Phalanx (Toe)`;
           const toeXBase = isRight ? -0.05 : 0.05;
           const toeXOffset = isRight ? (i * 0.08) : -(i * 0.08);
           toe.position.set(toeXBase + toeXOffset, -0.2, 0.65);
@@ -2823,33 +2698,6 @@
       console.log(`  → Arms: 172V (86V × 2) at shoulder height`);
       console.log(`  → Head: 100V at top of torso`);
       console.log(`  → All articulation controls enabled (elbow bend, neck swivel)`);
-      console.log(`\n🦴 ANATOMICAL BONE STRUCTURE:`);
-      console.log(`  LEGS (per side):`);
-      console.log(`    • Acetabulum (Hip Socket)`);
-      console.log(`    • Femur (Thigh Bone - longest bone)`);
-      console.log(`    • Patella (Kneecap)`);
-      console.log(`    • Tibia & Fibula (Shin Bones)`);
-      console.log(`    • Talus (Ankle Joint)`);
-      console.log(`    • Malleolus (Ankle Protrusion)`);
-      console.log(`    • Metatarsals & Tarsals (Foot Bones)`);
-      console.log(`    • Hallux (Big Toe - 1st Phalanx)`);
-      console.log(`    • 2nd-5th Phalanges (Toes)`);
-      console.log(`  ARMS (per side):`);
-      console.log(`    • Humerus (Upper Arm)`);
-      console.log(`    • Radius & Ulna (Forearm)`);
-      console.log(`    • Carpals (Wrist)`);
-      console.log(`    • Metacarpals & Phalanges (Hand & Fingers)`);
-      console.log(`  TORSO:`);
-      console.log(`    • Pelvis (Ilium, Ischium, Pubis)`);
-      console.log(`    • Lumbar Vertebrae (L1-L5)`);
-      console.log(`    • Thoracic Vertebrae (T1-T12)`);
-      console.log(`    • Ribs (1-12 pairs)`);
-      console.log(`    • Sternum (Breastbone)`);
-      console.log(`    • Clavicles (Collarbones)`);
-      console.log(`  HEAD:`);
-      console.log(`    • Cervical Vertebrae (C1-C7 - Neck)`);
-      console.log(`    • Cranium (Skull)`);
-      console.log(`    • Mandible (Jawbone)`);
       console.log(`  → 🚶 WALKING ANIMATION: Click body, then scroll mouse wheel!`);
       console.log(`     • Scroll slowly = walking | Scroll faster = running`);
       console.log(`     • Stop scrolling to slow down naturally`);
@@ -2857,372 +2705,6 @@
       console.log(`     • A/D or ←/→ = Turn body left/right`);
       console.log(`     • W/S or ↑/↓ = Speed up/slow down`);
       console.log(`     • Camera follows body automatically`);
-    }
-
-    // Load skeleton body (bones only - for enemies/friends in Sky Relics)
-    function loadSkeletonBody() {
-      clearScene();
-      
-      const skeletonGroup = new THREE.Group();
-      let totalVertices = 0;
-      
-      // === LEGS (172V) - Bone structure only ===
-      function createSkeletonLeg(xOffset, isRight) {
-        const legGroup = new THREE.Group();
-        const sideName = isRight ? 'Right' : 'Left';
-        const boneMat = new THREE.MeshStandardMaterial({ 
-          color: 0xdddddd, 
-          roughness: 0.3,
-          metalness: 0.1,
-          emissive: 0x222222
-        });
-        
-        // Femur (thigh bone)
-        const femurGeom = new THREE.CylinderGeometry(0.08, 0.06, 3.5, 12);
-        const femur = new THREE.Mesh(femurGeom, boneMat);
-        femur.name = `${sideName} Femur`;
-        femur.position.y = -1.75;
-        legGroup.add(femur);
-        
-        // Femur head (ball joint at hip)
-        const femurHeadGeom = new THREE.SphereGeometry(0.12, 12, 12);
-        const femurHead = new THREE.Mesh(femurHeadGeom, boneMat);
-        femurHead.position.y = 0;
-        legGroup.add(femurHead);
-        
-        // Patella (kneecap)
-        const patellaGeom = new THREE.SphereGeometry(0.15, 12, 12);
-        const patella = new THREE.Mesh(patellaGeom, boneMat);
-        patella.name = `${sideName} Patella`;
-        patella.position.y = -3.5;
-        legGroup.add(patella);
-        
-        // Knee group for articulation
-        const kneeGroup = new THREE.Group();
-        kneeGroup.position.y = -3.5;
-        
-        // Tibia (shin bone - larger)
-        const tibiaGeom = new THREE.CylinderGeometry(0.07, 0.055, 3.5, 12);
-        const tibia = new THREE.Mesh(tibiaGeom, boneMat);
-        tibia.name = `${sideName} Tibia`;
-        tibia.position.set(-0.04, -1.75, 0);
-        kneeGroup.add(tibia);
-        
-        // Fibula (smaller lateral bone)
-        const fibulaGeom = new THREE.CylinderGeometry(0.035, 0.03, 3.5, 8);
-        const fibula = new THREE.Mesh(fibulaGeom, boneMat);
-        fibula.name = `${sideName} Fibula`;
-        fibula.position.set(0.08, -1.75, 0);
-        kneeGroup.add(fibula);
-        
-        // Malleolus (ankle protrusion)
-        const malleolusGeom = new THREE.SphereGeometry(0.06, 8, 8);
-        const malleolus = new THREE.Mesh(malleolusGeom, boneMat);
-        malleolus.position.set(isRight ? 0.08 : -0.08, -3.5, 0);
-        kneeGroup.add(malleolus);
-        
-        // Foot group for articulation
-        const footGroup = new THREE.Group();
-        footGroup.position.y = -3.8;
-        
-        // Tarsals (heel/ankle bones)
-        const tarsalsGeom = new THREE.BoxGeometry(0.25, 0.15, 0.4);
-        const tarsals = new THREE.Mesh(tarsalsGeom, boneMat);
-        tarsals.position.set(0, 0, 0);
-        footGroup.add(tarsals);
-        
-        // Metatarsals (foot bones)
-        for (let i = 0; i < 5; i++) {
-          const metatarsalGeom = new THREE.CylinderGeometry(0.02, 0.015, 0.5, 8);
-          const metatarsal = new THREE.Mesh(metatarsalGeom, boneMat);
-          const xPos = isRight ? (-0.1 + i * 0.05) : (0.1 - i * 0.05);
-          metatarsal.position.set(xPos, 0, 0.35);
-          metatarsal.rotation.x = Math.PI / 2;
-          footGroup.add(metatarsal);
-          
-          // Phalanges (toe bones)
-          const phalanxGeom = new THREE.CylinderGeometry(0.015, 0.01, 0.2, 6);
-          const phalanx = new THREE.Mesh(phalanxGeom, boneMat);
-          phalanx.position.set(xPos, 0, 0.6);
-          phalanx.rotation.x = Math.PI / 2;
-          footGroup.add(phalanx);
-        }
-        
-        kneeGroup.add(footGroup);
-        legGroup.add(kneeGroup);
-        
-        // Tag groups for animation
-        legGroup.userData.bodyPart = isRight ? 'rightLeg' : 'leftLeg';
-        legGroup.userData.controlGroup = legGroup;
-        
-        return { legGroup, kneeGroup, footGroup };
-      }
-      
-      // Create both legs
-      const leftLegData = createSkeletonLeg(-0.4, false);
-      const rightLegData = createSkeletonLeg(0.4, true);
-      skeletonGroup.add(leftLegData.legGroup);
-      skeletonGroup.add(rightLegData.legGroup);
-      leftLegData.legGroup.position.set(-0.4, 7.5, 0);
-      rightLegData.legGroup.position.set(0.4, 7.5, 0);
-      totalVertices += 172;
-      
-      // Store references for animation
-      leftLegGroup = leftLegData.legGroup;
-      rightLegGroup = rightLegData.legGroup;
-      leftKneeGroup = leftLegData.kneeGroup;
-      rightKneeGroup = rightLegData.kneeGroup;
-      leftFootGroup = leftLegData.footGroup;
-      rightFootGroup = rightLegData.footGroup;
-      
-      // === PELVIS & SPINE (Torso skeleton) ===
-      const torsoGroup = new THREE.Group();
-      const boneMat = new THREE.MeshStandardMaterial({ 
-        color: 0xdddddd, 
-        roughness: 0.3,
-        metalness: 0.1,
-        emissive: 0x222222
-      });
-      
-      // Pelvis (hip bones)
-      const pelvisGeom = new THREE.SphereGeometry(0.5, 12, 12);
-      const pelvis = new THREE.Mesh(pelvisGeom, boneMat);
-      pelvis.position.y = 0.5;
-      pelvis.scale.set(1.2, 0.6, 0.8);
-      torsoGroup.add(pelvis);
-      
-      // Lumbar vertebrae (L1-L5)
-      for (let i = 0; i < 5; i++) {
-        const vertebraGeom = new THREE.CylinderGeometry(0.08, 0.08, 0.2, 8);
-        const vertebra = new THREE.Mesh(vertebraGeom, boneMat);
-        vertebra.position.y = 1.0 + (i * 0.25);
-        torsoGroup.add(vertebra);
-      }
-      
-      // Thoracic vertebrae (T1-T12) + Ribs
-      for (let i = 0; i < 12; i++) {
-        const vertebraGeom = new THREE.CylinderGeometry(0.07, 0.07, 0.15, 8);
-        const vertebra = new THREE.Mesh(vertebraGeom, boneMat);
-        vertebra.position.y = 2.25 + (i * 0.18);
-        torsoGroup.add(vertebra);
-        
-        // Ribs (pairs)
-        const ribGeom = new THREE.TorusGeometry(0.25 + (i * 0.03), 0.015, 6, 12, Math.PI);
-        const leftRib = new THREE.Mesh(ribGeom, boneMat);
-        leftRib.position.set(-0.1, 2.25 + (i * 0.18), 0);
-        leftRib.rotation.y = Math.PI / 2;
-        leftRib.rotation.z = -Math.PI / 12;
-        torsoGroup.add(leftRib);
-        
-        const rightRib = new THREE.Mesh(ribGeom, boneMat);
-        rightRib.position.set(0.1, 2.25 + (i * 0.18), 0);
-        rightRib.rotation.y = -Math.PI / 2;
-        rightRib.rotation.z = Math.PI / 12;
-        torsoGroup.add(rightRib);
-      }
-      
-      // Sternum (breastbone)
-      const sternumGeom = new THREE.BoxGeometry(0.12, 0.8, 0.08);
-      const sternum = new THREE.Mesh(sternumGeom, boneMat);
-      sternum.position.set(0, 3.5, 0.3);
-      torsoGroup.add(sternum);
-      
-      // Clavicles (collarbones)
-      const clavicleGeom = new THREE.CylinderGeometry(0.025, 0.025, 0.6, 8);
-      const leftClavicle = new THREE.Mesh(clavicleGeom, boneMat);
-      leftClavicle.position.set(-0.35, 4.5, 0.1);
-      leftClavicle.rotation.z = Math.PI / 6;
-      torsoGroup.add(leftClavicle);
-      
-      const rightClavicle = new THREE.Mesh(clavicleGeom, boneMat);
-      rightClavicle.position.set(0.35, 4.5, 0.1);
-      rightClavicle.rotation.z = -Math.PI / 6;
-      torsoGroup.add(rightClavicle);
-      
-      // Scapulae (shoulder blades)
-      const scapulaGeom = new THREE.BoxGeometry(0.3, 0.4, 0.05);
-      const leftScapula = new THREE.Mesh(scapulaGeom, boneMat);
-      leftScapula.position.set(-0.5, 4, -0.2);
-      torsoGroup.add(leftScapula);
-      
-      const rightScapula = new THREE.Mesh(scapulaGeom, boneMat);
-      rightScapula.position.set(0.5, 4, -0.2);
-      torsoGroup.add(rightScapula);
-      
-      torsoGroup.position.y = 7.5;
-      skeletonGroup.add(torsoGroup);
-      totalVertices += 120;
-      
-      // === ARMS (172V) - Bone structure ===
-      function createSkeletonArm(xOffset, isRight) {
-        const armGroup = new THREE.Group();
-        const sideName = isRight ? 'Right' : 'Left';
-        
-        // Humerus (upper arm bone)
-        const humerusGeom = new THREE.CylinderGeometry(0.06, 0.05, 3.5, 12);
-        const humerus = new THREE.Mesh(humerusGeom, boneMat);
-        humerus.name = `${sideName} Humerus`;
-        humerus.position.y = -1.75;
-        armGroup.add(humerus);
-        
-        // Elbow joint
-        const elbowGeom = new THREE.SphereGeometry(0.1, 10, 10);
-        const elbow = new THREE.Mesh(elbowGeom, boneMat);
-        elbow.position.y = -3.5;
-        armGroup.add(elbow);
-        
-        // Forearm group
-        const forearmGroup = new THREE.Group();
-        forearmGroup.position.y = -3.5;
-        
-        // Radius (thumb side)
-        const radiusGeom = new THREE.CylinderGeometry(0.04, 0.035, 3.5, 10);
-        const radius = new THREE.Mesh(radiusGeom, boneMat);
-        radius.name = `${sideName} Radius`;
-        radius.position.set(isRight ? -0.04 : 0.04, -1.75, 0);
-        forearmGroup.add(radius);
-        
-        // Ulna (pinky side)
-        const ulnaGeom = new THREE.CylinderGeometry(0.035, 0.03, 3.5, 10);
-        const ulna = new THREE.Mesh(ulnaGeom, boneMat);
-        ulna.name = `${sideName} Ulna`;
-        ulna.position.set(isRight ? 0.04 : -0.04, -1.75, 0);
-        forearmGroup.add(ulna);
-        
-        // Carpals (wrist bones cluster)
-        const carpalsGeom = new THREE.BoxGeometry(0.15, 0.1, 0.12);
-        const carpals = new THREE.Mesh(carpalsGeom, boneMat);
-        carpals.position.y = -3.5;
-        forearmGroup.add(carpals);
-        
-        // Metacarpals & Phalanges (hand bones)
-        for (let i = 0; i < 5; i++) {
-          const metacarpalGeom = new THREE.CylinderGeometry(0.015, 0.012, 0.35, 6);
-          const metacarpal = new THREE.Mesh(metacarpalGeom, boneMat);
-          const xPos = isRight ? (0.06 - i * 0.03) : (-0.06 + i * 0.03);
-          metacarpal.position.set(xPos, -4.1, 0);
-          forearmGroup.add(metacarpal);
-          
-          // Finger bones (3 phalanges per finger)
-          for (let j = 0; j < 3; j++) {
-            const phalanxGeom = new THREE.CylinderGeometry(0.01, 0.008, 0.15, 6);
-            const phalanx = new THREE.Mesh(phalanxGeom, boneMat);
-            phalanx.position.set(xPos, -4.4 - (j * 0.15), 0);
-            forearmGroup.add(phalanx);
-          }
-        }
-        
-        armGroup.add(forearmGroup);
-        armGroup.position.set(xOffset, 0, 0);
-        
-        return { armGroup, forearmGroup };
-      }
-      
-      const armsGroup = new THREE.Group();
-      const leftArmData = createSkeletonArm(-1.2, false);
-      const rightArmData = createSkeletonArm(1.2, true);
-      armsGroup.add(leftArmData.armGroup);
-      armsGroup.add(rightArmData.armGroup);
-      armsGroup.position.set(0, 12.25, 0);
-      skeletonGroup.add(armsGroup);
-      totalVertices += 172;
-      
-      // Store arm references for animation
-      leftArmGroupRef = leftArmData.armGroup;
-      rightArmGroupRef = rightArmData.armGroup;
-      leftForearmGroup = leftArmData.forearmGroup;
-      rightForearmGroup = rightArmData.forearmGroup;
-      
-      // === SKULL & SPINE (Head skeleton) ===
-      const headGroup = new THREE.Group();
-      const neckSwivelGroup = new THREE.Group();
-      
-      // Cervical vertebrae (C1-C7)
-      for (let i = 0; i < 7; i++) {
-        const cervicalGeom = new THREE.CylinderGeometry(0.05, 0.05, 0.12, 8);
-        const cervical = new THREE.Mesh(cervicalGeom, boneMat);
-        cervical.position.y = 0.2 + (i * 0.14);
-        headGroup.add(cervical);
-      }
-      
-      // Cranium (skull)
-      const craniumGeom = new THREE.SphereGeometry(0.55, 16, 16);
-      const cranium = new THREE.Mesh(craniumGeom, boneMat);
-      cranium.name = 'Cranium';
-      cranium.position.y = 1.8;
-      cranium.scale.set(1, 1.1, 1);
-      neckSwivelGroup.add(cranium);
-      
-      // Eye sockets
-      const socketGeom = new THREE.SphereGeometry(0.12, 12, 12);
-      const socketMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
-      const leftSocket = new THREE.Mesh(socketGeom, socketMat);
-      leftSocket.position.set(-0.18, 1.85, 0.45);
-      neckSwivelGroup.add(leftSocket);
-      
-      const rightSocket = new THREE.Mesh(socketGeom, socketMat);
-      rightSocket.position.set(0.18, 1.85, 0.45);
-      neckSwivelGroup.add(rightSocket);
-      
-      // Nasal cavity
-      const noseGeom = new THREE.BoxGeometry(0.08, 0.15, 0.08);
-      const nose = new THREE.Mesh(noseGeom, socketMat);
-      nose.position.set(0, 1.7, 0.52);
-      neckSwivelGroup.add(nose);
-      
-      // Mandible (jawbone)
-      const mandibleGeom = new THREE.BoxGeometry(0.4, 0.25, 0.3);
-      const mandible = new THREE.Mesh(mandibleGeom, boneMat);
-      mandible.name = 'Mandible';
-      mandible.position.set(0, 1.3, 0.35);
-      mandible.scale.set(1, 0.6, 1);
-      neckSwivelGroup.add(mandible);
-      
-      // Teeth (upper)
-      for (let i = 0; i < 8; i++) {
-        const toothGeom = new THREE.BoxGeometry(0.04, 0.08, 0.04);
-        const tooth = new THREE.Mesh(toothGeom, new THREE.MeshStandardMaterial({ color: 0xeeeeee }));
-        tooth.position.set(-0.14 + (i * 0.04), 1.5, 0.52);
-        neckSwivelGroup.add(tooth);
-      }
-      
-      // Teeth (lower)
-      for (let i = 0; i < 8; i++) {
-        const toothGeom = new THREE.BoxGeometry(0.04, 0.08, 0.04);
-        const tooth = new THREE.Mesh(toothGeom, new THREE.MeshStandardMaterial({ color: 0xeeeeee }));
-        tooth.position.set(-0.14 + (i * 0.04), 1.38, 0.52);
-        neckSwivelGroup.add(tooth);
-      }
-      
-      headGroup.add(neckSwivelGroup);
-      headGroup.position.y = 16.5;
-      skeletonGroup.add(headGroup);
-      totalVertices += 100;
-      
-      // Add to scene
-      scene.add(skeletonGroup);
-      objects.push(skeletonGroup);
-      window.fullBodyGroup = skeletonGroup;
-      
-      // Update UI
-      updateObjectCount();
-      updateVertexCount();
-      document.getElementById('primitiveDisplay').textContent = `SKELETON BODY (${totalVertices}V)`;
-      
-      console.log(`💀 ✅ SKELETON BODY loaded: ${totalVertices} vertices total`);
-      console.log(`  → Perfect for Sky Relics enemies, frenemies, and skeleton friends!`);
-      console.log(`  → All bones anatomically labeled and ready to animate`);
-      console.log(`  → Supports full walking/running animation with WASD controls`);
-      console.log(`  → Press W to walk, SHIFT to run, SPACE to jump, F to fly!`);
-      console.log(`\n💀 SKELETON ANATOMY:`);
-      console.log(`  → Femur, Tibia, Fibula (Leg bones)`);
-      console.log(`  → Humerus, Radius, Ulna (Arm bones)`);
-      console.log(`  → Pelvis, Vertebrae (L1-L5, T1-T12, C1-C7)`);
-      console.log(`  → 24 Ribs (12 pairs)`);
-      console.log(`  → Sternum, Clavicles, Scapulae`);
-      console.log(`  → Cranium, Mandible with teeth`);
-      console.log(`  → Carpals, Metacarpals, Phalanges (Hands)`);
-      console.log(`  → Tarsals, Metatarsals, Phalanges (Feet)`);
     }
 
     function updateSize(value) {
@@ -3244,286 +2726,6 @@
         alert('⚠️ Please allow pop-ups to open the vertex matrix editor');
       }
     }
-
-    // ========================================
-    // 🔬 VERTEX ENGINE - Microscopic Detail Access
-    // ========================================
-    let vertexEngineActive = false;
-    let selectedVertexIndex = null;
-    let vertexHelpers = []; // Visual helpers for vertices
-    let sculptMode = 'push'; // push, pull, smooth, inflate
-    let brushSize = 1.0;
-    let sculptStrength = 0.5;
-
-    function toggleVertexEngine() {
-      vertexEngineActive = !vertexEngineActive;
-      const panel = document.getElementById('vertexEnginePanel');
-      panel.style.display = vertexEngineActive ? 'block' : 'none';
-      
-      if (vertexEngineActive) {
-        console.log('🔬 VERTEX ENGINE ACTIVATED');
-        console.log('→ Click any object to inspect its vertices');
-        console.log('→ Three.js BufferGeometry vertices are now accessible');
-        
-        // If an object is selected, analyze it immediately
-        if (transformControl.object) {
-          analyzeObjectVertices(transformControl.object);
-        }
-      } else {
-        console.log('🔬 Vertex Engine deactivated');
-        clearVertexHelpers();
-      }
-    }
-
-    function analyzeObjectVertices(object) {
-      if (!object || !object.geometry) {
-        console.warn('⚠️ No geometry found on this object');
-        return;
-      }
-
-      const geometry = object.geometry;
-      const positionAttribute = geometry.getAttribute('position');
-      
-      if (!positionAttribute) {
-        console.warn('⚠️ No position attribute found');
-        return;
-      }
-
-      const vertexCount = positionAttribute.count;
-      
-      // Update UI
-      document.getElementById('vertexObjectName').textContent = object.name || object.type || 'Unnamed';
-      document.getElementById('vertexTotalCount').textContent = vertexCount;
-      
-      console.log(`\n🔬 VERTEX ANALYSIS:`);
-      console.log(`→ Object: ${object.name || object.type}`);
-      console.log(`→ Total Vertices: ${vertexCount}`);
-      console.log(`→ Position Buffer: Float32Array[${positionAttribute.array.length}]`);
-      console.log(`→ Format: [x, y, z] for each vertex`);
-      
-      // Show first 10 vertices as example
-      console.log(`\n📍 First 10 Vertices (local coordinates):`);
-      for (let i = 0; i < Math.min(10, vertexCount); i++) {
-        const x = positionAttribute.getX(i).toFixed(3);
-        const y = positionAttribute.getY(i).toFixed(3);
-        const z = positionAttribute.getZ(i).toFixed(3);
-        console.log(`  Vertex ${i}: (${x}, ${y}, ${z})`);
-      }
-      
-      if (vertexCount > 10) {
-        console.log(`  ... ${vertexCount - 10} more vertices`);
-      }
-    }
-
-    function toggleVertexVisualization(show) {
-      if (!transformControl.object || !transformControl.object.geometry) {
-        alert('⚠️ Please select an object first');
-        document.getElementById('showVertexPoints').checked = false;
-        return;
-      }
-
-      clearVertexHelpers();
-      
-      if (show) {
-        const object = transformControl.object;
-        const geometry = object.geometry;
-        const positionAttribute = geometry.getAttribute('position');
-        const vertexCount = positionAttribute.count;
-        
-        console.log(`🔬 Rendering ${vertexCount} vertex points...`);
-        
-        // Create a point for each vertex
-        const pointsGeometry = new THREE.BufferGeometry();
-        pointsGeometry.setAttribute('position', positionAttribute.clone());
-        
-        const pointsMaterial = new THREE.PointsMaterial({
-          color: 0x00ffff,
-          size: 0.1,
-          sizeAttenuation: true
-        });
-        
-        const points = new THREE.Points(pointsGeometry, pointsMaterial);
-        points.name = 'VertexHelper_Points';
-        
-        // Match the object's transform
-        points.position.copy(object.position);
-        points.rotation.copy(object.rotation);
-        points.scale.copy(object.scale);
-        
-        scene.add(points);
-        vertexHelpers.push(points);
-        
-        console.log(`✅ ${vertexCount} vertices visualized as cyan points`);
-      }
-    }
-
-    function toggleVertexNumbers(show) {
-      if (!transformControl.object || !transformControl.object.geometry) {
-        alert('⚠️ Please select an object first');
-        document.getElementById('showVertexNumbers').checked = false;
-        return;
-      }
-
-      // Clear existing labels
-      const existingLabels = scene.children.filter(c => c.name === 'VertexLabel');
-      existingLabels.forEach(label => scene.remove(label));
-      
-      if (show) {
-        const object = transformControl.object;
-        const geometry = object.geometry;
-        const positionAttribute = geometry.getAttribute('position');
-        const vertexCount = positionAttribute.count;
-        
-        console.log(`🔢 Adding labels for ${vertexCount} vertices...`);
-        
-        // Only show labels for first 100 vertices (performance)
-        const maxLabels = Math.min(100, vertexCount);
-        
-        for (let i = 0; i < maxLabels; i++) {
-          const x = positionAttribute.getX(i);
-          const y = positionAttribute.getY(i);
-          const z = positionAttribute.getZ(i);
-          
-          // Create text sprite (simplified - could use THREE.TextGeometry for better quality)
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-          canvas.width = 64;
-          canvas.height = 32;
-          context.fillStyle = '#00ffff';
-          context.font = 'Bold 20px Arial';
-          context.fillText(i.toString(), 10, 24);
-          
-          const texture = new THREE.CanvasTexture(canvas);
-          const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-          const sprite = new THREE.Sprite(spriteMaterial);
-          sprite.position.set(x, y, z);
-          sprite.scale.set(0.2, 0.1, 1);
-          sprite.name = 'VertexLabel';
-          
-          // Transform to world space
-          sprite.position.applyMatrix4(object.matrixWorld);
-          
-          scene.add(sprite);
-          vertexHelpers.push(sprite);
-        }
-        
-        if (vertexCount > 100) {
-          console.log(`ℹ️ Showing first 100 labels only (${vertexCount} total vertices)`);
-        }
-      }
-    }
-
-    function toggleWireframe(show) {
-      if (!transformControl.object || !transformControl.object.material) {
-        alert('⚠️ Please select an object first');
-        document.getElementById('showWireframe').checked = false;
-        return;
-      }
-
-      const object = transformControl.object;
-      
-      if (Array.isArray(object.material)) {
-        object.material.forEach(mat => mat.wireframe = show);
-      } else {
-        object.material.wireframe = show;
-      }
-      
-      console.log(`🔲 Wireframe: ${show ? 'ON' : 'OFF'}`);
-    }
-
-    function clearVertexHelpers() {
-      vertexHelpers.forEach(helper => scene.remove(helper));
-      vertexHelpers = [];
-      
-      // Clear labels
-      const labels = scene.children.filter(c => c.name === 'VertexLabel');
-      labels.forEach(label => scene.remove(label));
-    }
-
-    function updateVertexPosition() {
-      if (!transformControl.object || selectedVertexIndex === null) {
-        alert('⚠️ No vertex selected');
-        return;
-      }
-
-      const object = transformControl.object;
-      const geometry = object.geometry;
-      const positionAttribute = geometry.getAttribute('position');
-      
-      const x = parseFloat(document.getElementById('vertexPosX').value);
-      const y = parseFloat(document.getElementById('vertexPosY').value);
-      const z = parseFloat(document.getElementById('vertexPosZ').value);
-      
-      positionAttribute.setXYZ(selectedVertexIndex, x, y, z);
-      positionAttribute.needsUpdate = true;
-      
-      // Recompute normals for proper lighting
-      geometry.computeVertexNormals();
-      
-      console.log(`✅ Vertex ${selectedVertexIndex} moved to (${x}, ${y}, ${z})`);
-    }
-
-    function setSculptMode(mode) {
-      sculptMode = mode;
-      console.log(`🎨 Sculpt mode: ${mode.toUpperCase()}`);
-    }
-
-    function updateBrushSize(value) {
-      brushSize = parseFloat(value);
-    }
-
-    function updateSculptStrength(value) {
-      sculptStrength = parseFloat(value);
-    }
-
-    function exportVertexData() {
-      if (!transformControl.object || !transformControl.object.geometry) {
-        alert('⚠️ Please select an object first');
-        return;
-      }
-
-      const object = transformControl.object;
-      const geometry = object.geometry;
-      const positionAttribute = geometry.getAttribute('position');
-      const vertexCount = positionAttribute.count;
-      
-      const vertices = [];
-      for (let i = 0; i < vertexCount; i++) {
-        vertices.push({
-          index: i,
-          x: positionAttribute.getX(i),
-          y: positionAttribute.getY(i),
-          z: positionAttribute.getZ(i)
-        });
-      }
-      
-      const data = {
-        objectName: object.name || object.type || 'Unnamed',
-        vertexCount: vertexCount,
-        vertices: vertices,
-        exportDate: new Date().toISOString()
-      };
-      
-      const json = JSON.stringify(data, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${object.name || 'object'}_vertices.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      console.log(`💾 Exported ${vertexCount} vertices to JSON`);
-      
-      // Show preview in UI
-      const preview = document.getElementById('vertexInfoDisplay');
-      preview.style.display = 'block';
-      preview.textContent = json.substring(0, 1000) + '\n...\n(Download complete file)';
-    }
-
-    // ========================================
-    // END VERTEX ENGINE
-    // ========================================
 
     function clearScene() {
       if (confirm('Clear all objects?')) {
