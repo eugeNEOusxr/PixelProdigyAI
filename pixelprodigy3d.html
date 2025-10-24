@@ -226,6 +226,9 @@
         <button id="walkModeToggle" onclick="toggleWalkMode()" style="padding: 8px 16px; background: rgba(255,165,0,0.15); border: 2px solid rgba(255,165,0,0.3); color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
           🚶 Walk Mode: OFF
         </button>
+        <button id="thirdPersonToggle" onclick="toggle3rdPersonCamera()" style="padding: 8px 16px; background: rgba(33,150,243,0.15); border: 2px solid rgba(33,150,243,0.3); color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+          🎮 3rd Person: AUTO
+        </button>
       </div>
       
       <!-- Movement Info -->
@@ -598,6 +601,7 @@
     
     // Walking/Running animation state
     let walkModeEnabled = false; // Toggle between stationary animation and forward movement
+    let thirdPersonCamera = 'auto'; // 'auto', 'always', 'never' - 3rd person camera mode
     let walkCycleSpeed = 0; // 0 = stopped, 1-3 = walking, 4+ = running
     let walkCyclePhase = 0; // Current phase in walk cycle (0 to 2*PI)
     let lastWheelTime = 0;
@@ -891,6 +895,32 @@
       }
     }
     
+    // Toggle 3rd person camera mode
+    function toggle3rdPersonCamera() {
+      const modes = ['auto', 'always', 'never'];
+      const currentIndex = modes.indexOf(thirdPersonCamera);
+      thirdPersonCamera = modes[(currentIndex + 1) % modes.length];
+      
+      const btn = document.getElementById('thirdPersonToggle');
+      if (thirdPersonCamera === 'auto') {
+        btn.textContent = '🎮 3rd Person: AUTO';
+        btn.style.background = 'rgba(33,150,243,0.15)';
+        btn.style.borderColor = 'rgba(33,150,243,0.3)';
+        console.log('🎮 3rd Person: AUTO - Activates in Walk/Flight Mode');
+      } else if (thirdPersonCamera === 'always') {
+        btn.textContent = '🎮 3rd Person: ALWAYS';
+        btn.style.background = 'rgba(76,175,80,0.3)';
+        btn.style.borderColor = 'rgba(76,175,80,0.6)';
+        console.log('🎮 3rd Person: ALWAYS ON - Game camera always active');
+        controls.enabled = false; // Disable orbit when always on
+      } else {
+        btn.textContent = '🎮 3rd Person: NEVER';
+        btn.style.background = 'rgba(244,67,54,0.3)';
+        btn.style.borderColor = 'rgba(244,67,54,0.6)';
+        console.log('🎮 3rd Person: NEVER - Free camera only');
+      }
+    }
+    
     // Procedural walking/running animation with realistic biomechanics + WASD movement + Jump + Flight
     function updateWalkingAnimation() {
       if (!window.fullBodyGroup) return;
@@ -1163,7 +1193,10 @@
         }
         
         // === 3RD PERSON CAMERA (Game-style) ===
-        if (walkModeEnabled) {
+        const shouldUse3rdPerson = thirdPersonCamera === 'always' || 
+                                   (thirdPersonCamera === 'auto' && (walkModeEnabled || flightModeEnabled));
+        
+        if (shouldUse3rdPerson) {
           const bodyRotation = window.fullBodyGroup.rotation.y;
           const bodyPos = window.fullBodyGroup.position.clone();
           
