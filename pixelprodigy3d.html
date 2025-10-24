@@ -212,6 +212,47 @@
         box-shadow: 0 0 40px rgba(0, 255, 255, 0.8), 0 0 60px rgba(138, 43, 226, 0.6);
       }
     }
+    
+    /* WordWeaver Document Canvas Styles */
+    .doc-mode-selector {
+      transition: all 0.3s ease;
+    }
+    
+    .doc-mode-selector:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .shape-selector, .material-selector, .font-selector {
+      transition: all 0.2s ease;
+    }
+    
+    .shape-selector:hover, .material-selector:hover, .font-selector:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    }
+    
+    #blog-content::-webkit-scrollbar,
+    #pdf-paragraph::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    #blog-content::-webkit-scrollbar-track,
+    #pdf-paragraph::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+    
+    #blog-content::-webkit-scrollbar-thumb,
+    #pdf-paragraph::-webkit-scrollbar-thumb {
+      background: rgba(102, 126, 234, 0.5);
+      border-radius: 4px;
+    }
+    
+    #blog-content::-webkit-scrollbar-thumb:hover,
+    #pdf-paragraph::-webkit-scrollbar-thumb:hover {
+      background: rgba(102, 126, 234, 0.7);
+    }
   </style>
 </head>
 <body>
@@ -667,16 +708,158 @@
       <!-- WordWeaver Workspace -->
       <div id="workspace-word" class="workspace-content" style="display: none;">
         <div class="section">
-          <div class="section-title">📝 Writing Tools</div>
-          <div class="tool-grid">
-            <button class="tool-btn" onclick="alert('Text editor coming soon!')">
-              <span class="tool-icon">✍️</span>
-              <span>Editor</span>
+          <div class="section-title">🧬 WordWeaver Canvas</div>
+          
+          <!-- Document Format Selector -->
+          <div class="section" style="margin-bottom: 15px;">
+            <div class="section-title">📋 Document Format</div>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <button id="doc-mode-blog" class="tool-btn doc-mode-selector active" onclick="selectDocumentMode('blog')" style="flex: 1; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.5);">
+                <span class="tool-icon">📝</span>
+                <span>Blog Post</span>
+              </button>
+              <button id="doc-mode-pdf" class="tool-btn doc-mode-selector" onclick="selectDocumentMode('pdf')" style="flex: 1; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3);">
+                <span class="tool-icon">📄</span>
+                <span>PDF Document</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Text Input Area -->
+          <div class="section">
+            <div class="section-title">✍️ Content Input</div>
+            
+            <!-- Blog Mode Fields -->
+            <div id="blog-mode-fields" style="display: block;">
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; margin-bottom: 5px; color: #999; font-size: 12px;">Blog Title:</label>
+                <input type="text" id="blog-title" placeholder="Enter your blog title..." style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-family: inherit; font-size: 14px;">
+              </div>
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; margin-bottom: 5px; color: #999; font-size: 12px;">Blog Content:</label>
+                <textarea id="blog-content" placeholder="Write your blog post... Press 'Materialize' to see words appear in 3D!" style="width: 100%; min-height: 150px; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-family: 'Courier New', monospace; font-size: 13px; resize: vertical;"></textarea>
+              </div>
+            </div>
+            
+            <!-- PDF Mode Fields -->
+            <div id="pdf-mode-fields" style="display: none;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; color: #999; font-size: 11px;">Name:</label>
+                  <input type="text" id="pdf-name" placeholder="John Doe" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; color: #e0e0e0; font-size: 12px;">
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; color: #999; font-size: 11px;">City:</label>
+                  <input type="text" id="pdf-city" placeholder="City" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; color: #e0e0e0; font-size: 12px;">
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; color: #999; font-size: 11px;">State:</label>
+                  <input type="text" id="pdf-state" placeholder="ST" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; color: #e0e0e0; font-size: 12px;">
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; color: #999; font-size: 11px;">Zip:</label>
+                  <input type="text" id="pdf-zip" placeholder="00000" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; color: #e0e0e0; font-size: 12px;">
+                </div>
+              </div>
+              <div style="margin-bottom: 10px;">
+                <label style="display: block; margin-bottom: 5px; color: #999; font-size: 11px;">Document Title:</label>
+                <input type="text" id="pdf-title" placeholder="Enter document title..." style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-size: 14px;">
+              </div>
+              <div style="margin-bottom: 10px;">
+                <label style="display: block; margin-bottom: 5px; color: #999; font-size: 11px;">Paragraph Content:</label>
+                <textarea id="pdf-paragraph" placeholder="Enter paragraph text..." style="width: 100%; min-height: 120px; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-family: 'Courier New', monospace; font-size: 12px; resize: vertical;"></textarea>
+              </div>
+            </div>
+            
+            <!-- Materialize Button -->
+            <button onclick="materializeDocument()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: all 0.3s;">
+              ✨ Materialize in 3D Space
             </button>
-            <button class="tool-btn" onclick="alert('Templates coming soon!')">
-              <span class="tool-icon">📄</span>
-              <span>Templates</span>
-            </button>
+          </div>
+          
+          <!-- Visual Controls -->
+          <div class="section" style="margin-top: 15px;">
+            <div class="section-title">🎨 Word Appearance</div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Shape Distribution:</label>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <button class="shape-selector" data-shape="linear" onclick="selectDocShape('linear')" style="padding: 8px 6px; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.5); border-radius: 6px; color: #fff; font-size: 10px; cursor: pointer; transition: all 0.2s;">
+                  📄 Linear
+                </button>
+                <button class="shape-selector" data-shape="sphere" onclick="selectDocShape('sphere')" style="padding: 8px 6px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; transition: all 0.2s;">
+                  🔮 Sphere
+                </button>
+                <button class="shape-selector" data-shape="cube" onclick="selectDocShape('cube')" style="padding: 8px 6px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; transition: all 0.2s;">
+                  📦 Cube
+                </button>
+                <button class="shape-selector" data-shape="pyramid" onclick="selectDocShape('pyramid')" style="padding: 8px 6px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; transition: all 0.2s;">
+                  🔺 Pyramid
+                </button>
+                <button class="shape-selector" data-shape="sine" onclick="selectDocShape('sine')" style="padding: 8px 6px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; transition: all 0.2s;">
+                  〰️ Wave
+                </button>
+                <button class="shape-selector" data-shape="helix" onclick="selectDocShape('helix')" style="padding: 8px 6px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; transition: all 0.2s;">
+                  🧬 Helix
+                </button>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Material:</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                <button class="material-selector" data-material="biblical" onclick="selectDocMaterial('biblical')" style="padding: 8px; background: rgba(212, 165, 116, 0.3); border: 2px solid rgba(212, 165, 116, 0.5); border-radius: 6px; color: #fff; font-size: 10px; cursor: pointer;">
+                  📖 Biblical
+                </button>
+                <button class="material-selector" data-material="chrome" onclick="selectDocMaterial('chrome')" style="padding: 8px; background: rgba(224, 224, 224, 0.1); border: 2px solid rgba(224, 224, 224, 0.3); border-radius: 6px; color: #e0e0e0; font-size: 10px; cursor: pointer;">
+                  ⚙️ Chrome
+                </button>
+                <button class="material-selector" data-material="holographic" onclick="selectDocMaterial('holographic')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
+                  ✨ Holo
+                </button>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Font Style:</label>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                <button class="font-selector" data-font="helvetiker" onclick="selectDocFont('helvetiker')" style="padding: 8px; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.5); border-radius: 6px; color: #fff; font-size: 10px; cursor: pointer; font-family: Arial, sans-serif;">
+                  Aa Modern
+                </button>
+                <button class="font-selector" data-font="optimer" onclick="selectDocFont('optimer')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; font-family: 'Times New Roman', serif;">
+                  Aa Classic
+                </button>
+                <button class="font-selector" data-font="gentilis" onclick="selectDocFont('gentilis')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; font-family: Georgia, serif;">
+                  Aa Elegant
+                </button>
+                <button class="font-selector" data-font="droid" onclick="selectDocFont('droid')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; font-family: 'Courier New', monospace;">
+                  Aa Tech
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Word Color:</label>
+              <input type="color" id="doc-color" value="#667eea" onchange="updateDocColor(this.value)" style="width: 100%; height: 36px; border-radius: 6px; border: 2px solid rgba(255, 255, 255, 0.1); background: transparent; cursor: pointer;">
+            </div>
+          </div>
+          
+          <!-- Export & Clear -->
+          <div class="section" style="margin-top: 15px;">
+            <div style="display: flex; gap: 8px;">
+              <button onclick="exportDocument()" style="flex: 1; padding: 12px; background: rgba(34, 197, 94, 0.2); border: 2px solid rgba(34, 197, 94, 0.4); border-radius: 8px; color: #22c55e; font-weight: 600; font-size: 13px; cursor: pointer;">
+                📥 Export
+              </button>
+              <button onclick="clearDocument()" style="flex: 1; padding: 12px; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.4); border-radius: 8px; color: #ef4444; font-weight: 600; font-size: 13px; cursor: pointer;">
+                🗑️ Clear
+              </button>
+            </div>
+            
+            <!-- Word Count -->
+            <div style="margin-top: 12px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 6px; text-align: center;">
+              <span style="color: #999; font-size: 12px;">Word Count: </span>
+              <span id="doc-word-count" style="color: #667eea; font-size: 16px; font-weight: 700;">0</span>
+            </div>
           </div>
         </div>
       </div>
@@ -728,6 +911,9 @@
   <script src="lib/OrbitControls.js"></script>
   <script src="lib/TransformControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/webxr/VRButton.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+  <script src="document3d_canvas.js"></script>
   <script>
     // State
     let scene, camera, renderer, controls, transformControl;
@@ -6345,8 +6531,288 @@
       panel.style.display = 'block';
     }
 
+    // ========================================
+    // WORDWEAVER 3D DOCUMENT CANVAS
+    // ========================================
+    
+    let documentCanvas;
+    let currentDocumentMode = 'blog'; // 'blog' or 'pdf'
+    
+    // Initialize Document Canvas after scene is ready
+    function initDocumentCanvas() {
+      if (typeof scene !== 'undefined' && typeof camera !== 'undefined') {
+        documentCanvas = new Document3DCanvas(scene, camera);
+        console.log('✅ WordWeaver Document Canvas initialized!');
+        
+        // Set default settings
+        documentCanvas.setShape('linear');
+        documentCanvas.setMaterial('biblical');
+        documentCanvas.setFont('helvetiker');
+        
+        // Update first shape button to active
+        const firstShape = document.querySelector('.shape-selector[data-shape="linear"]');
+        if (firstShape) {
+          firstShape.style.background = 'rgba(102, 126, 234, 0.3)';
+          firstShape.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+          firstShape.style.color = '#fff';
+        }
+        
+        // Update first material button to active
+        const firstMaterial = document.querySelector('.material-selector[data-material="biblical"]');
+        if (firstMaterial) {
+          firstMaterial.style.background = 'rgba(212, 165, 116, 0.3)';
+          firstMaterial.style.borderColor = 'rgba(212, 165, 116, 0.5)';
+          firstMaterial.style.color = '#fff';
+        }
+        
+        // Update first font button to active
+        const firstFont = document.querySelector('.font-selector[data-font="helvetiker"]');
+        if (firstFont) {
+          firstFont.style.background = 'rgba(102, 126, 234, 0.3)';
+          firstFont.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+          firstFont.style.color = '#fff';
+        }
+      } else {
+        setTimeout(initDocumentCanvas, 100);
+      }
+    }
+    
+    // Switch between Blog and PDF document modes
+    function selectDocumentMode(mode) {
+      currentDocumentMode = mode;
+      
+      const blogFields = document.getElementById('blog-mode-fields');
+      const pdfFields = document.getElementById('pdf-mode-fields');
+      const blogBtn = document.getElementById('doc-mode-blog');
+      const pdfBtn = document.getElementById('doc-mode-pdf');
+      
+      if (mode === 'blog') {
+        blogFields.style.display = 'block';
+        pdfFields.style.display = 'none';
+        blogBtn.style.background = 'rgba(102, 126, 234, 0.3)';
+        blogBtn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+        pdfBtn.style.background = 'rgba(102, 126, 234, 0.1)';
+        pdfBtn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+      } else {
+        blogFields.style.display = 'none';
+        pdfFields.style.display = 'block';
+        pdfBtn.style.background = 'rgba(102, 126, 234, 0.3)';
+        pdfBtn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+        blogBtn.style.background = 'rgba(102, 126, 234, 0.1)';
+        blogBtn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+      }
+    }
+    
+    // Materialize document based on current mode
+    function materializeDocument() {
+      if (!documentCanvas) {
+        alert('Document Canvas not ready yet. Please wait...');
+        return;
+      }
+      
+      if (currentDocumentMode === 'blog') {
+        // Blog mode - materialize from center, expand into paragraph format
+        const title = document.getElementById('blog-title').value;
+        const content = document.getElementById('blog-content').value;
+        
+        if (!title && !content) {
+          alert('Please enter a title and content for your blog post!');
+          return;
+        }
+        
+        // Clear previous content
+        documentCanvas.clearDocument();
+        
+        // Materialize title from center
+        if (title) {
+          documentCanvas.materializeTitle(title);
+        }
+        
+        // Split content into paragraphs and materialize each
+        if (content) {
+          const paragraphs = content.split('\n\n').filter(p => p.trim().length > 0);
+          paragraphs.forEach((paragraph, index) => {
+            setTimeout(() => {
+              documentCanvas.materializeParagraph(paragraph.trim(), index);
+            }, 500 + (index * 300)); // Stagger paragraph materialization
+          });
+        }
+        
+        updateWordCount();
+        
+      } else {
+        // PDF mode - materialize with header section
+        const name = document.getElementById('pdf-name').value;
+        const city = document.getElementById('pdf-city').value;
+        const state = document.getElementById('pdf-state').value;
+        const zip = document.getElementById('pdf-zip').value;
+        const title = document.getElementById('pdf-title').value;
+        const paragraph = document.getElementById('pdf-paragraph').value;
+        
+        if (!title && !paragraph) {
+          alert('Please enter a title and paragraph content!');
+          return;
+        }
+        
+        // Materialize header if provided
+        if (name || city || state || zip) {
+          const headerData = {
+            name: name || 'Your Name',
+            city: city || 'City',
+            state: state || 'ST',
+            zipCode: zip || '00000'
+          };
+          documentCanvas.materializeHeader(headerData);
+          
+          setTimeout(() => {
+            if (title) documentCanvas.materializeTitle(title);
+          }, 300);
+          
+          setTimeout(() => {
+            if (paragraph) {
+              const paragraphIndex = documentCanvas.document.paragraphs.length;
+              documentCanvas.materializeParagraph(paragraph, paragraphIndex);
+              document.getElementById('pdf-paragraph').value = ''; // Clear input
+            }
+          }, 600);
+        } else {
+          // No header, just title and paragraph
+          if (title) documentCanvas.materializeTitle(title);
+          setTimeout(() => {
+            if (paragraph) {
+              const paragraphIndex = documentCanvas.document.paragraphs.length;
+              documentCanvas.materializeParagraph(paragraph, paragraphIndex);
+              document.getElementById('pdf-paragraph').value = '';
+            }
+          }, 300);
+        }
+        
+        updateWordCount();
+      }
+    }
+    
+    // Shape selection
+    function selectDocShape(shapeName) {
+      if (!documentCanvas) return;
+      
+      documentCanvas.setShape(shapeName);
+      
+      // Update UI
+      document.querySelectorAll('.shape-selector').forEach(btn => {
+        if (btn.dataset.shape === shapeName) {
+          btn.style.background = 'rgba(102, 126, 234, 0.3)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+          btn.style.color = '#fff';
+        } else {
+          btn.style.background = 'rgba(102, 126, 234, 0.1)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+          btn.style.color = '#667eea';
+        }
+      });
+    }
+    
+    // Material selection
+    function selectDocMaterial(materialName) {
+      if (!documentCanvas) return;
+      
+      documentCanvas.setMaterial(materialName);
+      
+      // Update UI
+      document.querySelectorAll('.material-selector').forEach(btn => {
+        if (btn.dataset.material === materialName) {
+          const colors = {
+            biblical: { bg: 'rgba(212, 165, 116, 0.3)', border: 'rgba(212, 165, 116, 0.5)' },
+            chrome: { bg: 'rgba(224, 224, 224, 0.3)', border: 'rgba(224, 224, 224, 0.5)' },
+            holographic: { bg: 'rgba(102, 126, 234, 0.3)', border: 'rgba(102, 126, 234, 0.5)' }
+          };
+          btn.style.background = colors[materialName].bg;
+          btn.style.borderColor = colors[materialName].border;
+          btn.style.color = '#fff';
+        } else {
+          const inactiveColors = {
+            biblical: { bg: 'rgba(212, 165, 116, 0.1)', border: 'rgba(212, 165, 116, 0.3)' },
+            chrome: { bg: 'rgba(224, 224, 224, 0.1)', border: 'rgba(224, 224, 224, 0.3)' },
+            holographic: { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' }
+          };
+          const mat = btn.dataset.material;
+          btn.style.background = inactiveColors[mat].bg;
+          btn.style.borderColor = inactiveColors[mat].border;
+          btn.style.color = mat === 'biblical' ? '#d4a574' : (mat === 'chrome' ? '#e0e0e0' : '#667eea');
+        }
+      });
+    }
+    
+    // Color picker
+    function updateDocColor(color) {
+      if (!documentCanvas) return;
+      documentCanvas.setColor(color);
+    }
+    
+    // Font selection
+    function selectDocFont(fontName) {
+      if (!documentCanvas) return;
+      
+      documentCanvas.setFont(fontName);
+      
+      // Update UI
+      document.querySelectorAll('.font-selector').forEach(btn => {
+        if (btn.dataset.font === fontName) {
+          btn.style.background = 'rgba(102, 126, 234, 0.3)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+          btn.style.color = '#fff';
+        } else {
+          btn.style.background = 'rgba(102, 126, 234, 0.1)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+          btn.style.color = '#667eea';
+        }
+      });
+    }
+    
+    // Export document
+    function exportDocument() {
+      if (!documentCanvas) return;
+      
+      const pdfData = documentCanvas.exportToPDF();
+      const mode = currentDocumentMode === 'blog' ? 'Blog Post' : 'PDF Document';
+      alert(`${mode} exported! Check your downloads folder.`);
+    }
+    
+    // Clear document
+    function clearDocument() {
+      if (!documentCanvas) return;
+      
+      if (confirm('Clear entire 3D document? This cannot be undone.')) {
+        documentCanvas.clearDocument();
+        
+        // Clear inputs based on mode
+        if (currentDocumentMode === 'blog') {
+          document.getElementById('blog-title').value = '';
+          document.getElementById('blog-content').value = '';
+        } else {
+          document.getElementById('pdf-name').value = '';
+          document.getElementById('pdf-city').value = '';
+          document.getElementById('pdf-state').value = '';
+          document.getElementById('pdf-zip').value = '';
+          document.getElementById('pdf-title').value = '';
+          document.getElementById('pdf-paragraph').value = '';
+        }
+        
+        updateWordCount();
+      }
+    }
+    
+    // Update word count display
+    function updateWordCount() {
+      if (!documentCanvas) return;
+      const count = documentCanvas.getTotalWordCount();
+      document.getElementById('doc-word-count').textContent = count;
+    }
+
     // Start
     window.addEventListener('load', init);
+    
+    // Initialize Document Canvas after scene loads
+    setTimeout(initDocumentCanvas, 1000);
   </script>
 </body>
 </html>

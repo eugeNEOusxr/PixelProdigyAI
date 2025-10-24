@@ -1,0 +1,380 @@
+<!-- 
+  3D Document Canvas UI Integration
+  Add this to pixelprodigy3d.html to enable 3D text document creation
+-->
+
+<!-- Load Document3D Canvas Script -->
+<script src="document3d_canvas.js"></script>
+
+<!-- Document Canvas UI Panel -->
+<div id="document-canvas-panel" style="display: none; position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 900px; background: rgba(10, 14, 39, 0.95); backdrop-filter: blur(20px); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 16px; padding: 20px; z-index: 1000; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2 style="margin: 0; font-size: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      📄 3D Document Canvas
+    </h2>
+    <button onclick="closeDocumentCanvas()" style="padding: 8px 16px; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.4); border-radius: 6px; color: #ef4444; font-weight: 600; cursor: pointer;">
+      ✕ Close
+    </button>
+  </div>
+  
+  <!-- Document Format Tabs -->
+  <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <button class="doc-tab active" data-tab="header" onclick="switchDocTab('header')" style="flex: 1; padding: 10px; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.5); border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer;">
+      📋 Header
+    </button>
+    <button class="doc-tab" data-tab="title" onclick="switchDocTab('title')" style="flex: 1; padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: #667eea; font-weight: 600; cursor: pointer;">
+      ✏️ Title
+    </button>
+    <button class="doc-tab" data-tab="body" onclick="switchDocTab('body')" style="flex: 1; padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; color: #667eea; font-weight: 600; cursor: pointer;">
+      📝 Body
+    </button>
+  </div>
+  
+  <!-- Header Section -->
+  <div id="doc-tab-header" class="doc-section" style="display: block;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+      <div>
+        <label style="display: block; margin-bottom: 5px; color: #999; font-size: 13px;">Name:</label>
+        <input type="text" id="doc-name" placeholder="John Doe" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-family: inherit;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; color: #999; font-size: 13px;">City:</label>
+        <input type="text" id="doc-city" placeholder="San Francisco" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-family: inherit;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; color: #999; font-size: 13px;">State:</label>
+        <input type="text" id="doc-state" placeholder="CA" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-family: inherit;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; color: #999; font-size: 13px;">Zip Code:</label>
+        <input type="text" id="doc-zip" placeholder="94103" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-family: inherit;">
+      </div>
+    </div>
+    <button onclick="materializeHeader()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+      ✨ Materialize Header
+    </button>
+  </div>
+  
+  <!-- Title Section -->
+  <div id="doc-tab-title" class="doc-section" style="display: none;">
+    <label style="display: block; margin-bottom: 8px; color: #999; font-size: 13px;">Document Title:</label>
+    <input type="text" id="doc-title" placeholder="Enter your document title..." style="width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-size: 16px; font-family: inherit; margin-bottom: 15px;">
+    <button onclick="materializeTitle()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+      ✨ Materialize Title
+    </button>
+  </div>
+  
+  <!-- Body Section -->
+  <div id="doc-tab-body" class="doc-section" style="display: none;">
+    <label style="display: block; margin-bottom: 8px; color: #999; font-size: 13px;">Paragraph Content:</label>
+    <textarea id="doc-paragraph" placeholder="Type your paragraph here... Press 'Materialize Paragraph' to add it to the 3D document." style="width: 100%; min-height: 120px; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #e0e0e0; font-size: 15px; font-family: 'Courier New', monospace; resize: vertical; margin-bottom: 15px;"></textarea>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+      <button onclick="materializeParagraph()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+        ✨ Materialize Paragraph
+      </button>
+      <button onclick="clearParagraphInput()" style="padding: 12px 20px; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.4); border-radius: 8px; color: #ef4444; font-weight: 600; cursor: pointer;">
+        🗑️ Clear
+      </button>
+    </div>
+    
+    <div style="padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 6px; font-size: 13px; color: #999;">
+      💡 Tip: Each paragraph will be indented automatically. Words materialize from micro to macro scale!
+    </div>
+  </div>
+  
+  <!-- Shape & Material Controls -->
+  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      
+      <!-- Shape Selection -->
+      <div>
+        <label style="display: block; margin-bottom: 10px; color: #999; font-size: 13px; font-weight: 600;">Word Shape:</label>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+          <button class="shape-selector active" data-shape="linear" onclick="selectDocShape('linear')" style="padding: 8px; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.5); border-radius: 6px; color: #fff; font-size: 11px; cursor: pointer;">
+            📄 Linear
+          </button>
+          <button class="shape-selector" data-shape="sphere" onclick="selectDocShape('sphere')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+            🔮 Sphere
+          </button>
+          <button class="shape-selector" data-shape="cube" onclick="selectDocShape('cube')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+            📦 Cube
+          </button>
+          <button class="shape-selector" data-shape="pyramid" onclick="selectDocShape('pyramid')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+            🔺 Pyramid
+          </button>
+          <button class="shape-selector" data-shape="sine" onclick="selectDocShape('sine')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+            〰️ Sine
+          </button>
+          <button class="shape-selector" data-shape="helix" onclick="selectDocShape('helix')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+            🧬 Helix
+          </button>
+        </div>
+      </div>
+      
+      <!-- Material Selection -->
+      <div>
+        <label style="display: block; margin-bottom: 10px; color: #999; font-size: 13px; font-weight: 600;">Material:</label>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <button class="material-selector active" data-material="biblical" onclick="selectDocMaterial('biblical')" style="padding: 8px 12px; background: rgba(212, 165, 116, 0.3); border: 2px solid rgba(212, 165, 116, 0.5); border-radius: 6px; color: #fff; font-size: 11px; cursor: pointer; text-align: left;">
+            📖 Biblical
+          </button>
+          <button class="material-selector" data-material="chrome" onclick="selectDocMaterial('chrome')" style="padding: 8px 12px; background: rgba(224, 224, 224, 0.1); border: 2px solid rgba(224, 224, 224, 0.3); border-radius: 6px; color: #e0e0e0; font-size: 11px; cursor: pointer; text-align: left;">
+            ⚙️ Chrome
+          </button>
+          <button class="material-selector" data-material="holographic" onclick="selectDocMaterial('holographic')" style="padding: 8px 12px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer; text-align: left;">
+            ✨ Holographic
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Color Picker -->
+    <div style="margin-top: 15px;">
+      <label style="display: block; margin-bottom: 8px; color: #999; font-size: 13px; font-weight: 600;">Word Color:</label>
+      <input type="color" id="doc-color" value="#667eea" onchange="updateDocColor(this.value)" style="width: 100%; height: 40px; border-radius: 6px; border: 2px solid rgba(255, 255, 255, 0.1); background: transparent; cursor: pointer;">
+    </div>
+  </div>
+  
+  <!-- Export Controls -->
+  <div style="margin-top: 20px; display: flex; gap: 10px;">
+    <button onclick="exportDocumentToPDF()" style="flex: 1; padding: 12px; background: rgba(34, 197, 94, 0.2); border: 2px solid rgba(34, 197, 94, 0.4); border-radius: 8px; color: #22c55e; font-weight: 600; cursor: pointer;">
+      📥 Export to PDF/Text
+    </button>
+    <button onclick="clearEntireDocument()" style="flex: 1; padding: 12px; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.4); border-radius: 8px; color: #ef4444; font-weight: 600; cursor: pointer;">
+      🗑️ Clear Document
+    </button>
+  </div>
+  
+  <!-- Word Count Display -->
+  <div style="margin-top: 15px; padding: 12px; background: rgba(102, 126, 234, 0.1); border-radius: 6px; text-align: center;">
+    <span style="color: #999; font-size: 13px;">Total Words: </span>
+    <span id="doc-word-count" style="color: #667eea; font-size: 18px; font-weight: 700;">0</span>
+  </div>
+</div>
+
+<!-- Add Button to Main UI -->
+<button onclick="openDocumentCanvas()" class="tool-btn" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3)); border: 3px solid rgba(102, 126, 234, 0.6); box-shadow: 0 0 15px rgba(102, 126, 234, 0.4); font-weight: bold; font-size: 1.1em;">
+  <span>📄 3D DOCUMENT CANVAS</span>
+</button>
+
+<script>
+// Global document canvas instance
+let documentCanvas;
+
+// Initialize Document Canvas (call after scene is ready)
+function initDocumentCanvas() {
+  if (typeof scene !== 'undefined' && typeof camera !== 'undefined') {
+    documentCanvas = new Document3DCanvas(scene, camera);
+    console.log('✅ Document Canvas initialized!');
+  } else {
+    console.warn('⚠️ Scene/camera not ready, retrying...');
+    setTimeout(initDocumentCanvas, 100);
+  }
+}
+
+// Open/close document canvas panel
+function openDocumentCanvas() {
+  if (!documentCanvas) {
+    initDocumentCanvas();
+  }
+  document.getElementById('document-canvas-panel').style.display = 'block';
+}
+
+function closeDocumentCanvas() {
+  document.getElementById('document-canvas-panel').style.display = 'none';
+}
+
+// Switch between tabs
+function switchDocTab(tabName) {
+  // Hide all sections
+  document.querySelectorAll('.doc-section').forEach(section => {
+    section.style.display = 'none';
+  });
+  
+  // Show selected section
+  document.getElementById(`doc-tab-${tabName}`).style.display = 'block';
+  
+  // Update tab buttons
+  document.querySelectorAll('.doc-tab').forEach(tab => {
+    if (tab.dataset.tab === tabName) {
+      tab.style.background = 'rgba(102, 126, 234, 0.3)';
+      tab.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+      tab.style.color = '#fff';
+      tab.classList.add('active');
+    } else {
+      tab.style.background = 'rgba(102, 126, 234, 0.1)';
+      tab.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+      tab.style.color = '#667eea';
+      tab.classList.remove('active');
+    }
+  });
+}
+
+// Materialize sections
+function materializeHeader() {
+  if (!documentCanvas) return;
+  
+  const headerData = {
+    name: document.getElementById('doc-name').value || 'Your Name',
+    city: document.getElementById('doc-city').value || 'City',
+    state: document.getElementById('doc-state').value || 'ST',
+    zipCode: document.getElementById('doc-zip').value || '00000'
+  };
+  
+  documentCanvas.materializeHeader(headerData);
+  updateWordCount();
+}
+
+function materializeTitle() {
+  if (!documentCanvas) return;
+  
+  const title = document.getElementById('doc-title').value;
+  if (!title) {
+    alert('Please enter a title!');
+    return;
+  }
+  
+  documentCanvas.materializeTitle(title);
+  updateWordCount();
+}
+
+function materializeParagraph() {
+  if (!documentCanvas) return;
+  
+  const paragraph = document.getElementById('doc-paragraph').value;
+  if (!paragraph) {
+    alert('Please enter paragraph content!');
+    return;
+  }
+  
+  const paragraphIndex = documentCanvas.document.paragraphs.length;
+  documentCanvas.materializeParagraph(paragraph, paragraphIndex);
+  
+  // Clear input
+  document.getElementById('doc-paragraph').value = '';
+  updateWordCount();
+}
+
+function clearParagraphInput() {
+  document.getElementById('doc-paragraph').value = '';
+}
+
+// Shape/Material selection
+function selectDocShape(shapeName) {
+  if (!documentCanvas) return;
+  
+  documentCanvas.setShape(shapeName);
+  
+  // Update UI
+  document.querySelectorAll('.shape-selector').forEach(btn => {
+    if (btn.dataset.shape === shapeName) {
+      btn.style.background = 'rgba(102, 126, 234, 0.3)';
+      btn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+      btn.style.color = '#fff';
+      btn.classList.add('active');
+    } else {
+      btn.style.background = 'rgba(102, 126, 234, 0.1)';
+      btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+      btn.style.color = '#667eea';
+      btn.classList.remove('active');
+    }
+  });
+}
+
+function selectDocMaterial(materialName) {
+  if (!documentCanvas) return;
+  
+  documentCanvas.setMaterial(materialName);
+  
+  // Update UI
+  document.querySelectorAll('.material-selector').forEach(btn => {
+    if (btn.dataset.material === materialName) {
+      btn.style.opacity = '1';
+      btn.style.borderWidth = '2px';
+      btn.classList.add('active');
+    } else {
+      btn.style.opacity = '0.6';
+      btn.style.borderWidth = '1px';
+      btn.classList.remove('active');
+    }
+  });
+}
+
+function updateDocColor(color) {
+  if (!documentCanvas) return;
+  documentCanvas.setColor(color);
+}
+
+// Export functions
+function exportDocumentToPDF() {
+  if (!documentCanvas) return;
+  const pdfData = documentCanvas.exportToPDF();
+  alert('Document exported! Check your downloads folder.');
+}
+
+function clearEntireDocument() {
+  if (!documentCanvas) return;
+  
+  if (confirm('Clear entire 3D document? This cannot be undone.')) {
+    documentCanvas.clearDocument();
+    
+    // Clear inputs
+    document.getElementById('doc-name').value = '';
+    document.getElementById('doc-city').value = '';
+    document.getElementById('doc-state').value = '';
+    document.getElementById('doc-zip').value = '';
+    document.getElementById('doc-title').value = '';
+    document.getElementById('doc-paragraph').value = '';
+    
+    updateWordCount();
+  }
+}
+
+function updateWordCount() {
+  if (!documentCanvas) return;
+  const count = documentCanvas.getTotalWordCount();
+  document.getElementById('doc-word-count').textContent = count;
+}
+
+// Auto-initialize when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initDocumentCanvas, 500);
+  });
+} else {
+  setTimeout(initDocumentCanvas, 500);
+}
+</script>
+
+<style>
+/* Document Canvas Animations */
+.doc-tab, .shape-selector, .material-selector {
+  transition: all 0.3s ease;
+}
+
+.doc-tab:hover, .shape-selector:hover, .material-selector:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Scrollbar styling for textarea */
+#doc-paragraph::-webkit-scrollbar {
+  width: 8px;
+}
+
+#doc-paragraph::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+#doc-paragraph::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 4px;
+}
+
+#doc-paragraph::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}
+</style>
