@@ -3385,119 +3385,217 @@
     }
 
     function toggleVertexVisualization(show) {
-      if (!transformControl.object || !transformControl.object.geometry) {
-        alert('⚠️ Please select an object first');
-        document.getElementById('showVertexPoints').checked = false;
-        return;
-      }
-
       clearVertexHelpers();
       
       if (show) {
-        const object = transformControl.object;
-        const geometry = object.geometry;
-        const positionAttribute = geometry.getAttribute('position');
-        const vertexCount = positionAttribute.count;
-        
-        console.log(`🔬 Rendering ${vertexCount} vertex points...`);
-        
-        // Create a point for each vertex
-        const pointsGeometry = new THREE.BufferGeometry();
-        pointsGeometry.setAttribute('position', positionAttribute.clone());
-        
-        const pointsMaterial = new THREE.PointsMaterial({
-          color: 0x00ffff,
-          size: 0.1,
-          sizeAttenuation: true
-        });
-        
-        const points = new THREE.Points(pointsGeometry, pointsMaterial);
-        points.name = 'VertexHelper_Points';
-        
-        // Match the object's transform
-        points.position.copy(object.position);
-        points.rotation.copy(object.rotation);
-        points.scale.copy(object.scale);
-        
-        scene.add(points);
-        vertexHelpers.push(points);
-        
-        console.log(`✅ ${vertexCount} vertices visualized as cyan points`);
+        // Check if we have a selected object with geometry
+        if (transformControl.object && transformControl.object.geometry) {
+          const object = transformControl.object;
+          const geometry = object.geometry;
+          const positionAttribute = geometry.getAttribute('position');
+          const vertexCount = positionAttribute.count;
+          
+          console.log(`🔬 Rendering ${vertexCount} vertex points for ${object.name || 'selected object'}...`);
+          
+          // Create a point for each vertex
+          const pointsGeometry = new THREE.BufferGeometry();
+          pointsGeometry.setAttribute('position', positionAttribute.clone());
+          
+          const pointsMaterial = new THREE.PointsMaterial({
+            color: 0x00ffff,
+            size: 0.1,
+            sizeAttenuation: true
+          });
+          
+          const points = new THREE.Points(pointsGeometry, pointsMaterial);
+          points.name = 'VertexHelper_Points';
+          
+          // Match the object's transform
+          points.position.copy(object.position);
+          points.rotation.copy(object.rotation);
+          points.scale.copy(object.scale);
+          
+          scene.add(points);
+          vertexHelpers.push(points);
+          
+          console.log(`✅ ${vertexCount} vertices visualized as cyan points`);
+        }
+        // Or visualize entire body if loaded
+        else if (window.fullBodyGroup) {
+          console.log(`🔬 Rendering vertices for entire body...`);
+          let totalPoints = 0;
+          
+          window.fullBodyGroup.traverse((child) => {
+            if (child.geometry) {
+              const posAttr = child.geometry.getAttribute('position');
+              if (posAttr) {
+                const pointsGeometry = new THREE.BufferGeometry();
+                pointsGeometry.setAttribute('position', posAttr.clone());
+                
+                const pointsMaterial = new THREE.PointsMaterial({
+                  color: 0x00ffff,
+                  size: 0.08,
+                  sizeAttenuation: true
+                });
+                
+                const points = new THREE.Points(pointsGeometry, pointsMaterial);
+                points.name = 'VertexHelper_Points';
+                
+                // Match the child's world transform
+                points.position.copy(child.getWorldPosition(new THREE.Vector3()));
+                points.rotation.copy(child.getWorldQuaternion(new THREE.Quaternion()));
+                points.scale.copy(child.getWorldScale(new THREE.Vector3()));
+                
+                scene.add(points);
+                vertexHelpers.push(points);
+                totalPoints += posAttr.count;
+              }
+            }
+          });
+          
+          console.log(`✅ ${totalPoints} vertices visualized across all bones`);
+        }
+        else {
+          alert('⚠️ Please load a body (🧍 or 💀) or select an object first');
+          document.getElementById('showVertexPoints').checked = false;
+        }
       }
     }
 
     function toggleVertexNumbers(show) {
-      if (!transformControl.object || !transformControl.object.geometry) {
-        alert('⚠️ Please select an object first');
-        document.getElementById('showVertexNumbers').checked = false;
-        return;
-      }
-
       // Clear existing labels
       const existingLabels = scene.children.filter(c => c.name === 'VertexLabel');
       existingLabels.forEach(label => scene.remove(label));
       
       if (show) {
-        const object = transformControl.object;
-        const geometry = object.geometry;
-        const positionAttribute = geometry.getAttribute('position');
-        const vertexCount = positionAttribute.count;
-        
-        console.log(`🔢 Adding labels for ${vertexCount} vertices...`);
-        
-        // Only show labels for first 100 vertices (performance)
-        const maxLabels = Math.min(100, vertexCount);
-        
-        for (let i = 0; i < maxLabels; i++) {
-          const x = positionAttribute.getX(i);
-          const y = positionAttribute.getY(i);
-          const z = positionAttribute.getZ(i);
+        // Check if we have a selected object with geometry
+        if (transformControl.object && transformControl.object.geometry) {
+          const object = transformControl.object;
+          const geometry = object.geometry;
+          const positionAttribute = geometry.getAttribute('position');
+          const vertexCount = positionAttribute.count;
           
-          // Create text sprite (simplified - could use THREE.TextGeometry for better quality)
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
-          canvas.width = 64;
-          canvas.height = 32;
-          context.fillStyle = '#00ffff';
-          context.font = 'Bold 20px Arial';
-          context.fillText(i.toString(), 10, 24);
+          console.log(`🔢 Adding labels for ${vertexCount} vertices on ${object.name || 'selected object'}...`);
           
-          const texture = new THREE.CanvasTexture(canvas);
-          const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-          const sprite = new THREE.Sprite(spriteMaterial);
-          sprite.position.set(x, y, z);
-          sprite.scale.set(0.2, 0.1, 1);
-          sprite.name = 'VertexLabel';
+          // Only show labels for first 100 vertices (performance)
+          const maxLabels = Math.min(100, vertexCount);
           
-          // Transform to world space
-          sprite.position.applyMatrix4(object.matrixWorld);
+          for (let i = 0; i < maxLabels; i++) {
+            const x = positionAttribute.getX(i);
+            const y = positionAttribute.getY(i);
+            const z = positionAttribute.getZ(i);
+            
+            // Create text sprite
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 64;
+            canvas.height = 32;
+            context.fillStyle = '#00ffff';
+            context.font = 'Bold 20px Arial';
+            context.fillText(i.toString(), 10, 24);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.position.set(x, y, z);
+            sprite.scale.set(0.2, 0.1, 1);
+            sprite.name = 'VertexLabel';
+            
+            // Transform to world space
+            sprite.position.applyMatrix4(object.matrixWorld);
+            
+            scene.add(sprite);
+            vertexHelpers.push(sprite);
+          }
           
-          scene.add(sprite);
-          vertexHelpers.push(sprite);
+          if (vertexCount > 100) {
+            console.log(`ℹ️ Showing first 100 labels only (${vertexCount} total vertices)`);
+          }
         }
-        
-        if (vertexCount > 100) {
-          console.log(`ℹ️ Showing first 100 labels only (${vertexCount} total vertices)`);
+        else if (window.fullBodyGroup) {
+          console.log(`🔢 Adding vertex labels to body (first 10 per bone)...`);
+          let totalLabels = 0;
+          
+          window.fullBodyGroup.traverse((child) => {
+            if (child.geometry) {
+              const posAttr = child.geometry.getAttribute('position');
+              if (posAttr && totalLabels < 100) { // Limit total labels
+                const maxPerBone = Math.min(10, posAttr.count, 100 - totalLabels);
+                
+                for (let i = 0; i < maxPerBone; i++) {
+                  const vec = new THREE.Vector3(
+                    posAttr.getX(i),
+                    posAttr.getY(i),
+                    posAttr.getZ(i)
+                  );
+                  
+                  // Transform to world space
+                  vec.applyMatrix4(child.matrixWorld);
+                  
+                  const canvas = document.createElement('canvas');
+                  const context = canvas.getContext('2d');
+                  canvas.width = 64;
+                  canvas.height = 32;
+                  context.fillStyle = '#00ffff';
+                  context.font = 'Bold 16px Arial';
+                  context.fillText(i.toString(), 10, 24);
+                  
+                  const texture = new THREE.CanvasTexture(canvas);
+                  const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+                  const sprite = new THREE.Sprite(spriteMaterial);
+                  sprite.position.copy(vec);
+                  sprite.scale.set(0.15, 0.075, 1);
+                  sprite.name = 'VertexLabel';
+                  
+                  scene.add(sprite);
+                  vertexHelpers.push(sprite);
+                  totalLabels++;
+                }
+              }
+            }
+          });
+          
+          console.log(`ℹ️ Showing ${totalLabels} vertex labels (limited for performance)`);
+        }
+        else {
+          alert('⚠️ Please load a body (🧍 or 💀) or select an object first');
+          document.getElementById('showVertexNumbers').checked = false;
         }
       }
     }
 
     function toggleWireframe(show) {
-      if (!transformControl.object || !transformControl.object.material) {
-        alert('⚠️ Please select an object first');
+      // Check if we have a selected object
+      if (transformControl.object && transformControl.object.material) {
+        const object = transformControl.object;
+        
+        if (Array.isArray(object.material)) {
+          object.material.forEach(mat => mat.wireframe = show);
+        } else {
+          object.material.wireframe = show;
+        }
+        
+        console.log(`🔲 Wireframe: ${show ? 'ON' : 'OFF'} for ${object.name || 'selected object'}`);
+      }
+      // Or apply to entire body
+      else if (window.fullBodyGroup) {
+        let count = 0;
+        window.fullBodyGroup.traverse((child) => {
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach(mat => mat.wireframe = show);
+            } else {
+              child.material.wireframe = show;
+            }
+            count++;
+          }
+        });
+        console.log(`🔲 Wireframe: ${show ? 'ON' : 'OFF'} for ${count} body parts`);
+      }
+      else {
+        alert('⚠️ Please load a body (🧍 or 💀) or select an object first');
         document.getElementById('showWireframe').checked = false;
-        return;
       }
-
-      const object = transformControl.object;
-      
-      if (Array.isArray(object.material)) {
-        object.material.forEach(mat => mat.wireframe = show);
-      } else {
-        object.material.wireframe = show;
-      }
-      
-      console.log(`🔲 Wireframe: ${show ? 'ON' : 'OFF'}`);
     }
 
     function clearVertexHelpers() {
