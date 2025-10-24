@@ -954,12 +954,20 @@
           }
         }
         
-        // Smooth camera follow for flight
-        const cameraOffset = new THREE.Vector3(0, 3, -8);
-        cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), bodyRotation);
-        const cameraTargetPos = window.fullBodyGroup.position.clone();
-        camera.position.lerp(cameraTargetPos.clone().add(cameraOffset), 0.05);
-        camera.lookAt(cameraTargetPos);
+        // 3rd person camera for flight (behind and slightly above)
+        const bodyPos = window.fullBodyGroup.position.clone();
+        const cameraDistance = 10;
+        const cameraHeight = 3;
+        
+        const cameraOffset = new THREE.Vector3(
+          -Math.sin(bodyRotation) * cameraDistance,
+          cameraHeight,
+          -Math.cos(bodyRotation) * cameraDistance
+        );
+        
+        const targetCameraPos = bodyPos.clone().add(cameraOffset);
+        camera.position.lerp(targetCameraPos, 0.08);
+        camera.lookAt(bodyPos);
         
         return; // Skip walking animation
       }
@@ -1154,13 +1162,29 @@
           window.fullBodyGroup.position.z -= Math.cos(bodyRotation) * walkCycleSpeed * backwardSpeed;
         }
         
-        // Camera follows
+        // === 3RD PERSON CAMERA (Game-style) ===
         if (walkModeEnabled) {
-          const cameraOffset = new THREE.Vector3(5, 5, 5);
-          cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), bodyRotation);
-          const cameraTargetPos = window.fullBodyGroup.position.clone();
-          camera.position.lerp(cameraTargetPos.clone().add(cameraOffset), 0.1);
-          camera.lookAt(cameraTargetPos);
+          const bodyRotation = window.fullBodyGroup.rotation.y;
+          const bodyPos = window.fullBodyGroup.position.clone();
+          
+          // Camera positioned behind and above character
+          const cameraDistance = 8; // Distance behind character
+          const cameraHeight = 4; // Height above character
+          const lookAtHeight = 2; // Look at character's upper body
+          
+          // Calculate camera position behind character (rotates with character)
+          const cameraOffset = new THREE.Vector3(
+            -Math.sin(bodyRotation) * cameraDistance, // Behind (negative forward)
+            cameraHeight,
+            -Math.cos(bodyRotation) * cameraDistance
+          );
+          
+          const targetCameraPos = bodyPos.clone().add(cameraOffset);
+          const lookAtTarget = bodyPos.clone().add(new THREE.Vector3(0, lookAtHeight, 0));
+          
+          // Smooth camera movement (lerp for cinematic feel)
+          camera.position.lerp(targetCameraPos, 0.1);
+          camera.lookAt(lookAtTarget);
         }
       }
     }
