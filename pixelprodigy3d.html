@@ -286,13 +286,16 @@
     <div id="header">
       <h1>⚡ PixelProdigy Universe</h1>
       <div class="workspace-tabs">
-        <button class="workspace-tab active" onclick="switchWorkspace('sculpt', this)">3D Sculpt</button>
-        <button class="workspace-tab" onclick="switchWorkspace('css', this)">CSS Designer</button>
-        <button class="workspace-tab" onclick="switchWorkspace('word', this)">WordWeaver</button>
-        <button class="workspace-tab" onclick="switchWorkspace('campus', this)">Campus</button>
-        <button class="workspace-tab" onclick="switchWorkspace('perfect', this)">Perfect</button>
+        <button class="workspace-tab active" onclick="switchDimensionUI('skyrelics', this)" data-dimension="skyrelics">🏰 SkyRelics</button>
+        <button class="workspace-tab" onclick="switchDimensionUI('wordweaver', this)" data-dimension="wordweaver">✍️ WordWeaver</button>
+        <button class="workspace-tab" onclick="switchDimensionUI('anatomy', this)" data-dimension="anatomy">🦴 Anatomy</button>
+        <button class="workspace-tab" onclick="switchDimensionUI('perfect', this)" data-dimension="perfect">✨ Perfect</button>
       </div>
-      <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Multi-Workspace Studio</div>
+      <div style="color: rgba(255,255,255,0.8); font-size: 14px;">
+        🌌 Dimensional Workspace System
+        <span id="current-dimension-display" style="margin-left: 10px; padding: 4px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; font-size: 11px;">SkyRelics</span>
+        <span style="margin-left: 10px; font-size: 11px; opacity: 0.6;">Press Ctrl+D to cycle</span>
+      </div>
       
       <!-- Camera Controls -->
       <div style="display: flex; gap: 8px; margin-left: auto;">
@@ -847,6 +850,18 @@
             
             <div style="margin-bottom: 12px;">
               <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Material:</label>
+              
+              <!-- Auto-Correlation Toggle -->
+              <div style="margin-bottom: 8px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" id="enable-matrix-correlation" checked onchange="toggleMatrixCorrelation()" style="width: 16px; height: 16px; cursor: pointer;">
+                  <span style="color: #e0e0e0; font-size: 11px;">🔄 Auto-correlate Matrix Background</span>
+                </label>
+                <div style="margin-top: 2px; padding-left: 24px; font-size: 9px; color: rgba(255,255,255,0.5);">
+                  Matrix wall automatically matches material type
+                </div>
+              </div>
+              
               <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
                 <button class="material-selector" data-material="biblical" onclick="selectDocMaterial('biblical')" style="padding: 8px; background: rgba(212, 165, 116, 0.3); border: 2px solid rgba(212, 165, 116, 0.5); border-radius: 6px; color: #fff; font-size: 10px; cursor: pointer;">
                   📖 Biblical
@@ -857,6 +872,20 @@
                 <button class="material-selector" data-material="holographic" onclick="selectDocMaterial('holographic')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
                   ✨ Holo
                 </button>
+                <button class="material-selector" data-material="metallic" onclick="selectDocMaterial('metallic')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
+                  🔧 Metal
+                </button>
+                <button class="material-selector" data-material="glass" onclick="selectDocMaterial('glass')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
+                  🔮 Glass
+                </button>
+                <button class="material-selector" data-material="magnetic" onclick="selectDocMaterial('magnetic')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
+                  🧲 Magnetic
+                </button>
+              </div>
+              
+              <!-- Material Correlation Display -->
+              <div id="material-correlation-info" style="margin-top: 6px; padding: 6px; background: rgba(102, 126, 234, 0.1); border-radius: 4px; font-size: 9px; color: rgba(255,255,255,0.7); line-height: 1.4;">
+                📄 Biblical → Solid Grid (Ancient parchment texture)
               </div>
             </div>
             
@@ -1108,6 +1137,49 @@
                 <span style="color: #e0e0e0; font-size: 12px;">Enable Rotation Animation</span>
               </label>
             </div>
+            
+            <div style="margin-top: 12px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="enable-matrix-grid" checked onchange="toggleMatrixGrid()" style="width: 16px; height: 16px; cursor: pointer;">
+                <span style="color: #e0e0e0; font-size: 12px;">🌐 Show Matrix Grid Backwall</span>
+              </label>
+              <div style="margin-top: 4px; padding-left: 24px; font-size: 10px; color: rgba(255,255,255,0.5);">
+                Spatial reference grid behind text
+              </div>
+              
+              <!-- Matrix Wall Mode Selector -->
+              <div style="margin-top: 10px; padding-left: 0px;">
+                <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 6px; font-weight: 600;">
+                  🎨 Matrix Wall Style:
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+                  <button 
+                    id="mode-paperback" 
+                    onclick="switchMatrixMode('paperback')" 
+                    class="matrix-mode-btn active-mode"
+                    style="padding: 8px 4px; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.6); border-radius: 6px; color: #fff; font-size: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                    📄 Solid
+                  </button>
+                  <button 
+                    id="mode-magnetic" 
+                    onclick="switchMatrixMode('magnetic')" 
+                    class="matrix-mode-btn"
+                    style="padding: 8px 4px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                    🧲 Field
+                  </button>
+                  <button 
+                    id="mode-holographic" 
+                    onclick="switchMatrixMode('holographic')" 
+                    class="matrix-mode-btn"
+                    style="padding: 8px 4px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                    🔮 Holo
+                  </button>
+                </div>
+                <div id="matrix-mode-description" style="margin-top: 6px; font-size: 9px; color: rgba(255,255,255,0.5); line-height: 1.4;">
+                  📄 Solid grid structure with clean lines
+                </div>
+              </div>
+            </div>
           </div>
           
           <!-- Quick Actions -->
@@ -1164,6 +1236,131 @@
               <span class="tool-icon">⭐</span>
               <span>Optimize</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🦴 ANATOMY WORKSPACE -->
+      <div id="workspace-anatomy" class="workspace-content" style="display: none; overflow-y: auto; max-height: calc(100vh - 100px);">
+        <!-- Anatomical Search Bar -->
+        <div class="section">
+          <div class="section-title">🔍 Anatomical Search</div>
+          <div style="padding: 10px;">
+            <input 
+              type="text" 
+              id="anatomy-search" 
+              placeholder="Search bones, muscles, organs... (e.g., 'femur', 'bicep', 'heart')"
+              style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 4px; color: #fff; font-size: 14px;"
+              oninput="anatomySearch(this.value)"
+              onkeydown="if(event.key==='Enter') anatomySearchEnter()"
+            />
+            <div id="search-suggestions" style="margin-top: 5px; max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 4px; display: none;"></div>
+            <div id="search-results-count" style="margin-top: 5px; color: rgba(255,255,255,0.6); font-size: 12px;"></div>
+          </div>
+        </div>
+
+        <!-- System Filters -->
+        <div class="section">
+          <div class="section-title">🎯 Filter by System</div>
+          <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
+            <button class="filter-btn active" data-system="all" onclick="filterBySystem('all', this)" style="background: rgba(102, 126, 234, 0.3); border: 1px solid rgba(102, 126, 234, 0.5); border-radius: 4px; padding: 8px 15px; color: #fff; cursor: pointer; font-size: 13px;">
+              🌟 All Systems
+            </button>
+            <button class="filter-btn" data-system="skeletal" onclick="filterBySystem('skeletal', this)" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px 15px; color: #fff; cursor: pointer; font-size: 13px;">
+              🦴 Skeletal
+            </button>
+            <button class="filter-btn" data-system="muscular" onclick="filterBySystem('muscular', this)" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px 15px; color: #fff; cursor: pointer; font-size: 13px;">
+              💪 Muscular
+            </button>
+            <button class="filter-btn" data-system="nervous" onclick="filterBySystem('nervous', this)" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px 15px; color: #fff; cursor: pointer; font-size: 13px;">
+              🧠 Nervous
+            </button>
+            <button class="filter-btn" data-system="circulatory" onclick="filterBySystem('circulatory', this)" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px 15px; color: #fff; cursor: pointer; font-size: 13px;">
+              ❤️ Circulatory
+            </button>
+            <button class="filter-btn" data-system="respiratory" onclick="filterBySystem('respiratory', this)" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px 15px; color: #fff; cursor: pointer; font-size: 13px;">
+              🫁 Respiratory
+            </button>
+            <button class="filter-btn" data-system="digestive" onclick="filterBySystem('digestive', this)" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 8px 15px; color: #fff; cursor: pointer; font-size: 13px;">
+              🫃 Digestive
+            </button>
+          </div>
+        </div>
+
+        <!-- Highlighted Structures List -->
+        <div class="section">
+          <div class="section-title">✨ Found Structures</div>
+          <div id="found-structures-list" style="padding: 10px; color: rgba(255,255,255,0.7); font-size: 13px;">
+            <div style="color: rgba(255,255,255,0.4);">Search or filter to find anatomical structures...</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section">
+          <div class="section-title">⚡ Quick Actions</div>
+          <div style="padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button onclick="showAllAnatomy()" style="background: rgba(102, 126, 234, 0.2); border: 1px solid rgba(102, 126, 234, 0.4); border-radius: 4px; padding: 10px; color: #fff; cursor: pointer; font-size: 13px;">
+              👁️ Show All
+            </button>
+            <button onclick="hideAllAnatomy()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 10px; color: #fff; cursor: pointer; font-size: 13px;">
+              🙈 Hide All
+            </button>
+            <button onclick="resetAnatomyView()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 10px; color: #fff; cursor: pointer; font-size: 13px;">
+              🔄 Reset View
+            </button>
+            <button onclick="focusOnSelected()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 10px; color: #fff; cursor: pointer; font-size: 13px;">
+              🎯 Focus Selected
+            </button>
+          </div>
+        </div>
+
+        <!-- Layer Visibility Toggle -->
+        <div class="section">
+          <div class="section-title">👁️ Layer Visibility</div>
+          <div style="padding: 10px;">
+            <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; color: rgba(255,255,255,0.8);">
+              <input type="checkbox" id="layer-skeleton" checked onchange="toggleLayer('skeleton', this.checked)" style="margin-right: 10px; cursor: pointer;">
+              🦴 Skeleton
+            </label>
+            <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; color: rgba(255,255,255,0.8);">
+              <input type="checkbox" id="layer-muscles" onchange="toggleLayer('muscles', this.checked)" style="margin-right: 10px; cursor: pointer;">
+              💪 Muscles
+            </label>
+            <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; color: rgba(255,255,255,0.8);">
+              <input type="checkbox" id="layer-organs" onchange="toggleLayer('organs', this.checked)" style="margin-right: 10px; cursor: pointer;">
+              🫀 Organs
+            </label>
+            <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; color: rgba(255,255,255,0.8);">
+              <input type="checkbox" id="layer-skin" onchange="toggleLayer('skin', this.checked)" style="margin-right: 10px; cursor: pointer;">
+              👤 Skin
+            </label>
+            <div style="margin-top: 15px;">
+              <label style="color: rgba(255,255,255,0.7); font-size: 13px; display: block; margin-bottom: 5px;">
+                Layer Transparency: <span id="layer-opacity-value">100</span>%
+              </label>
+              <input type="range" id="layer-opacity" min="0" max="100" value="100" oninput="updateLayerOpacity(this.value)" style="width: 100%; cursor: pointer;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Voice Search (VR Mode) -->
+        <div class="section">
+          <div class="section-title">🎤 Voice Search (VR)</div>
+          <div style="padding: 10px;">
+            <button id="voice-search-btn" onclick="startVoiceSearch()" style="width: 100%; background: rgba(102, 126, 234, 0.2); border: 1px solid rgba(102, 126, 234, 0.4); border-radius: 4px; padding: 12px; color: #fff; cursor: pointer; font-size: 14px;">
+              🎤 Start Voice Search
+            </button>
+            <div id="voice-search-status" style="margin-top: 8px; color: rgba(255,255,255,0.5); font-size: 12px; text-align: center;"></div>
+          </div>
+        </div>
+
+        <!-- Educational Info Panel -->
+        <div class="section">
+          <div class="section-title">📚 Selected Structure Info</div>
+          <div id="anatomy-info-panel" style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 4px; min-height: 100px;">
+            <div style="color: rgba(255,255,255,0.4); font-size: 13px;">
+              Click on a bone or structure in the 3D view to see details...
+            </div>
           </div>
         </div>
       </div>
@@ -1369,6 +1566,134 @@
     
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
+
+    // =====================================
+    // 🌌 DIMENSIONAL WORKSPACE SYSTEM
+    // Multi-Environment Manager with Isolated 3D Spaces
+    // =====================================
+    
+    let currentDimension = 'skyrelics'; // Active workspace/dimension
+    let dimensionalSpaces = {}; // Stores all workspace configurations
+    let masterMatrixGrid = null; // Universal boundary grid
+    
+    /**
+     * 🎯 Dimensional Workspace Configuration
+     * Each workspace is an isolated 3D universe with custom settings
+     */
+    const DIMENSIONAL_CONFIGS = {
+      skyrelics: {
+        name: 'SkyRelics Universe',
+        icon: '🏰',
+        description: 'Primitive 3D object creation and Sky Relics civilization',
+        backgroundColor: 0x0a0a0a,
+        fogColor: 0x0a0a0a,
+        fogNear: 10,
+        fogFar: 50,
+        cameraPosition: { x: 5, y: 5, z: 5 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 40,
+          divisions: 40,
+          centerColor: 0x667eea,
+          gridColor: 0x334477,
+          wallColor: 0x1a1a2e,
+          showWalls: true,
+          wallHeight: 20,
+          wallOpacity: 0.3
+        },
+        lighting: {
+          ambient: { color: 0x404040, intensity: 0.5 },
+          directional: { color: 0xffffff, intensity: 0.8, position: { x: 10, y: 20, z: 10 } },
+          point: { color: 0x667eea, intensity: 0.5, position: { x: 0, y: 10, z: 0 } }
+        }
+      },
+      
+      wordweaver: {
+        name: 'WordWeaver Studio',
+        icon: '✍️',
+        description: '3D text materialization and document creation',
+        backgroundColor: 0x0a0a1a,
+        fogColor: 0x0a0a1a,
+        fogNear: 15,
+        fogFar: 60,
+        cameraPosition: { x: 0, y: 8, z: 15 },
+        cameraTarget: { x: 0, y: 8, z: 0 },
+        gridConfig: {
+          size: 50,
+          divisions: 40,
+          centerColor: 0x00ff00,
+          gridColor: 0x667eea,
+          wallColor: 0x0a0a1a,
+          showWalls: true,
+          wallHeight: 30,
+          wallOpacity: 0.6,
+          backwallZ: -8 // Special backwall for text reference
+        },
+        lighting: {
+          ambient: { color: 0x606060, intensity: 0.7 },
+          directional: { color: 0xffffff, intensity: 0.6, position: { x: 5, y: 15, z: 10 } },
+          point: { color: 0x667eea, intensity: 0.3, position: { x: 0, y: 8, z: -5 } }
+        }
+      },
+      
+      anatomy: {
+        name: 'Anatomical Explorer',
+        icon: '🦴',
+        description: 'Human anatomy visualization and medical education',
+        backgroundColor: 0x1a1a1a,
+        fogColor: 0x1a1a1a,
+        fogNear: 20,
+        fogFar: 80,
+        cameraPosition: { x: 8, y: 3, z: 8 },
+        cameraTarget: { x: 0, y: 2, z: 0 },
+        gridConfig: {
+          size: 30,
+          divisions: 30,
+          centerColor: 0xff6b6b,
+          gridColor: 0x4a4a4a,
+          wallColor: 0x1a1a1a,
+          showWalls: true,
+          wallHeight: 15,
+          wallOpacity: 0.4,
+          circular: true // Circular grid for 360° viewing
+        },
+        lighting: {
+          ambient: { color: 0x505050, intensity: 0.6 },
+          directional: { color: 0xffffff, intensity: 1.0, position: { x: 10, y: 10, z: 10 } },
+          point: [
+            { color: 0xff6b6b, intensity: 0.4, position: { x: -5, y: 5, z: 5 } },
+            { color: 0x6bcfff, intensity: 0.4, position: { x: 5, y: 5, z: -5 } }
+          ]
+        }
+      },
+      
+      perfect: {
+        name: 'Perfect Universe',
+        icon: '✨',
+        description: 'Placeholder for perfect world creation',
+        backgroundColor: 0x1a0a2e,
+        fogColor: 0x1a0a2e,
+        fogNear: 10,
+        fogFar: 50,
+        cameraPosition: { x: 10, y: 5, z: 10 },
+        cameraTarget: { x: 0, y: 0, z: 0 },
+        gridConfig: {
+          size: 50,
+          divisions: 50,
+          centerColor: 0xffd700,
+          gridColor: 0x8b00ff,
+          wallColor: 0x1a0a2e,
+          showWalls: true,
+          wallHeight: 25,
+          wallOpacity: 0.5
+        },
+        lighting: {
+          ambient: { color: 0x404040, intensity: 0.5 },
+          directional: { color: 0xffd700, intensity: 0.7, position: { x: 15, y: 20, z: 15 } },
+          point: { color: 0x8b00ff, intensity: 0.6, position: { x: 0, y: 15, z: 0 } }
+        }
+      }
+    };
 
     // Initialize
     function init() {
@@ -2729,6 +3054,449 @@
       }
     }
 
+    // =====================================
+    // 🔍 ANATOMICAL SEARCH/FILTER SYSTEM
+    // =====================================
+
+    // Comprehensive anatomical database
+    const anatomicalDatabase = {
+      skeletal: [
+        // AXIAL SKELETON
+        { name: 'Skull', keywords: ['cranium', 'head', 'skull', 'brain case'], system: 'skeletal', region: 'head' },
+        { name: 'Mandible', keywords: ['jaw', 'lower jaw', 'mandible', 'jawbone'], system: 'skeletal', region: 'head' },
+        { name: 'Maxilla', keywords: ['upper jaw', 'maxilla'], system: 'skeletal', region: 'head' },
+        { name: 'Zygomatic', keywords: ['cheekbone', 'zygomatic', 'cheek'], system: 'skeletal', region: 'head' },
+        { name: 'Temporal', keywords: ['temporal', 'temple'], system: 'skeletal', region: 'head' },
+        { name: 'Occipital', keywords: ['occipital', 'back skull'], system: 'skeletal', region: 'head' },
+        
+        // SPINE
+        { name: 'Cervical Vertebrae', keywords: ['cervical', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'neck vertebrae', 'atlas', 'axis'], system: 'skeletal', region: 'spine' },
+        { name: 'Thoracic Vertebrae', keywords: ['thoracic', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 't10', 't11', 't12', 'upper back'], system: 'skeletal', region: 'spine' },
+        { name: 'Lumbar Vertebrae', keywords: ['lumbar', 'l1', 'l2', 'l3', 'l4', 'l5', 'lower back'], system: 'skeletal', region: 'spine' },
+        { name: 'Sacrum', keywords: ['sacrum', 'tailbone base'], system: 'skeletal', region: 'spine' },
+        { name: 'Coccyx', keywords: ['coccyx', 'tailbone'], system: 'skeletal', region: 'spine' },
+        
+        // THORAX
+        { name: 'Ribs', keywords: ['rib', 'ribs', 'ribcage', 'costal'], system: 'skeletal', region: 'thorax' },
+        { name: 'Sternum', keywords: ['sternum', 'breastbone', 'manubrium', 'xiphoid'], system: 'skeletal', region: 'thorax' },
+        
+        // PELVIS
+        { name: 'Pelvis', keywords: ['pelvis', 'hip', 'ilium', 'ischium', 'pubis'], system: 'skeletal', region: 'pelvis' },
+        
+        // UPPER LIMBS
+        { name: 'Clavicle', keywords: ['clavicle', 'collarbone'], system: 'skeletal', region: 'shoulder' },
+        { name: 'Scapula', keywords: ['scapula', 'shoulder blade'], system: 'skeletal', region: 'shoulder' },
+        { name: 'Humerus', keywords: ['humerus', 'upper arm'], system: 'skeletal', region: 'arm' },
+        { name: 'Radius', keywords: ['radius', 'forearm lateral'], system: 'skeletal', region: 'forearm' },
+        { name: 'Ulna', keywords: ['ulna', 'forearm medial', 'elbow bone'], system: 'skeletal', region: 'forearm' },
+        { name: 'Carpals', keywords: ['carpals', 'wrist', 'scaphoid', 'lunate', 'triquetrum', 'pisiform', 'trapezium', 'trapezoid', 'capitate', 'hamate'], system: 'skeletal', region: 'hand' },
+        { name: 'Metacarpals', keywords: ['metacarpals', 'hand bones', 'palm'], system: 'skeletal', region: 'hand' },
+        { name: 'Phalanges (Hand)', keywords: ['phalanges', 'fingers', 'thumb', 'finger bones'], system: 'skeletal', region: 'hand' },
+        
+        // LOWER LIMBS
+        { name: 'Femur', keywords: ['femur', 'thigh bone', 'thighbone'], system: 'skeletal', region: 'leg' },
+        { name: 'Patella', keywords: ['patella', 'kneecap', 'knee cap'], system: 'skeletal', region: 'leg' },
+        { name: 'Tibia', keywords: ['tibia', 'shin bone', 'shinbone'], system: 'skeletal', region: 'leg' },
+        { name: 'Fibula', keywords: ['fibula', 'calf bone'], system: 'skeletal', region: 'leg' },
+        { name: 'Tarsals', keywords: ['tarsals', 'ankle', 'talus', 'calcaneus', 'heel'], system: 'skeletal', region: 'foot' },
+        { name: 'Metatarsals', keywords: ['metatarsals', 'foot bones'], system: 'skeletal', region: 'foot' },
+        { name: 'Phalanges (Foot)', keywords: ['toe', 'toes', 'toe bones', 'hallux', 'big toe'], system: 'skeletal', region: 'foot' }
+      ],
+      muscular: [
+        { name: 'Biceps Brachii', keywords: ['biceps', 'bicep'], system: 'muscular', region: 'arm' },
+        { name: 'Triceps Brachii', keywords: ['triceps', 'tricep'], system: 'muscular', region: 'arm' },
+        { name: 'Deltoid', keywords: ['deltoid', 'shoulder muscle'], system: 'muscular', region: 'shoulder' },
+        { name: 'Pectoralis Major', keywords: ['pectoralis', 'pecs', 'chest'], system: 'muscular', region: 'chest' },
+        { name: 'Latissimus Dorsi', keywords: ['latissimus', 'lats', 'back'], system: 'muscular', region: 'back' },
+        { name: 'Trapezius', keywords: ['trapezius', 'traps'], system: 'muscular', region: 'back' },
+        { name: 'Rectus Abdominis', keywords: ['rectus abdominis', 'abs', 'six pack'], system: 'muscular', region: 'abdomen' },
+        { name: 'External Obliques', keywords: ['obliques', 'side abs'], system: 'muscular', region: 'abdomen' },
+        { name: 'Quadriceps', keywords: ['quadriceps', 'quads', 'thigh front'], system: 'muscular', region: 'leg' },
+        { name: 'Hamstrings', keywords: ['hamstrings', 'thigh back'], system: 'muscular', region: 'leg' },
+        { name: 'Gastrocnemius', keywords: ['gastrocnemius', 'calf'], system: 'muscular', region: 'leg' },
+        { name: 'Gluteus Maximus', keywords: ['gluteus', 'glutes', 'butt'], system: 'muscular', region: 'pelvis' }
+      ],
+      nervous: [
+        { name: 'Brain', keywords: ['brain', 'cerebrum', 'cerebellum'], system: 'nervous', region: 'head' },
+        { name: 'Spinal Cord', keywords: ['spinal cord', 'spine cord'], system: 'nervous', region: 'spine' },
+        { name: 'Nerves', keywords: ['nerve', 'nerves', 'neural'], system: 'nervous', region: 'all' }
+      ],
+      circulatory: [
+        { name: 'Heart', keywords: ['heart', 'cardiac'], system: 'circulatory', region: 'chest' },
+        { name: 'Arteries', keywords: ['artery', 'arteries', 'aorta'], system: 'circulatory', region: 'all' },
+        { name: 'Veins', keywords: ['vein', 'veins'], system: 'circulatory', region: 'all' }
+      ],
+      respiratory: [
+        { name: 'Lungs', keywords: ['lung', 'lungs', 'pulmonary'], system: 'respiratory', region: 'chest' },
+        { name: 'Trachea', keywords: ['trachea', 'windpipe'], system: 'respiratory', region: 'neck' },
+        { name: 'Bronchi', keywords: ['bronchi', 'bronchus'], system: 'respiratory', region: 'chest' }
+      ],
+      digestive: [
+        { name: 'Stomach', keywords: ['stomach'], system: 'digestive', region: 'abdomen' },
+        { name: 'Liver', keywords: ['liver'], system: 'digestive', region: 'abdomen' },
+        { name: 'Intestines', keywords: ['intestine', 'intestines', 'bowel'], system: 'digestive', region: 'abdomen' }
+      ]
+    };
+
+    // Flatten database for search
+    let allAnatomicalStructures = [];
+    Object.keys(anatomicalDatabase).forEach(system => {
+      allAnatomicalStructures = allAnatomicalStructures.concat(anatomicalDatabase[system]);
+    });
+
+    let currentAnatomyFilter = 'all';
+    let highlightedStructures = [];
+
+    // Search function with autocomplete
+    function anatomySearch(query) {
+      const searchBox = document.getElementById('anatomy-search');
+      const suggestionsDiv = document.getElementById('search-suggestions');
+      const resultsCount = document.getElementById('search-results-count');
+      
+      if (!query || query.length < 2) {
+        suggestionsDiv.style.display = 'none';
+        resultsCount.textContent = '';
+        return;
+      }
+      
+      const lowerQuery = query.toLowerCase();
+      const matches = [];
+      
+      // Search through all structures
+      allAnatomicalStructures.forEach(structure => {
+        // Check if query matches name or any keyword
+        if (structure.name.toLowerCase().includes(lowerQuery) || 
+            structure.keywords.some(keyword => keyword.includes(lowerQuery))) {
+          // Apply system filter if active
+          if (currentAnatomyFilter === 'all' || structure.system === currentAnatomyFilter) {
+            matches.push(structure);
+          }
+        }
+      });
+      
+      // Show suggestions
+      if (matches.length > 0) {
+        suggestionsDiv.innerHTML = matches.slice(0, 8).map(structure => 
+          `<div style="padding: 8px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1);" 
+                onmouseover="this.style.background='rgba(102,126,234,0.2)'" 
+                onmouseout="this.style.background='transparent'"
+                onclick="selectAnatomicalStructure('${structure.name}')">
+            ${getSystemIcon(structure.system)} <strong>${structure.name}</strong> 
+            <span style="color: rgba(255,255,255,0.5); font-size: 11px;">${structure.region}</span>
+          </div>`
+        ).join('');
+        suggestionsDiv.style.display = 'block';
+        resultsCount.textContent = `Found ${matches.length} structure${matches.length !== 1 ? 's' : ''}`;
+      } else {
+        suggestionsDiv.innerHTML = '<div style="padding: 8px; color: rgba(255,255,255,0.5);">No results found</div>';
+        suggestionsDiv.style.display = 'block';
+        resultsCount.textContent = 'No matches';
+      }
+    }
+
+    // Handle Enter key in search
+    function anatomySearchEnter() {
+      const query = document.getElementById('anatomy-search').value;
+      if (!query) return;
+      
+      // Find first match and select it
+      const lowerQuery = query.toLowerCase();
+      const firstMatch = allAnatomicalStructures.find(structure => 
+        (structure.name.toLowerCase().includes(lowerQuery) || 
+         structure.keywords.some(keyword => keyword.includes(lowerQuery))) &&
+        (currentAnatomyFilter === 'all' || structure.system === currentAnatomyFilter)
+      );
+      
+      if (firstMatch) {
+        selectAnatomicalStructure(firstMatch.name);
+      }
+    }
+
+    // Select and highlight a specific anatomical structure
+    function selectAnatomicalStructure(structureName) {
+      console.log(`🔍 Searching for: ${structureName}`);
+      
+      // Clear previous highlights
+      clearAnatomyHighlights();
+      
+      // Find all meshes matching this structure name
+      const matches = [];
+      scene.traverse(obj => {
+        if (obj.isMesh && obj.name) {
+          const objName = obj.name.toLowerCase();
+          const searchName = structureName.toLowerCase();
+          
+          // Check if object name contains the search term
+          if (objName.includes(searchName) || searchName.includes(objName.split(' ')[0])) {
+            matches.push(obj);
+          }
+        }
+      });
+      
+      console.log(`  ✅ Found ${matches.length} matching structures`);
+      
+      // Highlight found structures
+      matches.forEach(obj => {
+        highlightStructure(obj);
+        highlightedStructures.push(obj);
+      });
+      
+      // Update found structures list
+      updateFoundStructuresList();
+      
+      // Focus camera on first match if exists
+      if (matches.length > 0) {
+        focusOnStructure(matches[0]);
+      }
+      
+      // Hide suggestions
+      document.getElementById('search-suggestions').style.display = 'none';
+    }
+
+    // Highlight a structure
+    function highlightStructure(obj) {
+      if (obj.material) {
+        // Store original material properties
+        if (!obj.userData.originalMaterial) {
+          obj.userData.originalMaterial = {
+            emissive: obj.material.emissive ? obj.material.emissive.clone() : new THREE.Color(0x000000),
+            emissiveIntensity: obj.material.emissiveIntensity || 0
+          };
+        }
+        
+        // Apply highlight
+        obj.material.emissive = new THREE.Color(0x00ff00); // Green glow
+        obj.material.emissiveIntensity = 0.5;
+      }
+    }
+
+    // Clear all highlights
+    function clearAnatomyHighlights() {
+      highlightedStructures.forEach(obj => {
+        if (obj.material && obj.userData.originalMaterial) {
+          obj.material.emissive = obj.userData.originalMaterial.emissive;
+          obj.material.emissiveIntensity = obj.userData.originalMaterial.emissiveIntensity;
+        }
+      });
+      highlightedStructures = [];
+      updateFoundStructuresList();
+    }
+
+    // Update found structures list UI
+    function updateFoundStructuresList() {
+      const listDiv = document.getElementById('found-structures-list');
+      
+      if (highlightedStructures.length === 0) {
+        listDiv.innerHTML = '<div style="color: rgba(255,255,255,0.4);">Search or filter to find anatomical structures...</div>';
+        return;
+      }
+      
+      const uniqueNames = [...new Set(highlightedStructures.map(obj => obj.name))];
+      listDiv.innerHTML = uniqueNames.map((name, index) => 
+        `<div style="padding: 6px; margin-bottom: 4px; background: rgba(0,255,0,0.1); border-left: 3px solid #00ff00; border-radius: 2px; cursor: pointer;"
+              onclick="focusOnStructureByName('${name}')">
+          ✅ <strong>${name}</strong>
+          <button onclick="event.stopPropagation(); unhighlightByName('${name}')" 
+                  style="float: right; background: rgba(255,0,0,0.3); border: none; padding: 2px 8px; cursor: pointer; border-radius: 2px; color: #fff;">
+            ✕
+          </button>
+        </div>`
+      ).join('');
+    }
+
+    // Filter by system
+    function filterBySystem(system, buttonElement) {
+      currentAnatomyFilter = system;
+      
+      // Update button styling
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = 'rgba(0,0,0,0.3)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+      });
+      
+      buttonElement.classList.add('active');
+      buttonElement.style.background = 'rgba(102, 126, 234, 0.3)';
+      buttonElement.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+      
+      console.log(`🎯 Filter set to: ${system}`);
+      
+      // Re-run current search if exists
+      const currentSearch = document.getElementById('anatomy-search').value;
+      if (currentSearch) {
+        anatomySearch(currentSearch);
+      }
+    }
+
+    // Get system icon
+    function getSystemIcon(system) {
+      const icons = {
+        skeletal: '🦴',
+        muscular: '💪',
+        nervous: '🧠',
+        circulatory: '❤️',
+        respiratory: '🫁',
+        digestive: '🫃'
+      };
+      return icons[system] || '🔹';
+    }
+
+    // Focus camera on structure
+    function focusOnStructure(obj) {
+      if (!obj) return;
+      
+      // Get world position
+      const worldPos = new THREE.Vector3();
+      obj.getWorldPosition(worldPos);
+      
+      // Move camera to look at this structure
+      const distance = 5;
+      const targetPos = new THREE.Vector3(
+        worldPos.x + distance,
+        worldPos.y + distance / 2,
+        worldPos.z + distance
+      );
+      
+      // Animate camera (simple lerp in animate loop would be smoother)
+      camera.position.copy(targetPos);
+      camera.lookAt(worldPos);
+      controls.target.copy(worldPos);
+      controls.update();
+      
+      console.log(`📷 Camera focused on ${obj.name}`);
+    }
+
+    // Focus on structure by name
+    function focusOnStructureByName(name) {
+      const structure = highlightedStructures.find(obj => obj.name === name);
+      if (structure) {
+        focusOnStructure(structure);
+      }
+    }
+
+    // Unhighlight by name
+    function unhighlightByName(name) {
+      highlightedStructures = highlightedStructures.filter(obj => {
+        if (obj.name === name) {
+          if (obj.material && obj.userData.originalMaterial) {
+            obj.material.emissive = obj.userData.originalMaterial.emissive;
+            obj.material.emissiveIntensity = obj.userData.originalMaterial.emissiveIntensity;
+          }
+          return false;
+        }
+        return true;
+      });
+      updateFoundStructuresList();
+    }
+
+    // Show all anatomy
+    function showAllAnatomy() {
+      scene.traverse(obj => {
+        if (obj.isMesh) {
+          obj.visible = true;
+        }
+      });
+      console.log('👁️ All anatomy visible');
+    }
+
+    // Hide all anatomy
+    function hideAllAnatomy() {
+      scene.traverse(obj => {
+        if (obj.isMesh && obj.name && 
+            (obj.name.includes('Bone') || obj.name.includes('Vertebra') || obj.name.includes('Rib'))) {
+          obj.visible = false;
+        }
+      });
+      console.log('🙈 Anatomy hidden');
+    }
+
+    // Reset anatomy view
+    function resetAnatomyView() {
+      clearAnatomyHighlights();
+      showAllAnatomy();
+      camera.position.set(10, 5, 10);
+      camera.lookAt(0, 2, 0);
+      controls.target.set(0, 2, 0);
+      controls.update();
+      document.getElementById('anatomy-search').value = '';
+      document.getElementById('search-suggestions').style.display = 'none';
+      document.getElementById('search-results-count').textContent = '';
+      console.log('🔄 Anatomy view reset');
+    }
+
+    // Focus on selected
+    function focusOnSelected() {
+      if (highlightedStructures.length > 0) {
+        focusOnStructure(highlightedStructures[0]);
+      } else {
+        alert('No structures selected. Use search to find and highlight structures first.');
+      }
+    }
+
+    // Toggle layer visibility
+    function toggleLayer(layer, visible) {
+      scene.traverse(obj => {
+        if (obj.isMesh && obj.userData.layer === layer) {
+          obj.visible = visible;
+        }
+      });
+      console.log(`👁️ Layer '${layer}' ${visible ? 'shown' : 'hidden'}`);
+    }
+
+    // Update layer opacity
+    function updateLayerOpacity(value) {
+      const opacity = parseInt(value) / 100;
+      document.getElementById('layer-opacity-value').textContent = value;
+      
+      scene.traverse(obj => {
+        if (obj.isMesh && obj.material) {
+          obj.material.opacity = opacity;
+          obj.material.transparent = opacity < 1.0;
+        }
+      });
+    }
+
+    // Voice search (VR mode)
+    let recognition = null;
+    function startVoiceSearch() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Voice search not supported in this browser. Try Chrome or Edge.');
+        return;
+      }
+      
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      const btn = document.getElementById('voice-search-btn');
+      btn.textContent = '🎤 Listening...';
+      btn.style.background = 'rgba(255, 0, 0, 0.3)';
+      
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        console.log(`🎤 Voice input: "${transcript}"`);
+        
+        document.getElementById('anatomy-search').value = transcript;
+        anatomySearch(transcript);
+        anatomySearchEnter();
+      };
+      
+      recognition.onerror = function(event) {
+        console.error('Voice recognition error:', event.error);
+        btn.textContent = '🎤 Start Voice Search';
+        btn.style.background = 'rgba(102, 126, 234, 0.2)';
+      };
+      
+      recognition.onend = function() {
+        btn.textContent = '🎤 Start Voice Search';
+        btn.style.background = 'rgba(102, 126, 234, 0.2)';
+      };
+      
+      recognition.start();
+    }
+
     function animate() {
       // Use renderer.setAnimationLoop for VR compatibility
       renderer.setAnimationLoop(function() {
@@ -2742,6 +3510,14 @@
         
         // Animate SkyRelics (rotation and hover)
         animateSkyRelics();
+        
+        // Update matrix grid backwall animation (WordWeaver)
+        if (documentCanvas) {
+          documentCanvas.updateMatrixGridBackwall();
+        }
+        
+        // Update dimensional animations (pulsing grids, markers)
+        updateDimensionalAnimations();
         
         // Update selection box to follow selected object
         if (selectionBox && selectedObject) {
@@ -6709,6 +7485,164 @@
       console.log('Switched to:', workspace);
     }
 
+    // =====================================
+    // 🌌 DIMENSIONAL SWITCHING UI
+    // =====================================
+    
+    /**
+     * Switch dimension with UI updates (wrapper for switchDimension)
+     */
+    function switchDimensionUI(dimensionKey, buttonElement) {
+      // Call the core dimension switching function
+      if (typeof switchDimension === 'function') {
+        switchDimension(dimensionKey);
+        
+        // Update button highlighting
+        document.querySelectorAll('.workspace-tab').forEach(tab => {
+          tab.classList.remove('active');
+          tab.style.background = 'rgba(255, 255, 255, 0.1)';
+          tab.style.borderBottom = 'none';
+        });
+        
+        if (buttonElement) {
+          buttonElement.classList.add('active');
+          buttonElement.style.background = 'rgba(255, 255, 255, 0.3)';
+          buttonElement.style.borderBottom = '3px solid #fff';
+        }
+        
+        // Update dimension display
+        const displayNames = {
+          'skyrelics': '🏰 SkyRelics Universe',
+          'wordweaver': '✍️ WordWeaver Studio',
+          'anatomy': '🦴 Anatomical Explorer',
+          'perfect': '✨ Perfect Universe'
+        };
+        
+        const displayElement = document.getElementById('current-dimension-display');
+        if (displayElement) {
+          displayElement.textContent = displayNames[dimensionKey] || dimensionKey;
+        }
+        
+        console.log(`🌀 UI: Switched to ${dimensionKey} dimension`);
+      } else {
+        console.error('❌ switchDimension function not available yet. Dimensions will be ready after init.');
+      }
+    }
+    
+    /**
+     * Cycle to next dimension (for keyboard shortcut)
+     */
+    function cycleDimension() {
+      const dimensions = ['skyrelics', 'wordweaver', 'anatomy', 'perfect'];
+      const currentIndex = dimensions.indexOf(currentDimension);
+      const nextIndex = (currentIndex + 1) % dimensions.length;
+      const nextDimension = dimensions[nextIndex];
+      
+      // Find the button for the next dimension
+      const button = document.querySelector(`.workspace-tab[data-dimension="${nextDimension}"]`);
+      switchDimensionUI(nextDimension, button);
+      
+      // Show notification
+      showDimensionNotification(nextDimension);
+    }
+    
+    /**
+     * Show dimension switch notification
+     */
+    function showDimensionNotification(dimensionKey) {
+      const notifications = {
+        'skyrelics': '🏰 Entered SkyRelics Universe - Create primitives & Sky Relics',
+        'wordweaver': '✍️ Entered WordWeaver Studio - Materialize 3D text',
+        'anatomy': '🦴 Entered Anatomical Explorer - Explore human anatomy',
+        'perfect': '✨ Entered Perfect Universe - Build perfect worlds'
+      };
+      
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        z-index: 10000;
+        animation: slideDown 0.3s ease-out;
+      `;
+      notification.textContent = notifications[dimensionKey] || `Switched to ${dimensionKey}`;
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 2 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideUp 0.3s ease-out';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 2000);
+    }
+    
+    /**
+     * Keyboard shortcut handler (Ctrl+D to cycle dimensions)
+     */
+    document.addEventListener('keydown', function(event) {
+      // Ctrl+D (or Cmd+D on Mac)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+        event.preventDefault(); // Prevent browser bookmark
+        cycleDimension();
+      }
+      
+      // Number keys 1-4 for direct dimension access
+      if (event.ctrlKey || event.metaKey) {
+        const dimensionMap = {
+          '1': 'skyrelics',
+          '2': 'wordweaver',
+          '3': 'anatomy',
+          '4': 'perfect'
+        };
+        
+        if (dimensionMap[event.key]) {
+          event.preventDefault();
+          const dimension = dimensionMap[event.key];
+          const button = document.querySelector(`.workspace-tab[data-dimension="${dimension}"]`);
+          switchDimensionUI(dimension, button);
+          showDimensionNotification(dimension);
+        }
+      }
+    });
+    
+    // Add CSS animations for notifications
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+      
+      @keyframes slideUp {
+        from {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-20px);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
     function updateObjectCount() {
       document.getElementById('objectCount').textContent = objects.length;
     }
@@ -6925,7 +7859,21 @@
     
     // Initialize Document Canvas after scene is ready
     function initDocumentCanvas() {
-      if (typeof scene !== 'undefined' && typeof camera !== 'undefined') {
+      console.log('🔄 Initializing WordWeaver Document Canvas...');
+      
+      if (typeof scene === 'undefined' || typeof camera === 'undefined') {
+        console.warn('⚠️ Scene or camera not ready, retrying in 500ms...');
+        setTimeout(initDocumentCanvas, 500);
+        return;
+      }
+      
+      if (typeof Document3DCanvas === 'undefined') {
+        console.error('❌ Document3DCanvas class not loaded!');
+        alert('Error: Document3DCanvas class not found. Please check document3d_canvas.js is loaded.');
+        return;
+      }
+      
+      try {
         documentCanvas = new Document3DCanvas(scene, camera);
         console.log('✅ WordWeaver Document Canvas initialized!');
         
@@ -6957,8 +7905,9 @@
           firstFont.style.borderColor = 'rgba(102, 126, 234, 0.5)';
           firstFont.style.color = '#fff';
         }
-      } else {
-        setTimeout(initDocumentCanvas, 100);
+      } catch (error) {
+        console.error('❌ Error initializing Document Canvas:', error);
+        alert('Error initializing WordWeaver: ' + error.message);
       }
     }
     
@@ -7096,35 +8045,116 @@
       });
     }
     
-    // Material selection
+    // Global flag for matrix correlation
+    let matrixCorrelationEnabled = true;
+    
+    // Material selection with auto-correlation
     function selectDocMaterial(materialName) {
       if (!documentCanvas) return;
       
-      documentCanvas.setMaterial(materialName);
+      // Check if auto-correlation is enabled
+      const autoCorrelate = document.getElementById('enable-matrix-correlation')?.checked !== false;
       
-      // Update UI
+      if (autoCorrelate && matrixCorrelationEnabled) {
+        // Use material-to-matrix correlation system
+        const mapping = documentCanvas.setMaterialWithMatrixCorrelation(materialName);
+        
+        // Update correlation info display
+        if (mapping) {
+          const modeIcons = {
+            paperback: '📄',
+            magnetic: '🧲',
+            holographic: '🔮'
+          };
+          const modeNames = {
+            paperback: 'Solid Grid',
+            magnetic: 'Magnetic Field',
+            holographic: 'Holographic Projector'
+          };
+          
+          const infoElement = document.getElementById('material-correlation-info');
+          if (infoElement) {
+            const materialIcons = {
+              biblical: '📖',
+              chrome: '⚙️',
+              holographic: '✨',
+              metallic: '🔧',
+              glass: '🔮',
+              magnetic: '🧲',
+              matte: '🎨',
+              rubber: '🔘'
+            };
+            
+            infoElement.innerHTML = `
+              ${materialIcons[materialName] || '✨'} ${materialName.toUpperCase()} → 
+              ${modeIcons[mapping.mode]} ${modeNames[mapping.mode]} 
+              <span style="opacity: 0.6;">(${mapping.intensity}x intensity)</span><br>
+              <span style="opacity: 0.7;">${mapping.description}</span>
+            `;
+            
+            // Flash animation
+            infoElement.style.background = 'rgba(102, 126, 234, 0.3)';
+            setTimeout(() => {
+              infoElement.style.transition = 'background 0.5s';
+              infoElement.style.background = 'rgba(102, 126, 234, 0.1)';
+            }, 100);
+          }
+        }
+      } else {
+        // Standard material change without correlation
+        documentCanvas.setMaterial(materialName);
+      }
+      
+      // Update UI button styling
       document.querySelectorAll('.material-selector').forEach(btn => {
         if (btn.dataset.material === materialName) {
           const colors = {
             biblical: { bg: 'rgba(212, 165, 116, 0.3)', border: 'rgba(212, 165, 116, 0.5)' },
             chrome: { bg: 'rgba(224, 224, 224, 0.3)', border: 'rgba(224, 224, 224, 0.5)' },
-            holographic: { bg: 'rgba(102, 126, 234, 0.3)', border: 'rgba(102, 126, 234, 0.5)' }
+            holographic: { bg: 'rgba(102, 126, 234, 0.3)', border: 'rgba(102, 126, 234, 0.5)' },
+            metallic: { bg: 'rgba(102, 126, 234, 0.3)', border: 'rgba(102, 126, 234, 0.5)' },
+            glass: { bg: 'rgba(102, 126, 234, 0.3)', border: 'rgba(102, 126, 234, 0.5)' },
+            magnetic: { bg: 'rgba(0, 255, 255, 0.3)', border: 'rgba(0, 255, 255, 0.5)' },
+            matte: { bg: 'rgba(102, 126, 234, 0.3)', border: 'rgba(102, 126, 234, 0.5)' },
+            rubber: { bg: 'rgba(102, 126, 234, 0.3)', border: 'rgba(102, 126, 234, 0.5)' }
           };
-          btn.style.background = colors[materialName].bg;
-          btn.style.borderColor = colors[materialName].border;
+          btn.style.background = colors[materialName]?.bg || 'rgba(102, 126, 234, 0.3)';
+          btn.style.borderColor = colors[materialName]?.border || 'rgba(102, 126, 234, 0.5)';
           btn.style.color = '#fff';
         } else {
           const inactiveColors = {
             biblical: { bg: 'rgba(212, 165, 116, 0.1)', border: 'rgba(212, 165, 116, 0.3)' },
             chrome: { bg: 'rgba(224, 224, 224, 0.1)', border: 'rgba(224, 224, 224, 0.3)' },
-            holographic: { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' }
+            holographic: { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' },
+            metallic: { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' },
+            glass: { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' },
+            magnetic: { bg: 'rgba(0, 255, 255, 0.1)', border: 'rgba(0, 255, 255, 0.3)' },
+            matte: { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' },
+            rubber: { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' }
           };
           const mat = btn.dataset.material;
-          btn.style.background = inactiveColors[mat].bg;
-          btn.style.borderColor = inactiveColors[mat].border;
+          const inactive = inactiveColors[mat] || { bg: 'rgba(102, 126, 234, 0.1)', border: 'rgba(102, 126, 234, 0.3)' };
+          btn.style.background = inactive.bg;
+          btn.style.borderColor = inactive.border;
           btn.style.color = mat === 'biblical' ? '#d4a574' : (mat === 'chrome' ? '#e0e0e0' : '#667eea');
         }
       });
+    }
+    
+    // Toggle matrix correlation
+    function toggleMatrixCorrelation() {
+      matrixCorrelationEnabled = document.getElementById('enable-matrix-correlation').checked;
+      console.log(`🔄 Matrix correlation: ${matrixCorrelationEnabled ? 'ENABLED' : 'DISABLED'}`);
+      
+      const infoElement = document.getElementById('material-correlation-info');
+      if (infoElement) {
+        if (matrixCorrelationEnabled) {
+          infoElement.style.opacity = '1';
+        } else {
+          infoElement.style.opacity = '0.3';
+          infoElement.innerHTML = '🔄 Auto-correlation disabled - Manual matrix control';
+        }
+      }
     }
     
     // Color picker
@@ -7467,6 +8497,109 @@
       if (documentCanvas) documentCanvas.setRotationEnabled(enabled);
     }
     
+    function toggleMatrixGrid() {
+      const enabled = document.getElementById('enable-matrix-grid').checked;
+      if (documentCanvas) {
+        documentCanvas.toggleMatrixGridBackwall(enabled);
+        console.log(`🌐 Matrix Grid Backwall: ${enabled ? 'ON' : 'OFF'}`);
+      }
+    }
+    
+    /**
+     * Switch Matrix Wall Mode
+     * @param {string} mode - 'paperback', 'magnetic', or 'holographic'
+     */
+    function switchMatrixMode(mode) {
+      if (!documentCanvas) {
+        console.warn('DocumentCanvas not initialized yet');
+        return;
+      }
+      
+      // Switch the mode
+      documentCanvas.switchMatrixWallMode(mode);
+      
+      // Update button styling
+      document.querySelectorAll('.matrix-mode-btn').forEach(btn => {
+        btn.classList.remove('active-mode');
+        btn.style.background = 'rgba(102, 126, 234, 0.1)';
+        btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+        btn.style.color = '#667eea';
+      });
+      
+      const activeBtn = document.getElementById(`mode-${mode}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active-mode');
+        activeBtn.style.background = 'rgba(102, 126, 234, 0.3)';
+        activeBtn.style.borderColor = 'rgba(102, 126, 234, 0.6)';
+        activeBtn.style.color = '#fff';
+      }
+      
+      // Update description text
+      const descriptions = {
+        paperback: '📄 Solid grid structure with clean lines',
+        magnetic: '🧲 Magnetic field lines with spiraling particles',
+        holographic: '🔮 Sphere projector emitting light particles upward'
+      };
+      
+      const descElement = document.getElementById('matrix-mode-description');
+      if (descElement) {
+        descElement.textContent = descriptions[mode] || '';
+        
+        // Flash animation
+        descElement.style.opacity = '0';
+        setTimeout(() => {
+          descElement.style.transition = 'opacity 0.3s';
+          descElement.style.opacity = '1';
+        }, 50);
+      }
+      
+      // Show notification
+      const notifications = {
+        paperback: '📄 Switched to SOLID GRID mode - Classic paperback structure',
+        magnetic: '🧲 Switched to MAGNETIC FIELD mode - Letters attracted to field lines',
+        holographic: '🔮 Switched to HOLOGRAPHIC mode - Sphere projector displays text'
+      };
+      
+      console.log(`🎨 ${notifications[mode]}`);
+      
+      // Visual notification
+      showMatrixModeNotification(mode, notifications[mode]);
+    }
+    
+    /**
+     * Show matrix mode change notification
+     */
+    function showMatrixModeNotification(mode, message) {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        z-index: 10000;
+        animation: slideDown 0.3s ease-out;
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideUp 0.3s ease-out';
+        setTimeout(() => {
+          if (notification.parentElement) {
+            document.body.removeChild(notification);
+          }
+        }, 300);
+      }, 2500);
+    }
+    
     // Quick Actions
     function selectAllLetters() {
       if (!documentCanvas) return;
@@ -7547,8 +8680,457 @@
     // Initialize saved docs list on load
     setTimeout(refreshSavedDocsList, 1500);
 
+    // =====================================
+    // 🌌 DIMENSIONAL WORKSPACE MANAGEMENT
+    // =====================================
+    
+    /**
+     * Initialize Dimensional Workspace System
+     * Creates isolated 3D environments for each workspace
+     */
+    function initDimensionalSystem() {
+      console.log('\n🌌 ===== INITIALIZING DIMENSIONAL WORKSPACE SYSTEM =====\n');
+      
+      // Create dimensional spaces for each workspace
+      Object.keys(DIMENSIONAL_CONFIGS).forEach(key => {
+        dimensionalSpaces[key] = createDimensionalSpace(key, DIMENSIONAL_CONFIGS[key]);
+        console.log(`  ✓ ${DIMENSIONAL_CONFIGS[key].icon} ${DIMENSIONAL_CONFIGS[key].name} dimension created`);
+      });
+      
+      // Create master matrix grid (universal boundary)
+      createMasterMatrixGrid();
+      
+      // Load initial dimension (SkyRelics)
+      switchDimension('skyrelics');
+      
+      console.log('\n✅ Dimensional Workspace System initialized!');
+      console.log(`   → ${Object.keys(dimensionalSpaces).length} dimensions active`);
+      console.log(`   → Master Matrix Grid: Universal boundary system`);
+      console.log(`   → Current dimension: ${currentDimension}\n`);
+    }
+    
+    /**
+     * Create a dimensional space (isolated 3D environment)
+     */
+    function createDimensionalSpace(key, config) {
+      const space = {
+        key: key,
+        config: config,
+        objects: [], // Objects in this dimension
+        lights: [], // Lights specific to this dimension
+        matrixGrid: null, // Custom grid for this dimension
+        active: false
+      };
+      
+      // Create dimension-specific matrix grid
+      space.matrixGrid = createDimensionMatrixGrid(config.gridConfig, key);
+      space.matrixGrid.visible = false; // Hidden until dimension is active
+      scene.add(space.matrixGrid);
+      
+      // Create dimension-specific lights
+      const lights = createDimensionLights(config.lighting);
+      lights.forEach(light => {
+        light.visible = false; // Hidden until dimension is active
+        scene.add(light);
+        space.lights.push(light);
+      });
+      
+      return space;
+    }
+    
+    /**
+     * Create custom matrix grid for a dimension
+     */
+    function createDimensionMatrixGrid(gridConfig, dimensionKey) {
+      const group = new THREE.Group();
+      group.name = `MatrixGrid_${dimensionKey}`;
+      
+      const { size, divisions, centerColor, gridColor, wallColor, showWalls, wallHeight, wallOpacity, backwallZ, circular } = gridConfig;
+      
+      // 1. Floor grid
+      const gridHelper = new THREE.GridHelper(size, divisions, centerColor, gridColor);
+      gridHelper.position.y = 0;
+      group.add(gridHelper);
+      
+      // 2. Floor plane (subtle glow)
+      const floorGeom = new THREE.PlaneGeometry(size, size);
+      const floorMat = new THREE.MeshBasicMaterial({
+        color: wallColor,
+        transparent: true,
+        opacity: 0.2,
+        side: THREE.DoubleSide
+      });
+      const floor = new THREE.Mesh(floorGeom, floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = -0.01;
+      group.add(floor);
+      
+      if (showWalls) {
+        // 3. Create boundary walls (4 walls forming a box)
+        const wallMat = new THREE.MeshBasicMaterial({
+          color: wallColor,
+          transparent: true,
+          opacity: wallOpacity,
+          side: THREE.DoubleSide
+        });
+        
+        const lineMat = new THREE.LineBasicMaterial({
+          color: centerColor,
+          transparent: true,
+          opacity: 0.6,
+          linewidth: 2
+        });
+        
+        const halfSize = size / 2;
+        
+        // Back wall (most visible for reference)
+        const backWallGeom = new THREE.PlaneGeometry(size, wallHeight);
+        const backWall = new THREE.Mesh(backWallGeom, wallMat);
+        backWall.position.set(0, wallHeight / 2, -halfSize);
+        group.add(backWall);
+        
+        // Add grid lines to back wall
+        for (let i = 0; i <= divisions; i++) {
+          const x = -halfSize + (i * size / divisions);
+          const points = [
+            new THREE.Vector3(x, 0, -halfSize + 0.1),
+            new THREE.Vector3(x, wallHeight, -halfSize + 0.1)
+          ];
+          const geom = new THREE.BufferGeometry().setFromPoints(points);
+          const line = new THREE.Line(geom, lineMat);
+          group.add(line);
+        }
+        
+        for (let i = 0; i <= Math.floor(wallHeight); i++) {
+          const y = i;
+          const points = [
+            new THREE.Vector3(-halfSize, y, -halfSize + 0.1),
+            new THREE.Vector3(halfSize, y, -halfSize + 0.1)
+          ];
+          const geom = new THREE.BufferGeometry().setFromPoints(points);
+          const line = new THREE.Line(geom, lineMat);
+          group.add(line);
+        }
+        
+        // Left wall
+        const leftWall = backWall.clone();
+        leftWall.rotation.y = Math.PI / 2;
+        leftWall.position.set(-halfSize, wallHeight / 2, 0);
+        group.add(leftWall);
+        
+        // Right wall
+        const rightWall = backWall.clone();
+        rightWall.rotation.y = -Math.PI / 2;
+        rightWall.position.set(halfSize, wallHeight / 2, 0);
+        group.add(rightWall);
+        
+        // Front wall (more transparent for visibility)
+        const frontWallMat = wallMat.clone();
+        frontWallMat.opacity = wallOpacity * 0.3;
+        const frontWall = new THREE.Mesh(backWallGeom, frontWallMat);
+        frontWall.rotation.y = Math.PI;
+        frontWall.position.set(0, wallHeight / 2, halfSize);
+        group.add(frontWall);
+      }
+      
+      // 4. Center marker (origin point)
+      const markerGeom = new THREE.SphereGeometry(0.2, 16, 16);
+      const markerMat = new THREE.MeshBasicMaterial({
+        color: centerColor,
+        transparent: true,
+        opacity: 0.8
+      });
+      const marker = new THREE.Mesh(markerGeom, markerMat);
+      marker.position.y = 0.2;
+      marker.name = 'dimensionOrigin';
+      group.add(marker);
+      
+      // 5. Pulsing glow at center (animated)
+      const glowGeom = new THREE.CircleGeometry(1, 32);
+      const glowMat = new THREE.MeshBasicMaterial({
+        color: centerColor,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.DoubleSide
+      });
+      const glow = new THREE.Mesh(glowGeom, glowMat);
+      glow.rotation.x = -Math.PI / 2;
+      glow.position.y = 0.01;
+      glow.name = 'dimensionGlow';
+      group.add(glow);
+      
+      // 6. Corner markers for spatial reference
+      const cornerGeom = new THREE.ConeGeometry(0.3, 1, 8);
+      const cornerMat = new THREE.MeshBasicMaterial({
+        color: centerColor,
+        transparent: true,
+        opacity: 0.6
+      });
+      
+      const corners = [
+        { x: -halfSize + 1, z: -halfSize + 1 },
+        { x: halfSize - 1, z: -halfSize + 1 },
+        { x: -halfSize + 1, z: halfSize - 1 },
+        { x: halfSize - 1, z: halfSize - 1 }
+      ];
+      
+      corners.forEach(corner => {
+        const cone = new THREE.Mesh(cornerGeom, cornerMat);
+        cone.position.set(corner.x, 0.5, corner.z);
+        group.add(cone);
+      });
+      
+      return group;
+    }
+    
+    /**
+     * Create dimension-specific lights
+     */
+    function createDimensionLights(lightingConfig) {
+      const lights = [];
+      
+      // Ambient light
+      const ambient = new THREE.AmbientLight(
+        lightingConfig.ambient.color,
+        lightingConfig.ambient.intensity
+      );
+      lights.push(ambient);
+      
+      // Directional light
+      const directional = new THREE.DirectionalLight(
+        lightingConfig.directional.color,
+        lightingConfig.directional.intensity
+      );
+      const dirPos = lightingConfig.directional.position;
+      directional.position.set(dirPos.x, dirPos.y, dirPos.z);
+      directional.castShadow = true;
+      lights.push(directional);
+      
+      // Point light(s)
+      if (Array.isArray(lightingConfig.point)) {
+        lightingConfig.point.forEach(pointConfig => {
+          const point = new THREE.PointLight(
+            pointConfig.color,
+            pointConfig.intensity,
+            50
+          );
+          point.position.set(
+            pointConfig.position.x,
+            pointConfig.position.y,
+            pointConfig.position.z
+          );
+          lights.push(point);
+        });
+      } else {
+        const point = new THREE.PointLight(
+          lightingConfig.point.color,
+          lightingConfig.point.intensity,
+          50
+        );
+        const pointPos = lightingConfig.point.position;
+        point.position.set(pointPos.x, pointPos.y, pointPos.z);
+        lights.push(point);
+      }
+      
+      return lights;
+    }
+    
+    /**
+     * Create Master Matrix Grid (universal boundary - always visible)
+     */
+    function createMasterMatrixGrid() {
+      masterMatrixGrid = new THREE.Group();
+      masterMatrixGrid.name = 'MasterMatrixGrid';
+      
+      // Massive outer boundary box
+      const size = 100;
+      const height = 50;
+      
+      const boundaryMat = new THREE.LineBasicMaterial({
+        color: 0xff00ff,
+        transparent: true,
+        opacity: 0.2,
+        linewidth: 1
+      });
+      
+      // Create wireframe box
+      const points = [
+        // Bottom face
+        new THREE.Vector3(-size/2, 0, -size/2),
+        new THREE.Vector3(size/2, 0, -size/2),
+        new THREE.Vector3(size/2, 0, size/2),
+        new THREE.Vector3(-size/2, 0, size/2),
+        new THREE.Vector3(-size/2, 0, -size/2),
+        // Go up to top face
+        new THREE.Vector3(-size/2, height, -size/2),
+        new THREE.Vector3(size/2, height, -size/2),
+        new THREE.Vector3(size/2, height, size/2),
+        new THREE.Vector3(-size/2, height, size/2),
+        new THREE.Vector3(-size/2, height, -size/2)
+      ];
+      
+      // Vertical edges
+      const verticalEdges = [
+        [new THREE.Vector3(size/2, 0, -size/2), new THREE.Vector3(size/2, height, -size/2)],
+        [new THREE.Vector3(size/2, 0, size/2), new THREE.Vector3(size/2, height, size/2)],
+        [new THREE.Vector3(-size/2, 0, size/2), new THREE.Vector3(-size/2, height, size/2)]
+      ];
+      
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const boundaryBox = new THREE.Line(geometry, boundaryMat);
+      masterMatrixGrid.add(boundaryBox);
+      
+      verticalEdges.forEach(edge => {
+        const geom = new THREE.BufferGeometry().setFromPoints(edge);
+        const line = new THREE.Line(geom, boundaryMat);
+        masterMatrixGrid.add(line);
+      });
+      
+      masterMatrixGrid.visible = true; // Always visible
+      scene.add(masterMatrixGrid);
+      
+      console.log('🌐 Master Matrix Grid created: 100x50x100 universal boundary');
+    }
+    
+    /**
+     * Switch to a different dimensional workspace
+     */
+    function switchDimension(dimensionKey) {
+      if (!dimensionalSpaces[dimensionKey]) {
+        console.error(`❌ Dimension '${dimensionKey}' does not exist!`);
+        return;
+      }
+      
+      const oldDimension = currentDimension;
+      const newDimension = dimensionKey;
+      
+      console.log(`\n🌀 Switching dimension: ${oldDimension} → ${newDimension}`);
+      
+      // Hide old dimension
+      if (dimensionalSpaces[oldDimension]) {
+        dimensionalSpaces[oldDimension].matrixGrid.visible = false;
+        dimensionalSpaces[oldDimension].lights.forEach(light => light.visible = false);
+        dimensionalSpaces[oldDimension].active = false;
+        
+        // Hide dimension-specific objects
+        dimensionalSpaces[oldDimension].objects.forEach(obj => {
+          obj.visible = false;
+        });
+      }
+      
+      // Show new dimension
+      const space = dimensionalSpaces[newDimension];
+      const config = space.config;
+      
+      space.matrixGrid.visible = true;
+      space.lights.forEach(light => light.visible = true);
+      space.active = true;
+      
+      // Show dimension-specific objects
+      space.objects.forEach(obj => {
+        obj.visible = true;
+      });
+      
+      // Update scene environment
+      scene.background = new THREE.Color(config.backgroundColor);
+      scene.fog = new THREE.Fog(config.fogColor, config.fogNear, config.fogFar);
+      
+      // Move camera to dimension's default position
+      const camPos = config.cameraPosition;
+      const camTarget = config.cameraTarget;
+      
+      camera.position.set(camPos.x, camPos.y, camPos.z);
+      controls.target.set(camTarget.x, camTarget.y, camTarget.z);
+      controls.update();
+      
+      currentDimension = newDimension;
+      
+      console.log(`✅ Now in ${config.icon} ${config.name}`);
+      console.log(`   ${config.description}`);
+      
+      // Update UI workspace tab highlighting
+      updateWorkspaceTabHighlight(newDimension);
+      
+      // Show appropriate workspace panel
+      showWorkspacePanel(newDimension);
+    }
+    
+    /**
+     * Update workspace tab highlighting
+     */
+    function updateWorkspaceTabHighlight(activeTab) {
+      document.querySelectorAll('.workspace-tab').forEach(tab => {
+        const tabKey = tab.getAttribute('onclick').match(/'([^']+)'/)[1];
+        if (tabKey === activeTab) {
+          tab.style.background = 'rgba(255, 255, 255, 0.3)';
+          tab.style.borderBottom = '3px solid #fff';
+        } else {
+          tab.style.background = 'rgba(255, 255, 255, 0.1)';
+          tab.style.borderBottom = 'none';
+        }
+      });
+    }
+    
+    /**
+     * Show appropriate workspace control panel
+     */
+    function showWorkspacePanel(workspaceKey) {
+      // Hide all workspace panels
+      document.querySelectorAll('.workspace-content').forEach(panel => {
+        panel.style.display = 'none';
+      });
+      
+      // Show selected workspace panel
+      const panelId = `workspace-${workspaceKey}`;
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.style.display = 'block';
+      }
+    }
+    
+    /**
+     * Add object to current dimension
+     */
+    function addObjectToDimension(object) {
+      if (dimensionalSpaces[currentDimension]) {
+        dimensionalSpaces[currentDimension].objects.push(object);
+        object.userData.dimension = currentDimension;
+      }
+    }
+    
+    /**
+     * Update dimensional animations (call in animate loop)
+     */
+    function updateDimensionalAnimations() {
+      if (!dimensionalSpaces[currentDimension]) return;
+      
+      const space = dimensionalSpaces[currentDimension];
+      
+      // Animate pulsing glow
+      const glow = space.matrixGrid.getObjectByName('dimensionGlow');
+      if (glow) {
+        const time = Date.now() * 0.001;
+        const scale = 1 + Math.sin(time * 2) * 0.2;
+        glow.scale.set(scale, 1, scale);
+        glow.material.opacity = 0.2 + Math.sin(time * 2) * 0.1;
+      }
+      
+      // Animate origin marker
+      const marker = space.matrixGrid.getObjectByName('dimensionOrigin');
+      if (marker) {
+        marker.rotation.y += 0.02;
+        const time = Date.now() * 0.001;
+        marker.position.y = 0.2 + Math.sin(time * 3) * 0.1;
+      }
+    }
+
     // Start
-    window.addEventListener('load', init);
+    window.addEventListener('load', () => {
+      init();
+      setTimeout(() => {
+        initDimensionalSystem();
+      }, 500);
+    });
     
     // Initialize Document Canvas after scene loads
     setTimeout(initDocumentCanvas, 1000);

@@ -71,10 +71,16 @@ class Document3DCanvas {
         this.gridSurface = null;
         this.createGridSurface();
         
+        // Matrix Grid Backwall
+        this.matrixGridBackwall = null;
+        this.gridBackwallVisible = true;
+        this.createMatrixGridBackwall();
+        
         // Load fonts
         this.loadFonts();
         
         console.log('📄 3D Document Canvas initialized with 3D letter geometries!');
+        console.log('🌐 Matrix grid backwall active for spatial reference');
     }
     
     /**
@@ -182,6 +188,855 @@ class Document3DCanvas {
         
         this.scene.add(this.gridSurface);
         this.scene.add(gridHelper);
+    }
+    
+    /**
+     * 🌐 Create Matrix Grid Backwall - Spatial Reference for Letter Materialization
+     * Provides a structured backdrop so users don't lose orientation in 3D space
+     * 
+     * THREE MODES:
+     * 1. PAPERBACK (default) - Solid grid with clean lines
+     * 2. MAGNETIC - Letters stick to grid with field lines and particle attraction
+     * 3. HOLOGRAPHIC - Transparent structure with sphere projector emitting light upward
+     */
+    createMatrixGridBackwall() {
+        // Create group to hold all grid elements
+        this.matrixGridBackwall = new THREE.Group();
+        this.matrixGridBackwall.name = 'MatrixGridBackwall';
+        
+        // Matrix wall modes
+        this.matrixWallMode = 'paperback'; // 'paperback', 'magnetic', 'holographic'
+        
+        // Material-to-Matrix correlation system
+        this.materialMatrixMap = {
+            biblical: { mode: 'paperback', intensity: 1.0, description: 'Ancient parchment texture' },
+            glossy: { mode: 'holographic', intensity: 1.2, description: 'Reflective holographic display' },
+            matte: { mode: 'paperback', intensity: 0.8, description: 'Soft matte surface' },
+            metallic: { mode: 'magnetic', intensity: 1.0, description: 'Metallic field attraction' },
+            glass: { mode: 'holographic', intensity: 0.9, description: 'Transparent projection system' },
+            rubber: { mode: 'paperback', intensity: 0.7, description: 'Textured solid grid' },
+            magnetic: { mode: 'magnetic', intensity: 1.3, description: 'Strong magnetic field' },
+            holographic: { mode: 'holographic', intensity: 1.4, description: 'Full holographic projection' }
+        };
+        
+        // Transition state for smooth mode changes
+        this.transitionState = {
+            isTransitioning: false,
+            progress: 0,
+            fromMode: null,
+            toMode: null,
+            duration: 1500 // milliseconds
+        };
+        
+        // Grid dimensions
+        const width = 50;
+        const height = 30;
+        const divisions = 40;
+        const zPosition = -8; // Behind the text (text spawns at z=0)
+        
+        // 1. Create main grid plane (subtle glowing backdrop)
+        const planeGeometry = new THREE.PlaneGeometry(width, height);
+        const planeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x0a0a1a,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.DoubleSide
+        });
+        const backPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+        backPlane.position.z = zPosition - 0.1;
+        this.matrixGridBackwall.add(backPlane);
+        
+        // 2. Create vertical grid lines
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x667eea,
+            transparent: true,
+            opacity: 0.4,
+            linewidth: 1
+        });
+        
+        const cellWidth = width / divisions;
+        const cellHeight = height / divisions;
+        
+        // Vertical lines
+        for (let i = 0; i <= divisions; i++) {
+            const x = -width / 2 + i * cellWidth;
+            const points = [
+                new THREE.Vector3(x, -height / 2, zPosition),
+                new THREE.Vector3(x, height / 2, zPosition)
+            ];
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(geometry, lineMaterial);
+            this.matrixGridBackwall.add(line);
+        }
+        
+        // Horizontal lines
+        for (let i = 0; i <= divisions; i++) {
+            const y = -height / 2 + i * cellHeight;
+            const points = [
+                new THREE.Vector3(-width / 2, y, zPosition),
+                new THREE.Vector3(width / 2, y, zPosition)
+            ];
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(geometry, lineMaterial);
+            this.matrixGridBackwall.add(line);
+        }
+        
+        // 3. Add glowing center crosshair (origin marker)
+        const crosshairMaterial = new THREE.LineBasicMaterial({
+            color: 0x00ff00,
+            transparent: true,
+            opacity: 0.8,
+            linewidth: 2
+        });
+        
+        // Horizontal crosshair
+        const hPoints = [
+            new THREE.Vector3(-2, 0, zPosition + 0.1),
+            new THREE.Vector3(2, 0, zPosition + 0.1)
+        ];
+        const hGeometry = new THREE.BufferGeometry().setFromPoints(hPoints);
+        const hLine = new THREE.Line(hGeometry, crosshairMaterial);
+        this.matrixGridBackwall.add(hLine);
+        
+        // Vertical crosshair
+        const vPoints = [
+            new THREE.Vector3(0, -2, zPosition + 0.1),
+            new THREE.Vector3(0, 2, zPosition + 0.1)
+        ];
+        const vGeometry = new THREE.BufferGeometry().setFromPoints(vPoints);
+        const vLine = new THREE.Line(vGeometry, crosshairMaterial);
+        this.matrixGridBackwall.add(vLine);
+        
+        // 4. Add corner markers for spatial reference
+        const markerGeometry = new THREE.CircleGeometry(0.2, 16);
+        const markerMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff00ff,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        const corners = [
+            { x: -width / 2 + 1, y: height / 2 - 1 },  // Top-left
+            { x: width / 2 - 1, y: height / 2 - 1 },   // Top-right
+            { x: -width / 2 + 1, y: -height / 2 + 1 }, // Bottom-left
+            { x: width / 2 - 1, y: -height / 2 + 1 }   // Bottom-right
+        ];
+        
+        corners.forEach(corner => {
+            const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+            marker.position.set(corner.x, corner.y, zPosition + 0.1);
+            this.matrixGridBackwall.add(marker);
+        });
+        
+        // 5. Add pulsing glow effect to center (animated in update loop)
+        const glowGeometry = new THREE.CircleGeometry(1, 32);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: 0x667eea,
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide
+        });
+        const centerGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+        centerGlow.position.z = zPosition + 0.05;
+        centerGlow.name = 'centerGlow';
+        this.matrixGridBackwall.add(centerGlow);
+        
+        // ========================================
+        // 🧲 MAGNETIC MODE COMPONENTS
+        // ========================================
+        this.createMagneticField(width, height, zPosition);
+        
+        // ========================================
+        // 🔮 HOLOGRAPHIC MODE COMPONENTS
+        // ========================================
+        this.createHolographicProjector(width, height, zPosition);
+        
+        // Position grid backwall
+        this.matrixGridBackwall.position.y = 8; // Center vertically with text
+        
+        // Add to scene
+        this.scene.add(this.matrixGridBackwall);
+        
+        console.log('🌐 Matrix Grid Backwall created: 50x30 units, 40x40 divisions');
+        console.log('   ✓ PAPERBACK mode: Solid grid structure (default)');
+        console.log('   ✓ MAGNETIC mode: Field lines with particle attraction');
+        console.log('   ✓ HOLOGRAPHIC mode: Transparent structure with sphere projector');
+        console.log('   ✓ Letters spawn from center (0,0,0) and materialize to grid');
+    }
+    
+    /**
+     * 🧲 Create Magnetic Field Components
+     * Letters appear to be magnetically attracted to the grid
+     */
+    createMagneticField(width, height, zPosition) {
+        const magneticGroup = new THREE.Group();
+        magneticGroup.name = 'MagneticField';
+        magneticGroup.visible = false; // Hidden by default
+        
+        // Magnetic field lines (curved lines emanating from grid points)
+        const fieldLineMaterial = new THREE.LineBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.5,
+            linewidth: 2
+        });
+        
+        // Create field lines from grid intersections
+        const fieldLineCount = 20;
+        for (let i = 0; i < fieldLineCount; i++) {
+            const angle = (i / fieldLineCount) * Math.PI * 2;
+            const radius = Math.random() * 15 + 10;
+            
+            const curve = new THREE.CubicBezierCurve3(
+                new THREE.Vector3(0, 0, zPosition + 2),
+                new THREE.Vector3(
+                    Math.cos(angle) * radius * 0.3,
+                    Math.sin(angle) * radius * 0.3,
+                    zPosition + 1
+                ),
+                new THREE.Vector3(
+                    Math.cos(angle) * radius * 0.7,
+                    Math.sin(angle) * radius * 0.7,
+                    zPosition + 0.5
+                ),
+                new THREE.Vector3(
+                    Math.cos(angle) * radius,
+                    Math.sin(angle) * radius,
+                    zPosition
+                )
+            );
+            
+            const points = curve.getPoints(30);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(geometry, fieldLineMaterial);
+            line.name = `fieldLine_${i}`;
+            magneticGroup.add(line);
+        }
+        
+        // Magnetic particles (small glowing spheres that move along field lines)
+        const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+        const particleMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.8
+        });
+        
+        this.magneticParticles = [];
+        for (let i = 0; i < 40; i++) {
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial.clone());
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 20;
+            particle.position.set(
+                Math.cos(angle) * radius,
+                Math.sin(angle) * radius,
+                zPosition + Math.random() * 2
+            );
+            particle.userData.angle = angle;
+            particle.userData.radius = radius;
+            particle.userData.speed = 0.5 + Math.random() * 1;
+            particle.userData.phase = Math.random() * Math.PI * 2;
+            magneticGroup.add(particle);
+            this.magneticParticles.push(particle);
+        }
+        
+        // Magnetic core (central attraction point)
+        const coreGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const coreMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.6
+        });
+        const magneticCore = new THREE.Mesh(coreGeometry, coreMaterial);
+        magneticCore.position.z = zPosition + 1;
+        magneticCore.name = 'magneticCore';
+        magneticGroup.add(magneticCore);
+        
+        // Add magnetic grid overlay (hexagonal pattern)
+        this.createHexagonalGrid(magneticGroup, width, height, zPosition);
+        
+        this.matrixGridBackwall.add(magneticGroup);
+    }
+    
+    /**
+     * Create hexagonal grid pattern for magnetic mode
+     */
+    createHexagonalGrid(parent, width, height, zPosition) {
+        const hexMaterial = new THREE.LineBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.3
+        });
+        
+        const hexSize = 2;
+        const hexHeight = hexSize * Math.sqrt(3) / 2;
+        
+        for (let row = 0; row < height / hexHeight; row++) {
+            for (let col = 0; col < width / hexSize; col++) {
+                const x = col * hexSize * 1.5 - width / 2;
+                const y = row * hexHeight * 2 - height / 2 + (col % 2 === 0 ? 0 : hexHeight);
+                
+                const points = [];
+                for (let i = 0; i < 7; i++) {
+                    const angle = (Math.PI / 3) * i;
+                    points.push(new THREE.Vector3(
+                        x + Math.cos(angle) * hexSize,
+                        y + Math.sin(angle) * hexSize,
+                        zPosition
+                    ));
+                }
+                
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const hex = new THREE.Line(geometry, hexMaterial);
+                parent.add(hex);
+            }
+        }
+    }
+    
+    /**
+     * 🔮 Create Holographic Projector System
+     * Transparent grid structure with sphere projector emitting light particles upward
+     */
+    createHolographicProjector(width, height, zPosition) {
+        const holoGroup = new THREE.Group();
+        holoGroup.name = 'HolographicProjector';
+        holoGroup.visible = false; // Hidden by default
+        
+        // 1. HOLOGRAPHIC GRID (see-through with scan lines)
+        const holoGridMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ff88,
+            transparent: true,
+            opacity: 0.15,
+            side: THREE.DoubleSide,
+            wireframe: false
+        });
+        
+        const holoPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(width, height, 40, 40),
+            holoGridMaterial
+        );
+        holoPlane.position.z = zPosition;
+        holoGroup.add(holoPlane);
+        
+        // Holographic scan lines (horizontal moving lines)
+        this.holoScanLines = [];
+        for (let i = 0; i < 5; i++) {
+            const scanGeometry = new THREE.PlaneGeometry(width, 0.2);
+            const scanMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ff88,
+                transparent: true,
+                opacity: 0.6,
+                side: THREE.DoubleSide
+            });
+            const scanLine = new THREE.Mesh(scanGeometry, scanMaterial);
+            scanLine.position.set(0, -height / 2 + (i * height / 4), zPosition + 0.1);
+            scanLine.userData.speed = 0.5 + Math.random() * 0.5;
+            scanLine.userData.startY = scanLine.position.y;
+            holoGroup.add(scanLine);
+            this.holoScanLines.push(scanLine);
+        }
+        
+        // 2. SPHERE PROJECTOR (main light source at bottom center)
+        const projectorSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(1.5, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.8
+            })
+        );
+        projectorSphere.position.set(0, -height / 2 - 3, zPosition + 2);
+        projectorSphere.name = 'projectorSphere';
+        holoGroup.add(projectorSphere);
+        
+        // Inner core glow
+        const innerCore = new THREE.Mesh(
+            new THREE.SphereGeometry(0.8, 32, 32),
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.9
+            })
+        );
+        innerCore.position.copy(projectorSphere.position);
+        innerCore.name = 'innerCore';
+        holoGroup.add(innerCore);
+        
+        // 3. LIGHT PARTICLE STREAM (particles emitted upward from sphere)
+        this.holoParticles = [];
+        const particleCount = 200;
+        const particleGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particleMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color().setHSL(0.5 + Math.random() * 0.1, 1, 0.5),
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+            
+            // Start at projector sphere
+            const angle = Math.random() * Math.PI * 2;
+            const spreadRadius = Math.random() * 2;
+            particle.position.set(
+                Math.cos(angle) * spreadRadius,
+                projectorSphere.position.y,
+                projectorSphere.position.z + Math.random() * 1
+            );
+            
+            // Particle movement properties
+            particle.userData.velocity = new THREE.Vector3(
+                (Math.random() - 0.5) * 0.02,
+                0.05 + Math.random() * 0.1, // Upward velocity
+                (Math.random() - 0.5) * 0.02
+            );
+            particle.userData.startY = projectorSphere.position.y;
+            particle.userData.maxHeight = height / 2 + 5;
+            particle.userData.life = Math.random(); // 0-1 lifecycle
+            
+            holoGroup.add(particle);
+            this.holoParticles.push(particle);
+        }
+        
+        // 4. PROJECTION CONE (light beam visualization)
+        const coneGeometry = new THREE.ConeGeometry(25, 35, 32, 1, true);
+        const coneMaterial = new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.08,
+            side: THREE.DoubleSide
+        });
+        const projectionCone = new THREE.Mesh(coneGeometry, coneMaterial);
+        projectionCone.position.set(0, projectorSphere.position.y + 17.5, zPosition);
+        projectionCone.rotation.x = Math.PI;
+        projectionCone.name = 'projectionCone';
+        holoGroup.add(projectionCone);
+        
+        // 5. GRID STRUCTURE EDGES (clear outline of the display area)
+        const edgeMaterial = new THREE.LineBasicMaterial({
+            color: 0x00ff88,
+            transparent: true,
+            opacity: 0.6,
+            linewidth: 3
+        });
+        
+        const edgePoints = [
+            new THREE.Vector3(-width / 2, -height / 2, zPosition),
+            new THREE.Vector3(width / 2, -height / 2, zPosition),
+            new THREE.Vector3(width / 2, height / 2, zPosition),
+            new THREE.Vector3(-width / 2, height / 2, zPosition),
+            new THREE.Vector3(-width / 2, -height / 2, zPosition)
+        ];
+        const edgeGeometry = new THREE.BufferGeometry().setFromPoints(edgePoints);
+        const edgeOutline = new THREE.Line(edgeGeometry, edgeMaterial);
+        holoGroup.add(edgeOutline);
+        
+        this.matrixGridBackwall.add(holoGroup);
+        
+        console.log('🔮 Holographic projector created:');
+        console.log('   ✓ Sphere projector at bottom center');
+        console.log('   ✓ 200 light particles streaming upward');
+        console.log('   ✓ Transparent grid with scan lines');
+        console.log('   ✓ Projection cone visualization');
+    }
+    
+    /**
+     * Toggle matrix grid backwall visibility
+     */
+    toggleMatrixGridBackwall(visible) {
+        if (this.matrixGridBackwall) {
+            this.matrixGridBackwall.visible = visible !== undefined ? visible : !this.matrixGridBackwall.visible;
+            this.gridBackwallVisible = this.matrixGridBackwall.visible;
+            console.log(`🌐 Matrix grid backwall: ${this.gridBackwallVisible ? 'VISIBLE' : 'HIDDEN'}`);
+        }
+    }
+    
+    /**
+     * Switch Matrix Wall Mode with smooth transition
+     * @param {string} mode - 'paperback', 'magnetic', or 'holographic'
+     * @param {boolean} immediate - Skip transition animation if true
+     */
+    switchMatrixWallMode(mode, immediate = false) {
+        if (!this.matrixGridBackwall) return;
+        
+        const validModes = ['paperback', 'magnetic', 'holographic'];
+        if (!validModes.includes(mode)) {
+            console.error(`❌ Invalid mode: ${mode}. Use: paperback, magnetic, or holographic`);
+            return;
+        }
+        
+        // Don't transition if already in this mode
+        if (this.matrixWallMode === mode && !this.transitionState.isTransitioning) {
+            return;
+        }
+        
+        // Setup transition
+        if (!immediate) {
+            this.transitionState.isTransitioning = true;
+            this.transitionState.progress = 0;
+            this.transitionState.fromMode = this.matrixWallMode;
+            this.transitionState.toMode = mode;
+            this.transitionState.startTime = Date.now();
+        }
+        
+        this.matrixWallMode = mode;
+        
+        // Get mode groups
+        const paperbackGroup = this.matrixGridBackwall.children.filter(
+            child => !['MagneticField', 'HolographicProjector'].includes(child.name)
+        );
+        const magneticGroup = this.matrixGridBackwall.getObjectByName('MagneticField');
+        const holoGroup = this.matrixGridBackwall.getObjectByName('HolographicProjector');
+        
+        if (immediate) {
+            // Instant switch
+            this.applyModeVisibility(mode, paperbackGroup, magneticGroup, holoGroup, 1.0);
+        } else {
+            // Fade out old mode first
+            this.fadeOutOldMode(paperbackGroup, magneticGroup, holoGroup);
+        }
+        
+        console.log(`🎨 Matrix Wall Mode: ${mode.toUpperCase()}`);
+    }
+    
+    /**
+     * Apply mode visibility with opacity control
+     */
+    applyModeVisibility(mode, paperbackGroup, magneticGroup, holoGroup, opacity) {
+        switch(mode) {
+            case 'paperback':
+                paperbackGroup.forEach(obj => {
+                    obj.visible = true;
+                    if (obj.material && obj.material.opacity !== undefined) {
+                        obj.material.opacity = Math.min(obj.material.opacity, opacity * 0.6);
+                    }
+                });
+                if (magneticGroup) magneticGroup.visible = false;
+                if (holoGroup) holoGroup.visible = false;
+                break;
+                
+            case 'magnetic':
+                paperbackGroup.forEach(obj => obj.visible = false);
+                if (magneticGroup) {
+                    magneticGroup.visible = true;
+                    magneticGroup.traverse(child => {
+                        if (child.material && child.material.opacity !== undefined) {
+                            child.material.opacity = Math.min(child.material.opacity, opacity * 0.8);
+                        }
+                    });
+                }
+                if (holoGroup) holoGroup.visible = false;
+                break;
+                
+            case 'holographic':
+                paperbackGroup.forEach(obj => obj.visible = false);
+                if (magneticGroup) magneticGroup.visible = false;
+                if (holoGroup) {
+                    holoGroup.visible = true;
+                    holoGroup.traverse(child => {
+                        if (child.material && child.material.opacity !== undefined) {
+                            child.material.opacity = Math.min(child.material.opacity, opacity * 0.7);
+                        }
+                    });
+                }
+                break;
+        }
+    }
+    
+    /**
+     * Fade out old mode before transitioning
+     */
+    fadeOutOldMode(paperbackGroup, magneticGroup, holoGroup) {
+        const fadeOutDuration = 300; // milliseconds
+        const startTime = Date.now();
+        
+        const fadeOut = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / fadeOutDuration, 1.0);
+            const opacity = 1.0 - progress;
+            
+            // Apply opacity to all groups
+            paperbackGroup.forEach(obj => {
+                if (obj.material && obj.material.opacity !== undefined) {
+                    obj.material.opacity = opacity * 0.6;
+                }
+            });
+            
+            if (magneticGroup) {
+                magneticGroup.traverse(child => {
+                    if (child.material && child.material.opacity !== undefined) {
+                        child.material.opacity = opacity * 0.8;
+                    }
+                });
+            }
+            
+            if (holoGroup) {
+                holoGroup.traverse(child => {
+                    if (child.material && child.material.opacity !== undefined) {
+                        child.material.opacity = opacity * 0.7;
+                    }
+                });
+            }
+            
+            if (progress < 1.0) {
+                requestAnimationFrame(fadeOut);
+            }
+        };
+        
+        fadeOut();
+    }
+    
+    /**
+     * Automatically switch matrix mode based on text material
+     * Creates contextually appropriate visual environment
+     */
+    autoSwitchMatrixForMaterial(materialName) {
+        if (!this.materialMatrixMap[materialName]) {
+            console.warn(`⚠️ No matrix mapping for material: ${materialName}`);
+            return;
+        }
+        
+        const mapping = this.materialMatrixMap[materialName];
+        
+        console.log(`� Auto-switching matrix mode for "${materialName}" material`);
+        console.log(`   → Mode: ${mapping.mode}`);
+        console.log(`   → Intensity: ${mapping.intensity}x`);
+        console.log(`   → Context: ${mapping.description}`);
+        
+        // Switch to appropriate mode
+        this.switchMatrixWallMode(mapping.mode, false);
+        
+        // Store intensity for animation scaling
+        this.currentMatrixIntensity = mapping.intensity;
+        
+        // Return mapping info for UI updates
+        return mapping;
+    }
+    
+    /**
+     * Set text material and auto-correlate matrix background
+     */
+    setMaterialWithMatrixCorrelation(materialName) {
+        // Update current material
+        this.currentMaterial = materialName;
+        
+        // Auto-switch matrix mode
+        const mapping = this.autoSwitchMatrixForMaterial(materialName);
+        
+        // Apply material to existing letters
+        Object.values(this.letterGroups).forEach(group => {
+            group.forEach(letterMesh => {
+                if (letterMesh && letterMesh.material && this.materials[materialName]) {
+                    letterMesh.material = this.materials[materialName].clone();
+                }
+            });
+        });
+        
+        console.log(`✅ Material "${materialName}" applied with correlated matrix background`);
+        
+        return mapping;
+    }
+    
+    /**
+     * Update matrix grid backwall (animate center glow)
+     * Call this in your animation loop
+     */
+    updateMatrixGridBackwall() {
+        if (!this.matrixGridBackwall || !this.gridBackwallVisible) return;
+        
+        const time = Date.now() * 0.001;
+        
+        // Get intensity multiplier (default 1.0)
+        const intensity = this.currentMatrixIntensity || 1.0;
+        
+        // ========================================
+        // SMOOTH TRANSITION HANDLING
+        // ========================================
+        if (this.transitionState.isTransitioning) {
+            const elapsed = Date.now() - this.transitionState.startTime;
+            this.transitionState.progress = Math.min(elapsed / this.transitionState.duration, 1.0);
+            
+            // Easing function (ease-in-out)
+            const easeProgress = this.transitionState.progress < 0.5
+                ? 2 * this.transitionState.progress * this.transitionState.progress
+                : 1 - Math.pow(-2 * this.transitionState.progress + 2, 2) / 2;
+            
+            // Get mode groups
+            const paperbackGroup = this.matrixGridBackwall.children.filter(
+                child => !['MagneticField', 'HolographicProjector'].includes(child.name)
+            );
+            const magneticGroup = this.matrixGridBackwall.getObjectByName('MagneticField');
+            const holoGroup = this.matrixGridBackwall.getObjectByName('HolographicProjector');
+            
+            // Fade in new mode
+            if (easeProgress > 0.5) {
+                const fadeInProgress = (easeProgress - 0.5) * 2; // 0 to 1
+                this.applyModeVisibility(
+                    this.transitionState.toMode,
+                    paperbackGroup,
+                    magneticGroup,
+                    holoGroup,
+                    fadeInProgress
+                );
+            }
+            
+            // Complete transition
+            if (this.transitionState.progress >= 1.0) {
+                this.transitionState.isTransitioning = false;
+                console.log(`✅ Transition complete: ${this.transitionState.toMode} mode active`);
+            }
+        }
+        
+        // ========================================
+        // PAPERBACK MODE ANIMATIONS
+        // ========================================
+        if (this.matrixWallMode === 'paperback') {
+            const centerGlow = this.matrixGridBackwall.getObjectByName('centerGlow');
+            if (centerGlow) {
+                const scale = 1 + Math.sin(time * 2 * intensity) * (0.2 * intensity);
+                centerGlow.scale.set(scale, scale, 1);
+                centerGlow.material.opacity = (0.2 + Math.sin(time * 2 * intensity) * 0.1) * intensity;
+            }
+        }
+        
+        // ========================================
+        // MAGNETIC MODE ANIMATIONS (Intensity-Scaled)
+        // ========================================
+        if (this.matrixWallMode === 'magnetic' && this.magneticParticles) {
+            const magneticCore = this.matrixGridBackwall.getObjectByName('magneticCore');
+            
+            // Animate magnetic core pulsing (stronger with higher intensity)
+            if (magneticCore) {
+                const coreScale = 1 + Math.sin(time * 3 * intensity) * (0.3 * intensity);
+                magneticCore.scale.set(coreScale, coreScale, coreScale);
+                magneticCore.material.opacity = (0.4 + Math.sin(time * 3 * intensity) * 0.2) * intensity;
+            }
+            
+            // Animate magnetic particles spiraling (faster with higher intensity)
+            this.magneticParticles.forEach(particle => {
+                particle.userData.phase += 0.02 * particle.userData.speed * intensity;
+                
+                const angle = particle.userData.angle + particle.userData.phase;
+                const radius = particle.userData.radius + Math.sin(particle.userData.phase * 2) * 2 * intensity;
+                
+                particle.position.x = Math.cos(angle) * radius;
+                particle.position.y = Math.sin(angle) * radius;
+                particle.position.z += Math.sin(particle.userData.phase * 4) * 0.05;
+                
+                // Pulse opacity
+                particle.material.opacity = 0.5 + Math.sin(particle.userData.phase * 3) * 0.3;
+                
+                // Change color based on distance from center
+                const distanceFromCenter = Math.sqrt(
+                    particle.position.x ** 2 + particle.position.y ** 2
+                );
+                const hue = 0.5 + (distanceFromCenter / 30) * 0.2;
+                particle.material.color.setHSL(hue, 1, 0.5);
+            });
+            
+            // Rotate field lines
+            const magneticGroup = this.matrixGridBackwall.getObjectByName('MagneticField');
+            if (magneticGroup) {
+                magneticGroup.rotation.z += 0.001;
+            }
+        }
+        
+        // ========================================
+        // HOLOGRAPHIC MODE ANIMATIONS
+        // ========================================
+        if (this.matrixWallMode === 'holographic') {
+            // Animate projector sphere pulsing
+            const projectorSphere = this.matrixGridBackwall.getObjectByName('projectorSphere');
+            const innerCore = this.matrixGridBackwall.getObjectByName('innerCore');
+            
+            if (projectorSphere) {
+                const sphereScale = 1 + Math.sin(time * 2) * 0.15;
+                projectorSphere.scale.set(sphereScale, sphereScale, sphereScale);
+                projectorSphere.material.opacity = 0.7 + Math.sin(time * 2) * 0.1;
+            }
+            
+            if (innerCore) {
+                const coreScale = 1 + Math.sin(time * 4) * 0.2;
+                innerCore.scale.set(coreScale, coreScale, coreScale);
+            }
+            
+            // Animate scan lines moving up (speed scales with intensity)
+            if (this.holoScanLines) {
+                this.holoScanLines.forEach(scanLine => {
+                    scanLine.position.y += scanLine.userData.speed * 0.1 * intensity;
+                    
+                    // Reset when reaching top
+                    if (scanLine.position.y > 15) {
+                        scanLine.position.y = -15;
+                    }
+                    
+                    // Pulse opacity (brighter with higher intensity)
+                    scanLine.material.opacity = (0.4 + Math.sin(time * 3 + scanLine.position.y) * 0.2) * intensity;
+                });
+            }
+            
+            // Animate light particles streaming upward (more particles/faster with intensity)
+            if (this.holoParticles) {
+                this.holoParticles.forEach(particle => {
+                    // Move particle (velocity scaled by intensity)
+                    const velocityMultiplier = new THREE.Vector3(
+                        particle.userData.velocity.x * intensity,
+                        particle.userData.velocity.y * intensity,
+                        particle.userData.velocity.z * intensity
+                    );
+                    particle.position.add(velocityMultiplier);
+                    
+                    // Update lifecycle (faster with higher intensity)
+                    particle.userData.life += 0.005 * intensity;
+                    
+                    // Reset particle when it reaches top or dies
+                    if (particle.position.y > particle.userData.maxHeight || particle.userData.life > 1) {
+                        // Respawn at projector sphere
+                        const angle = Math.random() * Math.PI * 2;
+                        const spreadRadius = Math.random() * 2;
+                        particle.position.set(
+                            Math.cos(angle) * spreadRadius,
+                            particle.userData.startY,
+                            -8 + Math.random() * 1
+                        );
+                        particle.userData.life = 0;
+                        
+                        // Randomize velocity slightly
+                        particle.userData.velocity.y = 0.05 + Math.random() * 0.1;
+                    }
+                    
+                    // Fade based on lifecycle (brighter with intensity)
+                    particle.material.opacity = Math.sin(particle.userData.life * Math.PI) * 0.8 * Math.min(intensity, 1.2);
+                    
+                    // Change color as particle rises
+                    const heightRatio = (particle.position.y - particle.userData.startY) / 
+                                       (particle.userData.maxHeight - particle.userData.startY);
+                    particle.material.color.setHSL(0.5 + heightRatio * 0.2, 1, 0.5);
+                    
+                    // Scale particle as it rises (larger with intensity)
+                    const scale = (1 + heightRatio * 0.5) * Math.min(intensity, 1.3);
+                    particle.scale.set(scale, scale, scale);
+                });
+            }
+            
+            // Rotate projection cone slowly (speed scales with intensity)
+            const projectionCone = this.matrixGridBackwall.getObjectByName('projectionCone');
+            if (projectionCone) {
+                projectionCone.rotation.z += 0.002 * intensity;
+                projectionCone.material.opacity = 0.05 + Math.sin(time) * 0.03;
+            }
+            
+            // Pulse holographic grid
+            const holoGroup = this.matrixGridBackwall.getObjectByName('HolographicProjector');
+            if (holoGroup) {
+                const gridPlane = holoGroup.children.find(child => 
+                    child.geometry && child.geometry.type === 'PlaneGeometry'
+                );
+                if (gridPlane) {
+                    gridPlane.material.opacity = 0.1 + Math.sin(time * 1.5) * 0.05;
+                }
+            }
+        }
     }
     
     /**
