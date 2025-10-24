@@ -1,0 +1,228 @@
+{
+  "folders": [
+    {
+      "name": "📱 Mobile Root",
+      "path": "."
+    },
+    {
+      "name": "📚 Documentation",
+      "path": ".",
+      "pattern": "*.md"
+    },
+    {
+      "name": "🎨 HTML Apps",
+      "path": ".",
+      "pattern": "*.html"
+    },
+    {
+      "name": "⚙️ Scripts",
+      "path": "scripts"
+    },
+    {
+      "name": "🏗️ Core Files",
+      "path": ".",
+      "pattern": "{package.json,tsconfig.json,server.ts,*.js}"
+    }
+  ],
+  "settings": {
+    "editor.fontSize": 13,
+    "editor.lineHeight": 18,
+    "terminal.integrated.fontSize": 12,
+    "editor.minimap.enabled": false,
+    "editor.wordWrap": "on",
+    "editor.wrappingIndent": "indent",
+    "breadcrumbs.enabled": true,
+    "editor.folding": true,
+    "editor.foldingStrategy": "indentation",
+    "workbench.activityBar.location": "top",
+    "workbench.statusBar.visible": true,
+    "workbench.sideBar.location": "left",
+    "editor.renderWhitespace": "selection",
+    "editor.renderLineHighlight": "line",
+    "editor.cursorStyle": "line",
+    "editor.cursorBlinking": "smooth",
+    "editor.suggestOnTriggerCharacters": true,
+    "editor.acceptSuggestionOnEnter": "smart",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    },
+    "editor.quickSuggestionsDelay": 100,
+    "editor.parameterHints.enabled": true,
+    "editor.snippetSuggestions": "top",
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 2000,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.exclude": {
+      "**/.git": true,
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.DS_Store": true,
+      "**/ubuntu-22.04.iso": true,
+      "**/compressed_py": true,
+      "**/_archived_demos": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.git": true,
+      "**/compressed_py": true,
+      "**/generated_*": true,
+      "**/_archived_*": true
+    },
+    "search.smartCase": true,
+    "search.useIgnoreFiles": true,
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "scm.defaultViewMode": "tree",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "typescript.suggest.autoImports": true,
+    "javascript.suggest.autoImports": true,
+    "html.autoClosingTags": true,
+    "html.format.wrapLineLength": 100,
+    "css.lint.unknownAtRules": "ignore",
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.scrollback": 1000,
+    "terminal.integrated.cursorBlinking": true,
+    "extensions.autoUpdate": false,
+    "extensions.autoCheckUpdates": false,
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/dist/**": true,
+      "**/compressed_py/**": true
+    },
+    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.preferredDarkColorTheme": "Default Dark Modern"
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.vscode-typescript-next",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "streetsidesoftware.code-spell-checker",
+      "wayou.vscode-todo-highlight",
+      "eamodio.gitlens",
+      "ms-vscode.live-server",
+      "slevesque.shader",
+      "yzhang.markdown-all-in-one",
+      "bierner.markdown-preview-github-styles",
+      "usernamehw.errorlens",
+      "christian-kohler.path-intellisense",
+      "formulahendry.auto-rename-tag"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "🚀 Start Server",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/dist/server.js",
+        "preLaunchTask": "npm: pixelprodigy3d",
+        "outFiles": [
+          "${workspaceFolder}/dist/**/*.js"
+        ],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      },
+      {
+        "name": "🔍 Debug Server",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/dist/server.js",
+        "preLaunchTask": "npm: pixelprodigy3d",
+        "outFiles": [
+          "${workspaceFolder}/dist/**/*.js"
+        ],
+        "console": "integratedTerminal",
+        "sourceMaps": true
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "📦 Build TypeScript",
+        "type": "npm",
+        "script": "pixelprodigy3d",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared",
+          "showReuseMessage": false,
+          "clear": true
+        },
+        "problemMatcher": [
+          "$tsc"
+        ]
+      },
+      {
+        "label": "🚀 Start Server",
+        "type": "npm",
+        "script": "start",
+        "dependsOn": "📦 Build TypeScript",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "dedicated",
+          "showReuseMessage": false
+        },
+        "isBackground": true,
+        "problemMatcher": {
+          "pattern": {
+            "regexp": "^Server listening on port (\\d+)$",
+            "file": 1
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*Starting server.*$",
+            "endsPattern": "^.*Server listening.*$"
+          }
+        }
+      },
+      {
+        "label": "🔄 Build and Run",
+        "dependsOn": [
+          "📦 Build TypeScript",
+          "🚀 Start Server"
+        ],
+        "dependsOrder": "sequence",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared",
+          "showReuseMessage": false
+        }
+      },
+      {
+        "label": "🧹 Clean Build",
+        "type": "shell",
+        "command": "rm -rf dist && npm run pixelprodigy3d",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared",
+          "showReuseMessage": false,
+          "clear": true
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
