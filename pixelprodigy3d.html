@@ -223,35 +223,61 @@
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
-    .shape-selector, .material-selector, .font-selector {
+    .shape-selector, .material-selector, .font-selector, .doc-template-btn,
+    .weight-selector, .style-selector, .align-selector {
       transition: all 0.2s ease;
     }
     
-    .shape-selector:hover, .material-selector:hover, .font-selector:hover {
+    .shape-selector:hover, .material-selector:hover, .font-selector:hover,
+    .doc-template-btn:hover, .weight-selector:hover, .style-selector:hover,
+    .align-selector:hover {
       transform: translateY(-2px);
       box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
     }
     
     #blog-content::-webkit-scrollbar,
-    #pdf-paragraph::-webkit-scrollbar {
+    #pdf-paragraph::-webkit-scrollbar,
+    #saved-docs-list::-webkit-scrollbar {
       width: 8px;
     }
     
     #blog-content::-webkit-scrollbar-track,
-    #pdf-paragraph::-webkit-scrollbar-track {
+    #pdf-paragraph::-webkit-scrollbar-track,
+    #saved-docs-list::-webkit-scrollbar-track {
       background: rgba(255, 255, 255, 0.05);
       border-radius: 4px;
     }
     
     #blog-content::-webkit-scrollbar-thumb,
-    #pdf-paragraph::-webkit-scrollbar-thumb {
+    #pdf-paragraph::-webkit-scrollbar-thumb,
+    #saved-docs-list::-webkit-scrollbar-thumb {
       background: rgba(102, 126, 234, 0.5);
       border-radius: 4px;
     }
     
     #blog-content::-webkit-scrollbar-thumb:hover,
-    #pdf-paragraph::-webkit-scrollbar-thumb:hover {
+    #pdf-paragraph::-webkit-scrollbar-thumb:hover,
+    #saved-docs-list::-webkit-scrollbar-thumb:hover {
       background: rgba(102, 126, 234, 0.7);
+    }
+    
+    /* Saved documents list items */
+    .saved-doc-item {
+      padding: 8px;
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 4px;
+      font-size: 11px;
+      color: #e0e0e0;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .saved-doc-item:hover {
+      background: rgba(102, 126, 234, 0.2);
+      transform: translateX(4px);
     }
   </style>
 </head>
@@ -706,7 +732,21 @@
       </div>
 
       <!-- WordWeaver Workspace -->
-      <div id="workspace-word" class="workspace-content" style="display: none;">
+      <div id="workspace-word" class="workspace-content" style="display: none; overflow-y: auto; max-height: calc(100vh - 100px);">
+        
+        <!-- WordWeaver Control Panel Header -->
+        <div style="position: sticky; top: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 8px; margin-bottom: 15px; z-index: 10;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="margin: 0; font-size: 18px; font-weight: 700;">🧬 WordWeaver 3D Document Studio</h3>
+              <p style="margin: 5px 0 0 0; font-size: 11px; opacity: 0.9;">Create 3D text art with individual letter geometries</p>
+            </div>
+            <button onclick="toggleWordWeaverPanel()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 6px; color: white; font-weight: 600; cursor: pointer;">
+              ⚙️ Settings
+            </button>
+          </div>
+        </div>
+        
         <div class="section">
           <div class="section-title">🧬 WordWeaver Canvas</div>
           
@@ -859,6 +899,240 @@
             <div style="margin-top: 12px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 6px; text-align: center;">
               <span style="color: #999; font-size: 12px;">Word Count: </span>
               <span id="doc-word-count" style="color: #667eea; font-size: 16px; font-weight: 700;">0</span>
+            </div>
+          </div>
+          
+          <!-- ========================================
+               ADVANCED WORDWEAVER CONTROL PANEL
+               ======================================== -->
+          
+          <!-- Document Type Templates -->
+          <div class="section" style="margin-top: 20px;">
+            <div class="section-title">📄 Document Templates</div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+              <button class="doc-template-btn" onclick="loadDocTemplate('essay')" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+                📝 Essay
+              </button>
+              <button class="doc-template-btn" onclick="loadDocTemplate('letter')" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+                ✉️ Letter
+              </button>
+              <button class="doc-template-btn" onclick="loadDocTemplate('report')" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+                📊 Report
+              </button>
+              <button class="doc-template-btn" onclick="loadDocTemplate('poem')" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+                🎭 Poem
+              </button>
+              <button class="doc-template-btn" onclick="loadDocTemplate('resume')" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+                💼 Resume
+              </button>
+              <button class="doc-template-btn" onclick="loadDocTemplate('script')" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+                🎬 Script
+              </button>
+            </div>
+          </div>
+          
+          <!-- Text Formatting Controls -->
+          <div class="section" style="margin-top: 15px;">
+            <div class="section-title">✏️ Text Formatting</div>
+            
+            <!-- Font Weight & Style -->
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Font Weight:</label>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <button class="weight-selector active" data-weight="normal" onclick="selectFontWeight('normal')" style="padding: 8px; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.5); border-radius: 6px; color: #fff; font-size: 10px; cursor: pointer;">
+                  Regular
+                </button>
+                <button class="weight-selector" data-weight="bold" onclick="selectFontWeight('bold')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; font-weight: bold; cursor: pointer;">
+                  Bold
+                </button>
+                <button class="weight-selector" data-weight="bolder" onclick="selectFontWeight('bolder')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; font-weight: 900; cursor: pointer;">
+                  Extra Bold
+                </button>
+              </div>
+            </div>
+            
+            <!-- Text Decoration -->
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Text Style:</label>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <button class="style-selector" data-style="none" onclick="toggleTextDecoration('none')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
+                  Normal
+                </button>
+                <button class="style-selector" data-style="underline" onclick="toggleTextDecoration('underline')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; text-decoration: underline; cursor: pointer;">
+                  Underline
+                </button>
+                <button class="style-selector" data-style="italic" onclick="toggleTextDecoration('italic')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; font-style: italic; cursor: pointer;">
+                  Italic
+                </button>
+              </div>
+            </div>
+            
+            <!-- Letter Size Control -->
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Letter Size:</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="letter-size-slider" min="0.2" max="2.0" step="0.1" value="0.4" oninput="updateLetterSize(this.value)" style="flex: 1;">
+                <span id="letter-size-value" style="min-width: 45px; text-align: right; color: #667eea; font-weight: 600; font-size: 13px;">0.4</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 9px; color: #666;">
+                <span>Tiny</span>
+                <span>Normal</span>
+                <span>Huge</span>
+              </div>
+            </div>
+            
+            <!-- Letter Spacing -->
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Letter Spacing:</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="letter-spacing-slider" min="0.3" max="1.5" step="0.1" value="0.6" oninput="updateLetterSpacing(this.value)" style="flex: 1;">
+                <span id="letter-spacing-value" style="min-width: 45px; text-align: right; color: #667eea; font-weight: 600; font-size: 13px;">0.6</span>
+              </div>
+            </div>
+            
+            <!-- 3D Extrusion Depth -->
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">3D Depth:</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="extrusion-depth-slider" min="0.05" max="0.5" step=" 0.05" value="0.15" oninput="updateExtrusionDepth(this.value)" style="flex: 1;">
+                <span id="extrusion-depth-value" style="min-width: 45px; text-align: right; color: #667eea; font-weight: 600; font-size: 13px;">0.15</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 9px; color: #666;">
+                <span>Flat</span>
+                <span>3D</span>
+                <span>Deep</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Word Placement Controls -->
+          <div class="section" style="margin-top: 15px;">
+            <div class="section-title">📍 Word Placement</div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Alignment:</label>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <button class="align-selector active" data-align="left" onclick="selectAlignment('left')" style="padding: 8px; background: rgba(102, 126, 234, 0.3); border: 2px solid rgba(102, 126, 234, 0.5); border-radius: 6px; color: #fff; font-size: 10px; cursor: pointer;">
+                  ← Left
+                </button>
+                <button class="align-selector" data-align="center" onclick="selectAlignment('center')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
+                  ↔ Center
+                </button>
+                <button class="align-selector" data-align="right" onclick="selectAlignment('right')" style="padding: 8px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 10px; cursor: pointer;">
+                  Right →
+                </button>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Line Spacing:</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="line-spacing-slider" min="0.5" max="2.0" step="0.1" value="0.8" oninput="updateLineSpacing(this.value)" style="flex: 1;">
+                <span id="line-spacing-value" style="min-width: 45px; text-align: right; color: #667eea; font-weight: 600; font-size: 13px;">0.8</span>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Words Per Line:</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="words-per-line-slider" min="4" max="16" step="1" value="8" oninput="updateWordsPerLine(this.value)" style="flex: 1;">
+                <span id="words-per-line-value" style="min-width: 45px; text-align: right; color: #667eea; font-weight: 600; font-size: 13px;">8</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Save & Load System -->
+          <div class="section" style="margin-top: 15px;">
+            <div class="section-title">💾 Save & Load</div>
+            
+            <div style="margin-bottom: 10px;">
+              <label style="display: block; margin-bottom: 5px; color: #999; font-size: 11px;">Document Name:</label>
+              <input type="text" id="doc-save-name" placeholder="My 3D Document" style="width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #e0e0e0; font-size: 12px;">
+            </div>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+              <button onclick="saveDocument()" style="flex: 1; padding: 10px; background: rgba(59, 130, 246, 0.2); border: 2px solid rgba(59, 130, 246, 0.4); border-radius: 6px; color: #3b82f6; font-weight: 600; font-size: 12px; cursor: pointer;">
+                💾 Save
+              </button>
+              <button onclick="showLoadDialog()" style="flex: 1; padding: 10px; background: rgba(168, 85, 247, 0.2); border: 2px solid rgba(168, 85, 247, 0.4); border-radius: 6px; color: #a855f7; font-weight: 600; font-size: 12px; cursor: pointer;">
+                📂 Load
+              </button>
+            </div>
+            
+            <div style="display: flex; gap: 8px;">
+              <button onclick="newDocument()" style="flex: 1; padding: 10px; background: rgba(34, 197, 94, 0.2); border: 2px solid rgba(34, 197, 94, 0.4); border-radius: 6px; color: #22c55e; font-weight: 600; font-size: 12px; cursor: pointer;">
+                ➕ New
+              </button>
+              <button onclick="duplicateDocument()" style="flex: 1; padding: 10px; background: rgba(251, 146, 60, 0.2); border: 2px solid rgba(251, 146, 60, 0.4); border-radius: 6px; color: #fb923c; font-weight: 600; font-size: 12px; cursor: pointer;">
+                📋 Duplicate
+              </button>
+            </div>
+            
+            <!-- Saved Documents List -->
+            <div style="margin-top: 12px; max-height: 150px; overflow-y: auto; background: rgba(0, 0, 0, 0.3); border-radius: 6px; padding: 8px;">
+              <div style="font-size: 10px; color: #999; margin-bottom: 6px; font-weight: 600;">SAVED DOCUMENTS:</div>
+              <div id="saved-docs-list" style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="font-size: 10px; color: #666; font-style: italic; padding: 8px;">No saved documents yet...</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Animation Controls -->
+          <div class="section" style="margin-top: 15px;">
+            <div class="section-title">🎬 Animation Settings</div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Materialization Speed:</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="animation-speed-slider" min="500" max="2000" step="100" value="1200" oninput="updateAnimationSpeed(this.value)" style="flex: 1;">
+                <span id="animation-speed-value" style="min-width: 60px; text-align: right; color: #667eea; font-weight: 600; font-size: 13px;">1200ms</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 9px; color: #666;">
+                <span>Fast</span>
+                <span>Normal</span>
+                <span>Slow</span>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; color: #999; font-size: 11px; font-weight: 600;">Letter Stagger Delay:</label>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="range" id="stagger-delay-slider" min="0" max="150" step="10" value="50" oninput="updateStaggerDelay(this.value)" style="flex: 1;">
+                <span id="stagger-delay-value" style="min-width: 50px; text-align: right; color: #667eea; font-weight: 600; font-size: 13px;">50ms</span>
+              </div>
+            </div>
+            
+            <div>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="enable-rotation" checked onchange="toggleRotationAnimation()" style="width: 16px; height: 16px; cursor: pointer;">
+                <span style="color: #e0e0e0; font-size: 12px;">Enable Rotation Animation</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Quick Actions -->
+          <div class="section" style="margin-top: 15px; margin-bottom: 20px;">
+            <div class="section-title">⚡ Quick Actions</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button onclick="selectAllLetters()" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+                🔘 Select All
+              </button>
+              <button onclick="deselectAllLetters()" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+                ⭕ Deselect All
+              </button>
+              <button onclick="randomizeColors()" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+                🌈 Random Colors
+              </button>
+              <button onclick="resetToDefaults()" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+                🔄 Reset Defaults
+              </button>
+              <button onclick="arrangeInCircle()" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+                ⭕ Circle Layout
+              </button>
+              <button onclick="arrangeInSpiral()" style="padding: 10px; background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 6px; color: #667eea; font-size: 11px; cursor: pointer;">
+                🌀 Spiral Layout
+              </button>
             </div>
           </div>
         </div>
@@ -6807,6 +7081,360 @@
       const count = documentCanvas.getTotalWordCount();
       document.getElementById('doc-word-count').textContent = count;
     }
+
+    // ========================================
+    // ADVANCED WORDWEAVER CONTROLS
+    // ========================================
+    
+    // Document Templates
+    const documentTemplates = {
+      essay: {
+        title: "Essay Title Here",
+        content: "Introduction paragraph explaining the main topic and thesis statement.\n\nBody paragraph one with supporting evidence and analysis.\n\nBody paragraph two with additional points and examples.\n\nConclusion summarizing the key arguments and final thoughts."
+      },
+      letter: {
+        header: { name: "Your Name", city: "Your City", state: "ST", zipCode: "12345" },
+        title: "Formal Letter",
+        content: "Dear Recipient,\n\nI am writing to you regarding [subject]. This letter serves to formally communicate my thoughts and intentions.\n\nThank you for your time and consideration.\n\nSincerely,\nYour Name"
+      },
+      report: {
+        title: "Report Title",
+        content: "Executive Summary:\nBrief overview of findings and recommendations.\n\nIntroduction:\nBackground and purpose of this report.\n\nFindings:\nDetailed analysis and data presentation.\n\nConclusions:\nKey takeaways and recommendations."
+      },
+      poem: {
+        title: "Untitled Poem",
+        content: "Roses are red,\nViolets are blue,\n3D letters materialize,\nIn this WordWeaver view.\n\nWords dance and spiral,\nIn three-dimensional space,\nCreating art from language,\nWith elegance and grace."
+      },
+      resume: {
+        header: { name: "Your Name", city: "City", state: "State", zipCode: "Zip" },
+        title: "Professional Resume",
+        content: "EXPERIENCE:\nJob Title | Company Name | 2020-Present\n- Achievement one\n- Achievement two\n\nEDUCATION:\nDegree | University | Year\n\nSKILLS:\n3D Design, Creative Writing, Technical Communication"
+      },
+      script: {
+        title: "Scene Title",
+        content: "INT. WORDWEAVER STUDIO - DAY\n\nThe letters materialize one by one, floating in 3D space.\n\nNARRATOR\n(V.O.)\nIn a world where words become art...\n\nFADE IN: The text transforms, dancing through the digital realm."
+      }
+    };
+    
+    function loadDocTemplate(templateName) {
+      const template = documentTemplates[templateName];
+      if (!template) return;
+      
+      if (currentDocumentMode === 'blog') {
+        document.getElementById('blog-title').value = template.title || '';
+        document.getElementById('blog-content').value = template.content || '';
+      } else {
+        if (template.header) {
+          document.getElementById('pdf-name').value = template.header.name || '';
+          document.getElementById('pdf-city').value = template.header.city || '';
+          document.getElementById('pdf-state').value = template.header.state || '';
+          document.getElementById('pdf-zip').value = template.header.zipCode || '';
+        }
+        document.getElementById('pdf-title').value = template.title || '';
+        document.getElementById('pdf-paragraph').value = template.content || '';
+      }
+      
+      alert(`📄 Loaded ${templateName} template!`);
+    }
+    
+    // Text Formatting Controls
+    function selectFontWeight(weight) {
+      if (!documentCanvas) return;
+      documentCanvas.setFontWeight(weight);
+      
+      document.querySelectorAll('.weight-selector').forEach(btn => {
+        if (btn.dataset.weight === weight) {
+          btn.style.background = 'rgba(102, 126, 234, 0.3)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+          btn.style.color = '#fff';
+        } else {
+          btn.style.background = 'rgba(102, 126, 234, 0.1)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+          btn.style.color = '#667eea';
+        }
+      });
+    }
+    
+    function toggleTextDecoration(style) {
+      if (!documentCanvas) return;
+      documentCanvas.setTextDecoration(style);
+      
+      document.querySelectorAll('.style-selector').forEach(btn => {
+        if (btn.dataset.style === style) {
+          btn.style.background = 'rgba(102, 126, 234, 0.3)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+          btn.style.color = '#fff';
+        } else {
+          btn.style.background = 'rgba(102, 126, 234, 0.1)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+          btn.style.color = '#667eea';
+        }
+      });
+    }
+    
+    function updateLetterSize(value) {
+      if (documentCanvas) documentCanvas.setLetterSize(parseFloat(value));
+      document.getElementById('letter-size-value').textContent = value;
+    }
+    
+    function updateLetterSpacing(value) {
+      if (documentCanvas) documentCanvas.setLetterSpacing(parseFloat(value));
+      document.getElementById('letter-spacing-value').textContent = value;
+    }
+    
+    function updateExtrusionDepth(value) {
+      if (documentCanvas) documentCanvas.setExtrusionDepth(parseFloat(value));
+      document.getElementById('extrusion-depth-value').textContent = value;
+    }
+    
+    // Word Placement Controls
+    function selectAlignment(align) {
+      if (!documentCanvas) return;
+      documentCanvas.setAlignment(align);
+      
+      document.querySelectorAll('.align-selector').forEach(btn => {
+        if (btn.dataset.align === align) {
+          btn.style.background = 'rgba(102, 126, 234, 0.3)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.5)';
+          btn.style.color = '#fff';
+        } else {
+          btn.style.background = 'rgba(102, 126, 234, 0.1)';
+          btn.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+          btn.style.color = '#667eea';
+        }
+      });
+    }
+    
+    function updateLineSpacing(value) {
+      if (documentCanvas) documentCanvas.setLineSpacing(parseFloat(value));
+      document.getElementById('line-spacing-value').textContent = value;
+    }
+    
+    function updateWordsPerLine(value) {
+      if (documentCanvas) documentCanvas.setWordsPerLine(parseInt(value));
+      document.getElementById('words-per-line-value').textContent = value;
+    }
+    
+    // Save & Load System
+    function saveDocument() {
+      if (!documentCanvas) return;
+      
+      const docName = document.getElementById('doc-save-name').value || `Document_${Date.now()}`;
+      const docData = {
+        name: docName,
+        mode: currentDocumentMode,
+        document: documentCanvas.document,
+        settings: {
+          shape: documentCanvas.currentShape,
+          material: documentCanvas.currentMaterial,
+          font: documentCanvas.currentFont,
+          color: documentCanvas.currentColor,
+          letterSize: documentCanvas.letterSize || 0.4,
+          letterSpacing: documentCanvas.letterSpacing || 0.6,
+          extrusionDepth: documentCanvas.extrusionDepth || 0.15
+        },
+        timestamp: new Date().toISOString()
+      };
+      
+      // Save to localStorage
+      const savedDocs = JSON.parse(localStorage.getItem('wordweaver_documents') || '[]');
+      savedDocs.push(docData);
+      localStorage.setItem('wordweaver_documents', JSON.stringify(savedDocs));
+      
+      refreshSavedDocsList();
+      alert(`💾 Document "${docName}" saved successfully!`);
+    }
+    
+    function showLoadDialog() {
+      const savedDocs = JSON.parse(localStorage.getItem('wordweaver_documents') || '[]');
+      if (savedDocs.length === 0) {
+        alert('No saved documents found!');
+        return;
+      }
+      
+      refreshSavedDocsList();
+      alert('📂 Scroll down to "Saved Documents" section to load a document.');
+    }
+    
+    function loadSavedDocument(index) {
+      const savedDocs = JSON.parse(localStorage.getItem('wordweaver_documents') || '[]');
+      const doc = savedDocs[index];
+      
+      if (!doc) return;
+      
+      // Clear current document
+      clearDocument();
+      
+      // Load document data
+      documentCanvas.document = doc.document;
+      
+      // Restore settings
+      if (doc.settings) {
+        documentCanvas.setShape(doc.settings.shape);
+        documentCanvas.setMaterial(doc.settings.material);
+        documentCanvas.setFont(doc.settings.font);
+        documentCanvas.setColor(doc.settings.color);
+        if (doc.settings.letterSize) documentCanvas.setLetterSize(doc.settings.letterSize);
+        if (doc.settings.letterSpacing) documentCanvas.setLetterSpacing(doc.settings.letterSpacing);
+        if (doc.settings.extrusionDepth) documentCanvas.setExtrusionDepth(doc.settings.extrusionDepth);
+      }
+      
+      // Re-materialize the document
+      if (doc.document.title) {
+        documentCanvas.materializeTitle(doc.document.title);
+      }
+      doc.document.paragraphs.forEach((para, i) => {
+        setTimeout(() => {
+          documentCanvas.materializeParagraph(para, i);
+        }, 300 * (i + 1));
+      });
+      
+      updateWordCount();
+      alert(`📂 Loaded document: ${doc.name}`);
+    }
+    
+    function deleteSavedDocument(index) {
+      if (!confirm('Delete this document?')) return;
+      
+      const savedDocs = JSON.parse(localStorage.getItem('wordweaver_documents') || '[]');
+      savedDocs.splice(index, 1);
+      localStorage.setItem('wordweaver_documents', JSON.stringify(savedDocs));
+      
+      refreshSavedDocsList();
+    }
+    
+    function refreshSavedDocsList() {
+      const savedDocs = JSON.parse(localStorage.getItem('wordweaver_documents') || '[]');
+      const listContainer = document.getElementById('saved-docs-list');
+      
+      if (savedDocs.length === 0) {
+        listContainer.innerHTML = '<div style="font-size: 10px; color: #666; font-style: italic; padding: 8px;">No saved documents yet...</div>';
+        return;
+      }
+      
+      listContainer.innerHTML = savedDocs.map((doc, index) => `
+        <div class="saved-doc-item">
+          <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 2px;">${doc.name}</div>
+            <div style="font-size: 9px; color: #999;">${new Date(doc.timestamp).toLocaleString()}</div>
+          </div>
+          <div style="display: flex; gap: 4px;">
+            <button onclick="loadSavedDocument(${index})" style="padding: 4px 8px; background: rgba(59, 130, 246, 0.3); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 4px; color: #3b82f6; font-size: 9px; cursor: pointer;">Load</button>
+            <button onclick="deleteSavedDocument(${index})" style="padding: 4px 8px; background: rgba(239, 68, 68, 0.3); border: 1px solid rgba(239, 68, 68, 0.5); border-radius: 4px; color: #ef4444; font-size: 9px; cursor: pointer;">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function newDocument() {
+      if (confirm('Create new document? Current work will be cleared.')) {
+        clearDocument();
+        document.getElementById('doc-save-name').value = '';
+        resetToDefaults();
+      }
+    }
+    
+    function duplicateDocument() {
+      const currentName = document.getElementById('doc-save-name').value || 'Document';
+      document.getElementById('doc-save-name').value = `${currentName} (Copy)`;
+      saveDocument();
+    }
+    
+    // Animation Controls
+    function updateAnimationSpeed(value) {
+      if (documentCanvas) documentCanvas.setAnimationSpeed(parseInt(value));
+      document.getElementById('animation-speed-value').textContent = value + 'ms';
+    }
+    
+    function updateStaggerDelay(value) {
+      if (documentCanvas) documentCanvas.setStaggerDelay(parseInt(value));
+      document.getElementById('stagger-delay-value').textContent = value + 'ms';
+    }
+    
+    function toggleRotationAnimation() {
+      const enabled = document.getElementById('enable-rotation').checked;
+      if (documentCanvas) documentCanvas.setRotationEnabled(enabled);
+    }
+    
+    // Quick Actions
+    function selectAllLetters() {
+      if (!documentCanvas) return;
+      // TODO: Implement letter selection system
+      alert('🔘 Select all feature coming soon!');
+    }
+    
+    function deselectAllLetters() {
+      if (!documentCanvas) return;
+      // TODO: Implement letter selection system
+      alert('⭕ Deselect all feature coming soon!');
+    }
+    
+    function randomizeColors() {
+      if (!documentCanvas) return;
+      const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+      documentCanvas.setColor(randomColor);
+      document.getElementById('doc-color').value = randomColor;
+      alert(`🌈 Random color applied: ${randomColor}`);
+    }
+    
+    function resetToDefaults() {
+      if (!documentCanvas) return;
+      
+      // Reset all sliders and settings
+      document.getElementById('letter-size-slider').value = 0.4;
+      document.getElementById('letter-spacing-slider').value = 0.6;
+      document.getElementById('extrusion-depth-slider').value = 0.15;
+      document.getElementById('line-spacing-slider').value = 0.8;
+      document.getElementById('words-per-line-slider').value = 8;
+      document.getElementById('animation-speed-slider').value = 1200;
+      document.getElementById('stagger-delay-slider').value = 50;
+      document.getElementById('doc-color').value = '#667eea';
+      
+      // Update displays
+      document.getElementById('letter-size-value').textContent = '0.4';
+      document.getElementById('letter-spacing-value').textContent = '0.6';
+      document.getElementById('extrusion-depth-value').textContent = '0.15';
+      document.getElementById('line-spacing-value').textContent = '0.8';
+      document.getElementById('words-per-line-value').textContent = '8';
+      document.getElementById('animation-speed-value').textContent = '1200ms';
+      document.getElementById('stagger-delay-value').textContent = '50ms';
+      
+      // Apply to document canvas
+      documentCanvas.setLetterSize(0.4);
+      documentCanvas.setLetterSpacing(0.6);
+      documentCanvas.setExtrusionDepth(0.15);
+      documentCanvas.setLineSpacing(0.8);
+      documentCanvas.setWordsPerLine(8);
+      documentCanvas.setAnimationSpeed(1200);
+      documentCanvas.setStaggerDelay(50);
+      documentCanvas.setColor('#667eea');
+      documentCanvas.setShape('linear');
+      documentCanvas.setMaterial('biblical');
+      documentCanvas.setFont('helvetiker');
+      
+      alert('🔄 Reset to default settings!');
+    }
+    
+    function arrangeInCircle() {
+      if (!documentCanvas) return;
+      documentCanvas.setShape('sphere');
+      selectDocShape('sphere');
+      alert('⭕ Letters will arrange in circular pattern on next materialization!');
+    }
+    
+    function arrangeInSpiral() {
+      if (!documentCanvas) return;
+      documentCanvas.setShape('helix');
+      selectDocShape('helix');
+      alert('🌀 Letters will arrange in spiral pattern on next materialization!');
+    }
+    
+    function toggleWordWeaverPanel() {
+      alert('⚙️ Settings panel - All controls are already visible in the sidebar!');
+    }
+    
+    // Initialize saved docs list on load
+    setTimeout(refreshSavedDocsList, 1500);
 
     // Start
     window.addEventListener('load', init);

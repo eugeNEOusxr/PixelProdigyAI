@@ -45,6 +45,19 @@ class Document3DCanvas {
         this.currentColor = '#667eea';
         this.currentFont = 'helvetiker';
         
+        // Advanced formatting settings
+        this.letterSize = 0.4;
+        this.letterSpacing = 0.6;
+        this.extrusionDepth = 0.15;
+        this.lineSpacing = 0.8;
+        this.wordsPerLine = 8;
+        this.alignment = 'left';
+        this.fontWeight = 'normal';
+        this.textDecoration = 'none';
+        this.animationSpeed = 1200;
+        this.staggerDelay = 50;
+        this.rotationEnabled = true;
+        
         // Font loader and loaded fonts
         this.fontLoader = new THREE.FontLoader();
         this.loadedFonts = {};
@@ -265,14 +278,22 @@ class Document3DCanvas {
                     
                 case 'linear':
                 default:
-                    // Linear text flow (like a document)
-                    const wordsPerLine = 8;
-                    const lineIndex = Math.floor(i / wordsPerLine);
-                    const posInLine = i % wordsPerLine;
+                    // Linear text flow (like a document) - use configurable settings
+                    const lineIndex = Math.floor(i / this.wordsPerLine);
+                    const posInLine = i % this.wordsPerLine;
+                    
+                    let xOffset = 0;
+                    if (this.alignment === 'center') {
+                        xOffset = -(this.wordsPerLine * 2.5) / 2;
+                    } else if (this.alignment === 'right') {
+                        xOffset = -(this.wordsPerLine * 2.5);
+                    } else {
+                        xOffset = -10;  // left alignment
+                    }
                     
                     position = new THREE.Vector3(
-                        -10 + (posInLine * 2.5) + indent,  // Horizontal flow with indent
-                        startY - (lineIndex * 0.8),         // Line spacing
+                        xOffset + (posInLine * 2.5) + indent,
+                        startY - (lineIndex * this.lineSpacing),
                         0
                     );
                     break;
@@ -301,21 +322,21 @@ class Document3DCanvas {
             }
             
             const letters = word.split('');
-            const letterSpacing = 0.6 * scale;  // Space between letters
-            const totalWidth = (letters.length - 1) * letterSpacing;
+            const spacing = this.letterSpacing * scale;  // Use configurable spacing
+            const totalWidth = (letters.length - 1) * spacing;
             
             // Create each letter as a separate 3D geometry
             letters.forEach((char, letterIndex) => {
                 const letterGroup = new THREE.Group();
                 
                 // Calculate letter position within the word
-                const letterOffsetX = (letterIndex * letterSpacing) - (totalWidth / 2);
+                const letterOffsetX = (letterIndex * spacing) - (totalWidth / 2);
                 
-                // Create 3D text geometry for this letter
+                // Create 3D text geometry for this letter - use configurable settings
                 const textGeometry = new THREE.TextGeometry(char, {
                     font: font,
-                    size: 0.4 * scale,
-                    height: 0.15 * scale,  // 3D depth/extrusion
+                    size: this.letterSize * scale,
+                    height: this.extrusionDepth * scale,  // Use configurable 3D depth
                     curveSegments: 12,
                     bevelEnabled: true,
                     bevelThickness: 0.02 * scale,
@@ -329,9 +350,14 @@ class Document3DCanvas {
                 const centerOffset = -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x);
                 textGeometry.translate(centerOffset, 0, 0);
                 
-                // Apply material
+                // Apply material with configurable settings
                 const material = this.materials[this.currentMaterial].clone();
                 material.color = new THREE.Color(this.currentColor);
+                
+                // Font weight simulation (adjust material properties)
+                if (this.fontWeight === 'bold' || this.fontWeight === 'bolder') {
+                    material.metalness = Math.min(material.metalness + 0.2, 1.0);
+                }
                 
                 if (material.emissive) {
                     material.emissive = new THREE.Color(this.currentColor);
@@ -342,6 +368,14 @@ class Document3DCanvas {
                 letterMesh.castShadow = true;
                 letterMesh.receiveShadow = true;
                 letterGroup.add(letterMesh);
+                
+                // Add underline if decoration is set
+                if (this.textDecoration === 'underline') {
+                    const underlineGeom = new THREE.BoxGeometry(this.letterSize * scale, 0.02, 0.02);
+                    const underlineMesh = new THREE.Mesh(underlineGeom, material.clone());
+                    underlineMesh.position.y = -this.letterSize * scale * 0.3;
+                    letterGroup.add(underlineMesh);
+                }
                 
                 // Store letter data
                 const finalPosition = targetPosition.clone();
@@ -360,8 +394,8 @@ class Document3DCanvas {
                 letterGroup.position.set(0, 0, 0);
                 letterGroup.scale.set(0.001, 0.001, 0.001);
                 
-                // Micro → Macro animation (staggered per letter)
-                this.animateLetterMaterialization(letterGroup, letterIndex * 50);
+                // Micro → Macro animation (staggered per letter) - use configurable delay
+                this.animateLetterMaterialization(letterGroup, letterIndex * this.staggerDelay);
                 
                 this.scene.add(letterGroup);
                 this.letterGroups[section].push(letterGroup);
@@ -375,7 +409,7 @@ class Document3DCanvas {
      */
     animateLetterMaterialization(letterGroup, additionalDelay = 0) {
         setTimeout(() => {
-            const duration = 1200;  // 1.2 seconds per letter
+            const duration = this.animationSpeed;  // Use configurable speed
             const startTime = Date.now();
             const startPos = letterGroup.position.clone();
             const targetPos = letterGroup.userData.targetPosition;
@@ -395,9 +429,11 @@ class Document3DCanvas {
                 const currentScale = 0.001 + (targetScale - 0.001) * eased;
                 letterGroup.scale.set(currentScale, currentScale, currentScale);
                 
-                // Add rotation and wobble during materialization
-                letterGroup.rotation.y = (1 - progress) * Math.PI * 2;
-                letterGroup.rotation.x = Math.sin(progress * Math.PI) * 0.2;
+                // Add rotation and wobble during materialization (if enabled)
+                if (this.rotationEnabled) {
+                    letterGroup.rotation.y = (1 - progress) * Math.PI * 2;
+                    letterGroup.rotation.x = Math.sin(progress * Math.PI) * 0.2;
+                }
                 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
@@ -716,6 +752,64 @@ class Document3DCanvas {
         } else {
             console.warn(`⚠️ Font not available: ${fontName}`);
         }
+    }
+    
+    /**
+     * Advanced formatting setters
+     */
+    setLetterSize(size) {
+        this.letterSize = size;
+        console.log(`📏 Letter size: ${size}`);
+    }
+    
+    setLetterSpacing(spacing) {
+        this.letterSpacing = spacing;
+        console.log(`↔️ Letter spacing: ${spacing}`);
+    }
+    
+    setExtrusionDepth(depth) {
+        this.extrusionDepth = depth;
+        console.log(`📐 Extrusion depth: ${depth}`);
+    }
+    
+    setLineSpacing(spacing) {
+        this.lineSpacing = spacing;
+        console.log(`↕️ Line spacing: ${spacing}`);
+    }
+    
+    setWordsPerLine(count) {
+        this.wordsPerLine = count;
+        console.log(`📝 Words per line: ${count}`);
+    }
+    
+    setAlignment(align) {
+        this.alignment = align;
+        console.log(`📍 Alignment: ${align}`);
+    }
+    
+    setFontWeight(weight) {
+        this.fontWeight = weight;
+        console.log(`💪 Font weight: ${weight}`);
+    }
+    
+    setTextDecoration(decoration) {
+        this.textDecoration = decoration;
+        console.log(`✏️ Text decoration: ${decoration}`);
+    }
+    
+    setAnimationSpeed(speed) {
+        this.animationSpeed = speed;
+        console.log(`⏱️ Animation speed: ${speed}ms`);
+    }
+    
+    setStaggerDelay(delay) {
+        this.staggerDelay = delay;
+        console.log(`⏳ Stagger delay: ${delay}ms`);
+    }
+    
+    setRotationEnabled(enabled) {
+        this.rotationEnabled = enabled;
+        console.log(`🔄 Rotation animation: ${enabled ? 'enabled' : 'disabled'}`);
     }
 }
 
