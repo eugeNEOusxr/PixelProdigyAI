@@ -4408,16 +4408,48 @@
         const group = new THREE.Group();
         group.name = name;
         
+        // Add anatomical description
+        const descriptions = {
+          'C1': 'Atlas - First Cervical Vertebra (supports skull)',
+          'C2': 'Axis - Second Cervical Vertebra (allows head rotation)',
+          'C3': 'Third Cervical Vertebra',
+          'C4': 'Fourth Cervical Vertebra',
+          'C5': 'Fifth Cervical Vertebra',
+          'C6': 'Sixth Cervical Vertebra',
+          'C7': 'Vertebra Prominens - Seventh Cervical Vertebra',
+          'T1': 'First Thoracic Vertebra (connects to Rib 1)',
+          'T2': 'Second Thoracic Vertebra (connects to Rib 2)',
+          'T3': 'Third Thoracic Vertebra (connects to Rib 3)',
+          'T4': 'Fourth Thoracic Vertebra (connects to Rib 4)',
+          'T5': 'Fifth Thoracic Vertebra (connects to Rib 5)',
+          'T6': 'Sixth Thoracic Vertebra (connects to Rib 6)',
+          'T7': 'Seventh Thoracic Vertebra (connects to Rib 7)',
+          'T8': 'Eighth Thoracic Vertebra (connects to Rib 8)',
+          'T9': 'Ninth Thoracic Vertebra (connects to Rib 9)',
+          'T10': 'Tenth Thoracic Vertebra (connects to Rib 10)',
+          'T11': 'Eleventh Thoracic Vertebra (connects to Rib 11)',
+          'T12': 'Twelfth Thoracic Vertebra (connects to Rib 12)',
+          'L1': 'First Lumbar Vertebra (lower back)',
+          'L2': 'Second Lumbar Vertebra',
+          'L3': 'Third Lumbar Vertebra',
+          'L4': 'Fourth Lumbar Vertebra',
+          'L5': 'Fifth Lumbar Vertebra (connects to sacrum)'
+        };
+        
+        group.userData.description = descriptions[name] || `${name} Vertebra`;
+        
         // Vertebral body (cylinder)
         const bodyGeom = new THREE.CylinderGeometry(size * 0.8, size * 0.8, size, 16);
         const body = new THREE.Mesh(bodyGeom, boneMat);
-        body.name = `${name} Body`;
+        body.name = `${name} Vertebral Body`;
+        body.userData.description = 'Main weight-bearing part of vertebra';
         group.add(body);
         
         // Spinous process (back spike)
         const spinousGeom = new THREE.BoxGeometry(size * 0.3, size * 0.15, size * 1.5);
         const spinous = new THREE.Mesh(spinousGeom, boneMat);
         spinous.name = `${name} Spinous Process`;
+        spinous.userData.description = 'Posterior projection for muscle attachment';
         spinous.position.set(0, 0, -size * 0.9);
         group.add(spinous);
         
@@ -4425,6 +4457,7 @@
         const transverseGeom = new THREE.BoxGeometry(size * 1.2, size * 0.12, size * 0.3);
         const transverse = new THREE.Mesh(transverseGeom, boneMat);
         transverse.name = `${name} Transverse Processes`;
+        transverse.userData.description = 'Lateral projections for rib and muscle attachment';
         transverse.position.set(0, 0, 0);
         group.add(transverse);
         
@@ -4474,7 +4507,26 @@
         const curve = new THREE.CatmullRomCurve3(points);
         const tubeGeom = new THREE.TubeGeometry(curve, 20, 0.018, 8, false);
         const rib = new THREE.Mesh(tubeGeom, boneMat);
-        rib.name = `${side === 'left' ? 'Left' : 'Right'} Rib ${number}`;
+        
+        // Anatomical rib naming
+        const sideName = side === 'left' ? 'Left' : 'Right';
+        let ribType = '';
+        if (number >= 1 && number <= 7) {
+          ribType = 'True Rib'; // Connects directly to sternum
+        } else if (number >= 8 && number <= 10) {
+          ribType = 'False Rib'; // Connects indirectly to sternum
+        } else if (number >= 11 && number <= 12) {
+          ribType = 'Floating Rib'; // No anterior connection
+        }
+        
+        rib.name = `${sideName} Rib ${number} (${ribType})`;
+        rib.userData.description = `${ribType} - Protects thoracic organs, aids breathing`;
+        rib.userData.anatomical = {
+          number: number,
+          side: side,
+          type: ribType,
+          connects: number <= 7 ? 'Sternum (directly)' : number <= 10 ? 'Cartilage (indirectly)' : 'Free-floating'
+        };
         
         return rib;
       }
@@ -4496,26 +4548,111 @@
       
       // === PELVIS ===
       console.log('🦴 Creating pelvis...');
+      const pelvisGroup = new THREE.Group();
+      pelvisGroup.name = 'Pelvis (Hip Bone)';
+      pelvisGroup.userData.description = 'Ring-like bony structure connecting spine to lower limbs';
+      pelvisGroup.userData.anatomical = {
+        type: 'Composite Structure',
+        bones: ['Ilium (2)', 'Ischium (2)', 'Pubis (2)', 'Sacrum', 'Coccyx'],
+        function: 'Weight bearing, birth canal, muscle attachment'
+      };
+      
+      // Main pelvis body (representing ilium wings)
       const pelvisGeom = new THREE.SphereGeometry(0.5, 16, 16);
       const pelvis = new THREE.Mesh(pelvisGeom, boneMat);
-      pelvis.name = 'Pelvis';
-      pelvis.position.y = 8.2;
+      pelvis.name = 'Pelvis Main Body (Ilium)';
+      pelvis.userData.description = 'Largest part of hip bone, iliac crests';
+      pelvis.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Hip wings',
+        landmarks: ['Iliac Crest', 'ASIS (Anterior Superior Iliac Spine)', 'PSIS (Posterior Superior Iliac Spine)'],
+        function: 'Broad surface for muscle attachment'
+      };
       pelvis.scale.set(1.3, 0.65, 0.9);
-      skeletonGroup.add(pelvis);
-      totalVertices += 16 * 16;
-      console.log(`  ✓ Pelvis: 1 bone`);
+      pelvisGroup.add(pelvis);
+      
+      // Sacrum (fused vertebrae)
+      const sacrumGeom = new THREE.BoxGeometry(0.35, 0.5, 0.15);
+      const sacrum = new THREE.Mesh(sacrumGeom, boneMat);
+      sacrum.name = 'Sacrum (Fused S1-S5)';
+      sacrum.userData.description = '5 fused vertebrae forming posterior pelvis';
+      sacrum.userData.anatomical = {
+        type: 'Irregular Bone (Fused)',
+        vertebrae: ['S1', 'S2', 'S3', 'S4', 'S5'],
+        articulations: ['L5 (lumbar)', 'Ilium (sacroiliac joint)', 'Coccyx'],
+        function: 'Connects spine to pelvis, supports upper body weight'
+      };
+      sacrum.position.set(0, 0, -0.35);
+      pelvisGroup.add(sacrum);
+      
+      // Coccyx (tailbone)
+      const coccyxGeom = new THREE.CylinderGeometry(0.03, 0.02, 0.15, 8);
+      const coccyx = new THREE.Mesh(coccyxGeom, boneMat);
+      coccyx.name = 'Coccyx (Tailbone)';
+      coccyx.userData.description = '3-5 fused vertebrae, vestigial tail';
+      coccyx.userData.anatomical = {
+        type: 'Irregular Bone (Fused)',
+        location: 'Inferior to sacrum',
+        articulations: ['Sacrum'],
+        function: 'Attachment for pelvic floor muscles, ligaments'
+      };
+      coccyx.position.set(0, -0.35, -0.45);
+      coccyx.rotation.x = Math.PI / 8;
+      pelvisGroup.add(coccyx);
+      
+      // Ischium (sitting bones) - represented as lower protrusions
+      const ischiumGeom = new THREE.SphereGeometry(0.12, 10, 10);
+      const leftIschium = new THREE.Mesh(ischiumGeom, boneMat);
+      leftIschium.name = 'Left Ischium (Sitting Bone)';
+      leftIschium.userData.description = 'Inferior posterior hip bone, bears weight when sitting';
+      leftIschium.position.set(-0.35, -0.25, 0.1);
+      pelvisGroup.add(leftIschium);
+      
+      const rightIschium = new THREE.Mesh(ischiumGeom, boneMat);
+      rightIschium.name = 'Right Ischium (Sitting Bone)';
+      rightIschium.userData.description = 'Inferior posterior hip bone, bears weight when sitting';
+      rightIschium.position.set(0.35, -0.25, 0.1);
+      pelvisGroup.add(rightIschium);
+      
+      // Pubis (pubic bones) - represented as anterior arch
+      const pubisGeom = new THREE.TorusGeometry(0.25, 0.03, 8, 16, Math.PI);
+      const pubis = new THREE.Mesh(pubisGeom, boneMat);
+      pubis.name = 'Pubis (Pubic Arch)';
+      pubis.userData.description = 'Anterior hip bones forming pubic symphysis';
+      pubis.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Anterior pelvis',
+        articulations: ['Opposite pubis at symphysis'],
+        function: 'Forms anterior pelvic ring, protects pelvic organs'
+      };
+      pubis.position.set(0, -0.25, 0.45);
+      pubis.rotation.x = Math.PI / 2;
+      pelvisGroup.add(pubis);
+      
+      pelvisGroup.position.y = 8.2;
+      skeletonGroup.add(pelvisGroup);
+      totalVertices += 16 * 16 + 8 + 8 + 10 * 10 * 2 + 8 * 16;
+      console.log(`  ✓ Pelvis: 1 structure (Ilium, Ischium, Pubis, Sacrum, Coccyx)`);
       
       // === DETAILED HUMERUS (Upper Arm) ===
       console.log('🦴 Creating detailed humeri...');
       
       function createDetailedHumerus(side) {
         const group = new THREE.Group();
-        group.name = `${side} Humerus`;
+        group.name = `${side} Humerus (Upper Arm Bone)`;
+        group.userData.description = 'Long bone of the upper arm, connects shoulder to elbow';
+        group.userData.anatomical = {
+          type: 'Long Bone',
+          location: 'Upper Arm',
+          articulations: ['Scapula (shoulder)', 'Radius (elbow)', 'Ulna (elbow)'],
+          function: 'Provides attachment for arm muscles, enables lifting and throwing'
+        };
         
         // Humeral head (ball joint)
         const headGeom = new THREE.SphereGeometry(0.12, 14, 14);
         const head = new THREE.Mesh(headGeom, boneMat);
-        head.name = `${side} Humeral Head`;
+        head.name = `${side} Humeral Head (Ball Joint)`;
+        head.userData.description = 'Rounded proximal end that fits into glenoid cavity of scapula';
         head.position.y = 3.3;
         group.add(head);
         
@@ -4552,18 +4689,21 @@
         shaftGeom.computeVertexNormals();
         
         const shaft = new THREE.Mesh(shaftGeom, boneMat);
-        shaft.name = `${side} Humeral Shaft`;
+        shaft.name = `${side} Humeral Shaft (Diaphysis)`;
+        shaft.userData.description = 'Long cylindrical middle section with deltoid tuberosity';
         group.add(shaft);
         
         // Condyles (elbow bumps)
         const condyleGeom = new THREE.SphereGeometry(0.08, 10, 10);
         const medialCondyle = new THREE.Mesh(condyleGeom, boneMat);
         medialCondyle.name = `${side} Medial Epicondyle`;
+        medialCondyle.userData.description = 'Bony prominence on inner elbow, attachment for forearm flexors';
         medialCondyle.position.set(side === 'Left' ? 0.06 : -0.06, 0.2, 0);
         group.add(medialCondyle);
         
         const lateralCondyle = new THREE.Mesh(condyleGeom, boneMat);
         lateralCondyle.name = `${side} Lateral Epicondyle`;
+        lateralCondyle.userData.description = 'Bony prominence on outer elbow, attachment for forearm extensors';
         lateralCondyle.position.set(side === 'Left' ? -0.06 : 0.06, 0.2, 0);
         group.add(lateralCondyle);
         
@@ -4590,26 +4730,42 @@
       
       function createForearm(side) {
         const group = new THREE.Group();
-        group.name = `${side} Forearm`;
+        group.name = `${side} Forearm (Radius & Ulna)`;
+        group.userData.description = 'Two bones of the forearm enabling rotation and stability';
         
         // Radius (thumb side)
         const radiusGeom = new THREE.CylinderGeometry(0.04, 0.035, 3.2, 12);
         const radius = new THREE.Mesh(radiusGeom, boneMat);
-        radius.name = `${side} Radius`;
+        radius.name = `${side} Radius (Lateral Forearm Bone)`;
+        radius.userData.description = 'Thumb-side forearm bone, rotates around ulna for pronation/supination';
+        radius.userData.anatomical = {
+          type: 'Long Bone',
+          location: 'Forearm (Lateral)',
+          articulations: ['Humerus (elbow)', 'Ulna (forearm)', 'Carpals (wrist)'],
+          function: 'Supports wrist, enables forearm rotation'
+        };
         radius.position.set(side === 'Right' ? -0.04 : 0.04, -1.6, 0);
         group.add(radius);
         
         // Ulna (pinky side)
         const ulnaGeom = new THREE.CylinderGeometry(0.035, 0.03, 3.2, 12);
         const ulna = new THREE.Mesh(ulnaGeom, boneMat);
-        ulna.name = `${side} Ulna`;
+        ulna.name = `${side} Ulna (Medial Forearm Bone)`;
+        ulna.userData.description = 'Pinky-side forearm bone, primary elbow hinge joint';
+        ulna.userData.anatomical = {
+          type: 'Long Bone',
+          location: 'Forearm (Medial)',
+          articulations: ['Humerus (elbow)', 'Radius (forearm)'],
+          function: 'Forms elbow joint, stabilizes forearm'
+        };
         ulna.position.set(side === 'Right' ? 0.04 : -0.04, -1.6, 0);
         group.add(ulna);
         
         // Olecranon (elbow point)
         const olecranonGeom = new THREE.BoxGeometry(0.06, 0.1, 0.06);
         const olecranon = new THREE.Mesh(olecranonGeom, boneMat);
-        olecranon.name = `${side} Olecranon`;
+        olecranon.name = `${side} Olecranon Process`;
+        olecranon.userData.description = 'Bony point of elbow, attachment for triceps muscle';
         olecranon.position.set(side === 'Right' ? 0.04 : -0.04, 0, -0.04);
         group.add(olecranon);
         
@@ -4632,30 +4788,42 @@
       
       function createHand(side) {
         const group = new THREE.Group();
-        group.name = `${side} Hand`;
+        group.name = `${side} Hand (27 Bones)`;
+        group.userData.description = 'Complex structure of carpals, metacarpals, and phalanges';
         
         // Carpals (wrist bones cluster)
         const carpalsGeom = new THREE.BoxGeometry(0.15, 0.1, 0.12);
         const carpals = new THREE.Mesh(carpalsGeom, boneMat);
-        carpals.name = `${side} Carpals`;
+        carpals.name = `${side} Carpals (8 Wrist Bones)`;
+        carpals.userData.description = 'Scaphoid, Lunate, Triquetrum, Pisiform, Trapezium, Trapezoid, Capitate, Hamate';
+        carpals.userData.anatomical = {
+          count: 8,
+          bones: ['Scaphoid', 'Lunate', 'Triquetrum', 'Pisiform', 'Trapezium', 'Trapezoid', 'Capitate', 'Hamate'],
+          function: 'Enable wrist flexibility, transmit forces from hand to forearm'
+        };
         group.add(carpals);
         
         // 5 Metacarpals + Phalanges
+        const fingerNames = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'];
         for (let i = 0; i < 5; i++) {
           const xPos = side === 'Right' ? (0.06 - i * 0.03) : (-0.06 + i * 0.03);
+          const fingerName = fingerNames[i];
           
           // Metacarpal
           const metacarpalGeom = new THREE.CylinderGeometry(0.012, 0.01, 0.3, 6);
           const metacarpal = new THREE.Mesh(metacarpalGeom, boneMat);
-          metacarpal.name = `${side} Metacarpal ${i + 1}`;
+          metacarpal.name = `${side} Metacarpal ${i + 1} (${fingerName})`;
+          metacarpal.userData.description = `Palm bone connecting to ${fingerName} finger`;
           metacarpal.position.set(xPos, -0.2, 0);
           group.add(metacarpal);
           
           // Phalanges (3 per finger)
+          const phalanxNames = ['Proximal', 'Middle', 'Distal'];
           for (let j = 0; j < 3; j++) {
             const phalanxGeom = new THREE.CylinderGeometry(0.01, 0.008, 0.12, 6);
             const phalanx = new THREE.Mesh(phalanxGeom, boneMat);
-            phalanx.name = `${side} Phalanx ${i + 1}-${j + 1}`;
+            phalanx.name = `${side} ${phalanxNames[j]} Phalanx (${fingerName})`;
+            phalanx.userData.description = `${phalanxNames[j]} finger bone of ${fingerName}`;
             phalanx.position.set(xPos, -0.4 - (j * 0.12), 0);
             group.add(phalanx);
           }
@@ -4681,39 +4849,116 @@
       function createFoot(side) {
         const group = new THREE.Group();
         group.name = `${side} Foot`;
+        group.userData.description = 'Complex structure for weight bearing and locomotion';
+        group.userData.anatomical = {
+          type: 'Composite Structure',
+          bones: 26,
+          divisions: ['Tarsals (7)', 'Metatarsals (5)', 'Phalanges (14)']
+        };
         
-        // Tarsals (ankle/heel)
+        // Tarsals (ankle/heel) - 7 bones grouped
         const tarsalsGeom = new THREE.BoxGeometry(0.25, 0.15, 0.4);
         const tarsals = new THREE.Mesh(tarsalsGeom, boneMat);
-        tarsals.name = `${side} Tarsals`;
+        tarsals.name = `${side} Tarsals (7 Ankle Bones)`;
+        tarsals.userData.description = 'Group of 7 ankle bones providing stability and flexibility';
+        tarsals.userData.anatomical = {
+          type: 'Short Bones',
+          bones: ['Calcaneus', 'Talus', 'Navicular', 'Cuboid', 'Medial Cuneiform', 'Intermediate Cuneiform', 'Lateral Cuneiform'],
+          function: 'Weight distribution, shock absorption, adapt to uneven surfaces'
+        };
         group.add(tarsals);
         
-        // Calcaneus (heel bone)
+        // Calcaneus (heel bone) - largest tarsal
         const calcaneusGeom = new THREE.BoxGeometry(0.2, 0.12, 0.15);
         const calcaneus = new THREE.Mesh(calcaneusGeom, boneMat);
-        calcaneus.name = `${side} Calcaneus`;
+        calcaneus.name = `${side} Calcaneus (Heel Bone)`;
+        calcaneus.userData.description = 'Largest tarsal bone, insertion point for Achilles tendon';
+        calcaneus.userData.anatomical = {
+          type: 'Short Bone',
+          location: 'Posterior foot',
+          articulations: ['Talus (ankle joint)', 'Cuboid (midfoot)'],
+          function: 'Bears body weight, lever for calf muscles'
+        };
         calcaneus.position.set(0, -0.05, -0.2);
         group.add(calcaneus);
         
+        // Talus (ankle bone) - sits above calcaneus
+        const talusGeom = new THREE.BoxGeometry(0.18, 0.1, 0.15);
+        const talus = new THREE.Mesh(talusGeom, boneMat);
+        talus.name = `${side} Talus (Ankle Bone)`;
+        talus.userData.description = 'Connects leg to foot, no muscle attachments';
+        talus.userData.anatomical = {
+          type: 'Short Bone',
+          location: 'Superior to calcaneus',
+          articulations: ['Tibia', 'Fibula', 'Calcaneus', 'Navicular'],
+          function: 'Transmits weight from leg to foot, enables dorsiflexion/plantarflexion'
+        };
+        talus.position.set(0, 0.08, -0.1);
+        group.add(talus);
+        
         // 5 Metatarsals + Phalanges
+        const toeNames = ['Big Toe (Hallux)', '2nd Toe', '3rd Toe', '4th Toe', 'Pinky Toe (5th)'];
         for (let i = 0; i < 5; i++) {
           const xPos = side === 'Right' ? (-0.1 + i * 0.05) : (0.1 - i * 0.05);
           
           // Metatarsal
           const metatarsalGeom = new THREE.CylinderGeometry(0.018, 0.015, 0.4, 8);
           const metatarsal = new THREE.Mesh(metatarsalGeom, boneMat);
-          metatarsal.name = `${side} Metatarsal ${i + 1}`;
+          metatarsal.name = `${side} Metatarsal ${i + 1} (${toeNames[i]})`;
+          metatarsal.userData.description = `Long bone connecting ${toeNames[i]} to midfoot`;
+          metatarsal.userData.anatomical = {
+            type: 'Long Bone (miniature)',
+            location: `Midfoot to ${toeNames[i]}`,
+            articulations: i === 0 ? ['Medial Cuneiform', 'Proximal Phalanx'] : 
+                          i === 1 ? ['Intermediate Cuneiform', 'Proximal Phalanx'] :
+                          i === 2 ? ['Lateral Cuneiform', 'Proximal Phalanx'] : ['Cuboid', 'Proximal Phalanx'],
+            function: 'Weight bearing, propulsion during gait'
+          };
           metatarsal.position.set(xPos, 0, 0.3);
           metatarsal.rotation.x = Math.PI / 2;
           group.add(metatarsal);
           
-          // Phalanges (toe bones)
-          const phalanxGeom = new THREE.CylinderGeometry(0.012, 0.01, 0.15, 6);
-          const phalanx = new THREE.Mesh(phalanxGeom, boneMat);
-          phalanx.name = `${side} Toe Phalanx ${i + 1}`;
-          phalanx.position.set(xPos, 0, 0.55);
-          phalanx.rotation.x = Math.PI / 2;
-          group.add(phalanx);
+          // Proximal Phalanx (all toes have this)
+          const proximalGeom = new THREE.CylinderGeometry(0.012, 0.01, 0.15, 6);
+          const proximal = new THREE.Mesh(proximalGeom, boneMat);
+          proximal.name = `${side} Proximal Phalanx (${toeNames[i]})`;
+          proximal.userData.description = `First bone of ${toeNames[i]}`;
+          proximal.userData.anatomical = {
+            type: 'Long Bone (miniature)',
+            location: `Base of ${toeNames[i]}`,
+            function: 'Toe flexion/extension'
+          };
+          proximal.position.set(xPos, 0, 0.55);
+          proximal.rotation.x = Math.PI / 2;
+          group.add(proximal);
+          
+          // Middle & Distal Phalanges (toes 2-5 only, big toe has 2 bones total)
+          if (i > 0) {
+            const middleGeom = new THREE.CylinderGeometry(0.01, 0.008, 0.1, 6);
+            const middle = new THREE.Mesh(middleGeom, boneMat);
+            middle.name = `${side} Middle Phalanx (${toeNames[i]})`;
+            middle.userData.description = `Second bone of ${toeNames[i]}`;
+            middle.position.set(xPos, 0, 0.65);
+            middle.rotation.x = Math.PI / 2;
+            group.add(middle);
+            
+            const distalGeom = new THREE.CylinderGeometry(0.008, 0.006, 0.08, 6);
+            const distal = new THREE.Mesh(distalGeom, boneMat);
+            distal.name = `${side} Distal Phalanx (${toeNames[i]})`;
+            distal.userData.description = `Tip bone of ${toeNames[i]}`;
+            distal.position.set(xPos, 0, 0.73);
+            distal.rotation.x = Math.PI / 2;
+            group.add(distal);
+          } else {
+            // Big toe distal phalanx (only 2 bones total)
+            const distalGeom = new THREE.CylinderGeometry(0.01, 0.008, 0.12, 6);
+            const distal = new THREE.Mesh(distalGeom, boneMat);
+            distal.name = `${side} Distal Phalanx (${toeNames[i]})`;
+            distal.userData.description = `Tip bone of big toe (no middle phalanx)`;
+            distal.position.set(xPos, 0, 0.67);
+            distal.rotation.x = Math.PI / 2;
+            group.add(distal);
+          }
         }
         
         return group;
@@ -4737,13 +4982,27 @@
       const clavicleGeom = new THREE.CylinderGeometry(0.025, 0.025, 0.7, 10);
       
       const leftClavicle = new THREE.Mesh(clavicleGeom, boneMat);
-      leftClavicle.name = 'Left Clavicle';
+      leftClavicle.name = 'Left Clavicle (Collarbone)';
+      leftClavicle.userData.description = 'S-shaped bone connecting sternum to scapula';
+      leftClavicle.userData.anatomical = {
+        type: 'Long Bone',
+        location: 'Anterior shoulder girdle',
+        articulations: ['Sternum (sternal end)', 'Scapula (acromial end)'],
+        function: 'Strut holding shoulder away from thorax, transmits forces from arm to axial skeleton'
+      };
       leftClavicle.position.set(-0.4, 15.5, 0.1);
       leftClavicle.rotation.z = Math.PI / 6;
       skeletonGroup.add(leftClavicle);
       
       const rightClavicle = new THREE.Mesh(clavicleGeom, boneMat);
-      rightClavicle.name = 'Right Clavicle';
+      rightClavicle.name = 'Right Clavicle (Collarbone)';
+      rightClavicle.userData.description = 'S-shaped bone connecting sternum to scapula';
+      rightClavicle.userData.anatomical = {
+        type: 'Long Bone',
+        location: 'Anterior shoulder girdle',
+        articulations: ['Sternum (sternal end)', 'Scapula (acromial end)'],
+        function: 'Strut holding shoulder away from thorax, transmits forces from arm to axial skeleton'
+      };
       rightClavicle.position.set(0.4, 15.5, 0.1);
       rightClavicle.rotation.z = -Math.PI / 6;
       skeletonGroup.add(rightClavicle);
@@ -4752,12 +5011,28 @@
       const scapulaGeom = new THREE.BoxGeometry(0.35, 0.45, 0.05);
       
       const leftScapula = new THREE.Mesh(scapulaGeom, boneMat);
-      leftScapula.name = 'Left Scapula';
+      leftScapula.name = 'Left Scapula (Shoulder Blade)';
+      leftScapula.userData.description = 'Large triangular bone on posterior thorax';
+      leftScapula.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Posterior shoulder',
+        landmarks: ['Glenoid Cavity (shoulder socket)', 'Acromion (highest point)', 'Coracoid Process', 'Spine of Scapula'],
+        articulations: ['Humerus (glenohumeral joint)', 'Clavicle (acromioclavicular joint)'],
+        function: 'Attachment for 17 muscles, socket for humerus, enables wide range of shoulder motion'
+      };
       leftScapula.position.set(-0.6, 14.5, -0.2);
       skeletonGroup.add(leftScapula);
       
       const rightScapula = new THREE.Mesh(scapulaGeom, boneMat);
-      rightScapula.name = 'Right Scapula';
+      rightScapula.name = 'Right Scapula (Shoulder Blade)';
+      rightScapula.userData.description = 'Large triangular bone on posterior thorax';
+      rightScapula.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Posterior shoulder',
+        landmarks: ['Glenoid Cavity (shoulder socket)', 'Acromion (highest point)', 'Coracoid Process', 'Spine of Scapula'],
+        articulations: ['Humerus (glenohumeral joint)', 'Clavicle (acromioclavicular joint)'],
+        function: 'Attachment for 17 muscles, socket for humerus, enables wide range of shoulder motion'
+      };
       rightScapula.position.set(0.6, 14.5, -0.2);
       skeletonGroup.add(rightScapula);
       
@@ -4765,23 +5040,109 @@
       console.log(`  ✓ Clavicles & Scapulae: 4 bones`);
       
       // === STERNUM ===
-      const sternumGeom = new THREE.BoxGeometry(0.12, 0.9, 0.08);
-      const sternum = new THREE.Mesh(sternumGeom, boneMat);
-      sternum.name = 'Sternum';
-      sternum.position.set(0, 14, 0.35);
-      skeletonGroup.add(sternum);
-      totalVertices += 8;
-      console.log(`  ✓ Sternum: 1 bone`);
+      console.log('🦴 Creating sternum...');
+      const sternumGroup = new THREE.Group();
+      sternumGroup.name = 'Sternum (Breastbone)';
+      sternumGroup.userData.description = 'Central chest bone connecting ribs';
+      sternumGroup.userData.anatomical = {
+        type: 'Flat Bone',
+        divisions: ['Manubrium (superior)', 'Body (center)', 'Xiphoid Process (inferior)'],
+        articulations: ['Clavicles', 'Ribs 1-7 (true ribs)'],
+        function: 'Protects heart and lungs, attachment point for ribs'
+      };
+      
+      // Manubrium (upper part)
+      const manubriumGeom = new THREE.BoxGeometry(0.12, 0.25, 0.08);
+      const manubrium = new THREE.Mesh(manubriumGeom, boneMat);
+      manubrium.name = 'Manubrium (Superior Sternum)';
+      manubrium.userData.description = 'Upper segment of sternum, articulates with clavicles and ribs 1-2';
+      manubrium.position.y = 0.32;
+      sternumGroup.add(manubrium);
+      
+      // Body (middle part)
+      const bodyGeom = new THREE.BoxGeometry(0.12, 0.5, 0.08);
+      const body = new THREE.Mesh(bodyGeom, boneMat);
+      body.name = 'Sternal Body (Middle Sternum)';
+      body.userData.description = 'Longest segment, articulates with ribs 3-7';
+      body.position.y = 0;
+      sternumGroup.add(body);
+      
+      // Xiphoid process (lower tip)
+      const xiphoidGeom = new THREE.ConeGeometry(0.05, 0.15, 6);
+      const xiphoid = new THREE.Mesh(xiphoidGeom, boneMat);
+      xiphoid.name = 'Xiphoid Process (Inferior Sternum)';
+      xiphoid.userData.description = 'Small inferior tip, ossifies in adulthood';
+      xiphoid.userData.anatomical = {
+        landmarks: ['Attachment for diaphragm and abdominal muscles'],
+        function: 'Muscular attachment point'
+      };
+      xiphoid.position.y = -0.32;
+      xiphoid.rotation.x = Math.PI;
+      sternumGroup.add(xiphoid);
+      
+      sternumGroup.position.set(0, 14, 0.35);
+      skeletonGroup.add(sternumGroup);
+      totalVertices += 8 + 8 + 6;
+      console.log(`  ✓ Sternum: 1 bone (Manubrium, Body, Xiphoid Process)`);
       
       // === MANDIBLE (Jawbone) ===
+      console.log('🦴 Creating mandible...');
+      const mandibleGroup = new THREE.Group();
+      mandibleGroup.name = 'Mandible (Lower Jaw)';
+      mandibleGroup.userData.description = 'Largest and strongest facial bone, only movable skull bone';
+      mandibleGroup.userData.anatomical = {
+        type: 'Irregular Bone',
+        divisions: ['Body (horizontal)', 'Ramus (vertical, 2)', 'Condyle (TMJ joint)', 'Coronoid Process'],
+        articulations: ['Temporal bones (temporomandibular joint)'],
+        function: 'Mastication (chewing), speech, facial expression'
+      };
+      
+      // Main body (horizontal)
       const mandibleGeom = new THREE.BoxGeometry(0.45, 0.28, 0.35);
       const mandible = new THREE.Mesh(mandibleGeom, boneMat);
-      mandible.name = 'Mandible';
-      mandible.position.set(0, 17, 0.38);
+      mandible.name = 'Mandibular Body';
+      mandible.userData.description = 'Horizontal U-shaped body containing lower teeth';
+      mandible.userData.anatomical = {
+        landmarks: ['Mental Foramen (nerve exit)', 'Mental Protuberance (chin)', 'Alveolar Process (tooth sockets)'],
+        teeth: 16
+      };
       mandible.scale.set(1, 0.65, 1);
-      skeletonGroup.add(mandible);
-      totalVertices += 8;
-      console.log(`  ✓ Mandible: 1 bone`);
+      mandibleGroup.add(mandible);
+      
+      // Ramus (vertical portions)
+      const ramusGeom = new THREE.BoxGeometry(0.12, 0.35, 0.08);
+      
+      const leftRamus = new THREE.Mesh(ramusGeom, boneMat);
+      leftRamus.name = 'Left Mandibular Ramus';
+      leftRamus.userData.description = 'Vertical extension for muscle attachment and TMJ';
+      leftRamus.position.set(-0.22, 0.15, -0.12);
+      mandibleGroup.add(leftRamus);
+      
+      const rightRamus = new THREE.Mesh(ramusGeom, boneMat);
+      rightRamus.name = 'Right Mandibular Ramus';
+      rightRamus.userData.description = 'Vertical extension for muscle attachment and TMJ';
+      rightRamus.position.set(0.22, 0.15, -0.12);
+      mandibleGroup.add(rightRamus);
+      
+      // Condyles (TMJ articulation)
+      const condyleGeom = new THREE.SphereGeometry(0.045, 8, 8);
+      
+      const leftCondyle = new THREE.Mesh(condyleGeom, boneMat);
+      leftCondyle.name = 'Left Mandibular Condyle (TMJ)';
+      leftCondyle.userData.description = 'Articulates with temporal bone, enables jaw movement';
+      leftCondyle.position.set(-0.22, 0.33, -0.12);
+      mandibleGroup.add(leftCondyle);
+      
+      const rightCondyle = new THREE.Mesh(condyleGeom, boneMat);
+      rightCondyle.name = 'Right Mandibular Condyle (TMJ)';
+      rightCondyle.userData.description = 'Articulates with temporal bone, enables jaw movement';
+      rightCondyle.position.set(0.22, 0.33, -0.12);
+      mandibleGroup.add(rightCondyle);
+      
+      mandibleGroup.position.set(0, 17, 0.38);
+      skeletonGroup.add(mandibleGroup);
+      totalVertices += 8 + 8 * 2 + 8 * 8 * 2;
+      console.log(`  ✓ Mandible: 1 bone (Body, Ramus, Condyles)`);
       
       // === ADD TO SCENE ===
       scene.add(skeletonGroup);
@@ -4911,87 +5272,204 @@
     // Helper: Create detailed skull
     function createDetailedSkull(material) {
       const group = new THREE.Group();
-      group.name = 'Skull (Detailed)';
+      group.name = 'Skull (Cranium + Facial Bones)';
+      group.userData.description = '22 bones forming protective case for brain and sensory organs';
+      group.userData.anatomical = {
+        type: 'Composite Structure',
+        divisions: ['Cranium (8 bones)', 'Facial Bones (14 bones)'],
+        bones: 22,
+        function: 'Brain protection, sensory organ housing, facial structure'
+      };
       
-      // Cranial vault
+      // Cranial vault (neurocranium)
       const craniumGeom = new THREE.SphereGeometry(0.55, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.6);
       const cranium = new THREE.Mesh(craniumGeom, material);
-      cranium.name = 'Cranium';
+      cranium.name = 'Cranial Vault (Neurocranium)';
+      cranium.userData.description = 'Protective case for brain, formed by 8 bones';
+      cranium.userData.anatomical = {
+        type: 'Irregular Bones (Fused)',
+        bones: ['Frontal', 'Parietal (2)', 'Temporal (2)', 'Occipital', 'Sphenoid', 'Ethmoid'],
+        sutures: ['Coronal', 'Sagittal', 'Lambdoid', 'Squamosal'],
+        function: 'Brain protection, muscle attachment'
+      };
       cranium.position.y = 0.3;
       group.add(cranium);
       
-      // Frontal bone
+      // Frontal bone (forehead)
       const frontalGeom = new THREE.SphereGeometry(0.52, 20, 20, 0, Math.PI * 2, Math.PI * 0.25, Math.PI * 0.25);
       const frontal = new THREE.Mesh(frontalGeom, material);
-      frontal.name = 'Frontal Bone';
+      frontal.name = 'Frontal Bone (Forehead)';
+      frontal.userData.description = 'Forms forehead and superior orbital margins';
+      frontal.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Anterior cranium',
+        landmarks: ['Supraorbital Margin', 'Glabella', 'Frontal Sinus'],
+        articulations: ['Parietal bones', 'Nasal bones', 'Zygomatic bones'],
+        function: 'Protects frontal lobe, forms forehead contour'
+      };
       frontal.position.set(0, 0.3, 0.5);
       frontal.rotation.x = -Math.PI / 6;
       group.add(frontal);
       
-      // Temporal bones
+      // Parietal bones (top and sides)
+      const parietalGeom = new THREE.BoxGeometry(0.3, 0.4, 0.35);
+      const leftParietal = new THREE.Mesh(parietalGeom, material);
+      leftParietal.name = 'Left Parietal Bone';
+      leftParietal.userData.description = 'Forms superior lateral wall of cranium';
+      leftParietal.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Superior lateral cranium',
+        landmarks: ['Parietal Eminence', 'Temporal Lines'],
+        function: 'Protects parietal lobe of brain'
+      };
+      leftParietal.position.set(-0.35, 0.45, -0.1);
+      group.add(leftParietal);
+      
+      const rightParietal = new THREE.Mesh(parietalGeom, material);
+      rightParietal.name = 'Right Parietal Bone';
+      rightParietal.userData.description = 'Forms superior lateral wall of cranium';
+      rightParietal.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Superior lateral cranium',
+        landmarks: ['Parietal Eminence', 'Temporal Lines'],
+        function: 'Protects parietal lobe of brain'
+      };
+      rightParietal.position.set(0.35, 0.45, -0.1);
+      group.add(rightParietal);
+      
+      // Temporal bones (sides, contains ear structures)
       const temporalGeom = new THREE.BoxGeometry(0.15, 0.25, 0.3);
       const leftTemporal = new THREE.Mesh(temporalGeom, material);
       leftTemporal.name = 'Left Temporal Bone';
+      leftTemporal.userData.description = 'Lateral cranial bone containing ear structures';
+      leftTemporal.userData.anatomical = {
+        type: 'Irregular Bone',
+        location: 'Lateral cranium',
+        landmarks: ['Mastoid Process', 'Styloid Process', 'Zygomatic Process', 'Mandibular Fossa (TMJ socket)'],
+        contains: ['Middle ear ossicles', 'Inner ear (cochlea, semicircular canals)'],
+        articulations: ['Mandible (TMJ)', 'Parietal', 'Occipital', 'Sphenoid', 'Zygomatic'],
+        function: 'Hearing and balance, TMJ articulation'
+      };
       leftTemporal.position.set(-0.5, 0.1, 0);
       group.add(leftTemporal);
       
       const rightTemporal = new THREE.Mesh(temporalGeom, material);
       rightTemporal.name = 'Right Temporal Bone';
+      rightTemporal.userData.description = 'Lateral cranial bone containing ear structures';
+      rightTemporal.userData.anatomical = {
+        type: 'Irregular Bone',
+        location: 'Lateral cranium',
+        landmarks: ['Mastoid Process', 'Styloid Process', 'Zygomatic Process', 'Mandibular Fossa (TMJ socket)'],
+        contains: ['Middle ear ossicles', 'Inner ear (cochlea, semicircular canals)'],
+        articulations: ['Mandible (TMJ)', 'Parietal', 'Occipital', 'Sphenoid', 'Zygomatic'],
+        function: 'Hearing and balance, TMJ articulation'
+      };
       rightTemporal.position.set(0.5, 0.1, 0);
       group.add(rightTemporal);
       
-      // Eye orbits
+      // Occipital bone (back of skull)
+      const occipitalGeom = new THREE.SphereGeometry(0.5, 18, 18, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.4);
+      const occipital = new THREE.Mesh(occipitalGeom, material);
+      occipital.name = 'Occipital Bone (Back of Skull)';
+      occipital.userData.description = 'Posterior cranial bone with foramen magnum';
+      occipital.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Posterior cranium',
+        landmarks: ['Foramen Magnum (spinal cord passage)', 'Occipital Condyles', 'External Occipital Protuberance'],
+        articulations: ['Atlas (C1 vertebra)', 'Parietal bones', 'Temporal bones'],
+        function: 'Protects occipital lobe, articulates with C1 vertebra'
+      };
+      occipital.position.set(0, 0.2, -0.35);
+      occipital.rotation.x = Math.PI / 3;
+      group.add(occipital);
+      
+      // Eye orbits (formed by 7 bones each)
       const orbitGeom = new THREE.SphereGeometry(0.12, 16, 16);
       const orbitMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
       
       const leftOrbit = new THREE.Mesh(orbitGeom, orbitMat);
-      leftOrbit.name = 'Left Orbit';
+      leftOrbit.name = 'Left Orbital Cavity';
+      leftOrbit.userData.description = 'Eye socket formed by 7 bones (frontal, zygomatic, maxilla, lacrimal, ethmoid, sphenoid, palatine)';
       leftOrbit.position.set(-0.18, 0.2, 0.48);
       leftOrbit.scale.set(1, 1.2, 0.8);
       group.add(leftOrbit);
       
       const rightOrbit = new THREE.Mesh(orbitGeom, orbitMat);
-      rightOrbit.name = 'Right Orbit';
+      rightOrbit.name = 'Right Orbital Cavity';
+      rightOrbit.userData.description = 'Eye socket formed by 7 bones (frontal, zygomatic, maxilla, lacrimal, ethmoid, sphenoid, palatine)';
       rightOrbit.position.set(0.18, 0.2, 0.48);
       rightOrbit.scale.set(1, 1.2, 0.8);
       group.add(rightOrbit);
       
-      // Nasal cavity
+      // Nasal bones and cavity
       const nasalGeom = new THREE.BoxGeometry(0.08, 0.15, 0.08);
       const nasal = new THREE.Mesh(nasalGeom, orbitMat);
-      nasal.name = 'Nasal Cavity';
+      nasal.name = 'Nasal Cavity (Ethmoid Bone)';
+      nasal.userData.description = 'Houses ethmoid bone with olfactory receptors';
+      nasal.userData.anatomical = {
+        type: 'Irregular Bone',
+        bones: ['Nasal bones (2)', 'Vomer', 'Ethmoid (contains cribriform plate)'],
+        function: 'Olfaction (smell), air filtration, vocal resonance'
+      };
       nasal.position.set(0, 0.05, 0.54);
       group.add(nasal);
       
       // Maxilla (upper jaw)
       const maxillaGeom = new THREE.BoxGeometry(0.4, 0.2, 0.3);
       const maxilla = new THREE.Mesh(maxillaGeom, material);
-      maxilla.name = 'Maxilla';
+      maxilla.name = 'Maxilla (Upper Jaw)';
+      maxilla.userData.description = 'Paired facial bone forming upper jaw and palate';
+      maxilla.userData.anatomical = {
+        type: 'Irregular Bone',
+        location: 'Central face',
+        landmarks: ['Alveolar Process (tooth sockets)', 'Palatine Process (hard palate)', 'Maxillary Sinus'],
+        teeth: 16,
+        articulations: ['All facial bones except mandible'],
+        function: 'Anchors upper teeth, forms most of hard palate, contributes to orbits and nasal cavity'
+      };
       maxilla.position.set(0, -0.1, 0.4);
       maxilla.scale.set(1, 0.6, 1);
       group.add(maxilla);
       
       // Upper teeth
-      const toothMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      const toothMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
       for (let i = 0; i < 8; i++) {
         const toothGeom = new THREE.BoxGeometry(0.04, 0.08, 0.04);
         const tooth = new THREE.Mesh(toothGeom, toothMat);
-        tooth.name = `Upper Tooth ${i + 1}`;
+        const toothType = i <= 1 ? 'Incisor' : i <= 2 ? 'Canine' : 'Molar';
+        tooth.name = `Upper ${toothType} ${i + 1}`;
+        tooth.userData.description = `Upper dental arch ${toothType.toLowerCase()}`;
         tooth.position.set(-0.14 + (i * 0.04), -0.15, 0.54);
         group.add(tooth);
       }
       
-      // Zygomatic arches (cheekbones)
+      // Zygomatic bones (cheekbones)
       const zygomaticGeom = new THREE.CylinderGeometry(0.03, 0.03, 0.25, 8);
       
       const leftZygomatic = new THREE.Mesh(zygomaticGeom, material);
-      leftZygomatic.name = 'Left Zygomatic Arch';
+      leftZygomatic.name = 'Left Zygomatic Bone (Cheekbone)';
+      leftZygomatic.userData.description = 'Forms prominence of cheek and lateral orbital wall';
+      leftZygomatic.userData.anatomical = {
+        type: 'Irregular Bone',
+        location: 'Lateral face',
+        landmarks: ['Zygomatic Arch (with temporal bone)'],
+        articulations: ['Frontal', 'Maxilla', 'Temporal', 'Sphenoid'],
+        function: 'Facial contour, protection of eye, muscle attachment for mastication'
+      };
       leftZygomatic.position.set(-0.42, 0, 0.2);
       leftZygomatic.rotation.z = Math.PI / 2;
       group.add(leftZygomatic);
       
       const rightZygomatic = new THREE.Mesh(zygomaticGeom, material);
-      rightZygomatic.name = 'Right Zygomatic Arch';
+      rightZygomatic.name = 'Right Zygomatic Bone (Cheekbone)';
+      rightZygomatic.userData.description = 'Forms prominence of cheek and lateral orbital wall';
+      rightZygomatic.userData.anatomical = {
+        type: 'Irregular Bone',
+        location: 'Lateral face',
+        landmarks: ['Zygomatic Arch (with temporal bone)'],
+        articulations: ['Frontal', 'Maxilla', 'Temporal', 'Sphenoid'],
+        function: 'Facial contour, protection of eye, muscle attachment for mastication'
+      };
       rightZygomatic.position.set(0.42, 0, 0.2);
       rightZygomatic.rotation.z = Math.PI / 2;
       group.add(rightZygomatic);
