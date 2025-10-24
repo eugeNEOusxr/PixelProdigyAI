@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WordWeaver Demo - Blog to 3D</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0e27;
+      color: #e0e0e0;
+      overflow: hidden;
+    }
+    
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    #controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 350px;
+      z-index: 1000;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-size: 0.9rem;
+      color: #667eea;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-family: inherit;
+      margin-bottom: 10px;
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary {
+      background: rgba(102, 126, 234, 0.2);
+      border: 2px solid rgba(102, 126, 234, 0.4);
+    }
+    
+    #info {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(10, 14, 39, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      max-width: 350px;
+    }
+    
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+    
+    .stat-label {
+      color: #999;
+    }
+    
+    .stat-value {
+      color: #667eea;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div id="controls">
+    <h1>🧬 WordWeaver Demo</h1>
+    
+    <div class="section">
+      <div class="section-title">Blog Post Content</div>
+      <input type="text" id="postTitle" placeholder="Title: My Amazing Journey" value="My Amazing Journey">
+      <textarea id="postContent" placeholder="Write your blog post here...">This is the introduction to my amazing journey. I learned so much!
+
+The middle section describes all the wonderful experiences I had. It was fantastic and exciting.
+
+Finally, this conclusion wraps everything up nicely.</textarea>
+      
+      <input type="text" id="postTags" placeholder="Tags (comma separated)" value="adventure, learning, growth">
+      
+      <select id="postGrade">
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate" selected>Intermediate</option>
+        <option value="Advanced">Advanced</option>
+      </select>
+    </div>
+    
+    <button onclick="weavePost()">🧵 Weave into 3D</button>
+    <button class="btn-secondary" onclick="clearStructures()" style="margin-top: 10px;">🗑️ Clear All</button>
+    <button class="btn-secondary" onclick="loadSamplePosts()" style="margin-top: 10px;">📚 Load Sample Gallery</button>
+  </div>
+  
+  <div id="info">
+    <div class="stat">
+      <span class="stat-label">Structures:</span>
+      <span class="stat-value" id="structureCount">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Words:</span>
+      <span class="stat-value" id="wordCount">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Vertices:</span>
+      <span class="stat-value" id="vertexCount">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">FPS:</span>
+      <span class="stat-value" id="fps">60</span>
+    </div>
+  </div>
+  
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- OrbitControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <!-- WordWeaver Engine -->
+  <script src="wordweaver_engine.js"></script>
+  
+  <script>
+    // ============================================
+    // SCENE SETUP
+    // ============================================
+    
+    let scene, camera, renderer, controls, wordWeaver;
+    let structureCounter = 0;
+    
+    function initScene() {
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0e27);
+      scene.fog = new THREE.FogExp2(0x0a0e27, 0.05);
+      
+      // Camera
+      camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(3, 2, 5);
+      
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+      document.getElementById('canvas-container').appendChild(renderer.domElement);
+      
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 2;
+      controls.maxDistance = 50;
+      
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0x667eea, 0.4);
+      scene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(5, 10, 7.5);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+      
+      const pointLight1 = new THREE.PointLight(0x667eea, 1, 20);
+      pointLight1.position.set(-5, 3, -5);
+      scene.add(pointLight1);
+      
+      const pointLight2 = new THREE.PointLight(0x764ba2, 1, 20);
+      pointLight2.position.set(5, 3, 5);
+      scene.add(pointLight2);
+      
+      // Ground
+      const groundGeometry = new THREE.PlaneGeometry(100, 100);
+      const groundMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1a1f3a,
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+      
+      // Grid
+      const gridHelper = new THREE.GridHelper(100, 50, 0x667eea, 0x1a1f3a);
+      gridHelper.position.y = -1.99;
+      scene.add(gridHelper);
+      
+      // Initialize WordWeaver
+      wordWeaver = new WordWeaverEngine(scene, camera);
+      
+      console.log('✅ Scene initialized!');
+    }
+    
+    // ============================================
+    // WORDWEAVER INTEGRATION
+    // ============================================
+    
+    function weavePost() {
+      const title = document.getElementById('postTitle').value;
+      const content = document.getElementById('postContent').value;
+      const tagsRaw = document.getElementById('postTags').value;
+      const grade = document.getElementById('postGrade').value;
+      
+      if (!title || !content) {
+        alert('Please enter both title and content!');
+        return;
+      }
+      
+      // Create blog post object
+      const post = {
+        id: `post_${Date.now()}`,
+        title: title,
+        content: content,
+        grade: grade,
+        tags: tagsRaw.split(',').map(t => t.trim()).filter(t => t.length > 0),
+        author: 'Demo User',
+        date: new Date().toISOString(),
+        views: Math.floor(Math.random() * 1000),
+        likes: Math.floor(Math.random() * 100),
+        isPublic: true
+      };
+      
+      // Weave into 3D
+      const structure = wordWeaver.weavePost(post);
+      
+      // Position based on counter
+      const angle = (structureCounter / 5) * Math.PI * 2;
+      const radius = 3;
+      structure.position.set(
+        Math.cos(angle) * radius,
+        0,
+        Math.sin(angle) * radius
+      );
+      
+      scene.add(structure);
+      structureCounter++;
+      
+      // Update stats
+      updateStats();
+      
+      // Focus camera on new structure
+      controls.target.copy(structure.position);
+      
+      console.log(`✅ Woven: "${title}"`);
+    }
+    
+    function clearStructures() {
+      wordWeaver.clearAll();
+      structureCounter = 0;
+      updateStats();
+      console.log('🧹 Cleared all structures');
+    }
+    
+    function loadSamplePosts() {
+      const samples = [
+        {
+          id: 'sample_1',
+          title: 'The Power of Perseverance',
+          content: 'Every journey begins with a single step. This is my story of never giving up.\n\nThrough challenges and obstacles, I learned that determination is the key to success. Each failure taught me valuable lessons.\n\nIn the end, perseverance led me to achieve my dreams.',
+          tags: ['motivation', 'success', 'personal-growth'],
+          grade: 'Beginner',
+          author: 'Demo',
+          date: new Date().toISOString(),
+          views: 1500,
+          likes: 89,
+          isPublic: true
+        },
+        {
+          id: 'sample_2',
+          title: 'Technical Deep Dive: Algorithms',
+          content: 'Understanding algorithms is crucial for computer science. Let\'s explore sorting algorithms.\n\nQuicksort uses a divide-and-conquer approach. It partitions arrays efficiently.\n\nMerge sort guarantees O(n log n) performance. Both algorithms have their place.',
+          tags: ['computer-science', 'algorithms', 'technical'],
+          grade: 'Advanced',
+          author: 'Demo',
+          date: new Date().toISOString(),
+          views: 3200,
+          likes: 145,
+          isPublic: true
+        },
+        {
+          id: 'sample_3',
+          title: 'My Art Journey',
+          content: 'Creating art has always been my passion. Colors speak to my soul.\n\nEvery brushstroke tells a story. I love exploring new techniques and styles.\n\nArt is freedom. It\'s expression without boundaries.',
+          tags: ['art', 'creativity', 'expression'],
+          grade: 'Intermediate',
+          author: 'Demo',
+          date: new Date().toISOString(),
+          views: 980,
+          likes: 67,
+          isPublic: true
+        }
+      ];
+      
+      samples.forEach((post, i) => {
+        setTimeout(() => {
+          const structure = wordWeaver.weavePost(post);
+          
+          // Arrange in circle
+          const angle = (i / samples.length) * Math.PI * 2;
+          const radius = 5;
+          structure.position.set(
+            Math.cos(angle) * radius,
+            0,
+            Math.sin(angle) * radius
+          );
+          
+          scene.add(structure);
+          structureCounter++;
+          updateStats();
+        }, i * 500); // Stagger creation
+      });
+      
+      console.log('📚 Loading sample gallery...');
+    }
+    
+    function updateStats() {
+      document.getElementById('structureCount').textContent = wordWeaver.postStructures.size;
+      
+      // Count total words across all structures
+      let totalWords = 0;
+      let totalVertices = 0;
+      
+      wordWeaver.postStructures.forEach((structure) => {
+        const muscles = structure.children.find(c => c.name === 'muscles');
+        if (muscles) {
+          totalWords += muscles.children.length;
+        }
+        
+        structure.traverse((child) => {
+          if (child.geometry) {
+            const positions = child.geometry.attributes.position;
+            if (positions) {
+              totalVertices += positions.count;
+            }
+          }
+        });
+      });
+      
+      document.getElementById('wordCount').textContent = totalWords;
+      document.getElementById('vertexCount').textContent = totalVertices.toLocaleString();
+    }
+    
+    // ============================================
+    // ANIMATION LOOP
+    // ============================================
+    
+    let lastTime = performance.now();
+    let frameCount = 0;
+    let fpsUpdateTime = 0;
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const currentTime = performance.now();
+      const deltaTime = currentTime - lastTime;
+      lastTime = currentTime;
+      
+      // Update FPS counter
+      frameCount++;
+      fpsUpdateTime += deltaTime;
+      if (fpsUpdateTime >= 1000) {
+        document.getElementById('fps').textContent = frameCount;
+        frameCount = 0;
+        fpsUpdateTime = 0;
+      }
+      
+      // Update WordWeaver animations
+      wordWeaver.animate(currentTime);
+      
+      // Update controls
+      controls.update();
+      
+      // Render
+      renderer.render(scene, camera);
+    }
+    
+    // ============================================
+    // WINDOW RESIZE
+    // ============================================
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'w' || e.key === 'W') {
+        weavePost();
+      } else if (e.key === 'c' || e.key === 'C') {
+        clearStructures();
+      } else if (e.key === 'g' || e.key === 'G') {
+        loadSamplePosts();
+      }
+    });
+    
+    // ============================================
+    // MOUSE INTERACTION
+    // ============================================
+    
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    
+    window.addEventListener('click', (event) => {
+      // Skip if clicking on UI
+      if (event.target.closest('#controls')) return;
+      
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      
+      raycaster.setFromCamera(mouse, camera);
+      
+      // Check for word fiber intersections
+      wordWeaver.postStructures.forEach((structure) => {
+        const muscles = structure.children.find(c => c.name === 'muscles');
+        if (muscles) {
+          const intersects = raycaster.intersectObjects(muscles.children, true);
+          if (intersects.length > 0) {
+            const word = intersects[0].object.userData.word;
+            if (word) {
+              console.log(`🔍 Selected word: "${word}"`);
+              
+              // Highlight effect
+              const originalColor = intersects[0].object.material.color.clone();
+              intersects[0].object.material.color.set(0xffffff);
+              
+              setTimeout(() => {
+                intersects[0].object.material.color.copy(originalColor);
+              }, 500);
+            }
+          }
+        }
+      });
+    });
+    
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    
+    initScene();
+    animate();
+    
+    console.log('🧬 WordWeaver Demo ready!');
+    console.log('📝 Keyboard shortcuts:');
+    console.log('  W - Weave post');
+    console.log('  C - Clear all');
+    console.log('  G - Load gallery');
+  </script>
+</body>
+</html>

@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TextWeaver3D - Living Text Editor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0e27;
+      color: #e0e0e0;
+      overflow: hidden;
+    }
+    
+    /* 3D Canvas */
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    
+    /* 2D Text Input (Bone Structure) */
+    #text-input-panel {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 800px;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    
+    #text-input {
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 16px;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+      transition: all 0.3s;
+    }
+    
+    #text-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* Shape Selection */
+    .shape-selector {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .shape-btn {
+      padding: 10px 20px;
+      background: rgba(102, 126, 234, 0.1);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      color: #667eea;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+    
+    .shape-btn:hover {
+      background: rgba(102, 126, 234, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .shape-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: transparent;
+    }
+    
+    /* Material Selection */
+    #material-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 300px;
+      z-index: 1000;
+    }
+    
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
+    
+    .material-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .material-option:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+    
+    .material-option.active {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+      box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .material-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .material-name {
+      flex: 1;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    /* Color Picker */
+    .color-picker {
+      margin-top: 15px;
+    }
+    
+    .color-picker label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #999;
+    }
+    
+    #text-color {
+      width: 100%;
+      height: 40px;
+      border-radius: 6px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: transparent;
+      cursor: pointer;
+    }
+    
+    /* Controls */
+    #controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(10, 14, 39, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      z-index: 1000;
+    }
+    
+    .control-btn {
+      width: 100%;
+      padding: 10px;
+      background: rgba(102, 126, 234, 0.2);
+      border: 2px solid rgba(102, 126, 234, 0.4);
+      border-radius: 6px;
+      color: #667eea;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.3s;
+    }
+    
+    .control-btn:hover {
+      background: rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    /* Info Panel */
+    #info {
+      position: fixed;
+      bottom: 200px;
+      right: 20px;
+      background: rgba(10, 14, 39, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      max-width: 250px;
+    }
+    
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+    
+    .stat-value {
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    /* Spellcheck Indicator */
+    .spell-indicator {
+      position: absolute;
+      top: -30px;
+      right: 10px;
+      padding: 5px 12px;
+      background: rgba(239, 68, 68, 0.9);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .spell-indicator.show {
+      opacity: 1;
+    }
+    
+    .spell-indicator.correct {
+      background: rgba(34, 197, 94, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <!-- Controls -->
+  <div id="controls">
+    <div class="panel-title">🧬 TextWeaver3D</div>
+    <button class="control-btn" onclick="clearAllText()">🗑️ Clear All</button>
+    <button class="control-btn" onclick="toggleSpellCheck()">✓ Spell Check</button>
+    <button class="control-btn" onclick="exportTo3D()">💾 Export Scene</button>
+    <button class="control-btn" onclick="toggleAnimations()">✨ Animations</button>
+  </div>
+  
+  <!-- Material Selection -->
+  <div id="material-panel">
+    <div class="panel-title">📜 Scroll Materials</div>
+    
+    <div class="material-option active" data-material="biblical">
+      <div class="material-preview" style="background: linear-gradient(135deg, #d4a574 0%, #8b6f47 100%);"></div>
+      <div class="material-name">📖 Biblical Parchment</div>
+    </div>
+    
+    <div class="material-option" data-material="chrome">
+      <div class="material-preview" style="background: linear-gradient(135deg, #e0e0e0 0%, #808080 100%);"></div>
+      <div class="material-name">⚙️ Chrome Plated</div>
+    </div>
+    
+    <div class="material-option" data-material="rubber">
+      <div class="material-preview" style="background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);"></div>
+      <div class="material-name">🧪 White Rubber</div>
+    </div>
+    
+    <div class="material-option" data-material="magnetic">
+      <div class="material-preview" style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%);"></div>
+      <div class="material-name">🧲 Magnetic Surface</div>
+    </div>
+    
+    <div class="material-option" data-material="holographic">
+      <div class="material-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+      <div class="material-name">✨ Holographic</div>
+    </div>
+    
+    <div class="color-picker">
+      <label>Word Color:</label>
+      <input type="color" id="text-color" value="#667eea">
+    </div>
+  </div>
+  
+  <!-- Text Input (Bone Structure) -->
+  <div id="text-input-panel">
+    <div class="spell-indicator" id="spell-indicator">Checking spelling...</div>
+    <textarea id="text-input" placeholder="Type your text here... Words will materialize in 3D space!
+
+Try typing:
+- Single words for floating text
+- Sentences for connected structures
+- Paragraphs for complex geometries
+
+Press ENTER after typing to see your words come alive!"></textarea>
+    
+    <div class="shape-selector">
+      <button class="shape-btn active" data-shape="sphere" onclick="selectShape('sphere')">🔮 Sphere</button>
+      <button class="shape-btn" data-shape="cube" onclick="selectShape('cube')">📦 Cube</button>
+      <button class="shape-btn" data-shape="pyramid" onclick="selectShape('pyramid')">🔺 Pyramid</button>
+      <button class="shape-btn" data-shape="diamond" onclick="selectShape('diamond')">💎 Diamond</button>
+      <button class="shape-btn" data-shape="sine" onclick="selectShape('sine')">〰️ Sine Wave</button>
+      <button class="shape-btn" data-shape="helix" onclick="selectShape('helix')">🧬 Helix</button>
+      <button class="shape-btn" data-shape="lattice" onclick="selectShape('lattice')">🕸️ Lattice</button>
+    </div>
+  </div>
+  
+  <!-- Info -->
+  <div id="info">
+    <div class="stat">
+      <span>Words in Scene:</span>
+      <span class="stat-value" id="word-count">0</span>
+    </div>
+    <div class="stat">
+      <span>Active Shape:</span>
+      <span class="stat-value" id="active-shape">Sphere</span>
+    </div>
+    <div class="stat">
+      <span>Material:</span>
+      <span class="stat-value" id="active-material">Biblical</span>
+    </div>
+    <div class="stat">
+      <span>FPS:</span>
+      <span class="stat-value" id="fps">60</span>
+    </div>
+  </div>
+  
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  
+  <script>
+    // ============================================
+    // SCENE SETUP
+    // ============================================
+    
+    let scene, camera, renderer, controls, composer, bloomPass;
+    let raycaster, mouse;
+    let textInput, currentMaterial = 'biblical', currentShape = 'sphere', currentColor = '#667eea';
+    let wordMeshes = [];
+    let scrollSurface;
+    let spellCheckEnabled = false;
+    let animationsEnabled = true;
+    
+    // Simple spell check dictionary (expand as needed)
+    const dictionary = new Set([
+      'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
+      'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
+      'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she',
+      'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their', 'what',
+      'text', 'word', 'materialize', 'space', 'beautiful', 'amazing', 'create',
+      'hello', 'world', 'test', 'demo', 'example', 'words', 'transform'
+    ]);
+    
+    function initScene() {
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0e27);
+      scene.fog = new THREE.FogExp2(0x0a0e27, 0.02);
+      
+      // Camera
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 5, 15);
+      
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
+      document.getElementById('canvas-container').appendChild(renderer.domElement);
+      
+      // Bloom Post-Processing
+      composer = new THREE.EffectComposer(renderer);
+      const renderPass = new THREE.RenderPass(scene, camera);
+      composer.addPass(renderPass);
+      
+      bloomPass = new THREE.UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        1.5,  // Strength
+        0.4,  // Radius
+        0.85  // Threshold
+      );
+      composer.addPass(bloomPass);
+      
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 5;
+      controls.maxDistance = 50;
+      
+      // Raycaster
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+      
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      scene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 20, 10);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+      
+      const pointLight1 = new THREE.PointLight(0x667eea, 2, 30);
+      pointLight1.position.set(-10, 10, -10);
+      scene.add(pointLight1);
+      
+      const pointLight2 = new THREE.PointLight(0x764ba2, 2, 30);
+      pointLight2.position.set(10, 10, 10);
+      scene.add(pointLight2);
+      
+      // Create scroll surface (bone structure)
+      createScrollSurface();
+      
+      // Text input reference
+      textInput = document.getElementById('text-input');
+      
+      console.log('✅ TextWeaver3D initialized!');
+    }
+    
+    // ============================================
+    // SCROLL SURFACE (Bone Structure)
+    // ============================================
+    
+    function createScrollSurface() {
+      const geometry = new THREE.PlaneGeometry(20, 30, 50, 50);
+      const material = getMaterialByType(currentMaterial, true); // isScroll = true
+      
+      scrollSurface = new THREE.Mesh(geometry, material);
+      scrollSurface.rotation.x = -Math.PI / 4;
+      scrollSurface.position.y = -2;
+      scrollSurface.receiveShadow = true;
+      
+      // Add wave animation to vertices
+      const positions = geometry.attributes.position;
+      scrollSurface.userData.originalPositions = new Float32Array(positions.array);
+      
+      scene.add(scrollSurface);
+    }
+    
+    // ============================================
+    // MATERIAL SYSTEM
+    // ============================================
+    
+    function getMaterialByType(type, isScroll = false) {
+      const baseOpacity = isScroll ? 0.7 : 1;
+      
+      switch(type) {
+        case 'biblical':
+          return new THREE.MeshPhysicalMaterial({
+            color: 0xd4a574,
+            roughness: 0.9,
+            metalness: 0.1,
+            transparent: isScroll,
+            opacity: baseOpacity,
+            side: THREE.DoubleSide,
+            normalScale: new THREE.Vector2(0.5, 0.5)
+          });
+          
+        case 'chrome':
+          return new THREE.MeshStandardMaterial({
+            color: 0xe0e0e0,
+            roughness: 0.1,
+            metalness: 1.0,
+            transparent: isScroll,
+            opacity: baseOpacity,
+            side: THREE.DoubleSide,
+            envMapIntensity: 2
+          });
+          
+        case 'rubber':
+          return new THREE.MeshPhysicalMaterial({
+            color: 0xf5f5f5,
+            roughness: 0.8,
+            metalness: 0,
+            clearcoat: 0.3,
+            clearcoatRoughness: 0.5,
+            transparent: isScroll,
+            opacity: baseOpacity,
+            side: THREE.DoubleSide
+          });
+          
+        case 'magnetic':
+          return new THREE.MeshStandardMaterial({
+            color: 0x1e293b,
+            roughness: 0.4,
+            metalness: 0.8,
+            emissive: 0x475569,
+            emissiveIntensity: 0.2,
+            transparent: isScroll,
+            opacity: baseOpacity,
+            side: THREE.DoubleSide
+          });
+          
+        case 'holographic':
+          return new THREE.MeshPhysicalMaterial({
+            color: 0x667eea,
+            roughness: 0.2,
+            metalness: 0.5,
+            transparent: true,
+            opacity: isScroll ? 0.5 : 0.9,
+            side: THREE.DoubleSide,
+            iridescence: 1.0,
+            iridescenceIOR: 1.5,
+            emissive: 0x764ba2,
+            emissiveIntensity: 0.3
+          });
+          
+        default:
+          return new THREE.MeshStandardMaterial({ color: 0x667eea });
+      }
+    }
+    
+    // ============================================
+    // WORD GEOMETRY SYSTEM
+    // ============================================
+    
+    function createWordGeometry(word, shape, position) {
+      const group = new THREE.Group();
+      
+      // Get material
+      const material = getMaterialByType(currentMaterial);
+      material.color = new THREE.Color(currentColor);
+      
+      // Add bloom/emissive
+      if (material.emissive) {
+        material.emissive = new THREE.Color(currentColor);
+        material.emissiveIntensity = 0.5;
+      }
+      
+      // Create shape geometry
+      let geometry;
+      switch(shape) {
+        case 'sphere':
+          geometry = new THREE.SphereGeometry(0.5, 32, 32);
+          break;
+        case 'cube':
+          geometry = new THREE.BoxGeometry(1, 1, 1);
+          break;
+        case 'pyramid':
+          geometry = new THREE.ConeGeometry(0.5, 1, 4);
+          break;
+        case 'diamond':
+          geometry = new THREE.OctahedronGeometry(0.5);
+          break;
+        case 'sine':
+          geometry = createSineWaveGeometry();
+          break;
+        case 'helix':
+          geometry = createHelixGeometry();
+          break;
+        case 'lattice':
+          geometry = createLatticeGeometry();
+          break;
+        default:
+          geometry = new THREE.SphereGeometry(0.5, 32, 32);
+      }
+      
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+      
+      // Add text label
+      const textSprite = createTextSprite(word);
+      textSprite.position.y = 1;
+      group.add(textSprite);
+      
+      group.position.copy(position);
+      group.userData.word = word;
+      group.userData.shape = shape;
+      group.userData.isCorrect = checkSpelling(word);
+      
+      // Magnetic material: check spelling for attraction/repulsion
+      if (currentMaterial === 'magnetic') {
+        group.userData.magneticForce = group.userData.isCorrect ? 1 : -1;
+      }
+      
+      return group;
+    }
+    
+    function createSineWaveGeometry() {
+      const curve = new THREE.Curve();
+      curve.getPoint = function(t) {
+        const x = t * 2 - 1;
+        const y = Math.sin(t * Math.PI * 4) * 0.3;
+        const z = 0;
+        return new THREE.Vector3(x, y, z);
+      };
+      
+      return new THREE.TubeGeometry(curve, 64, 0.1, 16, false);
+    }
+    
+    function createHelixGeometry() {
+      const curve = new THREE.Curve();
+      curve.getPoint = function(t) {
+        const angle = t * Math.PI * 8;
+        const x = Math.cos(angle) * 0.5;
+        const y = t * 2 - 1;
+        const z = Math.sin(angle) * 0.5;
+        return new THREE.Vector3(x, y, z);
+      };
+      
+      return new THREE.TubeGeometry(curve, 128, 0.08, 12, false);
+    }
+    
+    function createLatticeGeometry() {
+      const geometry = new THREE.BoxGeometry(1, 1, 1, 4, 4, 4);
+      return new THREE.EdgesGeometry(geometry);
+    }
+    
+    function createTextSprite(text) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = 256;
+      canvas.height = 64;
+      
+      // Background
+      context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      context.fillRect(0, 0, 256, 64);
+      
+      // Text
+      context.font = 'bold 28px Arial';
+      context.fillStyle = currentColor;
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(text.substring(0, 15), 128, 32);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      const sprite = new THREE.Sprite(material);
+      sprite.scale.set(2, 0.5, 1);
+      
+      return sprite;
+    }
+    
+    // ============================================
+    // TEXT INPUT HANDLING
+    // ============================================
+    
+    textInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        processText();
+      }
+    });
+    
+    function processText() {
+      const text = textInput.value.trim();
+      if (!text) return;
+      
+      // Split into words
+      const words = text.match(/\b\w+\b/g) || [];
+      
+      words.forEach((word, i) => {
+        setTimeout(() => {
+          materializeWord(word, i, words.length);
+        }, i * 200); // Stagger appearance
+      });
+      
+      // Clear input
+      textInput.value = '';
+    }
+    
+    function materializeWord(word, index, total) {
+      // Calculate position based on current shape
+      let position;
+      
+      switch(currentShape) {
+        case 'sphere':
+          position = calculateSpherePosition(index, total);
+          break;
+        case 'cube':
+          position = calculateCubePosition(index, total);
+          break;
+        case 'pyramid':
+          position = calculatePyramidPosition(index, total);
+          break;
+        case 'diamond':
+          position = calculateDiamondPosition(index, total);
+          break;
+        case 'sine':
+          position = calculateSinePosition(index, total);
+          break;
+        case 'helix':
+          position = calculateHelixPosition(index, total);
+          break;
+        case 'lattice':
+          position = calculateLatticePosition(index, total);
+          break;
+        default:
+          position = new THREE.Vector3(
+            (Math.random() - 0.5) * 10,
+            Math.random() * 10,
+            (Math.random() - 0.5) * 10
+          );
+      }
+      
+      // Create word geometry
+      const wordGroup = createWordGeometry(word, currentShape, position);
+      
+      // Spawn animation
+      wordGroup.scale.set(0, 0, 0);
+      const targetScale = 1;
+      
+      gsap.to(wordGroup.scale, {
+        x: targetScale,
+        y: targetScale,
+        z: targetScale,
+        duration: 0.8,
+        ease: 'elastic.out(1, 0.5)'
+      });
+      
+      // Magnetic material: show attraction/repulsion
+      if (currentMaterial === 'magnetic') {
+        const isCorrect = wordGroup.userData.isCorrect;
+        if (!isCorrect) {
+          // Repulsion animation
+          gsap.to(wordGroup.position, {
+            y: position.y + 5,
+            duration: 1,
+            ease: 'power2.out',
+            yoyo: true,
+            repeat: 1
+          });
+          
+          // Red tint for misspelled
+          wordGroup.children[0].material.color.set(0xff4444);
+        } else {
+          // Attraction glow
+          wordGroup.children[0].material.emissive = new THREE.Color(0x00ff00);
+          wordGroup.children[0].material.emissiveIntensity = 0.8;
+          
+          setTimeout(() => {
+            gsap.to(wordGroup.children[0].material, {
+              emissiveIntensity: 0.2,
+              duration: 1
+            });
+          }, 500);
+        }
+      }
+      
+      scene.add(wordGroup);
+      wordMeshes.push(wordGroup);
+      
+      updateWordCount();
+      
+      console.log(`✨ Materialized: "${word}" at position`, position);
+    }
+    
+    // ============================================
+    // POSITION CALCULATIONS
+    // ============================================
+    
+    function calculateSpherePosition(index, total) {
+      const phi = Math.acos(-1 + (2 * index) / total);
+      const theta = Math.sqrt(total * Math.PI) * phi;
+      const radius = 8;
+      
+      return new THREE.Vector3(
+        radius * Math.cos(theta) * Math.sin(phi),
+        radius * Math.cos(phi),
+        radius * Math.sin(theta) * Math.sin(phi)
+      );
+    }
+    
+    function calculateCubePosition(index, total) {
+      const gridSize = Math.ceil(Math.cbrt(total));
+      const x = (index % gridSize) - gridSize / 2;
+      const y = Math.floor(index / gridSize) % gridSize;
+      const z = Math.floor(index / (gridSize * gridSize)) - gridSize / 2;
+      
+      return new THREE.Vector3(x * 2, y * 2, z * 2);
+    }
+    
+    function calculatePyramidPosition(index, total) {
+      const layer = Math.floor(Math.sqrt(index));
+      const posInLayer = index - layer * layer;
+      const layerSize = layer * 2 + 1;
+      
+      return new THREE.Vector3(
+        (posInLayer - layer) * 2,
+        -layer * 1.5,
+        (layer - layerSize / 2) * 2
+      );
+    }
+    
+    function calculateDiamondPosition(index, total) {
+      const angle = (index / total) * Math.PI * 2;
+      const layer = Math.floor(index / 6);
+      const radius = 5 + layer;
+      
+      return new THREE.Vector3(
+        Math.cos(angle) * radius,
+        Math.sin(layer) * 3,
+        Math.sin(angle) * radius
+      );
+    }
+    
+    function calculateSinePosition(index, total) {
+      const t = index / total;
+      const x = (t * 20) - 10;
+      const y = Math.sin(t * Math.PI * 4) * 3;
+      const z = 0;
+      
+      return new THREE.Vector3(x, y, z);
+    }
+    
+    function calculateHelixPosition(index, total) {
+      const t = index / total;
+      const angle = t * Math.PI * 8;
+      const radius = 5;
+      
+      return new THREE.Vector3(
+        Math.cos(angle) * radius,
+        (t * 20) - 10,
+        Math.sin(angle) * radius
+      );
+    }
+    
+    function calculateLatticePosition(index, total) {
+      const gridSize = Math.ceil(Math.cbrt(total));
+      const spacing = 3;
+      const x = (index % gridSize) * spacing - (gridSize * spacing) / 2;
+      const y = Math.floor(index / gridSize) % gridSize * spacing;
+      const z = Math.floor(index / (gridSize * gridSize)) * spacing - (gridSize * spacing) / 2;
+      
+      return new THREE.Vector3(x, y, z);
+    }
+    
+    // ============================================
+    // SPELL CHECK
+    // ============================================
+    
+    function checkSpelling(word) {
+      return dictionary.has(word.toLowerCase());
+    }
+    
+    function toggleSpellCheck() {
+      spellCheckEnabled = !spellCheckEnabled;
+      console.log(`Spell check: ${spellCheckEnabled ? 'ON' : 'OFF'}`);
+    }
+    
+    // ============================================
+    // UI INTERACTIONS
+    // ============================================
+    
+    function selectShape(shape) {
+      currentShape = shape;
+      document.querySelectorAll('.shape-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`[data-shape="${shape}"]`).classList.add('active');
+      document.getElementById('active-shape').textContent = shape.charAt(0).toUpperCase() + shape.slice(1);
+    }
+    
+    document.querySelectorAll('.material-option').forEach(option => {
+      option.addEventListener('click', () => {
+        currentMaterial = option.dataset.material;
+        document.querySelectorAll('.material-option').forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        
+        // Update scroll surface
+        if (scrollSurface) {
+          scrollSurface.material = getMaterialByType(currentMaterial, true);
+        }
+        
+        document.getElementById('active-material').textContent = 
+          option.querySelector('.material-name').textContent.replace(/[^a-zA-Z ]/g, '').trim();
+      });
+    });
+    
+    document.getElementById('text-color').addEventListener('input', (e) => {
+      currentColor = e.target.value;
+    });
+    
+    function clearAllText() {
+      wordMeshes.forEach(mesh => scene.remove(mesh));
+      wordMeshes = [];
+      updateWordCount();
+    }
+    
+    function toggleAnimations() {
+      animationsEnabled = !animationsEnabled;
+      console.log(`Animations: ${animationsEnabled ? 'ON' : 'OFF'}`);
+    }
+    
+    function exportTo3D() {
+      const data = {
+        words: wordMeshes.map(m => ({
+          word: m.userData.word,
+          position: m.position.toArray(),
+          shape: m.userData.shape
+        })),
+        material: currentMaterial,
+        color: currentColor
+      };
+      
+      console.log('Export data:', data);
+      alert('Scene exported to console!');
+    }
+    
+    function updateWordCount() {
+      document.getElementById('word-count').textContent = wordMeshes.length;
+    }
+    
+    // ============================================
+    // RAYCASTING & INTERACTION
+    // ============================================
+    
+    window.addEventListener('mousemove', (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+    
+    window.addEventListener('click', () => {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(wordMeshes, true);
+      
+      if (intersects.length > 0) {
+        const word = intersects[0].object.parent;
+        console.log(`Selected: "${word.userData.word}"`);
+        
+        // Pulse animation
+        gsap.to(word.scale, {
+          x: 1.3,
+          y: 1.3,
+          z: 1.3,
+          duration: 0.3,
+          yoyo: true,
+          repeat: 1
+        });
+      }
+    });
+    
+    // ============================================
+    // ANIMATION LOOP
+    // ============================================
+    
+    let lastTime = performance.now();
+    let frameCount = 0;
+    let fpsTime = 0;
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const currentTime = performance.now();
+      const delta = currentTime - lastTime;
+      lastTime = currentTime;
+      
+      // FPS counter
+      frameCount++;
+      fpsTime += delta;
+      if (fpsTime >= 1000) {
+        document.getElementById('fps').textContent = frameCount;
+        frameCount = 0;
+        fpsTime = 0;
+      }
+      
+      if (animationsEnabled) {
+        // Animate scroll surface
+        if (scrollSurface) {
+          const positions = scrollSurface.geometry.attributes.position;
+          const originalPositions = scrollSurface.userData.originalPositions;
+          
+          for (let i = 0; i < positions.count; i++) {
+            const x = originalPositions[i * 3];
+            const z = originalPositions[i * 3 + 2];
+            positions.array[i * 3 + 1] = originalPositions[i * 3 + 1] + 
+              Math.sin(x * 0.5 + currentTime * 0.001) * 0.3 +
+              Math.cos(z * 0.5 + currentTime * 0.001) * 0.3;
+          }
+          positions.needsUpdate = true;
+        }
+        
+        // Animate word meshes
+        wordMeshes.forEach((mesh, i) => {
+          mesh.rotation.y += 0.01;
+          
+          // Floating animation
+          mesh.position.y += Math.sin(currentTime * 0.001 + i) * 0.002;
+          
+          // Shimmer effect on hover
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObject(mesh, true);
+          if (intersects.length > 0) {
+            if (mesh.children[0].material.emissive) {
+              mesh.children[0].material.emissiveIntensity = 0.8;
+            }
+          } else {
+            if (mesh.children[0].material.emissive) {
+              mesh.children[0].material.emissiveIntensity = 0.2;
+            }
+          }
+        });
+      }
+      
+      controls.update();
+      composer.render();
+    }
+    
+    // ============================================
+    // WINDOW RESIZE
+    // ============================================
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    // ============================================
+    // GSAP (for animations)
+    // ============================================
+    
+    const gsap = {
+      to: (target, props) => {
+        const duration = props.duration * 1000;
+        const start = performance.now();
+        const startValues = {};
+        
+        Object.keys(props).forEach(key => {
+          if (key !== 'duration' && key !== 'ease' && key !== 'yoyo' && key !== 'repeat') {
+            startValues[key] = target[key];
+          }
+        });
+        
+        function update() {
+          const elapsed = performance.now() - start;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          Object.keys(startValues).forEach(key => {
+            target[key] = startValues[key] + (props[key] - startValues[key]) * progress;
+          });
+          
+          if (progress < 1) {
+            requestAnimationFrame(update);
+          }
+        }
+        
+        update();
+      }
+    };
+    
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    
+    initScene();
+    animate();
+    
+    console.log('🧬 TextWeaver3D ready!');
+    console.log('💡 Type text and press ENTER to see it materialize in 3D!');
+  </script>
+</body>
+</html>
