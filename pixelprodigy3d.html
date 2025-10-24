@@ -378,6 +378,143 @@
       background: rgba(102, 126, 234, 0.2);
       transform: translateX(4px);
     }
+    
+    /* 🤖 AI TUTORIAL DISPLAY BOX */
+    #aiTutorialBox {
+      position: fixed;
+      right: 20px;
+      top: 80px;
+      width: 350px;
+      max-height: calc(100vh - 100px);
+      background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 31, 58, 0.95) 100%);
+      border: 2px solid;
+      border-image: linear-gradient(135deg, #00FFFF, #FFD700, #764ba2) 1;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+      z-index: 900;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+    
+    #aiTutorialBox.minimized {
+      width: 50px;
+      height: 50px;
+      padding: 10px;
+      overflow: hidden;
+    }
+    
+    #aiTutorialBox::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    #aiTutorialBox::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+    
+    #aiTutorialBox::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #00FFFF, #FFD700);
+      border-radius: 10px;
+    }
+    
+    .ai-tutorial-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+    }
+    
+    .ai-tutorial-title {
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00FFFF 0%, #FFD700 50%, #764ba2 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .ai-tutorial-minimize {
+      background: none;
+      border: none;
+      color: #00FFFF;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .ai-tutorial-minimize:hover {
+      color: #FFD700;
+      transform: scale(1.2);
+    }
+    
+    .ai-personality-search {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 14px;
+      margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+    
+    .ai-personality-search:focus {
+      outline: none;
+      border-color: #00FFFF;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+    
+    .ai-personality-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .ai-personality-item {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .ai-personality-item:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: #00FFFF;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      transform: translateX(-5px);
+    }
+    
+    .ai-personality-item.active {
+      background: rgba(0, 255, 255, 0.1);
+      border-color: #FFD700;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+    }
+    
+    .ai-personality-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #00FFFF;
+      margin-bottom: 5px;
+    }
+    
+    .ai-personality-desc {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.4;
+    }
+    
+    .ai-personality-methods {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #FFD700;
+    }
   </style>
 </head>
 <body>
@@ -860,6 +997,26 @@
               <span>Animate</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- 🤖 AI TUTORIAL DISPLAY BOX -->
+      <div id="aiTutorialBox">
+        <div class="ai-tutorial-header">
+          <div class="ai-tutorial-title">🤖 AI Personalities</div>
+          <button class="ai-tutorial-minimize" onclick="toggleAITutorialBox()">−</button>
+        </div>
+        
+        <input 
+          type="text" 
+          class="ai-personality-search" 
+          id="aiPersonalitySearch"
+          placeholder="🔍 Search AI personalities..."
+          onkeyup="filterAIPersonalities()"
+        />
+        
+        <div class="ai-personality-list" id="aiPersonalityList">
+          <!-- Dynamically populated by JavaScript -->
         </div>
       </div>
 
@@ -7168,6 +7325,38 @@
       totalVertices += 24 * 20 * 8; // 24 ribs, 20 segments, 8 sides
       console.log(`  ✓ Ribs: 24 bones (12 pairs)`);
       
+      // === SCAPULAE (Shoulder Blades) - MUST BE CREATED BEFORE HUMERUS ===
+      console.log('🦴 Creating scapulae (shoulder blades)...');
+      const scapulaGeom = new THREE.BoxGeometry(0.35, 0.45, 0.05);
+      
+      const leftScapula = new THREE.Mesh(scapulaGeom, boneMat);
+      leftScapula.name = 'Left Scapula (Shoulder Blade)';
+      leftScapula.userData.description = 'Large triangular bone on posterior thorax';
+      leftScapula.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Posterior shoulder',
+        landmarks: ['Glenoid Cavity (shoulder socket)', 'Acromion (highest point)', 'Coracoid Process', 'Spine of Scapula'],
+        articulations: ['Humerus (glenohumeral joint)', 'Clavicle (acromioclavicular joint)'],
+        function: 'Attachment for 17 muscles, socket for humerus, enables wide range of shoulder motion'
+      };
+      leftScapula.position.set(-0.6, 14.5, -0.2);
+      skeletonGroup.add(leftScapula);
+      
+      const rightScapula = new THREE.Mesh(scapulaGeom, boneMat);
+      rightScapula.name = 'Right Scapula (Shoulder Blade)';
+      rightScapula.userData.description = 'Large triangular bone on posterior thorax';
+      rightScapula.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Posterior shoulder',
+        landmarks: ['Glenoid Cavity (shoulder socket)', 'Acromion (highest point)', 'Coracoid Process', 'Spine of Scapula'],
+        articulations: ['Humerus (glenohumeral joint)', 'Clavicle (acromioclavicular joint)'],
+        function: 'Attachment for 17 muscles, socket for humerus, enables wide range of shoulder motion'
+      };
+      rightScapula.position.set(0.6, 14.5, -0.2);
+      skeletonGroup.add(rightScapula);
+      
+      console.log(`  ✓ Scapulae: 2 bones (shoulder blades)`);
+      
       // === DETAILED HUMERUS (Upper Arm) ===
       console.log('🦴 Creating detailed humeri...');
       
@@ -7576,36 +7765,7 @@
       rightClavicle.rotation.z = -Math.PI / 6;
       skeletonGroup.add(rightClavicle);
       
-      // Scapulae (shoulder blades)
-      const scapulaGeom = new THREE.BoxGeometry(0.35, 0.45, 0.05);
-      
-      const leftScapula = new THREE.Mesh(scapulaGeom, boneMat);
-      leftScapula.name = 'Left Scapula (Shoulder Blade)';
-      leftScapula.userData.description = 'Large triangular bone on posterior thorax';
-      leftScapula.userData.anatomical = {
-        type: 'Flat Bone',
-        location: 'Posterior shoulder',
-        landmarks: ['Glenoid Cavity (shoulder socket)', 'Acromion (highest point)', 'Coracoid Process', 'Spine of Scapula'],
-        articulations: ['Humerus (glenohumeral joint)', 'Clavicle (acromioclavicular joint)'],
-        function: 'Attachment for 17 muscles, socket for humerus, enables wide range of shoulder motion'
-      };
-      leftScapula.position.set(-0.6, 14.5, -0.2);
-      skeletonGroup.add(leftScapula);
-      
-      const rightScapula = new THREE.Mesh(scapulaGeom, boneMat);
-      rightScapula.name = 'Right Scapula (Shoulder Blade)';
-      rightScapula.userData.description = 'Large triangular bone on posterior thorax';
-      rightScapula.userData.anatomical = {
-        type: 'Flat Bone',
-        location: 'Posterior shoulder',
-        landmarks: ['Glenoid Cavity (shoulder socket)', 'Acromion (highest point)', 'Coracoid Process', 'Spine of Scapula'],
-        articulations: ['Humerus (glenohumeral joint)', 'Clavicle (acromioclavicular joint)'],
-        function: 'Attachment for 17 muscles, socket for humerus, enables wide range of shoulder motion'
-      };
-      rightScapula.position.set(0.6, 14.5, -0.2);
-      skeletonGroup.add(rightScapula);
-      
-      // Store shoulder references for joint parenting
+      // Store shoulder references for joint parenting (scapulae created earlier)
       leftClavicle.userData.shoulder = leftScapula;
       rightClavicle.userData.shoulder = rightScapula;
       
@@ -7780,6 +7940,191 @@
       console.log(`  → SPACE to jump, F to fly`);
       console.log(`  → All bones properly named and hierarchical!`);
     }
+    
+    // === 💀 SKELETOR AI PERSONALITY SYSTEM ===
+    // ========================================
+    
+    let skeletorCharacter = null;
+    let skeletorDialogueBox = null;
+    let skeletorActive = false;
+    let skeletorQuipTimer = null;
+    
+    const skeletorQuips = [
+      "NYAH! You'll never catch me, fool!",
+      "Bumbling fools! Is that the best you can do?",
+      "MYAH! I am the master of evil!",
+      "You dare challenge SKELETOR?!",
+      "Fools! Your pathetic attempts amuse me!",
+      "NYAH-HA-HA! Run faster, weakling!",
+      "I have the POWER! ...to run away!",
+      "Beast Man! ...oh wait, you're not Beast Man.",
+      "By the power of Greyskull... I shall FLEE!",
+      "Curse you, He-Man! Wait... you're not He-Man.",
+      "Evil-Lyn! Teleport me out! ...Hello?",
+      "RETREAT! ...I mean, STRATEGIC WITHDRAWAL!",
+      "You think you're fast? Watch THIS!",
+      "My genius is wasted on you simpletons!",
+      "NYAH! Catch me if you can, which you CAN'T!",
+      "I'll be back! And next time with a PLAN!",
+      "Mer-Man! ...no? Nobody? Fine, I'll run myself.",
+      "Your persistence is... ANNOYING!",
+      "FOOL! I was merely testing your reflexes!",
+      "This isn't over! SKELETOR ALWAYS RETURNS!"
+    ];
+    
+    function createSkeletorCharacter() {
+      console.log('💀 Creating Skeletor AI Personality...');
+      
+      // Check if skeleton is loaded
+      if (!window.fullBodyGroup) {
+        console.warn('⚠️ Skeleton not loaded! Load skeleton first.');
+        return null;
+      }
+      
+      // Clone skeleton with PURPLE material
+      skeletorCharacter = window.fullBodyGroup.clone();
+      skeletorCharacter.name = 'Skeletor (Evil Genius)';
+      skeletorCharacter.scale.set(0.15, 0.15, 0.15);
+      skeletorCharacter.position.set(10, 0.5, 10);
+      
+      // PURPLE material with glow
+      const purpleMat = new THREE.MeshStandardMaterial({
+        color: 0x9900ff,
+        roughness: 0.6,
+        metalness: 0.1,
+        emissive: 0x6600aa,
+        emissiveIntensity: 0.3
+      });
+      
+      skeletorCharacter.traverse((child) => {
+        if (child.isMesh) {
+          child.material = purpleMat.clone();
+          
+          // Add RED GLOWING EYES
+          if (child.name && child.name.includes('Skull')) {
+            const eyeGeom = new THREE.SphereGeometry(0.08, 16, 16);
+            const eyeMat = new THREE.MeshStandardMaterial({
+              color: 0xff0000,
+              emissive: 0xff0000,
+              emissiveIntensity: 1.5,
+              roughness: 0.3
+            });
+            
+            const leftEye = new THREE.Mesh(eyeGeom, eyeMat);
+            leftEye.position.set(-0.15, 0.1, 0.4);
+            child.add(leftEye);
+            
+            const rightEye = new THREE.Mesh(eyeGeom, eyeMat);
+            rightEye.position.set(0.15, 0.1, 0.4);
+            child.add(rightEye);
+          }
+        }
+      });
+      
+      scene.add(skeletorCharacter);
+      skeletorActive = true;
+      startSkeletorAI();
+      
+      console.log('✅ Skeletor character created!');
+      return skeletorCharacter;
+    }
+    
+    function startSkeletorAI() {
+      // Random quips every 5-10 seconds
+      function scheduleNextQuip() {
+        const delay = 5000 + Math.random() * 5000;
+        skeletorQuipTimer = setTimeout(() => {
+          if (skeletorActive) {
+            showSkeletorDialogue();
+            scheduleNextQuip();
+          }
+        }, delay);
+      }
+      scheduleNextQuip();
+      
+      // Random movement
+      setInterval(() => {
+        if (skeletorActive && skeletorCharacter) {
+          const angle = Math.random() * Math.PI * 2;
+          const distance = 2 + Math.random() * 5;
+          const targetX = skeletorCharacter.position.x + Math.cos(angle) * distance;
+          const targetZ = skeletorCharacter.position.z + Math.sin(angle) * distance;
+          
+          const startX = skeletorCharacter.position.x;
+          const startZ = skeletorCharacter.position.z;
+          const duration = 1000 + Math.random() * 1000;
+          const startTime = Date.now();
+          
+          function animate() {
+            if (!skeletorActive) return;
+            
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            
+            skeletorCharacter.position.x = startX + (targetX - startX) * eased;
+            skeletorCharacter.position.z = startZ + (targetZ - startZ) * eased;
+            skeletorCharacter.rotation.y = Math.atan2(targetZ - startZ, targetX - startX);
+            skeletorCharacter.position.y = 0.5 + Math.abs(Math.sin(Date.now() * 0.01)) * 0.3;
+            
+            if (progress < 1) requestAnimationFrame(animate);
+          }
+          animate();
+        }
+      }, 2000);
+    }
+    
+    function showSkeletorDialogue() {
+      const quip = skeletorQuips[Math.floor(Math.random() * skeletorQuips.length)];
+      
+      if (!skeletorDialogueBox) {
+        skeletorDialogueBox = document.createElement('div');
+        skeletorDialogueBox.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: linear-gradient(135deg, rgba(153, 0, 255, 0.95) 0%, rgba(102, 0, 170, 0.95) 100%);
+          color: #ffffff;
+          padding: 20px 30px;
+          border-radius: 15px;
+          font-size: 24px;
+          font-weight: bold;
+          text-align: center;
+          box-shadow: 0 0 30px rgba(153, 0, 255, 0.8), 0 0 60px rgba(153, 0, 255, 0.4);
+          border: 3px solid #ff00ff;
+          z-index: 10000;
+          font-family: 'Comic Sans MS', cursive;
+          max-width: 500px;
+          pointer-events: none;
+        `;
+        document.body.appendChild(skeletorDialogueBox);
+      }
+      
+      skeletorDialogueBox.textContent = quip;
+      skeletorDialogueBox.style.display = 'block';
+      
+      setTimeout(() => {
+        if (skeletorDialogueBox) skeletorDialogueBox.style.display = 'none';
+      }, 3000);
+      
+      console.log(`💀 Skeletor: "${quip}"`);
+    }
+    
+    function stopSkeletorAI() {
+      skeletorActive = false;
+      if (skeletorQuipTimer) clearTimeout(skeletorQuipTimer);
+      if (skeletorCharacter) {
+        scene.remove(skeletorCharacter);
+        skeletorCharacter = null;
+      }
+      if (skeletorDialogueBox) {
+        skeletorDialogueBox.remove();
+        skeletorDialogueBox = null;
+      }
+    }
+    
+    // === END SKELETOR AI SYSTEM ===
     
     // Helper: Create detailed femur with anatomical features
     function createDetailedFemur(side, material) {
@@ -10970,8 +11315,117 @@
       }
     }
 
+    // === 🤖 AI TUTORIAL BOX SYSTEM ===
+    
+    let aiPersonalitiesData = [];
+    let currentSelectedPersonality = null;
+    
+    // Load AI personalities from JSON
+    async function loadAIPersonalities() {
+      try {
+        const response = await fetch('ai_method_assignments.json');
+        const data = await response.json();
+        aiPersonalitiesData = Object.values(data.assignments);
+        populateAIPersonalities();
+        console.log(`✅ Loaded ${aiPersonalitiesData.length} AI personalities`);
+      } catch (error) {
+        console.error('❌ Failed to load AI personalities:', error);
+        // Fallback with sample data
+        aiPersonalitiesData = [
+          { name: 'Interior Designer', methods: [{name: 'furniture_generation'}] },
+          { name: 'Organic Naturalist', methods: [{name: 'nature_rendering'}] },
+          { name: 'Architectural Visionary', methods: [{name: 'building_design'}] }
+        ];
+        populateAIPersonalities();
+      }
+    }
+    
+    function populateAIPersonalities() {
+      const listEl = document.getElementById('aiPersonalityList');
+      listEl.innerHTML = '';
+      
+      aiPersonalitiesData.forEach((personality, index) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'ai-personality-item';
+        itemEl.onclick = () => selectAIPersonality(personality, itemEl);
+        
+        const methodNames = personality.methods ? personality.methods.map(m => m.name).join(', ') : 'N/A';
+        
+        itemEl.innerHTML = `
+          <div class="ai-personality-name">${personality.name || 'Personality #' + index}</div>
+          <div class="ai-personality-desc">
+            ${personality.methods && personality.methods[0] ? personality.methods[0].description || 'AI-powered creation methods' : 'Advanced AI capabilities'}
+          </div>
+          <div class="ai-personality-methods">📋 Methods: ${personality.methods ? personality.methods.length : 0}</div>
+        `;
+        
+        listEl.appendChild(itemEl);
+      });
+    }
+    
+    function selectAIPersonality(personality, element) {
+      // Remove active from all
+      document.querySelectorAll('.ai-personality-item').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Add active to clicked
+      element.classList.add('active');
+      currentSelectedPersonality = personality;
+      
+      console.log(`✅ Selected AI Personality: ${personality.name}`);
+      
+      // Show details in console
+      if (personality.methods) {
+        console.log(`   Methods available:`);
+        personality.methods.forEach(method => {
+          console.log(`   - ${method.name}: ${method.description || 'N/A'}`);
+        });
+      }
+      
+      // TODO: Apply personality to Skeletor or other AI systems
+      if (personality.name === 'Skeletor' || personality.name.includes('Evil')) {
+        console.log('💀 NYAH! You have summoned SKELETOR!');
+        if (window.fullBodyGroup && !skeletorCharacter) {
+          createSkeletorCharacter();
+        }
+      }
+    }
+    
+    function filterAIPersonalities() {
+      const searchTerm = document.getElementById('aiPersonalitySearch').value.toLowerCase();
+      const items = document.querySelectorAll('.ai-personality-item');
+      
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    
+    function toggleAITutorialBox() {
+      const box = document.getElementById('aiTutorialBox');
+      box.classList.toggle('minimized');
+      
+      const btn = box.querySelector('.ai-tutorial-minimize');
+      if (box.classList.contains('minimized')) {
+        btn.textContent = '+';
+      } else {
+        btn.textContent = '−';
+      }
+    }
+    
     // Start
     window.addEventListener('load', () => {
+      init();
+      setTimeout(() => {
+        initDimensionalSystem();
+        loadAIPersonalities(); // Load AI personalities
+      }, 500);
+    });
       init();
       setTimeout(() => {
         initDimensionalSystem();
