@@ -412,6 +412,7 @@
         <button class="workspace-tab" onclick="switchDimensionUI('wordweaver', this)" data-dimension="wordweaver">✍️ WordWeaver</button>
         <button class="workspace-tab" onclick="switchDimensionUI('anatomy', this)" data-dimension="anatomy">🦴 Anatomy</button>
         <button class="workspace-tab" onclick="switchDimensionUI('perfect', this)" data-dimension="perfect">✨ Perfect</button>
+        <button class="workspace-tab" onclick="switchDimensionUI('venuespro', this)" data-dimension="venuespro" title="Interactive Event Showcases">🎪 VenuesPro</button>
         <button class="workspace-tab" onclick="switchDimensionUI('skeletor_land', this)" data-dimension="skeletor_land" title="Chase Skeletor!">💀 Skeletor Land</button>
       </div>
       <div style="color: rgba(255,255,255,0.8); font-size: 14px;">
@@ -2298,15 +2299,199 @@
         }
       },
       
+      // ========================================
+      // 🎪 VENUESPRO SHOWCASE DIMENSION
+      // ========================================
+      
+      venuespro: {
+        name: 'VenuesPro Showcase',
+        icon: '🎪',
+        description: '3D webpage gallery - interactive iframe displays for events & celebrations',
+        backgroundColor: 0x0f0f1a,
+        fogColor: 0x1a1a2a,
+        fogNear: 15,
+        fogFar: 80,
+        cameraPosition: { x: 0, y: 6, z: 25 },
+        cameraTarget: { x: 0, y: 4, z: 0 },
+        gridConfig: {
+          size: 70,
+          divisions: 70,
+          centerColor: 0x4a90e2,
+          gridColor: 0x2a4a6a,
+          wallColor: 0x1a2a3a,
+          showWalls: true,
+          wallHeight: 26,
+          wallOpacity: 0.3,
+          gallery: true
+        },
+        lighting: {
+          ambient: { color: 0x3a3a4a, intensity: 0.7 },
+          directional: { color: 0xffffff, intensity: 0.8, position: { x: 0, y: 20, z: 10 } },
+          point: [
+            { color: 0x4a90e2, intensity: 1.0, position: { x: 0, y: 10, z: 0 } },   // Spotlight center
+            { color: 0xffffff, intensity: 0.6, position: { x: -12, y: 8, z: 0 } },  // Left gallery light
+            { color: 0xffffff, intensity: 0.6, position: { x: 12, y: 8, z: 0 } }    // Right gallery light
+          ]
+        },
+        previewText: 'Interactive webpage gallery. Scroll iframe displays. Event marketing showcase.',
+        isGalleryMode: true,
+        venueConfig: {
+          layouts: [
+            {
+              name: 'Corporate Professional',
+              category: 'business',
+              style: 'minimalist_corporate',
+              keywords: ['business', 'professional', 'corporate', 'enterprise', 'B2B', 'consulting', 'finance'],
+              position: { x: -15, y: 4, z: 0 },
+              color: 0x2a4a8a,
+              targetAudience: 'Business conferences, corporate events, professional networking'
+            },
+            {
+              name: 'Modern Startup',
+              category: 'business',
+              style: 'tech_startup',
+              keywords: ['startup', 'tech', 'innovation', 'SaaS', 'modern', 'agile', 'disruptive'],
+              position: { x: -8, y: 4, z: 0 },
+              color: 0x6a4ac2,
+              targetAudience: 'Product launches, pitch events, hackathons, tech conferences'
+            },
+            {
+              name: 'Cyberpunk Edge',
+              category: 'creative',
+              style: 'cyberpunk_neon',
+              keywords: ['cyberpunk', 'futuristic', 'neon', 'edgy', 'gaming', 'esports', 'metaverse'],
+              position: { x: -1, y: 4, z: 0 },
+              color: 0xff00ff,
+              targetAudience: 'Gaming tournaments, VR events, NFT showcases, crypto conferences'
+            },
+            {
+              name: 'Elegant Wedding',
+              category: 'celebration',
+              style: 'wedding_elegant',
+              keywords: ['wedding', 'marriage', 'elegant', 'romantic', 'ceremony', 'reception', 'bridal'],
+              position: { x: 6, y: 4, z: 0 },
+              color: 0xffd4e5,
+              targetAudience: 'Weddings, engagement parties, vow renewals, bridal showers'
+            },
+            {
+              name: 'Birthday Bash',
+              category: 'celebration',
+              style: 'birthday_festive',
+              keywords: ['birthday', 'party', 'celebration', 'festive', 'milestone', 'anniversary'],
+              position: { x: 13, y: 4, z: 0 },
+              color: 0xffaa00,
+              targetAudience: 'Birthday parties, milestone celebrations, surprise parties'
+            },
+            {
+              name: 'Family Reunion',
+              category: 'celebration',
+              style: 'reunion_warm',
+              keywords: ['reunion', 'family', 'gathering', 'homecoming', 'heritage', 'legacy'],
+              position: { x: 20, y: 4, z: 0 },
+              color: 0x66aa44,
+              targetAudience: 'Family reunions, homecomings, memorial services, heritage events'
+            },
+            {
+              name: 'Career Milestone',
+              category: 'professional',
+              style: 'career_achievement',
+              keywords: ['promotion', 'job', 'career', 'achievement', 'LinkedIn', 'professional', 'raise'],
+              position: { x: -15, y: 4, z: -8 },
+              color: 0x0077b5,
+              targetAudience: 'Promotions, job placements, career fairs, LinkedIn events, salary negotiations'
+            },
+            {
+              name: 'Retirement Gala',
+              category: 'professional',
+              style: 'retirement_honor',
+              keywords: ['retirement', 'honor', 'legacy', 'farewell', 'milestone', 'career'],
+              position: { x: -8, y: 4, z: -8 },
+              color: 0xaa8844,
+              targetAudience: 'Retirement parties, farewell events, career retrospectives'
+            },
+            {
+              name: 'Graduation Ceremony',
+              category: 'celebration',
+              style: 'graduation_academic',
+              keywords: ['graduation', 'commencement', 'academic', 'achievement', 'diploma', 'degree'],
+              position: { x: -1, y: 4, z: -8 },
+              color: 0x4444aa,
+              targetAudience: 'Graduations, commencements, academic achievements, scholarships'
+            },
+            {
+              name: 'Holiday Festival',
+              category: 'celebration',
+              style: 'holiday_seasonal',
+              keywords: ['holiday', 'festival', 'seasonal', 'Christmas', 'Thanksgiving', 'celebration'],
+              position: { x: 6, y: 4, z: -8 },
+              color: 0xdd4444,
+              targetAudience: 'Holiday parties, seasonal celebrations, festival gatherings'
+            },
+            {
+              name: 'Charity Fundraiser',
+              category: 'professional',
+              style: 'charity_nonprofit',
+              keywords: ['charity', 'fundraiser', 'nonprofit', 'philanthropy', 'donation', 'cause'],
+              position: { x: 13, y: 4, z: -8 },
+              color: 0x44aa88,
+              targetAudience: 'Fundraising galas, charity auctions, nonprofit events'
+            },
+            {
+              name: 'Trade Show Booth',
+              category: 'business',
+              style: 'tradeshow_expo',
+              keywords: ['trade show', 'expo', 'exhibition', 'booth', 'B2B', 'vendor', 'showcase'],
+              position: { x: 20, y: 4, z: -8 },
+              color: 0xaa6644,
+              targetAudience: 'Trade shows, expos, vendor showcases, B2B exhibitions'
+            }
+          ],
+          interactionConfig: {
+            iframeEnabled: true,
+            scrollEnabled: true,
+            clickThrough: true,
+            proximityActivation: 3.5,  // Units from camera to activate iframe
+            displaySize: { width: 6, height: 4.5 },  // 3D plane size
+            resolution: { width: 1920, height: 1080 }  // Iframe resolution
+          },
+          partnershipOpportunities: [
+            {
+              name: 'LinkedIn Integration',
+              description: 'Career milestone celebrations, job placement announcements, professional networking events',
+              potential: 'Partner for professional event marketing, job fair showcases, career advancement tracking',
+              apis: ['LinkedIn API', 'Job Boards', 'Professional Networks']
+            },
+            {
+              name: 'Wedding Industry',
+              description: 'Bridal showcases, venue tours, vendor coordination, guest management',
+              potential: 'Partner with wedding planners, venues, photographers, caterers',
+              apis: ['Wedding Wire', 'The Knot', 'Eventbrite']
+            },
+            {
+              name: 'Corporate Events',
+              description: 'Conference planning, team building, product launches, shareholder meetings',
+              potential: 'Partner with event management companies, corporate venues, AV providers',
+              apis: ['Cvent', 'Bizzabo', 'Hopin']
+            },
+            {
+              name: 'Blockchain Ticketing',
+              description: 'NFT tickets, tokenized event access, proof of attendance, loyalty rewards',
+              potential: 'Integrate with ticket marketplaces, create exclusive digital collectibles',
+              apis: ['Polygon', 'Ethereum', 'IPFS']
+            }
+          ]
+        }
+      },
+      
       navigator: {
-        name: 'Matrix Prism Navigator',
+        name: 'Spherical Navigator',
         icon: '🎯',
-        description: '3D navigation hub - visual dimension selection',
+        description: 'Multi-layered spherical navigation - scroll to rotate layers, hover segments',
         backgroundColor: 0x000000,
         fogColor: 0x000000,
         fogNear: 5,
-        fogFar: 30,
-        cameraPosition: { x: 0, y: 8, z: 20 },
+        fogFar: 40,
+        cameraPosition: { x: 0, y: 0, z: 18 },
         cameraTarget: { x: 0, y: 0, z: 0 },
         gridConfig: {
           size: 60,
@@ -2319,15 +2504,87 @@
           wallOpacity: 0
         },
         lighting: {
-          ambient: { color: 0x202020, intensity: 0.3 },
-          directional: { color: 0xffffff, intensity: 0.5, position: { x: 10, y: 20, z: 10 } },
+          ambient: { color: 0x202020, intensity: 0.4 },
+          directional: { color: 0xffffff, intensity: 0.6, position: { x: 10, y: 20, z: 10 } },
           point: [
-            { color: 0x00ffff, intensity: 0.8, position: { x: 0, y: 0, z: 0 } },
-            { color: 0xff00ff, intensity: 0.6, position: { x: 10, y: 5, z: 10 } }
+            { color: 0x00ffff, intensity: 1.0, position: { x: 0, y: 0, z: 0 } },
+            { color: 0xff00ff, intensity: 0.8, position: { x: 10, y: 5, z: 10 } },
+            { color: 0xffff00, intensity: 0.7, position: { x: -10, y: -5, z: -10 } }
           ]
         },
-        previewText: 'Navigate dimensions spatially. Click preview cubes to enter worlds.',
-        isNavigator: true
+        previewText: 'Spherical dimension navigator. Scroll to rotate layers. Hover segments to explore.',
+        isNavigator: true,
+        sphericalNav: {
+          enabled: true,
+          radius: 8,
+          layers: [
+            {
+              name: 'SkyRelics Core',
+              category: 'skyrelics_core',
+              angle: 0,
+              dimensions: ['skyrelics', 'skyrelics_forge', 'skyrelics_sanctuary', 'skyrelics_observatory'],
+              color: 0x667eea,
+              icon: '🏰'
+            },
+            {
+              name: 'Environmental Worlds',
+              category: 'environments',
+              angle: 60,
+              dimensions: ['skyrelics_mirror', 'skyrelics_desert', 'skyrelics_tundra', 'skyrelics_monsoon'],
+              color: 0x4a90e2,
+              icon: '🌍'
+            },
+            {
+              name: 'Extreme Environments',
+              category: 'extreme',
+              angle: 120,
+              dimensions: ['skyrelics_mountain', 'skyrelics_space', 'skyrelics_underwater', 'skyrelics_volcanic'],
+              color: 0xe24a90,
+              icon: '⚡'
+            },
+            {
+              name: 'Tech & Crystal',
+              category: 'tech',
+              angle: 180,
+              dimensions: ['skyrelics_crystal_cave', 'skyrelics_cyberpunk'],
+              color: 0x9a4ae2,
+              icon: '💠'
+            },
+            {
+              name: 'Creative Tools',
+              category: 'creative',
+              angle: 240,
+              dimensions: ['wordweaver', 'anatomy', 'perfect'],
+              color: 0x4ae290,
+              icon: '✨'
+            },
+            {
+              name: 'Business & Events',
+              category: 'business',
+              angle: 300,
+              dimensions: ['venuespro'],
+              color: 0xe2904a,
+              icon: '🎪'
+            },
+            {
+              name: 'Game Worlds',
+              category: 'games',
+              angle: 360,
+              dimensions: ['skeletor_land'],
+              color: 0xaa00ff,
+              icon: '💀'
+            }
+          ],
+          segmentConfig: {
+            segmentsPerLayer: 8,
+            segmentHeight: 2.5,
+            segmentThickness: 0.3,
+            hoverScale: 1.3,
+            hoverGlow: 2.0,
+            rotationSpeed: 0.5,  // Degrees per scroll tick
+            transitionTime: 0.5  // Seconds for smooth rotation
+          }
+        }
       }
     };
 
@@ -4250,6 +4507,42 @@
             }
           }
         }
+        
+        // 🌐 Spherical Navigator: Check if clicking segment
+        const sphereGroup = dimensionalSpaces['navigator'].objects.find(
+          obj => obj.name === 'SphericalNavigator'
+        );
+        
+        if (sphereGroup) {
+          const sphereIntersects = raycaster.intersectObjects(sphereGroup.children, true);
+          
+          if (sphereIntersects.length > 0) {
+            // Find the segment group (traverse up from intersected mesh)
+            let segmentGroup = sphereIntersects[0].object;
+            while (segmentGroup && !segmentGroup.userData.isNavigatorSegment) {
+              segmentGroup = segmentGroup.parent;
+            }
+            
+            if (segmentGroup && segmentGroup.userData.dimensionKey) {
+              const targetDimension = segmentGroup.userData.dimensionKey;
+              const dimConfig = segmentGroup.userData.dimensionConfig;
+              console.log(`🌐 Spherical Navigator: Entering ${dimConfig.icon} ${dimConfig.name}`);
+              
+              // Switch to target dimension
+              switchDimension(targetDimension);
+              
+              // Update UI tabs
+              const targetTab = document.querySelector(
+                `.workspace-tab[data-dimension="${targetDimension}"]`
+              );
+              if (targetTab) {
+                switchDimensionUI(targetDimension, targetTab);
+              }
+              
+              return; // Don't process regular object clicks
+            }
+          }
+        }
       }
       
       // Check if clicking existing object to select it
@@ -4318,6 +4611,60 @@
       
       raycaster.setFromCamera(mouse, camera);
       
+      // 🌐 Check Spherical Navigator segments first (priority)
+      const sphereGroup = dimensionalSpaces['navigator'].objects.find(
+        obj => obj.name === 'SphericalNavigator'
+      );
+      
+      if (sphereGroup) {
+        const sphereIntersects = raycaster.intersectObjects(sphereGroup.children, true);
+        
+        // Reset all previous segment hovers
+        sphereGroup.userData.layers.forEach(layerGroup => {
+          layerGroup.userData.segments.forEach(segment => {
+            if (segment.userData.isHovered) {
+              segment.scale.copy(segment.userData.baseScale);
+              const glow = segment.getObjectByName('segmentGlow');
+              if (glow) glow.material.opacity = 0;
+              segment.userData.isHovered = false;
+            }
+          });
+        });
+        
+        if (sphereIntersects.length > 0) {
+          // Find the segment group (traverse up from intersected mesh)
+          let segmentGroup = sphereIntersects[0].object;
+          while (segmentGroup && !segmentGroup.userData.isNavigatorSegment) {
+            segmentGroup = segmentGroup.parent;
+          }
+          
+          if (segmentGroup) {
+            const navConfig = DIMENSIONAL_CONFIGS['navigator'];
+            const hoverScale = navConfig.sphericalNav.segmentConfig.hoverScale || 1.3;
+            const hoverGlow = navConfig.sphericalNav.segmentConfig.hoverGlow || 2.0;
+            
+            segmentGroup.scale.set(hoverScale, hoverScale, hoverScale);
+            const glow = segmentGroup.getObjectByName('segmentGlow');
+            if (glow) {
+              glow.material.opacity = 0.4;
+              glow.scale.set(hoverGlow, hoverGlow, hoverGlow);
+            }
+            segmentGroup.userData.isHovered = true;
+            canvas.style.cursor = 'pointer';
+            
+            // Show tooltip with dimension name and category
+            const dimConfig = segmentGroup.userData.dimensionConfig;
+            canvas.title = `${dimConfig.icon} ${dimConfig.name}\n${segmentGroup.userData.layerCategory}`;
+            return;
+          }
+        }
+        
+        canvas.style.cursor = 'default';
+        canvas.title = 'Scroll to rotate layers';
+        return;
+      }
+      
+      // Fallback: Check Matrix Prism Navigator (legacy cube grid)
       const navigatorGroup = dimensionalSpaces['navigator'].objects.find(
         obj => obj.name === 'MatrixPrismNavigator'
       );
@@ -4431,6 +4778,27 @@
     
     // Mouse wheel handler for wrist/hand rotation OR walking animation
     function onMouseWheel(event) {
+      // 🌐 Spherical Navigator: Rotate layers with scroll wheel
+      if (currentDimension === 'navigator' && dimensionalSpaces['navigator']) {
+        const sphereGroup = dimensionalSpaces['navigator'].objects.find(
+          obj => obj.name === 'SphericalNavigator'
+        );
+        
+        if (sphereGroup) {
+          event.preventDefault();
+          
+          const navConfig = DIMENSIONAL_CONFIGS['navigator'];
+          const rotationSpeed = navConfig.sphericalNav.segmentConfig.rotationSpeed || 0.5;
+          
+          // Scroll down = rotate clockwise (positive), scroll up = counter-clockwise (negative)
+          const delta = event.deltaY > 0 ? rotationSpeed : -rotationSpeed;
+          sphereGroup.userData.targetRotation += delta * (Math.PI / 180); // Convert degrees to radians
+          
+          console.log(`🌐 Spherical Navigator rotating ${delta > 0 ? 'clockwise ↻' : 'counter-clockwise ↺'} ${Math.abs(delta)}°`);
+          return;
+        }
+      }
+      
       // If hand is selected, rotate wrist
       if (selectedBodyPart && (bodyPartControlMode === 'leftHand' || bodyPartControlMode === 'rightHand')) {
         event.preventDefault();
@@ -9424,8 +9792,14 @@
       // Create master matrix grid (universal boundary)
       createMasterMatrixGrid();
       
-      // Create Matrix Prism Navigator
+      // Create Matrix Prism Navigator (legacy cube grid)
       createMatrixPrismNavigator();
+      
+      // Create Spherical Navigator (new rotating layers system)
+      createSphericalNavigator();
+      
+      // Create VenuesPro Interactive Gallery
+      createVenuesProGallery();
       
       // Load initial dimension (SkyRelics)
       switchDimension('skyrelics');
@@ -9433,7 +9807,9 @@
       console.log('\n✅ Dimensional Workspace System initialized!');
       console.log(`   → ${Object.keys(dimensionalSpaces).length} dimensions active`);
       console.log(`   → Master Matrix Grid: Universal boundary system`);
-      console.log(`   → Matrix Prism Navigator: 3D dimension selection`);
+      console.log(`   → Matrix Prism Navigator: 3D cube grid (legacy)`);
+      console.log(`   → Spherical Navigator: Rotating layers system (NEW!)`);
+      console.log(`   → VenuesPro Gallery: Interactive event showcases`);
       console.log(`   → Current dimension: ${currentDimension}\n`);
     }
     
@@ -9581,6 +9957,395 @@
         navigatorGroup.visible = false; // Hidden until navigator is active
         
         console.log(`\n✅ Matrix Prism Navigator created with ${dimensions.length} dimension previews`);
+      }
+    }
+    
+    /**
+     * � Create Spherical Navigator (Rotating Layers System)
+     * Multi-layered sphere with rotating segments - scroll to rotate, hover to interact
+     */
+    function createSphericalNavigator() {
+      console.log('\n🌐 Creating Spherical Navigator System...\n');
+      
+      const navConfig = DIMENSIONAL_CONFIGS['navigator'];
+      if (!navConfig || !navConfig.sphericalNav || !navConfig.sphericalNav.enabled) {
+        console.warn('⚠️ Spherical navigation not enabled');
+        return;
+      }
+      
+      const sphereGroup = new THREE.Group();
+      sphereGroup.name = 'SphericalNavigator';
+      
+      const sphereConfig = navConfig.sphericalNav;
+      const layers = sphereConfig.layers;
+      const segmentConfig = sphereConfig.segmentConfig;
+      const radius = sphereConfig.radius;
+      
+      // Store state for rotation
+      sphereGroup.userData.currentRotation = 0;
+      sphereGroup.userData.targetRotation = 0;
+      sphereGroup.userData.layers = [];
+      
+      layers.forEach((layer, layerIndex) => {
+        const layerGroup = new THREE.Group();
+        layerGroup.name = `layer_${layer.category}`;
+        layerGroup.userData.layerInfo = layer;
+        layerGroup.userData.segments = [];
+        
+        const dimensions = layer.dimensions;
+        const segmentCount = Math.min(dimensions.length, segmentConfig.segmentsPerLayer);
+        const angleStep = (Math.PI * 2) / segmentCount;
+        
+        console.log(`  📊 Layer ${layerIndex + 1}: ${layer.name} (${layer.icon}) - ${segmentCount} segments`);
+        
+        dimensions.forEach((dimKey, segmentIndex) => {
+          const dimConfig = DIMENSIONAL_CONFIGS[dimKey];
+          if (!dimConfig) return;
+          
+          const segmentGroup = new THREE.Group();
+          segmentGroup.name = `segment_${dimKey}`;
+          
+          // Calculate position on sphere surface
+          const angle = angleStep * segmentIndex;
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
+          const y = (layerIndex - layers.length / 2) * segmentConfig.segmentHeight;
+          
+          segmentGroup.position.set(x, y, z);
+          
+          // Create segment button (rounded box)
+          const segmentWidth = (Math.PI * 2 * radius) / segmentCount * 0.8; // 80% of arc length
+          const segmentGeometry = new THREE.BoxGeometry(
+            segmentWidth,
+            segmentConfig.segmentHeight * 0.8,
+            segmentConfig.segmentThickness
+          );
+          
+          const segmentMaterial = new THREE.MeshStandardMaterial({
+            color: layer.color,
+            metalness: 0.6,
+            roughness: 0.3,
+            emissive: layer.color,
+            emissiveIntensity: 0.4,
+            transparent: true,
+            opacity: 0.85
+          });
+          
+          const segmentMesh = new THREE.Mesh(segmentGeometry, segmentMaterial);
+          segmentMesh.lookAt(0, y, 0); // Face the center
+          segmentGroup.add(segmentMesh);
+          
+          // Create edge glow
+          const edgesGeometry = new THREE.EdgesGeometry(segmentGeometry);
+          const edgesMaterial = new THREE.LineBasicMaterial({ 
+            color: 0xffffff, 
+            linewidth: 2,
+            transparent: true,
+            opacity: 0.8
+          });
+          const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+          edges.lookAt(0, y, 0);
+          segmentGroup.add(edges);
+          
+          // Create icon sprite
+          const iconCanvas = document.createElement('canvas');
+          iconCanvas.width = 256;
+          iconCanvas.height = 256;
+          const iconCtx = iconCanvas.getContext('2d');
+          iconCtx.fillStyle = '#ffffff';
+          iconCtx.font = 'bold 120px Arial';
+          iconCtx.textAlign = 'center';
+          iconCtx.textBaseline = 'middle';
+          iconCtx.fillText(dimConfig.icon, 128, 128);
+          
+          const iconTexture = new THREE.CanvasTexture(iconCanvas);
+          const iconSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: iconTexture }));
+          iconSprite.scale.set(1.2, 1.2, 1);
+          iconSprite.position.z = segmentConfig.segmentThickness / 2 + 0.3;
+          segmentGroup.add(iconSprite);
+          
+          // Create text label
+          const labelCanvas = document.createElement('canvas');
+          labelCanvas.width = 512;
+          labelCanvas.height = 128;
+          const labelCtx = labelCanvas.getContext('2d');
+          
+          labelCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          labelCtx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
+          
+          labelCtx.fillStyle = '#ffffff';
+          labelCtx.font = 'bold 32px Arial';
+          labelCtx.textAlign = 'center';
+          labelCtx.textBaseline = 'middle';
+          
+          // Truncate long names
+          let displayName = dimConfig.name;
+          if (displayName.length > 20) {
+            displayName = displayName.substring(0, 18) + '...';
+          }
+          labelCtx.fillText(displayName, 256, 64);
+          
+          const labelTexture = new THREE.CanvasTexture(labelCanvas);
+          const labelGeometry = new THREE.PlaneGeometry(2, 0.5);
+          const labelMaterial = new THREE.MeshBasicMaterial({ 
+            map: labelTexture, 
+            transparent: true,
+            side: THREE.DoubleSide
+          });
+          const label = new THREE.Mesh(labelGeometry, labelMaterial);
+          label.position.y = -(segmentConfig.segmentHeight * 0.8) / 2 - 0.4;
+          label.lookAt(0, y, 0);
+          segmentGroup.add(label);
+          
+          // Create glow sphere for hover effect
+          const glowGeometry = new THREE.SphereGeometry(segmentWidth * 0.6, 16, 16);
+          const glowMaterial = new THREE.MeshBasicMaterial({
+            color: layer.color,
+            transparent: true,
+            opacity: 0,
+            side: THREE.BackSide
+          });
+          const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+          glow.name = 'segmentGlow';
+          segmentGroup.add(glow);
+          
+          // Store metadata
+          segmentGroup.userData.isNavigatorSegment = true;
+          segmentGroup.userData.dimensionKey = dimKey;
+          segmentGroup.userData.dimensionConfig = dimConfig;
+          segmentGroup.userData.layerCategory = layer.category;
+          segmentGroup.userData.layerColor = layer.color;
+          segmentGroup.userData.baseScale = new THREE.Vector3(1, 1, 1);
+          segmentGroup.userData.isHovered = false;
+          
+          layerGroup.add(segmentGroup);
+          layerGroup.userData.segments.push(segmentGroup);
+          
+          console.log(`    ✓ ${dimConfig.icon} ${displayName} segment at angle ${(angle * 180 / Math.PI).toFixed(1)}°`);
+        });
+        
+        sphereGroup.add(layerGroup);
+        sphereGroup.userData.layers.push(layerGroup);
+      });
+      
+      // Add central core sphere (visual anchor)
+      const coreGeometry = new THREE.SphereGeometry(1.5, 32, 32);
+      const coreMaterial = new THREE.MeshStandardMaterial({
+        color: 0x00ffff,
+        metalness: 0.9,
+        roughness: 0.1,
+        emissive: 0x00ffff,
+        emissiveIntensity: 0.5,
+        transparent: true,
+        opacity: 0.6
+      });
+      const coreSphere = new THREE.Mesh(coreGeometry, coreMaterial);
+      coreSphere.name = 'navigatorCore';
+      sphereGroup.add(coreSphere);
+      
+      // Add wireframe sphere outline
+      const wireframeGeometry = new THREE.SphereGeometry(radius + 0.5, 24, 24);
+      const wireframeMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.2
+      });
+      const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+      wireframe.name = 'sphereWireframe';
+      sphereGroup.add(wireframe);
+      
+      // Add to scene
+      if (dimensionalSpaces['navigator']) {
+        dimensionalSpaces['navigator'].objects.push(sphereGroup);
+        scene.add(sphereGroup);
+        sphereGroup.visible = false; // Hidden until navigator is active
+        
+        const totalSegments = layers.reduce((sum, layer) => sum + layer.dimensions.length, 0);
+        console.log(`\n✅ Spherical Navigator created!`);
+        console.log(`   → ${layers.length} layers with ${totalSegments} total segments`);
+        console.log(`   → Radius: ${radius} units`);
+        console.log(`   → Scroll to rotate • Hover to highlight • Click to enter\n`);
+      }
+      
+      return sphereGroup;
+    }
+    
+    /**
+     * �🎪 Create VenuesPro Interactive Webpage Gallery
+     * 3D displays showing different event/celebration webpage layouts
+     * Interactive iframes that activate on proximity for scrolling
+     */
+    function createVenuesProGallery() {
+      console.log('\n🎪 Creating VenuesPro Interactive Gallery...\n');
+      
+      const venueConfig = DIMENSIONAL_CONFIGS['venuespro'];
+      if (!venueConfig || !venueConfig.venueConfig) {
+        console.warn('⚠️ VenuesPro config not found');
+        return;
+      }
+      
+      const venueGroup = new THREE.Group();
+      venueGroup.name = 'VenuesProGallery';
+      
+      const layouts = venueConfig.venueConfig.layouts;
+      const displayConfig = venueConfig.venueConfig.interactionConfig;
+      
+      layouts.forEach((layout, index) => {
+        const displayGroup = new THREE.Group();
+        displayGroup.name = `venue_${layout.category}_${index}`;
+        
+        const { x, y, z } = layout.position;
+        displayGroup.position.set(x, y, z);
+        
+        // 1. Create display frame (border around the "screen")
+        const frameDepth = 0.3;
+        const frameThickness = 0.2;
+        const frameGeometry = new THREE.BoxGeometry(
+          displayConfig.displaySize.width + frameThickness,
+          displayConfig.displaySize.height + frameThickness,
+          frameDepth
+        );
+        const frameMaterial = new THREE.MeshStandardMaterial({
+          color: layout.color,
+          metalness: 0.8,
+          roughness: 0.2,
+          emissive: layout.color,
+          emissiveIntensity: 0.3
+        });
+        const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+        displayGroup.add(frame);
+        
+        // 2. Create display screen (canvas-based texture placeholder)
+        const canvas = document.createElement('canvas');
+        canvas.width = displayConfig.resolution.width;
+        canvas.height = displayConfig.resolution.height;
+        const ctx = canvas.getContext('2d');
+        
+        // Draw layout preview
+        ctx.fillStyle = `#${layout.color.toString(16).padStart(6, '0')}`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add gradient overlay
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, 'rgba(0,0,0,0.3)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.7)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw title
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 120px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(layout.name, canvas.width / 2, 250);
+        
+        // Draw category badge
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.font = 'bold 60px Arial';
+        ctx.fillText(layout.category.toUpperCase(), canvas.width / 2, 350);
+        
+        // Draw style keywords
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '40px Arial';
+        const keywordsText = layout.keywords.slice(0, 5).join(' • ');
+        ctx.fillText(keywordsText, canvas.width / 2, 450);
+        
+        // Draw target audience (wrapped text)
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.font = '36px Arial';
+        const audience = layout.targetAudience;
+        const maxWidth = canvas.width - 200;
+        const words = audience.split(' ');
+        let line = '';
+        let lineY = 600;
+        
+        words.forEach(word => {
+          const testLine = line + word + ' ';
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && line !== '') {
+            ctx.fillText(line, canvas.width / 2, lineY);
+            line = word + ' ';
+            lineY += 50;
+          } else {
+            line = testLine;
+          }
+        });
+        ctx.fillText(line, canvas.width / 2, lineY);
+        
+        // Draw interaction hint
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = 'italic 32px Arial';
+        ctx.fillText('🖱️ Approach to interact', canvas.width / 2, canvas.height - 100);
+        
+        const screenTexture = new THREE.CanvasTexture(canvas);
+        const screenGeometry = new THREE.PlaneGeometry(
+          displayConfig.displaySize.width,
+          displayConfig.displaySize.height
+        );
+        const screenMaterial = new THREE.MeshBasicMaterial({
+          map: screenTexture,
+          side: THREE.DoubleSide,
+          transparent: true
+        });
+        const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+        screen.position.z = frameDepth / 2 + 0.01; // Slightly in front of frame
+        displayGroup.add(screen);
+        
+        // 3. Add spotlight above display
+        const spotlight = new THREE.SpotLight(layout.color, 0.8);
+        spotlight.position.set(0, 4, 1);
+        spotlight.angle = Math.PI / 6;
+        spotlight.penumbra = 0.3;
+        spotlight.decay = 2;
+        spotlight.distance = 10;
+        spotlight.target = displayGroup;
+        displayGroup.add(spotlight);
+        
+        // 4. Add label below display
+        const labelCanvas = document.createElement('canvas');
+        labelCanvas.width = 1024;
+        labelCanvas.height = 128;
+        const labelCtx = labelCanvas.getContext('2d');
+        
+        labelCtx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        labelCtx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
+        
+        labelCtx.fillStyle = '#ffffff';
+        labelCtx.font = 'bold 48px Arial';
+        labelCtx.textAlign = 'center';
+        labelCtx.fillText(layout.name, labelCanvas.width / 2, 70);
+        
+        const labelTexture = new THREE.CanvasTexture(labelCanvas);
+        const labelGeometry = new THREE.PlaneGeometry(4, 0.5);
+        const labelMaterial = new THREE.MeshBasicMaterial({
+          map: labelTexture,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+        const label = new THREE.Mesh(labelGeometry, labelMaterial);
+        label.position.y = -(displayConfig.displaySize.height / 2) - 0.7;
+        displayGroup.add(label);
+        
+        // 5. Store metadata for interaction
+        displayGroup.userData.isVenueDisplay = true;
+        displayGroup.userData.layout = layout;
+        displayGroup.userData.canvasElement = canvas;
+        displayGroup.userData.proximityDistance = displayConfig.proximityActivation;
+        displayGroup.userData.iframeURL = `https://venuespro.example.com/${layout.style}`;  // Placeholder URL
+        
+        venueGroup.add(displayGroup);
+        
+        console.log(`  ✓ ${layout.name} display created at (${x}, ${y}, ${z}) - ${layout.category}`);
+      });
+      
+      // Add venue group to venuespro dimension
+      if (dimensionalSpaces['venuespro']) {
+        dimensionalSpaces['venuespro'].objects.push(venueGroup);
+        scene.add(venueGroup);
+        venueGroup.visible = false; // Hidden until venuespro is active
+        
+        console.log(`\n✅ VenuesPro Gallery created with ${layouts.length} interactive displays`);
+        console.log(`   → Partnership opportunities: ${venueConfig.venueConfig.partnershipOpportunities.length} identified`);
       }
     }
     
@@ -9998,7 +10763,7 @@
         marker.position.y = 0.2 + Math.sin(time * 3) * 0.1;
       }
       
-      // 🎯 Animate Matrix Prism Navigator cubes
+      // 🎯 Animate Matrix Prism Navigator cubes (legacy)
       if (currentDimension === 'navigator') {
         const navigatorGroup = space.objects.find(obj => obj.name === 'MatrixPrismNavigator');
         
@@ -10019,6 +10784,110 @@
               // Subtle floating motion
               const floatAmount = Math.sin(time * 1.5 + index * 0.3) * 0.1;
               cubeGroup.position.y = floatAmount;
+            }
+          });
+        }
+        
+        // 🌐 Animate Spherical Navigator (new rotating layers system)
+        const sphereGroup = space.objects.find(obj => obj.name === 'SphericalNavigator');
+        
+        if (sphereGroup) {
+          const navConfig = DIMENSIONAL_CONFIGS['navigator'];
+          const transitionTime = navConfig.sphericalNav.segmentConfig.transitionTime || 0.5;
+          
+          // Smooth rotation towards target
+          const rotationDiff = sphereGroup.userData.targetRotation - sphereGroup.userData.currentRotation;
+          if (Math.abs(rotationDiff) > 0.001) {
+            const rotationSpeed = rotationDiff * (1 / (transitionTime * 60)); // 60 fps assumption
+            sphereGroup.userData.currentRotation += rotationSpeed;
+            sphereGroup.rotation.y = sphereGroup.userData.currentRotation;
+          }
+          
+          // Animate central core sphere
+          const core = sphereGroup.getObjectByName('navigatorCore');
+          if (core) {
+            core.rotation.y += 0.01;
+            core.rotation.x += 0.005;
+            
+            // Pulsing glow
+            const pulseScale = 1 + Math.sin(time * 3) * 0.1;
+            core.scale.set(pulseScale, pulseScale, pulseScale);
+            core.material.emissiveIntensity = 0.5 + Math.sin(time * 2) * 0.2;
+          }
+          
+          // Animate wireframe sphere
+          const wireframe = sphereGroup.getObjectByName('sphereWireframe');
+          if (wireframe) {
+            wireframe.rotation.y -= 0.003;
+            wireframe.rotation.x += 0.002;
+            wireframe.material.opacity = 0.2 + Math.sin(time * 1.5) * 0.1;
+          }
+          
+          // Animate segments (gentle pulsing for non-hovered)
+          sphereGroup.userData.layers.forEach((layerGroup, layerIndex) => {
+            layerGroup.userData.segments.forEach((segment, segmentIndex) => {
+              if (!segment.userData.isHovered) {
+                // Gentle pulsing emissive intensity
+                const meshes = segment.children.filter(child => child.type === 'Mesh' && child.material.emissive);
+                meshes.forEach(mesh => {
+                  const phaseOffset = layerIndex * 0.5 + segmentIndex * 0.3;
+                  mesh.material.emissiveIntensity = 0.4 + Math.sin(time * 2 + phaseOffset) * 0.1;
+                });
+                
+                // Very subtle breathing scale
+                const breatheScale = 1 + Math.sin(time + segmentIndex * 0.5) * 0.02;
+                segment.scale.set(breatheScale, breatheScale, breatheScale);
+              }
+            });
+          });
+        }
+      }
+      
+      // 🎪 VenuesPro Gallery: Proximity-based interaction and animation
+      if (currentDimension === 'venuespro') {
+        const venueGroup = space.objects.find(obj => obj.name === 'VenuesProGallery');
+        
+        if (venueGroup) {
+          venueGroup.children.forEach((displayGroup, index) => {
+            if (displayGroup.userData.isVenueDisplay) {
+              // Calculate distance from camera
+              const cameraPos = new THREE.Vector3();
+              camera.getWorldPosition(cameraPos);
+              const displayPos = new THREE.Vector3();
+              displayGroup.getWorldPosition(displayPos);
+              const distance = cameraPos.distanceTo(displayPos);
+              
+              // Get frame for proximity effects
+              const frame = displayGroup.children.find(child => child.geometry && child.geometry.type === 'BoxGeometry');
+              
+              if (frame) {
+                // Proximity-based glow intensity
+                const proximityRange = displayGroup.userData.proximityDistance || 3.5;
+                const proximityFactor = Math.max(0, 1 - (distance / proximityRange));
+                
+                // Update emissive intensity based on proximity
+                if (proximityFactor > 0) {
+                  frame.material.emissiveIntensity = 0.3 + proximityFactor * 0.7;
+                  
+                  // Show interaction indicator when very close
+                  if (proximityFactor > 0.7) {
+                    console.log(`🎪 Near ${displayGroup.userData.layout.name} - Distance: ${distance.toFixed(2)}`);
+                  }
+                } else {
+                  frame.material.emissiveIntensity = 0.3;
+                }
+              }
+              
+              // Gentle pulsing animation
+              const spotlight = displayGroup.children.find(child => child.type === 'SpotLight');
+              if (spotlight) {
+                spotlight.intensity = 0.8 + Math.sin(time * 2 + index * 0.4) * 0.2;
+              }
+              
+              // Subtle hover animation
+              const baseY = displayGroup.userData.layout.position.y;
+              const hoverAmount = Math.sin(time * 1 + index * 0.5) * 0.05;
+              displayGroup.position.y = baseY + hoverAmount;
             }
           });
         }
