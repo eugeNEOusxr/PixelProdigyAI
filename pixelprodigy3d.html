@@ -4290,17 +4290,111 @@
         emissiveIntensity: 0.3
       });
       
-      console.log('\n🦴 ===== BUILDING DETAILED ANATOMICAL SKELETON =====\n');
+      console.log('\n🦴 ===== BUILDING HIERARCHICAL ANATOMICAL SKELETON =====\n');
+      console.log('🔗 Using parent-child bone relationships for realistic movement\n');
       
-      // === DETAILED FEMURS (Thigh Bones) ===
+      // === PELVIS (ROOT OF HIERARCHY) ===
+      console.log('🦴 Creating pelvis (root bone)...');
+      const pelvisGroup = new THREE.Group();
+      pelvisGroup.name = 'Pelvis (Hip Bone)';
+      pelvisGroup.userData.description = 'Ring-like bony structure connecting spine to lower limbs';
+      pelvisGroup.userData.anatomical = {
+        type: 'Composite Structure',
+        bones: ['Ilium (2)', 'Ischium (2)', 'Pubis (2)', 'Sacrum', 'Coccyx'],
+        function: 'Weight bearing, birth canal, muscle attachment'
+      };
+      
+      // Main pelvis body (representing ilium wings)
+      const pelvisGeom = new THREE.SphereGeometry(0.5, 16, 16);
+      const pelvisMain = new THREE.Mesh(pelvisGeom, boneMat);
+      pelvisMain.name = 'Pelvis Main Body (Ilium)';
+      pelvisMain.userData.description = 'Largest part of hip bone, iliac crests';
+      pelvisMain.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Hip wings',
+        landmarks: ['Iliac Crest', 'ASIS (Anterior Superior Iliac Spine)', 'PSIS (Posterior Superior Iliac Spine)'],
+        function: 'Broad surface for muscle attachment'
+      };
+      pelvisMain.scale.set(1.3, 0.65, 0.9);
+      pelvisGroup.add(pelvisMain);
+      
+      // Sacrum (fused vertebrae)
+      const sacrumGeom = new THREE.BoxGeometry(0.35, 0.5, 0.15);
+      const sacrum = new THREE.Mesh(sacrumGeom, boneMat);
+      sacrum.name = 'Sacrum (Fused S1-S5)';
+      sacrum.userData.description = '5 fused vertebrae forming posterior pelvis';
+      sacrum.userData.anatomical = {
+        type: 'Irregular Bone (Fused)',
+        vertebrae: ['S1', 'S2', 'S3', 'S4', 'S5'],
+        articulations: ['L5 (lumbar)', 'Ilium (sacroiliac joint)', 'Coccyx'],
+        function: 'Connects spine to pelvis, supports upper body weight'
+      };
+      sacrum.position.set(0, 0, -0.35);
+      pelvisGroup.add(sacrum);
+      
+      // Coccyx (tailbone)
+      const coccyxGeom = new THREE.CylinderGeometry(0.03, 0.02, 0.15, 8);
+      const coccyx = new THREE.Mesh(coccyxGeom, boneMat);
+      coccyx.name = 'Coccyx (Tailbone)';
+      coccyx.userData.description = '3-5 fused vertebrae, vestigial tail';
+      coccyx.userData.anatomical = {
+        type: 'Irregular Bone (Fused)',
+        location: 'Inferior to sacrum',
+        articulations: ['Sacrum'],
+        function: 'Attachment for pelvic floor muscles, ligaments'
+      };
+      coccyx.position.set(0, -0.35, -0.45);
+      coccyx.rotation.x = Math.PI / 8;
+      pelvisGroup.add(coccyx);
+      
+      // Ischium (sitting bones)
+      const ischiumGeom = new THREE.SphereGeometry(0.12, 10, 10);
+      const leftIschium = new THREE.Mesh(ischiumGeom, boneMat);
+      leftIschium.name = 'Left Ischium (Sitting Bone)';
+      leftIschium.userData.description = 'Inferior posterior hip bone, bears weight when sitting';
+      leftIschium.position.set(-0.35, -0.25, 0.1);
+      pelvisGroup.add(leftIschium);
+      
+      const rightIschium = new THREE.Mesh(ischiumGeom, boneMat);
+      rightIschium.name = 'Right Ischium (Sitting Bone)';
+      rightIschium.userData.description = 'Inferior posterior hip bone, bears weight when sitting';
+      rightIschium.position.set(0.35, -0.25, 0.1);
+      pelvisGroup.add(rightIschium);
+      
+      // Pubis (pubic bones)
+      const pubisGeom = new THREE.TorusGeometry(0.25, 0.03, 8, 16, Math.PI);
+      const pubis = new THREE.Mesh(pubisGeom, boneMat);
+      pubis.name = 'Pubis (Pubic Arch)';
+      pubis.userData.description = 'Anterior hip bones forming pubic symphysis';
+      pubis.userData.anatomical = {
+        type: 'Flat Bone',
+        location: 'Anterior pelvis',
+        articulations: ['Opposite pubis at symphysis'],
+        function: 'Forms anterior pelvic ring, protects pelvic organs'
+      };
+      pubis.position.set(0, -0.25, 0.45);
+      pubis.rotation.x = Math.PI / 2;
+      pelvisGroup.add(pubis);
+      
+      // Position pelvis at hip height (absolute world position)
+      pelvisGroup.position.y = 8.2;
+      skeletonGroup.add(pelvisGroup);
+      totalVertices += 16 * 16 + 8 + 8 + 10 * 10 * 2 + 8 * 16;
+      console.log(`  ✓ Pelvis: 1 structure (Ilium, Ischium, Pubis, Sacrum, Coccyx)`);
+      
+      // === DETAILED FEMURS (Thigh Bones) - Parented to pelvis ===
       console.log('🦴 Creating detailed femurs...');
       const leftFemur = createDetailedFemur('Left', boneMat);
-      leftFemur.position.set(-0.4, 7.5, 0);
-      skeletonGroup.add(leftFemur);
+      leftFemur.position.set(-0.4, -0.3, 0); // Relative to pelvis
+      leftFemur.userData.jointType = 'hip';
+      leftFemur.userData.side = 'Left';
+      pelvisGroup.add(leftFemur); // ✅ HIERARCHY: Pelvis → Femur
       
       const rightFemur = createDetailedFemur('Right', boneMat);
-      rightFemur.position.set(0.4, 7.5, 0);
-      skeletonGroup.add(rightFemur);
+      rightFemur.position.set(0.4, -0.3, 0); // Relative to pelvis
+      rightFemur.userData.jointType = 'hip';
+      rightFemur.userData.side = 'Right';
+      pelvisGroup.add(rightFemur); // ✅ HIERARCHY: Pelvis → Femur
       
       // Count femur vertices
       let femurVertices = 0;
@@ -4373,13 +4467,24 @@
         return group;
       }
       
+      // Create tibia/fibula groups (will be parented to femurs)
       const leftTibFib = createDetailedTibiaFibula('Left');
-      leftTibFib.position.set(-0.4, 4, 0);
-      skeletonGroup.add(leftTibFib);
+      leftTibFib.position.set(0, -4.0, 0); // Relative to femur (knee position)
+      leftTibFib.userData.jointType = 'knee';
+      leftTibFib.userData.side = 'Left';
+      // Parent to femur to create hierarchy
+      leftFemur.add(leftTibFib); // ✅ HIERARCHY: Femur → Tibia/Fibula
       
       const rightTibFib = createDetailedTibiaFibula('Right');
-      rightTibFib.position.set(0.4, 4, 0);
-      skeletonGroup.add(rightTibFib);
+      rightTibFib.position.set(0, -4.0, 0); // Relative to femur (knee position)
+      rightTibFib.userData.jointType = 'knee';
+      rightTibFib.userData.side = 'Right';
+      // Parent to femur to create hierarchy
+      rightFemur.add(rightTibFib); // ✅ HIERARCHY: Femur → Tibia/Fibula
+      
+      // Store joint references in userData for easy animation access
+      leftFemur.userData.knee = leftTibFib;
+      rightFemur.userData.knee = rightTibFib;
       
       let tibFibVertices = 0;
       leftTibFib.traverse(child => {
@@ -4546,94 +4651,6 @@
       totalVertices += 24 * 20 * 8; // 24 ribs, 20 segments, 8 sides
       console.log(`  ✓ Ribs: 24 bones (12 pairs)`);
       
-      // === PELVIS ===
-      console.log('🦴 Creating pelvis...');
-      const pelvisGroup = new THREE.Group();
-      pelvisGroup.name = 'Pelvis (Hip Bone)';
-      pelvisGroup.userData.description = 'Ring-like bony structure connecting spine to lower limbs';
-      pelvisGroup.userData.anatomical = {
-        type: 'Composite Structure',
-        bones: ['Ilium (2)', 'Ischium (2)', 'Pubis (2)', 'Sacrum', 'Coccyx'],
-        function: 'Weight bearing, birth canal, muscle attachment'
-      };
-      
-      // Main pelvis body (representing ilium wings)
-      const pelvisGeom = new THREE.SphereGeometry(0.5, 16, 16);
-      const pelvis = new THREE.Mesh(pelvisGeom, boneMat);
-      pelvis.name = 'Pelvis Main Body (Ilium)';
-      pelvis.userData.description = 'Largest part of hip bone, iliac crests';
-      pelvis.userData.anatomical = {
-        type: 'Flat Bone',
-        location: 'Hip wings',
-        landmarks: ['Iliac Crest', 'ASIS (Anterior Superior Iliac Spine)', 'PSIS (Posterior Superior Iliac Spine)'],
-        function: 'Broad surface for muscle attachment'
-      };
-      pelvis.scale.set(1.3, 0.65, 0.9);
-      pelvisGroup.add(pelvis);
-      
-      // Sacrum (fused vertebrae)
-      const sacrumGeom = new THREE.BoxGeometry(0.35, 0.5, 0.15);
-      const sacrum = new THREE.Mesh(sacrumGeom, boneMat);
-      sacrum.name = 'Sacrum (Fused S1-S5)';
-      sacrum.userData.description = '5 fused vertebrae forming posterior pelvis';
-      sacrum.userData.anatomical = {
-        type: 'Irregular Bone (Fused)',
-        vertebrae: ['S1', 'S2', 'S3', 'S4', 'S5'],
-        articulations: ['L5 (lumbar)', 'Ilium (sacroiliac joint)', 'Coccyx'],
-        function: 'Connects spine to pelvis, supports upper body weight'
-      };
-      sacrum.position.set(0, 0, -0.35);
-      pelvisGroup.add(sacrum);
-      
-      // Coccyx (tailbone)
-      const coccyxGeom = new THREE.CylinderGeometry(0.03, 0.02, 0.15, 8);
-      const coccyx = new THREE.Mesh(coccyxGeom, boneMat);
-      coccyx.name = 'Coccyx (Tailbone)';
-      coccyx.userData.description = '3-5 fused vertebrae, vestigial tail';
-      coccyx.userData.anatomical = {
-        type: 'Irregular Bone (Fused)',
-        location: 'Inferior to sacrum',
-        articulations: ['Sacrum'],
-        function: 'Attachment for pelvic floor muscles, ligaments'
-      };
-      coccyx.position.set(0, -0.35, -0.45);
-      coccyx.rotation.x = Math.PI / 8;
-      pelvisGroup.add(coccyx);
-      
-      // Ischium (sitting bones) - represented as lower protrusions
-      const ischiumGeom = new THREE.SphereGeometry(0.12, 10, 10);
-      const leftIschium = new THREE.Mesh(ischiumGeom, boneMat);
-      leftIschium.name = 'Left Ischium (Sitting Bone)';
-      leftIschium.userData.description = 'Inferior posterior hip bone, bears weight when sitting';
-      leftIschium.position.set(-0.35, -0.25, 0.1);
-      pelvisGroup.add(leftIschium);
-      
-      const rightIschium = new THREE.Mesh(ischiumGeom, boneMat);
-      rightIschium.name = 'Right Ischium (Sitting Bone)';
-      rightIschium.userData.description = 'Inferior posterior hip bone, bears weight when sitting';
-      rightIschium.position.set(0.35, -0.25, 0.1);
-      pelvisGroup.add(rightIschium);
-      
-      // Pubis (pubic bones) - represented as anterior arch
-      const pubisGeom = new THREE.TorusGeometry(0.25, 0.03, 8, 16, Math.PI);
-      const pubis = new THREE.Mesh(pubisGeom, boneMat);
-      pubis.name = 'Pubis (Pubic Arch)';
-      pubis.userData.description = 'Anterior hip bones forming pubic symphysis';
-      pubis.userData.anatomical = {
-        type: 'Flat Bone',
-        location: 'Anterior pelvis',
-        articulations: ['Opposite pubis at symphysis'],
-        function: 'Forms anterior pelvic ring, protects pelvic organs'
-      };
-      pubis.position.set(0, -0.25, 0.45);
-      pubis.rotation.x = Math.PI / 2;
-      pelvisGroup.add(pubis);
-      
-      pelvisGroup.position.y = 8.2;
-      skeletonGroup.add(pelvisGroup);
-      totalVertices += 16 * 16 + 8 + 8 + 10 * 10 * 2 + 8 * 16;
-      console.log(`  ✓ Pelvis: 1 structure (Ilium, Ischium, Pubis, Sacrum, Coccyx)`);
-      
       // === DETAILED HUMERUS (Upper Arm) ===
       console.log('🦴 Creating detailed humeri...');
       
@@ -4711,12 +4728,16 @@
       }
       
       const leftHumerus = createDetailedHumerus('Left');
-      leftHumerus.position.set(-1.2, 12, 0);
-      skeletonGroup.add(leftHumerus);
+      leftHumerus.position.set(0, -0.5, 0); // Relative to scapula (shoulder socket)
+      leftHumerus.userData.jointType = 'shoulder';
+      leftHumerus.userData.side = 'Left';
+      leftScapula.add(leftHumerus); // ✅ HIERARCHY: Scapula → Humerus
       
       const rightHumerus = createDetailedHumerus('Right');
-      rightHumerus.position.set(1.2, 12, 0);
-      skeletonGroup.add(rightHumerus);
+      rightHumerus.position.set(0, -0.5, 0); // Relative to scapula (shoulder socket)
+      rightHumerus.userData.jointType = 'shoulder';
+      rightHumerus.userData.side = 'Right';
+      rightScapula.add(rightHumerus); // ✅ HIERARCHY: Scapula → Humerus
       
       let humerusVertices = 0;
       leftHumerus.traverse(child => {
@@ -4773,12 +4794,20 @@
       }
       
       const leftForearm = createForearm('Left');
-      leftForearm.position.set(-1.2, 8.5, 0);
-      skeletonGroup.add(leftForearm);
+      leftForearm.position.set(0, -3.5, 0); // Relative to humerus (elbow position)
+      leftForearm.userData.jointType = 'elbow';
+      leftForearm.userData.side = 'Left';
+      leftHumerus.add(leftForearm); // ✅ HIERARCHY: Humerus → Forearm
       
       const rightForearm = createForearm('Right');
-      rightForearm.position.set(1.2, 8.5, 0);
-      skeletonGroup.add(rightForearm);
+      rightForearm.position.set(0, -3.5, 0); // Relative to humerus (elbow position)
+      rightForearm.userData.jointType = 'elbow';
+      rightForearm.userData.side = 'Right';
+      rightHumerus.add(rightForearm); // ✅ HIERARCHY: Humerus → Forearm
+      
+      // Store joint references for animation
+      leftHumerus.userData.elbow = leftForearm;
+      rightHumerus.userData.elbow = rightForearm;
       
       totalVertices += (12 * 20 * 2 + 100) * 2; // Approx for both forearms
       console.log(`  ✓ Radius & Ulna (both sides): 4 bones`);
@@ -4833,12 +4862,20 @@
       }
       
       const leftHand = createHand('Left');
-      leftHand.position.set(-1.2, 5.2, 0);
-      skeletonGroup.add(leftHand);
+      leftHand.position.set(0, -3.3, 0); // Relative to forearm (wrist position)
+      leftHand.userData.jointType = 'wrist';
+      leftHand.userData.side = 'Left';
+      leftForearm.add(leftHand); // ✅ HIERARCHY: Forearm → Hand
       
       const rightHand = createHand('Right');
-      rightHand.position.set(1.2, 5.2, 0);
-      skeletonGroup.add(rightHand);
+      rightHand.position.set(0, -3.3, 0); // Relative to forearm (wrist position)
+      rightHand.userData.jointType = 'wrist';
+      rightHand.userData.side = 'Right';
+      rightForearm.add(rightHand); // ✅ HIERARCHY: Forearm → Hand
+      
+      // Store wrist joint references for animation
+      leftForearm.userData.wrist = leftHand;
+      rightForearm.userData.wrist = rightHand;
       
       totalVertices += (8 + 5 * 6 + 15 * 6) * 2; // Both hands
       console.log(`  ✓ Hand bones (both): Carpals, Metacarpals, Phalanges`);
@@ -4964,13 +5001,24 @@
         return group;
       }
       
+      // Create feet (will be parented to tibia/fibula groups)
       const leftFoot = createFoot('Left');
-      leftFoot.position.set(-0.4, 0.5, 0);
-      skeletonGroup.add(leftFoot);
+      leftFoot.position.set(0, -3.8, 0); // Relative to tibia/fibula (ankle position)
+      leftFoot.userData.jointType = 'ankle';
+      leftFoot.userData.side = 'Left';
+      // Parent to tibia/fibula to create hierarchy
+      leftTibFib.add(leftFoot); // ✅ HIERARCHY: Tibia/Fibula → Foot
       
       const rightFoot = createFoot('Right');
-      rightFoot.position.set(0.4, 0.5, 0);
-      skeletonGroup.add(rightFoot);
+      rightFoot.position.set(0, -3.8, 0); // Relative to tibia/fibula (ankle position)
+      rightFoot.userData.jointType = 'ankle';
+      rightFoot.userData.side = 'Right';
+      // Parent to tibia/fibula to create hierarchy
+      rightTibFib.add(rightFoot); // ✅ HIERARCHY: Tibia/Fibula → Foot
+      
+      // Store joint references for easy animation access
+      leftTibFib.userData.ankle = leftFoot;
+      rightTibFib.userData.ankle = rightFoot;
       
       totalVertices += (8 + 8 + 5 * 8 + 5 * 6) * 2; // Both feet
       console.log(`  ✓ Foot bones (both): Tarsals, Calcaneus, Metatarsals, Phalanges`);
@@ -5035,6 +5083,10 @@
       };
       rightScapula.position.set(0.6, 14.5, -0.2);
       skeletonGroup.add(rightScapula);
+      
+      // Store shoulder references for joint parenting
+      leftClavicle.userData.shoulder = leftScapula;
+      rightClavicle.userData.shoulder = rightScapula;
       
       totalVertices += (10 * 20 * 2) + (8 * 2); // Clavicles + scapulae
       console.log(`  ✓ Clavicles & Scapulae: 4 bones`);
@@ -5152,6 +5204,12 @@
       // Store references for animation
       leftLegGroup = leftFemur;
       rightLegGroup = rightFemur;
+      
+      // Wire detailed arm bones to animation system
+      leftArmGroupRef = leftHumerus; // Shoulder swing
+      rightArmGroupRef = rightHumerus;
+      leftForearmGroup = leftForearm; // Elbow bend
+      rightForearmGroup = rightForearm;
       
       // Update UI
       updateObjectCount();
