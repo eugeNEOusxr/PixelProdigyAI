@@ -364,6 +364,16 @@
             </div>
           </div>
 
+          <!-- Quick Actions for Bodies -->
+          <div style="margin-bottom: 15px;">
+            <button onclick="analyzeFullBody()" style="width: 100%; padding: 10px; background: linear-gradient(135deg, rgba(255, 64, 129, 0.3), rgba(63, 81, 181, 0.3)); border: 2px solid rgba(255, 64, 129, 0.5); border-radius: 5px; color: #fff; cursor: pointer; margin-bottom: 8px; font-weight: bold;">
+              🧍 Analyze Full Body
+            </button>
+            <button onclick="analyzeSkeletonBody()" style="width: 100%; padding: 10px; background: linear-gradient(135deg, rgba(200, 200, 200, 0.3), rgba(100, 100, 100, 0.3)); border: 2px solid rgba(200, 200, 200, 0.5); border-radius: 5px; color: #fff; cursor: pointer; font-weight: bold;">
+              💀 Analyze Skeleton Body
+            </button>
+          </div>
+
           <!-- Vertex Visualization -->
           <div style="margin-bottom: 15px;">
             <label style="display: flex; align-items: center; gap: 10px; color: #fff; margin-bottom: 8px;">
@@ -439,9 +449,13 @@
           </div>
 
           <!-- Export Vertex Data -->
-          <button onclick="exportVertexData()" style="width: 100%; padding: 10px; background: rgba(0, 200, 0, 0.3); border: 2px solid rgba(0, 200, 0, 0.5); border-radius: 5px; color: #fff; cursor: pointer; margin-bottom: 8px;">
+          <button onclick="smartExportVertices()" style="width: 100%; padding: 10px; background: rgba(0, 200, 0, 0.3); border: 2px solid rgba(0, 200, 0, 0.5); border-radius: 5px; color: #fff; cursor: pointer; margin-bottom: 8px;">
             💾 Export Vertex Coordinates (JSON)
           </button>
+          
+          <div style="font-size: 0.8em; color: #888; margin-bottom: 8px; text-align: center;">
+            Exports selected object or entire body if body is loaded
+          </div>
 
           <!-- Vertex Info Display -->
           <div id="vertexInfoDisplay" style="background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 5px; font-family: monospace; font-size: 0.75em; color: #0ff; max-height: 200px; overflow-y: auto; display: none;">
@@ -2857,6 +2871,7 @@
       console.log(`     • A/D or ←/→ = Turn body left/right`);
       console.log(`     • W/S or ↑/↓ = Speed up/slow down`);
       console.log(`     • Camera follows body automatically`);
+      console.log(`\n🔬 VERTEX ENGINE: Click 🔬 button, then click any bone to inspect vertices!`);
     }
 
     // Load skeleton body (bones only - for enemies/friends in Sky Relics)
@@ -3223,6 +3238,7 @@
       console.log(`  → Cranium, Mandible with teeth`);
       console.log(`  → Carpals, Metacarpals, Phalanges (Hands)`);
       console.log(`  → Tarsals, Metatarsals, Phalanges (Feet)`);
+      console.log(`\n🔬 VERTEX ENGINE: Click 🔬 button, then click any bone to inspect vertices!`);
     }
 
     function updateSize(value) {
@@ -3277,6 +3293,44 @@
 
     function analyzeObjectVertices(object) {
       if (!object || !object.geometry) {
+        // Check if this is a group (like fullBodyGroup)
+        if (object && object.children && object.children.length > 0) {
+          console.log(`\n🔬 GROUP ANALYSIS: ${object.name || 'Body Group'}`);
+          console.log(`→ Contains ${object.children.length} child objects`);
+          
+          let totalVertices = 0;
+          const bodyParts = [];
+          
+          // Recursively count all vertices in hierarchy
+          object.traverse((child) => {
+            if (child.geometry) {
+              const posAttr = child.geometry.getAttribute('position');
+              if (posAttr) {
+                const vCount = posAttr.count;
+                totalVertices += vCount;
+                bodyParts.push({
+                  name: child.name || child.type || 'Unnamed',
+                  vertices: vCount,
+                  object: child
+                });
+              }
+            }
+          });
+          
+          console.log(`→ Total Vertices in Body: ${totalVertices}`);
+          console.log(`\n📋 BODY PARTS (Click individual bones to inspect):`);
+          bodyParts.forEach(part => {
+            console.log(`  • ${part.name}: ${part.vertices} vertices`);
+          });
+          
+          // Update UI
+          document.getElementById('vertexObjectName').textContent = `${object.name || 'Body'} (${bodyParts.length} parts)`;
+          document.getElementById('vertexTotalCount').textContent = `${totalVertices} (across all bones)`;
+          
+          console.log(`\n💡 TIP: Click individual bones (femur, skull, ribs, etc.) to see their vertices!`);
+          return;
+        }
+        
         console.warn('⚠️ No geometry found on this object');
         return;
       }
@@ -3313,6 +3367,21 @@
       if (vertexCount > 10) {
         console.log(`  ... ${vertexCount - 10} more vertices`);
       }
+      
+      // Show vertex density info
+      if (geometry.boundingBox === null) {
+        geometry.computeBoundingBox();
+      }
+      const bbox = geometry.boundingBox;
+      const size = new THREE.Vector3();
+      bbox.getSize(size);
+      const volume = size.x * size.y * size.z;
+      const density = (vertexCount / volume).toFixed(2);
+      
+      console.log(`\n📊 MESH STATISTICS:`);
+      console.log(`  • Bounding Box: ${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)}`);
+      console.log(`  • Vertex Density: ${density} vertices/unit³`);
+      console.log(`  • Triangle Count: ${vertexCount / 3} (approx)`);
     }
 
     function toggleVertexVisualization(show) {
@@ -3519,6 +3588,118 @@
       const preview = document.getElementById('vertexInfoDisplay');
       preview.style.display = 'block';
       preview.textContent = json.substring(0, 1000) + '\n...\n(Download complete file)';
+    }
+    
+    // Smart export - detects if body is loaded and exports entire hierarchy
+    function smartExportVertices() {
+      if (window.fullBodyGroup) {
+        // Export entire body
+        exportBodyVertexData();
+      } else if (transformControl.object && transformControl.object.geometry) {
+        // Export single object
+        exportVertexData();
+      } else {
+        alert('⚠️ Please select an object or load a body first!');
+      }
+    }
+    
+    // ========================================
+    // BODY-SPECIFIC VERTEX ANALYSIS
+    // ========================================
+    
+    function analyzeFullBody() {
+      if (!window.fullBodyGroup) {
+        alert('⚠️ No full body loaded! Click 🧍 FULL BODY button first.');
+        return;
+      }
+      
+      console.log('\n🧍 ===== FULL BODY VERTEX ANALYSIS =====');
+      analyzeObjectVertices(window.fullBodyGroup);
+      
+      // Auto-enable vertex engine if not active
+      if (!vertexEngineActive) {
+        toggleVertexEngine();
+      }
+    }
+    
+    function analyzeSkeletonBody() {
+      if (!window.fullBodyGroup) {
+        alert('⚠️ No skeleton body loaded! Click 💀 BONES BODY button first.');
+        return;
+      }
+      
+      console.log('\n💀 ===== SKELETON BODY VERTEX ANALYSIS =====');
+      analyzeObjectVertices(window.fullBodyGroup);
+      
+      // Auto-enable vertex engine if not active
+      if (!vertexEngineActive) {
+        toggleVertexEngine();
+      }
+    }
+    
+    // Export entire body's vertex data (all bones)
+    function exportBodyVertexData() {
+      if (!window.fullBodyGroup) {
+        alert('⚠️ No body loaded!');
+        return;
+      }
+      
+      const bodyParts = [];
+      let totalVertices = 0;
+      
+      window.fullBodyGroup.traverse((child) => {
+        if (child.geometry) {
+          const posAttr = child.geometry.getAttribute('position');
+          if (posAttr) {
+            const vertices = [];
+            for (let i = 0; i < posAttr.count; i++) {
+              vertices.push({
+                index: i,
+                x: posAttr.getX(i),
+                y: posAttr.getY(i),
+                z: posAttr.getZ(i)
+              });
+            }
+            
+            bodyParts.push({
+              name: child.name || child.type || 'Unnamed',
+              vertexCount: posAttr.count,
+              vertices: vertices,
+              position: {
+                x: child.position.x,
+                y: child.position.y,
+                z: child.position.z
+              },
+              rotation: {
+                x: child.rotation.x,
+                y: child.rotation.y,
+                z: child.rotation.z
+              }
+            });
+            
+            totalVertices += posAttr.count;
+          }
+        }
+      });
+      
+      const data = {
+        bodyName: window.fullBodyGroup.name || 'Full Body',
+        totalVertices: totalVertices,
+        bodyPartCount: bodyParts.length,
+        bodyParts: bodyParts,
+        exportDate: new Date().toISOString()
+      };
+      
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `full_body_vertices_${totalVertices}V.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      console.log(`💾 Exported entire body: ${totalVertices} vertices across ${bodyParts.length} bones`);
     }
 
     // ========================================
