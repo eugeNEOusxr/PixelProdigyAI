@@ -234,8 +234,9 @@
       <!-- Movement Info -->
       <div style="position: absolute; top: 70px; left: 20px; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 8px; font-size: 12px; color: #fff; font-family: monospace;">
         <div style="margin-bottom: 4px;">🎮 <strong>CONTROLS:</strong></div>
-        <div>W/S - Forward/Back</div>
+        <div>W/S - Walk Forward/Back</div>
         <div>A/D - Turn Left/Right</div>
+        <div><strong>SHIFT - Run (hold)</strong></div>
         <div>SPACE - Jump</div>
         <div>F - Flight Mode (Superman)</div>
         <div style="margin-top: 4px; font-size: 11px; opacity: 0.7;">Flight: SHIFT=Up, CTRL=Down</div>
@@ -632,6 +633,7 @@
     let moveRight = false;
     let moveUp = false;
     let moveDown = false;
+    let isRunning = false; // Shift key for running
     
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
@@ -805,7 +807,8 @@
           }
           break;
         case 'shift':
-          // Hold shift for ascend in flight mode
+          // Hold shift for running OR ascend in flight mode
+          isRunning = true;
           if (flightModeEnabled) {
             moveUp = true;
           }
@@ -838,6 +841,7 @@
           moveRight = false;
           break;
         case 'shift':
+          isRunning = false;
           moveUp = false;
           break;
         case 'control':
@@ -1035,18 +1039,21 @@
       
       // === WALKING/RUNNING ANIMATION ===
       if (isMoving && !isJumping && !flightModeEnabled) {
-        // Auto-set walk cycle speed based on movement
+        // Gradual acceleration: Start with paced walk, Shift for run
+        const targetSpeed = isRunning ? 8 : 3; // Walk: 3, Run: 8
+        const acceleration = isRunning ? 0.3 : 0.2; // Run accelerates faster
+        
         if (moveForward) {
-          walkCycleSpeed = Math.min(walkCycleSpeed + 0.5, 6);
+          walkCycleSpeed = Math.min(walkCycleSpeed + acceleration, targetSpeed);
         } else if (moveBackward) {
-          walkCycleSpeed = Math.min(walkCycleSpeed + 0.3, 3); // Slower backward
+          walkCycleSpeed = Math.min(walkCycleSpeed + 0.15, 2); // Slower backward
         }
         lastWheelTime = Date.now();
       }
       
       // Decay walk speed when not moving
       if (!isMoving || isJumping) {
-        walkCycleSpeed *= 0.9;
+        walkCycleSpeed *= 0.85; // Slower deceleration for smoother stop
         if (walkCycleSpeed < 0.01) {
           walkCycleSpeed = 0;
           walkCyclePhase = 0;
@@ -1055,15 +1062,15 @@
       
       // Only animate walking if speed > 0
       if (walkCycleSpeed > 0 && leftLegGroup && rightLegGroup && leftKneeGroup && rightKneeGroup) {
-        // Determine animation speed
-        const isRunning = walkCycleSpeed > 4;
-        const cycleSpeedMultiplier = isRunning ? 0.15 : 0.08;
+        // Determine animation speed based on current walk speed
+        const isRunningAnim = walkCycleSpeed > 5;
+        const cycleSpeedMultiplier = isRunningAnim ? 0.15 : 0.08;
         walkCyclePhase += walkCycleSpeed * cycleSpeedMultiplier;
         
         // === BIOMECHANICAL WALKING CYCLE ===
-        const legSwingAmplitude = isRunning ? 0.6 : 0.4;
-        const kneeFlexionMax = isRunning ? 1.2 : 0.8;
-        const armSwingAmplitude = isRunning ? 0.5 : 0.3;
+        const legSwingAmplitude = isRunningAnim ? 0.6 : 0.4;
+        const kneeFlexionMax = isRunningAnim ? 1.2 : 0.8;
+        const armSwingAmplitude = isRunningAnim ? 0.5 : 0.3;
         
         // === RIGHT LEG CYCLE ===
         const rightPhase = walkCyclePhase % (Math.PI * 2);
@@ -1160,7 +1167,7 @@
         if (leftArmGroupRef) {
           leftArmGroupRef.rotation.x = leftArmSwing;
           if (leftForearmGroup) {
-            const elbowBendAmplitude = isRunning ? 0.4 : 0.25;
+            const elbowBendAmplitude = isRunningAnim ? 0.4 : 0.25;
             const elbowBend = Math.max(0, -leftArmSwing) * elbowBendAmplitude;
             leftForearmGroup.rotation.x = elbowBend;
           }
@@ -1168,21 +1175,21 @@
         if (rightArmGroupRef) {
           rightArmGroupRef.rotation.x = rightArmSwing;
           if (rightForearmGroup) {
-            const elbowBendAmplitude = isRunning ? 0.4 : 0.25;
+            const elbowBendAmplitude = isRunningAnim ? 0.4 : 0.25;
             const elbowBend = Math.max(0, -rightArmSwing) * elbowBendAmplitude;
             rightForearmGroup.rotation.x = elbowBend;
           }
         }
         
         // === BODY BOB ===
-        const bobAmount = isRunning ? 0.15 : 0.08;
+        const bobAmount = isRunningAnim ? 0.15 : 0.08;
         const bodyBob = Math.abs(Math.sin(walkCyclePhase * 2)) * bobAmount;
         window.fullBodyGroup.position.y = groundLevel + bodyBob;
         
         // === FORWARD/BACKWARD MOVEMENT ===
         const bodyRotation = window.fullBodyGroup.rotation.y;
         if (moveForward) {
-          const forwardSpeed = isRunning ? 0.08 : 0.04;
+          const forwardSpeed = isRunningAnim ? 0.08 : 0.04;
           window.fullBodyGroup.position.x += Math.sin(bodyRotation) * walkCycleSpeed * forwardSpeed;
           window.fullBodyGroup.position.z += Math.cos(bodyRotation) * walkCycleSpeed * forwardSpeed;
         }
@@ -1200,10 +1207,10 @@
           const bodyRotation = window.fullBodyGroup.rotation.y;
           const bodyPos = window.fullBodyGroup.position.clone();
           
-          // Camera positioned behind and above character
+          // Camera positioned behind and above character (80% higher)
           const cameraDistance = 8; // Distance behind character
-          const cameraHeight = 4; // Height above character
-          const lookAtHeight = 2; // Look at character's upper body
+          const cameraHeight = 7.2; // Height above character (raised 80%)
+          const lookAtHeight = 3; // Look at character's upper body
           
           // Calculate camera position behind character (rotates with character)
           const cameraOffset = new THREE.Vector3(
