@@ -1207,10 +1207,10 @@
           const bodyRotation = window.fullBodyGroup.rotation.y;
           const bodyPos = window.fullBodyGroup.position.clone();
           
-          // Camera positioned behind and above character (80% higher)
+          // Camera positioned behind and HIGH above character (bird's eye view)
           const cameraDistance = 8; // Distance behind character
-          const cameraHeight = 7.2; // Height above character (raised 80%)
-          const lookAtHeight = 3; // Look at character's upper body
+          const cameraHeight = 27; // Height above character (MUCH higher - no more staring at ass!)
+          const lookAtHeight = 5; // Look at character's head/upper body
           
           // Calculate camera position behind character (rotates with character)
           const cameraOffset = new THREE.Vector3(
