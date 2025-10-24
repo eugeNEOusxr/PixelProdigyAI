@@ -229,6 +229,9 @@
         <button id="thirdPersonToggle" onclick="toggle3rdPersonCamera()" style="padding: 8px 16px; background: rgba(33,150,243,0.15); border: 2px solid rgba(33,150,243,0.3); color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
           🎮 3rd Person: AUTO
         </button>
+        <button id="vrIKToggle" onclick="toggleVRIK()" style="padding: 8px 16px; background: rgba(156,39,176,0.15); border: 2px solid rgba(156,39,176,0.3); color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+          🦾 VR IK: ON
+        </button>
       </div>
       
       <!-- Movement Info -->
@@ -705,6 +708,7 @@
   <script src="lib/three.min.js"></script>
   <script src="lib/OrbitControls.js"></script>
   <script src="lib/TransformControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/webxr/VRButton.js"></script>
   <script>
     // State
     let scene, camera, renderer, controls, transformControl;
@@ -762,6 +766,17 @@
     let moveDown = false;
     let isRunning = false; // Shift key for running
     
+    // VR State
+    let vrEnabled = false;
+    let vrIKEnabled = true; // Use IK solver for arm tracking
+    let vrControllers = [];
+    let controllerGrips = [];
+    let leftController = null;
+    let rightController = null;
+    let leftHand = null;  // Reference to left arm/hand body part
+    let rightHand = null; // Reference to right arm/hand body part
+    let vrBodyOffset = new THREE.Vector3(0, -1.5, 0); // Body position relative to headset
+    
     let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
 
@@ -788,6 +803,21 @@
       renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.shadowMap.enabled = true;
+      
+      // Enable VR support
+      renderer.xr.enabled = true;
+      
+      // Add VR button to the page
+      const vrButton = VRButton.createButton(renderer);
+      document.body.appendChild(vrButton);
+      vrButton.style.position = 'absolute';
+      vrButton.style.bottom = '20px';
+      vrButton.style.left = '50%';
+      vrButton.style.transform = 'translateX(-50%)';
+      vrButton.style.zIndex = '1000';
+      
+      // Setup VR controllers
+      setupVRControllers();
 
       // Controls
       controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -881,6 +911,11 @@
     // Keyboard controls for body movement
     function onKeyDown(event) {
       if (!window.fullBodyGroup) return;
+      
+      // Disable body controls when OrbitControls are active
+      if (orbitEnabled) {
+        return; // OrbitControls take priority
+      }
       
       // Prevent default for space (no page scroll)
       if (event.key === ' ') {
@@ -977,6 +1012,446 @@
       }
     }
 
+    // ========================================
+    // VR CONTROLLER SETUP & BODY ATTACHMENT
+    // ========================================
+    
+    function setupVRControllers() {
+      console.log('🥽 Setting up VR controllers...');
+      
+      // Controller 0 (typically left hand)
+      leftController = renderer.xr.getController(0);
+      leftController.addEventListener('selectstart', onControllerSelectStart);
+      leftController.addEventListener('selectend', onControllerSelectEnd);
+      leftController.addEventListener('connected', function(event) {
+        console.log('🎮 Left controller connected:', event.data);
+        this.add(buildControllerModel(event.data));
+      });
+      leftController.addEventListener('disconnected', function() {
+        console.log('🎮 Left controller disconnected');
+        this.remove(this.children[0]);
+      });
+      scene.add(leftController);
+      vrControllers.push(leftController);
+      
+      // Controller 1 (typically right hand)
+      rightController = renderer.xr.getController(1);
+      rightController.addEventListener('selectstart', onControllerSelectStart);
+      rightController.addEventListener('selectend', onControllerSelectEnd);
+      rightController.addEventListener('connected', function(event) {
+        console.log('🎮 Right controller connected:', event.data);
+        this.add(buildControllerModel(event.data));
+      });
+      rightController.addEventListener('disconnected', function() {
+        console.log('🎮 Right controller disconnected');
+        this.remove(this.children[0]);
+      });
+      scene.add(rightController);
+      vrControllers.push(rightController);
+      
+      // Controller grips (for hand models)
+      const leftGrip = renderer.xr.getControllerGrip(0);
+      leftGrip.add(createHandModel('left'));
+      scene.add(leftGrip);
+      controllerGrips.push(leftGrip);
+      
+      const rightGrip = renderer.xr.getControllerGrip(1);
+      rightGrip.add(createHandModel('right'));
+      scene.add(rightGrip);
+      controllerGrips.push(rightGrip);
+      
+      // Listen for VR session start/end
+      renderer.xr.addEventListener('sessionstart', onVRSessionStart);
+      renderer.xr.addEventListener('sessionend', onVRSessionEnd);
+      
+      console.log('✅ VR controllers ready!');
+    }
+    
+    function buildControllerModel(data) {
+      // Simple line pointing forward from controller
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0, -1)
+      ]);
+      const material = new THREE.LineBasicMaterial({
+        color: 0x00ffff,
+        linewidth: 2
+      });
+      return new THREE.Line(geometry, material);
+    }
+    
+    function createHandModel(hand) {
+      // Create a simple hand representation
+      const handGroup = new THREE.Group();
+      handGroup.name = `${hand}_hand_model`;
+      
+      // Palm
+      const palmGeom = new THREE.BoxGeometry(0.08, 0.03, 0.12);
+      const palmMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffdbac,
+        roughness: 0.8,
+        metalness: 0.1
+      });
+      const palm = new THREE.Mesh(palmGeom, palmMat);
+      palm.name = `${hand}_palm`;
+      handGroup.add(palm);
+      
+      // Fingers (simplified)
+      for (let i = 0; i < 5; i++) {
+        const fingerGeom = new THREE.CylinderGeometry(0.008, 0.008, 0.06, 8);
+        const finger = new THREE.Mesh(fingerGeom, palmMat);
+        finger.name = `${hand}_finger_${i}`;
+        
+        const xOffset = hand === 'left' ? 
+          (0.03 - i * 0.015) : 
+          (-0.03 + i * 0.015);
+        
+        finger.position.set(xOffset, 0, 0.06);
+        finger.rotation.x = Math.PI / 2;
+        handGroup.add(finger);
+      }
+      
+      return handGroup;
+    }
+    
+    function onControllerSelectStart(event) {
+      const controller = event.target;
+      console.log('🎮 Controller select start', controller === leftController ? 'LEFT' : 'RIGHT');
+      
+      // Could implement grabbing objects here
+      // For now, just log
+    }
+    
+    function onControllerSelectEnd(event) {
+      const controller = event.target;
+      console.log('🎮 Controller select end', controller === leftController ? 'LEFT' : 'RIGHT');
+    }
+    
+    function onVRSessionStart() {
+      console.log('🥽 ===== VR SESSION STARTED =====');
+      vrEnabled = true;
+      
+      // Disable OrbitControls in VR
+      if (orbitEnabled) {
+        controls.enabled = false;
+      }
+      
+      // Attach body to VR space if it exists
+      if (window.fullBodyGroup) {
+        attachBodyToVR();
+      }
+      
+      console.log('✅ VR mode active! Body will follow headset position.');
+    }
+    
+    function onVRSessionEnd() {
+      console.log('🥽 ===== VR SESSION ENDED =====');
+      vrEnabled = false;
+      
+      // Re-enable OrbitControls
+      if (orbitEnabled) {
+        controls.enabled = true;
+      }
+      
+      // Detach body from VR
+      if (window.fullBodyGroup) {
+        detachBodyFromVR();
+      }
+      
+      console.log('✅ Desktop mode restored.');
+    }
+    
+    function attachBodyToVR() {
+      console.log('🦴 Attaching body to VR controllers...');
+      
+      if (!window.fullBodyGroup) {
+        console.warn('⚠️ No body loaded to attach to VR!');
+        return;
+      }
+      
+      // Find arm references in the body
+      window.fullBodyGroup.traverse(child => {
+        if (child.name && child.name.toLowerCase().includes('left') && 
+            (child.name.toLowerCase().includes('hand') || child.name.toLowerCase().includes('arm'))) {
+          if (!leftHand && child.isMesh) {
+            leftHand = child;
+            console.log('  → Found left hand/arm:', child.name);
+          }
+        }
+        if (child.name && child.name.toLowerCase().includes('right') && 
+            (child.name.toLowerCase().includes('hand') || child.name.toLowerCase().includes('arm'))) {
+          if (!rightHand && child.isMesh) {
+            rightHand = child;
+            console.log('  → Found right hand/arm:', child.name);
+          }
+        }
+      });
+      
+      // Position body relative to headset
+      // Body will be positioned below the camera (headset)
+      window.fullBodyGroup.userData.vrMode = true;
+      
+      console.log('✅ Body attached to VR! Arms will follow controllers.');
+      console.log('   → Left controller → Left arm');
+      console.log('   → Right controller → Right arm');
+      console.log('   → Headset → Body position (offset below)');
+    }
+    
+    function detachBodyFromVR() {
+      console.log('🦴 Detaching body from VR...');
+      
+      if (window.fullBodyGroup) {
+        window.fullBodyGroup.userData.vrMode = false;
+        leftHand = null;
+        rightHand = null;
+      }
+      
+      console.log('✅ Body detached from VR.');
+    }
+    
+    function updateVRBodyTracking() {
+      if (!vrEnabled || !window.fullBodyGroup || !window.fullBodyGroup.userData.vrMode) {
+        return;
+      }
+      
+      // Use IK solver if enabled, otherwise use simple tracking
+      if (vrIKEnabled) {
+        updateVRBodyTrackingWithIK();
+      } else {
+        // Simple tracking (original method)
+        updateVRBodyTrackingSimple();
+      }
+    }
+    
+    function updateVRBodyTrackingSimple() {
+      // Get headset position (camera position in VR)
+      const headsetPosition = new THREE.Vector3();
+      camera.getWorldPosition(headsetPosition);
+      
+      // Position body below headset
+      window.fullBodyGroup.position.copy(headsetPosition);
+      window.fullBodyGroup.position.add(vrBodyOffset);
+      
+      // Track controller positions for IK (Inverse Kinematics)
+      if (leftController && leftHand) {
+        // Get controller world position
+        const leftControllerPos = new THREE.Vector3();
+        leftController.getWorldPosition(leftControllerPos);
+        
+        // Simple position matching (later we'll add proper IK)
+        const leftArmGroup = leftHand.parent;
+        if (leftArmGroup) {
+          // Point arm toward controller position
+          leftArmGroup.lookAt(leftControllerPos);
+          
+          // Optional: Move hand toward controller
+          // This is simplified - proper IK would calculate elbow position
+          const handTarget = leftControllerPos.clone().sub(window.fullBodyGroup.position);
+          if (handTarget.length() < 1.5) { // Within arm reach
+            leftHand.position.lerp(handTarget, 0.1);
+          }
+        }
+      }
+      
+      if (rightController && rightHand) {
+        // Get controller world position
+        const rightControllerPos = new THREE.Vector3();
+        rightController.getWorldPosition(rightControllerPos);
+        
+        // Simple position matching
+        const rightArmGroup = rightHand.parent;
+        if (rightArmGroup) {
+          // Point arm toward controller position
+          rightArmGroup.lookAt(rightControllerPos);
+          
+          // Optional: Move hand toward controller
+          const handTarget = rightControllerPos.clone().sub(window.fullBodyGroup.position);
+          if (handTarget.length() < 1.5) { // Within arm reach
+            rightHand.position.lerp(handTarget, 0.1);
+          }
+        }
+      }
+      
+      // Rotate body to face forward (based on headset orientation)
+      const cameraDirection = new THREE.Vector3();
+      camera.getWorldDirection(cameraDirection);
+      cameraDirection.y = 0; // Keep on horizontal plane
+      cameraDirection.normalize();
+      
+      // Calculate target rotation
+      const targetRotation = Math.atan2(cameraDirection.x, cameraDirection.z);
+      
+      // Smooth rotation
+      const currentRotation = window.fullBodyGroup.rotation.y;
+      window.fullBodyGroup.rotation.y = THREE.MathUtils.lerp(
+        currentRotation,
+        targetRotation,
+        0.1
+      );
+    }
+    
+    // ========================================
+    // INVERSE KINEMATICS (IK) SYSTEM
+    // ========================================
+    
+    /**
+     * Two-bone IK solver for arm (shoulder → elbow → wrist)
+     * Based on law of cosines
+     */
+    function solveArmIK(shoulderPos, targetPos, upperArmLength, forearmLength, side) {
+      // Calculate distance to target
+      const toTarget = targetPos.clone().sub(shoulderPos);
+      const distance = toTarget.length();
+      
+      // Clamp to reachable distance
+      const maxReach = upperArmLength + forearmLength;
+      const minReach = Math.abs(upperArmLength - forearmLength);
+      const clampedDistance = Math.max(minReach, Math.min(maxReach, distance));
+      
+      // If target is too far, reach as far as possible
+      if (distance > maxReach) {
+        toTarget.normalize().multiplyScalar(maxReach);
+      }
+      
+      // Law of cosines to find elbow angle
+      const a = upperArmLength;
+      const b = forearmLength;
+      const c = clampedDistance;
+      
+      // Angle at elbow joint
+      const elbowAngle = Math.acos(
+        (a * a + b * b - c * c) / (2 * a * b)
+      );
+      
+      // Angle at shoulder (to point toward target)
+      const shoulderToTarget = Math.acos(
+        (a * a + c * c - b * b) / (2 * a * c)
+      );
+      
+      return {
+        shoulderAngle: shoulderToTarget,
+        elbowAngle: Math.PI - elbowAngle, // Bend inward
+        reachable: distance <= maxReach
+      };
+    }
+    
+    /**
+     * Apply IK to body arm based on controller position
+     */
+    function applyIKToArm(controllerPos, side) {
+      if (!window.fullBodyGroup) return;
+      
+      // Find arm components
+      let shoulder, upperArm, forearm, hand;
+      
+      window.fullBodyGroup.traverse(child => {
+        const name = child.name ? child.name.toLowerCase() : '';
+        const matchesSide = name.includes(side);
+        
+        if (matchesSide) {
+          if (name.includes('shoulder') || name.includes('humerus')) {
+            shoulder = child;
+          } else if (name.includes('upper') && name.includes('arm')) {
+            upperArm = child;
+          } else if (name.includes('forearm') || name.includes('radius') || name.includes('ulna')) {
+            forearm = child;
+          } else if (name.includes('hand') || name.includes('wrist')) {
+            hand = child;
+          }
+        }
+      });
+      
+      if (!shoulder || !upperArm) {
+        console.warn(`⚠️ Could not find ${side} arm components for IK`);
+        return;
+      }
+      
+      // Get shoulder world position
+      const shoulderPos = new THREE.Vector3();
+      shoulder.getWorldPosition(shoulderPos);
+      
+      // Calculate IK
+      const upperArmLength = 1.4; // Approximate upper arm length
+      const forearmLength = 1.3;  // Approximate forearm length
+      
+      const ik = solveArmIK(shoulderPos, controllerPos, upperArmLength, forearmLength, side);
+      
+      if (ik.reachable) {
+        // Apply shoulder rotation
+        const toTarget = controllerPos.clone().sub(shoulderPos).normalize();
+        const targetQuat = new THREE.Quaternion().setFromUnitVectors(
+          new THREE.Vector3(0, -1, 0), // Default arm direction
+          toTarget
+        );
+        
+        // Smooth rotation
+        if (shoulder.quaternion) {
+          shoulder.quaternion.slerp(targetQuat, 0.2);
+        }
+        
+        // Apply elbow bend
+        if (forearm) {
+          forearm.rotation.x = THREE.MathUtils.lerp(
+            forearm.rotation.x,
+            ik.elbowAngle,
+            0.2
+          );
+        }
+        
+        console.log(`🦾 ${side} arm IK: shoulder=${(ik.shoulderAngle * 180 / Math.PI).toFixed(1)}° elbow=${(ik.elbowAngle * 180 / Math.PI).toFixed(1)}°`);
+      } else {
+        console.warn(`⚠️ ${side} controller out of reach`);
+      }
+    }
+    
+    /**
+     * Enhanced VR body tracking with proper IK
+     */
+    function updateVRBodyTrackingWithIK() {
+      if (!vrEnabled || !window.fullBodyGroup || !window.fullBodyGroup.userData.vrMode) {
+        return;
+      }
+      
+      // Get headset position (camera position in VR)
+      const headsetPosition = new THREE.Vector3();
+      camera.getWorldPosition(headsetPosition);
+      
+      // Position body below headset
+      window.fullBodyGroup.position.copy(headsetPosition);
+      window.fullBodyGroup.position.add(vrBodyOffset);
+      
+      // Apply IK to left arm
+      if (leftController) {
+        const leftControllerPos = new THREE.Vector3();
+        leftController.getWorldPosition(leftControllerPos);
+        applyIKToArm(leftControllerPos, 'left');
+      }
+      
+      // Apply IK to right arm
+      if (rightController) {
+        const rightControllerPos = new THREE.Vector3();
+        rightController.getWorldPosition(rightControllerPos);
+        applyIKToArm(rightControllerPos, 'right');
+      }
+      
+      // Rotate body to face forward (based on headset orientation)
+      const cameraDirection = new THREE.Vector3();
+      camera.getWorldDirection(cameraDirection);
+      cameraDirection.y = 0; // Keep on horizontal plane
+      cameraDirection.normalize();
+      
+      // Calculate target rotation
+      const targetRotation = Math.atan2(cameraDirection.x, cameraDirection.z);
+      
+      // Smooth rotation
+      const currentRotation = window.fullBodyGroup.rotation.y;
+      window.fullBodyGroup.rotation.y = THREE.MathUtils.lerp(
+        currentRotation,
+        targetRotation,
+        0.1
+      );
+    }
+
     // Toggle orbit controls on/off
     function toggleOrbitControls() {
       orbitEnabled = !orbitEnabled;
@@ -987,13 +1462,15 @@
         btn.textContent = '🎥 Orbit: ON';
         btn.style.background = 'rgba(76, 175, 80, 0.3)';
         btn.style.borderColor = 'rgba(76, 175, 80, 0.6)';
+        console.log('🎥 Orbit controls: ENABLED');
+        console.log('   → WASD body movement DISABLED (use mouse to orbit camera)');
       } else {
         btn.textContent = '🎥 Orbit: OFF';
         btn.style.background = 'rgba(244, 67, 54, 0.3)';
         btn.style.borderColor = 'rgba(244, 67, 54, 0.6)';
+        console.log('🎥 Orbit controls: DISABLED');
+        console.log('   → WASD body movement ENABLED');
       }
-      
-      console.log(`🎥 Orbit controls: ${orbitEnabled ? 'ENABLED' : 'DISABLED'}`);
     }
     
     // Toggle Walk Mode (stationary animation vs. forward movement)
@@ -1052,9 +1529,35 @@
       }
     }
     
+    // Toggle VR IK (Inverse Kinematics for arm tracking)
+    function toggleVRIK() {
+      vrIKEnabled = !vrIKEnabled;
+      
+      const btn = document.getElementById('vrIKToggle');
+      if (vrIKEnabled) {
+        btn.textContent = '🦾 VR IK: ON';
+        btn.style.background = 'rgba(156, 39, 176, 0.3)';
+        btn.style.borderColor = 'rgba(156, 39, 176, 0.6)';
+        console.log('🦾 VR IK: ENABLED - Using mechanical arm IK solver');
+        console.log('   → Arms will bend realistically at elbow joints');
+        console.log('   → Hands track VR controllers with proper kinematics');
+      } else {
+        btn.textContent = '🦾 VR IK: OFF';
+        btn.style.background = 'rgba(156, 39, 176, 0.15)';
+        btn.style.borderColor = 'rgba(156, 39, 176, 0.3)';
+        console.log('🦾 VR IK: DISABLED - Using simple tracking');
+        console.log('   → Arms point toward controllers (no elbow bend)');
+      }
+    }
+    
     // Procedural walking/running animation with realistic biomechanics + WASD movement + Jump + Flight
     function updateWalkingAnimation() {
       if (!window.fullBodyGroup) return;
+      
+      // Disable body movement when OrbitControls are active
+      if (orbitEnabled) {
+        return; // Let OrbitControls handle camera movement
+      }
       
       // === MOVEMENT PROCESSING ===
       const moveSpeed = 0.1;
@@ -1357,18 +1860,23 @@
     }
 
     function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      
-      // Update walking/running animation
-      updateWalkingAnimation();
-      
-      // Update selection box to follow selected object
-      if (selectionBox && selectedObject) {
-        selectionBox.update();
-      }
-      
-      renderer.render(scene, camera);
+      // Use renderer.setAnimationLoop for VR compatibility
+      renderer.setAnimationLoop(function() {
+        controls.update();
+        
+        // Update VR body tracking (if in VR mode)
+        updateVRBodyTracking();
+        
+        // Update walking/running animation (disabled in VR)
+        updateWalkingAnimation();
+        
+        // Update selection box to follow selected object
+        if (selectionBox && selectedObject) {
+          selectionBox.update();
+        }
+        
+        renderer.render(scene, camera);
+      });
     }
 
     function onWindowResize() {
