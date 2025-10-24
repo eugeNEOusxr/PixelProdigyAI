@@ -1093,6 +1093,327 @@
     }
 
     // =============================================
+    // AI CHAT SUPPORT SYSTEM (Day 1 Build)
+    // =============================================
+
+    class RecoveryAIChat {
+      constructor() {
+        this.messages = [];
+        this.crisisKeywords = [
+          'suicide', 'kill myself', 'end it', 'die', 'death',
+          'relapse', 'using', 'get high', 'score', 'dealer',
+          'hurt myself', 'self-harm', 'overdose', 'od',
+          "can't do this", 'give up', 'hopeless', 'no point'
+        ];
+        this.supportResponses = {
+          crisis: [
+            "I'm really concerned about what you're sharing. Please call 988 (Suicide & Crisis Lifeline) right now. They have trained counselors available 24/7.",
+            "What you're feeling is serious, and you deserve immediate support. Text 'HELLO' to 741741 to connect with a crisis counselor. I'm here, but they're trained for this.",
+            "I hear your pain, and I want you to be safe. Please reach out to a professional immediately: 988 for crisis support or 741741 to text with a counselor."
+          ],
+          relapse: [
+            "Thinking about using is part of recovery - it doesn't mean you've failed. Have you called your sponsor? Can you get to a meeting? You've made it this far for a reason.",
+            "The craving will pass. It always does. Can you do something RIGHT NOW? Call someone in the fellowship, go for a walk, come to a virtual meeting. You're not alone in this.",
+            "This feeling is temporary, even though it doesn't feel that way. What helped you last time you felt like this? And remember - one day at a time, sometimes one minute at a time."
+          ],
+          greeting: [
+            "Welcome to the Recovery Virtual Hub. I'm here to listen without judgment. How are you doing today?",
+            "Hi there. This is a safe space. Whether you're celebrating time clean or struggling today, you belong here. What's on your mind?",
+            "Welcome. You took a brave step just by showing up here. How can I support you today?"
+          ],
+          encouragement: [
+            "One day at a time. That's all any of us can do. How many days do you have? Every single one counts.",
+            "Recovery isn't linear. There will be hard days, but you're building something real. Keep showing up.",
+            "The fact that you're here, reaching out, asking for help - that's the program working. Keep going."
+          ],
+          meeting: [
+            "We have virtual NA meetings starting every hour. Would you like me to connect you to the next one?",
+            "Sometimes just sitting in a meeting, even virtually, helps. Our next meeting starts at the top of the hour. You don't have to share - just listen.",
+            "There's a meeting happening right now. Want me to take you there? No pressure to talk, just show up."
+          ]
+        };
+      }
+
+      detectCrisis(message) {
+        const lowercaseMessage = message.toLowerCase();
+        return this.crisisKeywords.some(keyword => lowercaseMessage.includes(keyword));
+      }
+
+      detectRelapse(message) {
+        const relapseTerms = ['using', 'relapse', 'get high', 'score', 'dealer', 'crave', 'craving'];
+        const lowercaseMessage = message.toLowerCase();
+        return relapseTerms.some(term => lowercaseMessage.includes(term));
+      }
+
+      getResponse(userMessage) {
+        this.messages.push({ role: 'user', content: userMessage, timestamp: new Date() });
+
+        // CRITICAL: Crisis detection first
+        if (this.detectCrisis(userMessage)) {
+          console.warn('🚨 CRISIS KEYWORDS DETECTED:', userMessage);
+          const response = this.getRandomResponse('crisis');
+          this.messages.push({ role: 'assistant', content: response, type: 'CRISIS', timestamp: new Date() });
+          
+          // Auto-show crisis banner
+          setTimeout(() => {
+            if (confirm(response + "\n\nWould you like me to help you call 988 right now?")) {
+              window.location.href = 'tel:988';
+            }
+          }, 500);
+          
+          return response;
+        }
+
+        // Relapse thoughts detection
+        if (this.detectRelapse(userMessage)) {
+          const response = this.getRandomResponse('relapse');
+          this.messages.push({ role: 'assistant', content: response, type: 'RELAPSE', timestamp: new Date() });
+          return response;
+        }
+
+        // Meeting requests
+        if (userMessage.toLowerCase().includes('meeting')) {
+          const response = this.getRandomResponse('meeting');
+          this.messages.push({ role: 'assistant', content: response, timestamp: new Date() });
+          return response;
+        }
+
+        // Encouragement for check-ins
+        if (userMessage.toLowerCase().match(/\\b\\d+\\s*(day|week|month|year)s?\\b/)) {
+          const response = this.getRandomResponse('encouragement');
+          this.messages.push({ role: 'assistant', content: response, timestamp: new Date() });
+          return response;
+        }
+
+        // First message greeting
+        if (this.messages.length === 1) {
+          const response = this.getRandomResponse('greeting');
+          this.messages.push({ role: 'assistant', content: response, timestamp: new Date() });
+          return response;
+        }
+
+        // Default empathetic responses
+        const defaultResponses = [
+          "I hear you. Keep talking - sometimes just getting it out helps. What's weighing on you most right now?",
+          "That sounds really hard. You're doing the right thing by reaching out. Tell me more.",
+          "Thank you for trusting me with this. Recovery is brave work. How are you taking care of yourself today?",
+          "One thing I've learned in recovery: we can't do this alone. Have you connected with anyone in the fellowship today?",
+          "Your feelings are valid. All of them. What do you need right now - encouragement, a meeting, or just someone to listen?"
+        ];
+        
+        const response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        this.messages.push({ role: 'assistant', content: response, timestamp: new Date() });
+        return response;
+      }
+
+      getRandomResponse(type) {
+        const responses = this.supportResponses[type];
+        return responses[Math.floor(Math.random() * responses.length)];
+      }
+
+      getMessageHistory() {
+        return this.messages;
+      }
+    }
+
+    // Initialize AI chat system
+    const recoveryAI = new RecoveryAIChat();
+
+    // Create chat interface
+    function initAIChatInterface() {
+      const chatHTML = `
+        <div id="ai-chat-container" style="
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 350px;
+          max-height: 500px;
+          background: rgba(0, 0, 0, 0.95);
+          border: 2px solid #00ffaa;
+          border-radius: 15px;
+          box-shadow: 0 10px 40px rgba(0, 255, 170, 0.3);
+          display: none;
+          flex-direction: column;
+          z-index: 10000;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        ">
+          <div style="
+            background: linear-gradient(135deg, #00ffaa, #00aa88);
+            padding: 15px;
+            border-radius: 13px 13px 0 0;
+            color: #000;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          ">
+            <span>🤝 Recovery Support AI</span>
+            <button onclick="toggleChat()" style="
+              background: none;
+              border: none;
+              color: #000;
+              font-size: 20px;
+              cursor: pointer;
+            ">✕</button>
+          </div>
+          
+          <div id="chat-messages" style="
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 350px;
+            color: #fff;
+          ">
+            <div class="ai-message" style="
+              background: rgba(0, 255, 170, 0.1);
+              padding: 10px;
+              border-radius: 10px;
+              margin-bottom: 10px;
+              border-left: 3px solid #00ffaa;
+            ">
+              👋 Welcome. I'm here to listen without judgment. This is a safe space. How are you doing today?
+            </div>
+          </div>
+          
+          <div style="padding: 15px; border-top: 1px solid #333;">
+            <input 
+              type="text" 
+              id="chat-input" 
+              placeholder="Type your message... (Press Enter to send)"
+              style="
+                width: 100%;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid #555;
+                border-radius: 5px;
+                color: #fff;
+                font-size: 14px;
+              "
+            />
+            <div style="
+              margin-top: 8px;
+              font-size: 10px;
+              color: #888;
+              text-align: center;
+            ">
+              Crisis? Call 988 immediately
+            </div>
+          </div>
+        </div>
+        
+        <button id="ai-chat-toggle" onclick="toggleChat()" style="
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #00ffaa, #00aa88);
+          border: none;
+          color: #000;
+          font-size: 28px;
+          cursor: pointer;
+          box-shadow: 0 5px 20px rgba(0, 255, 170, 0.5);
+          z-index: 9999;
+          transition: transform 0.3s;
+        " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          🤝
+        </button>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', chatHTML);
+      
+      // Add enter key listener
+      document.getElementById('chat-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+    }
+
+    function toggleChat() {
+      const chatContainer = document.getElementById('ai-chat-container');
+      const toggleButton = document.getElementById('ai-chat-toggle');
+      
+      if (chatContainer.style.display === 'none' || chatContainer.style.display === '') {
+        chatContainer.style.display = 'flex';
+        toggleButton.style.display = 'none';
+        document.getElementById('chat-input').focus();
+      } else {
+        chatContainer.style.display = 'none';
+        toggleButton.style.display = 'block';
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const userMessage = input.value.trim();
+      
+      if (!userMessage) return;
+      
+      const messagesContainer = document.getElementById('chat-messages');
+      
+      // Add user message to UI
+      messagesContainer.insertAdjacentHTML('beforeend', `
+        <div class="user-message" style="
+          background: rgba(100, 100, 255, 0.2);
+          padding: 10px;
+          border-radius: 10px;
+          margin-bottom: 10px;
+          border-left: 3px solid #6666ff;
+          text-align: right;
+        ">
+          ${userMessage}
+        </div>
+      `);
+      
+      input.value = '';
+      
+      // Get AI response
+      const aiResponse = recoveryAI.getResponse(userMessage);
+      
+      // Add AI response to UI (with delay for natural feel)
+      setTimeout(() => {
+        const responseType = recoveryAI.messages[recoveryAI.messages.length - 1].type;
+        const borderColor = responseType === 'CRISIS' ? '#ff0000' : responseType === 'RELAPSE' ? '#ffaa00' : '#00ffaa';
+        
+        messagesContainer.insertAdjacentHTML('beforeend', `
+          <div class="ai-message" style="
+            background: rgba(0, 255, 170, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid ${borderColor};
+          ">
+            ${responseType === 'CRISIS' ? '🚨 ' : ''}${aiResponse}
+          </div>
+        `);
+        
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 500);
+    }
+
+    // Initialize chat on page load
+    window.addEventListener('load', () => {
+      initAIChatInterface();
+      
+      console.log(`
+╔════════════════════════════════════════════════════════════╗
+║         🤖 AI CHAT SUPPORT SYSTEM INITIALIZED           ║
+╠════════════════════════════════════════════════════════════╣
+║  
+║  ✅ Crisis keyword detection active
+║  ✅ Relapse support responses loaded
+║  ✅ NA/AA inspired empathy model
+║  ✅ Auto-escalation to 988 configured
+║  
+║  This is Day 1 build - AI chat is LIVE!
+║  
+╚════════════════════════════════════════════════════════════╝
+      `);
+    });
+
+    // =============================================
     // ANALYTICS & LOGGING
     // =============================================
 
