@@ -24,6 +24,12 @@
 **For Feature Reference:**
 1. Complete specs → [VERTEX_TOOLS_MASTER_LIST.md](VERTEX_TOOLS_MASTER_LIST.md) - All 45+ tools documented
 
+**For Mobile Development:**
+1. Setup → [README_MOBILE_WORKSPACE.md](README_MOBILE_WORKSPACE.md) - Quick start guide ⭐ NEW
+2. Full guide → [MOBILE_WORKSPACE_GUIDE.md](MOBILE_WORKSPACE_GUIDE.md) - Complete documentation
+3. Quick ref → [MOBILE_WORKSPACE_QUICK_REF.md](MOBILE_WORKSPACE_QUICK_REF.md) - Cheat sheet
+4. Workspace → [mobile-workspace.code-workspace](mobile-workspace.code-workspace) - VS Code config
+
 ---
 
 ## 📁 DOCUMENTATION STRUCTURE
