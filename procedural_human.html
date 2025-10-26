@@ -5,34 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Procedural Human — EugeneousOS</title>
   <style>
-    html,body { height:100%; margin:0; font-family:Inter,Segoe UI,Roboto,Arial }
-    #ui { position: absolute; left: 12px; top: 12px; z-index: 10; background: rgba(0,0,0,0.45); color: #fff; padding:12px; border-radius:10px; width:260px }
-    #ui h3 { margin:0 0 8px 0; font-size:16px }
-    .row { display:flex; gap:8px; align-items:center; margin:8px 0 }
-    .row label { width:110px; font-size:13px }
-    input[type=range] { width:120px }
-    button { margin-top:8px; padding:8px 12px; border-radius:6px; border:none; cursor:pointer }
+    html,body { height:100%; margin:0; font-family:Inter,Segoe UI,Roboto,Arial; overflow:hidden }
+    #info { position: absolute; left: 20px; bottom: 20px; z-index: 10; background: rgba(0,0,0,0.7); color: #fff; padding:15px; border-radius:8px; font-size:14px }
     #renderer { width:100%; height:100%; display:block }
-    .small { font-size:12px; opacity:0.9 }
+    .controls { position: absolute; right: 20px; top: 20px; z-index: 10; background: rgba(0,0,0,0.7); color: #fff; padding:10px; border-radius:8px; font-size:12px }
+    button { padding:6px 12px; margin:2px; border-radius:4px; border:none; cursor:pointer; background:#333; color:#fff }
+    button:hover { background:#555 }
   </style>
 </head>
 <body>
-  <div id="ui">
-    <h3>Procedural Human</h3>
-    <div class="row"><label>Seed</label><input id="seed" type="number" value="42" style="width:110px"/></div>
-    <div class="row"><label>Height</label><input id="height" type="range" min="1.4" max="2.2" step="0.01" value="1.8"/><div class="small" id="heightVal">1.80m</div></div>
-    <div class="row"><label>Torso ratio</label><input id="torso" type="range" min="0.3" max="0.6" step="0.01" value="0.45"/><div class="small" id="torsoVal">0.45</div></div>
-    <div class="row"><label>Arm length</label><input id="arm" type="range" min="0.6" max="0.9" step="0.01" value="0.75"/><div class="small" id="armVal">0.75</div></div>
-    <div class="row"><label>Leg length</label><input id="leg" type="range" min="0.8" max="1.2" step="0.01" value="1.0"/><div class="small" id="legVal">1.00</div></div>
-    <div class="row"><label>Head scale</label><input id="head" type="range" min="0.6" max="1.4" step="0.01" value="1.0"/><div class="small" id="headVal">1.00</div></div>
-    <div class="row"><label>Noise</label><input id="noise" type="range" min="0" max="0.6" step="0.01" value="0.08"/><div class="small" id="noiseVal">0.08</div></div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap">
-      <button id="regen" style="background:#00c6ff;color:#002">Regenerate</button>
-      <button id="randomPose" style="background:#ffd166;color:#222">Random Pose</button>
-      <button id="exportGLB" style="background:#7bd389;color:#042">Export GLB</button>
-      <button id="toggleWire" style="background:#eeeeee;color:#222">Wireframe</button>
-    </div>
-    <div style="margin-top:8px;font-size:12px;opacity:0.9">Simple procedural articulating human. Use seed for repeatability.</div>
+  <div id="info">
+    <strong>3D Human Model</strong><br>
+    Mouse: Rotate • Wheel: Zoom • Right-click: Pan
+  </div>
+  
+  <div class="controls">
+    <button id="exportGLB">Export GLB</button>
   </div>
 
   <canvas id="renderer"></canvas>
@@ -68,160 +56,205 @@
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(50,50), new THREE.MeshStandardMaterial({ color:0x0b0b0f, metalness:0.1, roughness:0.9 }));
     ground.rotation.x = -Math.PI/2; ground.position.y = 0; scene.add(ground);
 
-    // Parameters and UI
-    const params = {
-      seed: 42,
-      height: 1.8,
-      torso: 0.45,
-      arm: 0.75,
-      leg: 1.0,
-      head: 1.0,
-      noise: 0.08,
-      wire: false
-    };
-
-    // random generator with seed
-    function rng(seed) {
-      let s = seed % 2147483647;
-      if (s <= 0) s += 2147483646;
-      return () => (s = s * 16807 % 2147483647) / 2147483647;
-    }
-
     // Human group
-    let humanGroup = new THREE.Group();
+    const humanGroup = new THREE.Group();
     scene.add(humanGroup);
 
-    // Simple material
-    const skinMat = new THREE.MeshStandardMaterial({ color:0xf1c28a, metalness:0.05, roughness:0.7 });
+    // Materials
+    const skinMat = new THREE.MeshStandardMaterial({ 
+      color: 0xf4a574, 
+      metalness: 0.02, 
+      roughness: 0.8,
+      normalScale: new THREE.Vector2(0.3, 0.3)
+    });
+    
+    const hairMat = new THREE.MeshStandardMaterial({ color: 0x3d2914, roughness: 0.9 });
+    const eyeMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.3 });
+    const lipMat = new THREE.MeshStandardMaterial({ color: 0xb85450, roughness: 0.6 });
 
-    function clearHuman() {
-      if (humanGroup) {
-        humanGroup.traverse((c) => { if (c.isMesh) c.geometry.dispose(); });
-        scene.remove(humanGroup);
-      }
-      humanGroup = new THREE.Group();
-      scene.add(humanGroup);
-    }
-
-    function buildHuman(p) {
-      clearHuman();
-      const rnd = rng(p.seed);
-
-      // proportions
-      const H = p.height; // total height in meters
-      const torsoH = H * p.torso; // torso fraction
-      const headH = H * 0.125 * p.head; // approximate
-      const neck = headH * 0.25;
-      const legLen = p.leg; // absolute meter
-      const armLen = p.arm;
-
-      // Torso: use capsule (cylinder + spheres)
-      const chestRadius = H * 0.12 + (rnd()-0.5)*p.noise*0.05;
-      const torsoGeom = new THREE.CapsuleGeometry(chestRadius, Math.max(0.01, torsoH-2*chestRadius), 8, 12);
-      const torso = new THREE.Mesh(torsoGeom, skinMat.clone()); torso.castShadow=true; torso.receiveShadow=true;
-      torso.position.y = legLen + torsoH/2;
-      humanGroup.add(torso);
-
-      // Pelvis
-      const pelvisRadius = chestRadius * 0.85;
-      const pelvisGeom = new THREE.CylinderGeometry(pelvisRadius, pelvisRadius*1.05, chestRadius*0.7, 12);
-      const pelvis = new THREE.Mesh(pelvisGeom, skinMat.clone()); pelvis.position.y = legLen + pelvisRadius*0.35; pelvis.castShadow=true;
-      humanGroup.add(pelvis);
-
-      // Head
-      const headGeom = new THREE.SphereGeometry(headH/2, 16, 12);
-      const head = new THREE.Mesh(headGeom, skinMat.clone()); head.castShadow=true;
-      head.position.y = legLen + torsoH + neck + headH/2 - 0.02;
+    function createDetailedHuman() {
+      // More realistic proportions (1.75m tall human)
+      const H = 1.75;
+      const headH = 0.23;
+      const neckH = 0.08;
+      const torsoH = 0.66;
+      const armL = 0.62;
+      const legL = 0.9;
+      
+      // HEAD - more detailed
+      const headGeo = new THREE.SphereGeometry(headH/2.2, 24, 16);
+      const head = new THREE.Mesh(headGeo, skinMat);
+      head.position.set(0, legL + torsoH + neckH + headH/2.2, 0);
+      head.scale.set(0.95, 1.1, 0.9); // more human head shape
+      head.castShadow = true;
       humanGroup.add(head);
 
-      // Arms (upper, lower, hand)
-      const shoulderY = legLen + torsoH - chestRadius*0.2;
-      const shoulderX = chestRadius + 0.05;
-      function makeArm(side=1) {
-        const armRoot = new THREE.Group(); armRoot.position.set(side*shoulderX, shoulderY, 0);
-        const upperLen = armLen * 0.55 * (0.9 + (rnd()-0.5)*p.noise);
-        const lowerLen = armLen * 0.45 * (1.05 + (rnd()-0.5)*p.noise);
-        const upperGeom = new THREE.CylinderGeometry(chestRadius*0.15, chestRadius*0.12, upperLen, 10);
-        const lowerGeom = new THREE.CylinderGeometry(chestRadius*0.12, chestRadius*0.1, lowerLen, 10);
-        const handGeom = new THREE.BoxGeometry(chestRadius*0.18, chestRadius*0.12, chestRadius*0.3);
-        const upper = new THREE.Mesh(upperGeom, skinMat.clone()); upper.position.y = -upperLen/2; upper.castShadow=true;
-        const elbow = new THREE.Group(); elbow.position.y = -upperLen;
-        const lower = new THREE.Mesh(lowerGeom, skinMat.clone()); lower.position.y = -lowerLen/2; lower.castShadow=true;
-        const hand = new THREE.Mesh(handGeom, skinMat.clone()); hand.position.y = -lowerLen - chestRadius*0.06; hand.position.x = side*0.03; hand.castShadow=true;
-        elbow.add(lower); elbow.add(hand);
-        armRoot.add(upper); armRoot.add(elbow);
+      // NECK
+      const neckGeo = new THREE.CylinderGeometry(0.065, 0.075, neckH, 12);
+      const neck = new THREE.Mesh(neckGeo, skinMat);
+      neck.position.set(0, legL + torsoH + neckH/2, 0);
+      neck.castShadow = true;
+      humanGroup.add(neck);
 
-        // slight random pose
-        armRoot.rotation.z = (rnd()-0.5) * 0.25 * side;
+      // FACIAL FEATURES
+      // Eyes
+      const eyeGeo = new THREE.SphereGeometry(0.018, 12, 8);
+      const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+      leftEye.position.set(-0.035, head.position.y + 0.02, 0.09);
+      const rightEye = leftEye.clone();
+      rightEye.position.x = 0.035;
+      humanGroup.add(leftEye, rightEye);
 
-        humanGroup.add(armRoot);
+      // Nose
+      const noseGeo = new THREE.ConeGeometry(0.012, 0.04, 8);
+      const nose = new THREE.Mesh(noseGeo, skinMat);
+      nose.position.set(0, head.position.y - 0.015, 0.095);
+      nose.rotation.x = Math.PI;
+      nose.castShadow = true;
+      humanGroup.add(nose);
+
+      // Mouth
+      const mouthGeo = new THREE.CapsuleGeometry(0.008, 0.025, 4, 8);
+      const mouth = new THREE.Mesh(mouthGeo, lipMat);
+      mouth.position.set(0, head.position.y - 0.05, 0.085);
+      mouth.rotation.z = Math.PI/2;
+      humanGroup.add(mouth);
+
+      // Hair
+      const hairGeo = new THREE.SphereGeometry(headH/2.1, 16, 12, 0, Math.PI*2, 0, Math.PI*0.6);
+      const hair = new THREE.Mesh(hairGeo, hairMat);
+      hair.position.copy(head.position);
+      hair.position.y += 0.02;
+      hair.scale.set(1.05, 0.8, 1.02);
+      hair.castShadow = true;
+      humanGroup.add(hair);
+
+      // TORSO - more anatomical
+      const chestGeo = new THREE.CapsuleGeometry(0.18, torsoH*0.6, 12, 20);
+      const chest = new THREE.Mesh(chestGeo, skinMat);
+      chest.position.set(0, legL + torsoH*0.7, 0);
+      chest.scale.set(1.2, 1, 0.7); // broader shoulders, flatter
+      chest.castShadow = true;
+      humanGroup.add(chest);
+
+      // Lower torso/abdomen
+      const abdomenGeo = new THREE.CylinderGeometry(0.16, 0.19, torsoH*0.4, 16);
+      const abdomen = new THREE.Mesh(abdomenGeo, skinMat);
+      abdomen.position.set(0, legL + torsoH*0.2, 0);
+      abdomen.castShadow = true;
+      humanGroup.add(abdomen);
+
+      // ARMS - more realistic
+      function createArm(side) {
+        const armGroup = new THREE.Group();
+        
+        // Shoulder
+        const shoulderGeo = new THREE.SphereGeometry(0.08, 12, 8);
+        const shoulder = new THREE.Mesh(shoulderGeo, skinMat);
+        shoulder.position.set(side * 0.25, legL + torsoH - 0.1, 0);
+        shoulder.castShadow = true;
+        humanGroup.add(shoulder);
+        
+        // Upper arm
+        const upperArmGeo = new THREE.CapsuleGeometry(0.055, armL*0.55, 10, 12);
+        const upperArm = new THREE.Mesh(upperArmGeo, skinMat);
+        upperArm.position.set(side * 0.25, legL + torsoH - 0.1 - armL*0.55/2, 0);
+        upperArm.castShadow = true;
+        humanGroup.add(upperArm);
+        
+        // Elbow
+        const elbowGeo = new THREE.SphereGeometry(0.04, 10, 8);
+        const elbow = new THREE.Mesh(elbowGeo, skinMat);
+        elbow.position.set(side * 0.25, legL + torsoH - 0.1 - armL*0.55, 0);
+        elbow.castShadow = true;
+        humanGroup.add(elbow);
+        
+        // Forearm
+        const forearmGeo = new THREE.CapsuleGeometry(0.045, armL*0.45, 10, 12);
+        const forearm = new THREE.Mesh(forearmGeo, skinMat);
+        forearm.position.set(side * 0.25, legL + torsoH - 0.1 - armL*0.55 - armL*0.45/2, 0);
+        forearm.castShadow = true;
+        humanGroup.add(forearm);
+        
+        // Hand
+        const handGeo = new THREE.BoxGeometry(0.08, 0.12, 0.04);
+        const hand = new THREE.Mesh(handGeo, skinMat);
+        hand.position.set(side * 0.25, legL + torsoH - 0.1 - armL - 0.06, 0);
+        hand.castShadow = true;
+        humanGroup.add(hand);
+        
+        // Fingers
+        for(let i = 0; i < 4; i++) {
+          const fingerGeo = new THREE.CylinderGeometry(0.008, 0.006, 0.04, 6);
+          const finger = new THREE.Mesh(fingerGeo, skinMat);
+          finger.position.set(
+            side * 0.25 + (i - 1.5) * 0.015, 
+            hand.position.y - 0.08, 
+            0.02
+          );
+          finger.castShadow = true;
+          humanGroup.add(finger);
+        }
       }
-      makeArm(1); makeArm(-1);
+      
+      createArm(1);  // right arm
+      createArm(-1); // left arm
 
-      // Legs
-      const hipY = legLen;
-      function makeLeg(side=1) {
-        const hipX = pelvisRadius * (0.5 + (rnd()-0.5)*0.1) * side;
-        const upperLen = legLen * 0.52 * (0.95 + (rnd()-0.5)*p.noise);
-        const lowerLen = legLen * 0.48 * (1.02 + (rnd()-0.5)*p.noise);
-        const upperGeom = new THREE.CylinderGeometry(chestRadius*0.16, chestRadius*0.14, upperLen, 10);
-        const lowerGeom = new THREE.CylinderGeometry(chestRadius*0.14, chestRadius*0.12, lowerLen, 10);
-        const footGeom = new THREE.BoxGeometry(chestRadius*0.2, chestRadius*0.07, chestRadius*0.35);
-        const legRoot = new THREE.Group(); legRoot.position.set(hipX, hipY, 0);
-        const upper = new THREE.Mesh(upperGeom, skinMat.clone()); upper.position.y = -upperLen/2; upper.castShadow=true;
-        const knee = new THREE.Group(); knee.position.y = -upperLen; const lower = new THREE.Mesh(lowerGeom, skinMat.clone()); lower.position.y = -lowerLen/2; lower.castShadow=true;
-        const foot = new THREE.Mesh(footGeom, skinMat.clone()); foot.position.y = -lowerLen - chestRadius*0.05; foot.position.z = chestRadius*0.15; foot.castShadow=true;
-        knee.add(lower); knee.add(foot);
-        legRoot.add(upper); legRoot.add(knee);
-        legRoot.rotation.z = (rnd()-0.5)*0.15*side;
-        humanGroup.add(legRoot);
+      // LEGS - more realistic
+      function createLeg(side) {
+        // Hip
+        const hipGeo = new THREE.SphereGeometry(0.09, 12, 8);
+        const hip = new THREE.Mesh(hipGeo, skinMat);
+        hip.position.set(side * 0.12, legL, 0);
+        hip.castShadow = true;
+        humanGroup.add(hip);
+        
+        // Thigh
+        const thighGeo = new THREE.CapsuleGeometry(0.08, legL*0.55, 12, 16);
+        const thigh = new THREE.Mesh(thighGeo, skinMat);
+        thigh.position.set(side * 0.12, legL - legL*0.55/2, 0);
+        thigh.castShadow = true;
+        humanGroup.add(thigh);
+        
+        // Knee
+        const kneeGeo = new THREE.SphereGeometry(0.055, 10, 8);
+        const knee = new THREE.Mesh(kneeGeo, skinMat);
+        knee.position.set(side * 0.12, legL - legL*0.55, 0);
+        knee.castShadow = true;
+        humanGroup.add(knee);
+        
+        // Calf
+        const calfGeo = new THREE.CapsuleGeometry(0.06, legL*0.45, 12, 16);
+        const calf = new THREE.Mesh(calfGeo, skinMat);
+        calf.position.set(side * 0.12, legL - legL*0.55 - legL*0.45/2, 0);
+        calf.castShadow = true;
+        humanGroup.add(calf);
+        
+        // Foot
+        const footGeo = new THREE.BoxGeometry(0.1, 0.06, 0.25);
+        const foot = new THREE.Mesh(footGeo, skinMat);
+        foot.position.set(side * 0.12, 0.03, 0.08);
+        foot.castShadow = true;
+        humanGroup.add(foot);
       }
-      makeLeg(1); makeLeg(-1);
+      
+      createLeg(1);  // right leg
+      createLeg(-1); // left leg
 
-      // Add simple eyes
-      const eyeGeo = new THREE.SphereGeometry(headH*0.03,8,6);
-      const eyeMat = new THREE.MeshStandardMaterial({color:0x111111,roughness:0.4});
-      const leftEye = new THREE.Mesh(eyeGeo, eyeMat); leftEye.position.set(-headH*0.12, head.position.y, headH*0.42);
-      const rightEye = leftEye.clone(); rightEye.position.x *= -1;
-      humanGroup.add(leftEye); humanGroup.add(rightEye);
-
-      // shadow and receive
-      humanGroup.traverse((c) => { if (c.isMesh) { c.castShadow=true; c.receiveShadow=true; } });
-
-      // add a simple name tag or bounding box helper (debug)
-    }
-
-    // initial build
-    buildHuman(params);
-
-    // UI wiring
-    function $(id){return document.getElementById(id)}
-    $('height').addEventListener('input', e => { params.height = parseFloat(e.target.value); $('heightVal').textContent = params.height.toFixed(2)+'m'; });
-    $('torso').addEventListener('input', e => { params.torso = parseFloat(e.target.value); $('torsoVal').textContent = params.torso.toFixed(2); });
-    $('arm').addEventListener('input', e => { params.arm = parseFloat(e.target.value); $('armVal').textContent = params.arm.toFixed(2); });
-    $('leg').addEventListener('input', e => { params.leg = parseFloat(e.target.value); $('legVal').textContent = params.leg.toFixed(2); });
-    $('head').addEventListener('input', e => { params.head = parseFloat(e.target.value); $('headVal').textContent = params.head.toFixed(2); });
-    $('noise').addEventListener('input', e => { params.noise = parseFloat(e.target.value); $('noiseVal').textContent = params.noise.toFixed(2); });
-    $('seed').addEventListener('change', e => { params.seed = parseInt(e.target.value); });
-
-    $('regen').addEventListener('click', () => { params.seed = parseInt($('seed').value) || 42; buildHuman(params); });
-    $('randomPose').addEventListener('click', () => { randomPose(); });
-    $('toggleWire').addEventListener('click', () => { params.wire = !params.wire; setWireframe(params.wire); $('toggleWire').textContent = params.wire ? 'Solid' : 'Wireframe'; });
-
-    function setWireframe(flag) {
-      humanGroup.traverse(c => { if (c.isMesh) c.material.wireframe = flag; });
-    }
-
-    function randomPose() {
-      // shallow random adjustments to limbs
+      // Set all meshes to cast and receive shadows
       humanGroup.traverse((child) => {
-        if (child.type === 'Group' && child.children.length) {
-          child.rotation.x = (Math.random()-0.5)*0.8;
-          child.rotation.y = (Math.random()-0.5)*0.4;
-          child.rotation.z = (Math.random()-0.5)*0.4;
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
         }
       });
     }
+
+    // Create the detailed human
+    createDetailedHuman();
+
+    // Simple UI helper
+    function $(id){return document.getElementById(id)}
 
     // Export GLB
     $('exportGLB').addEventListener('click', () => {
@@ -261,8 +294,7 @@
     }
     animate();
 
-    // expose build for console tinkering
-    window.buildHuman = buildHuman;
+    console.log('3D Human loaded - use mouse to rotate, wheel to zoom');
 
   </script>
 </body>
