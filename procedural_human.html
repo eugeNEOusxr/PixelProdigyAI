@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Procedural Human — EugeneousOS</title>
+  <style>
+    html,body { height:100%; margin:0; font-family:Inter,Segoe UI,Roboto,Arial }
+    #ui { position: absolute; left: 12px; top: 12px; z-index: 10; background: rgba(0,0,0,0.45); color: #fff; padding:12px; border-radius:10px; width:260px }
+    #ui h3 { margin:0 0 8px 0; font-size:16px }
+    .row { display:flex; gap:8px; align-items:center; margin:8px 0 }
+    .row label { width:110px; font-size:13px }
+    input[type=range] { width:120px }
+    button { margin-top:8px; padding:8px 12px; border-radius:6px; border:none; cursor:pointer }
+    #renderer { width:100%; height:100%; display:block }
+    .small { font-size:12px; opacity:0.9 }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <h3>Procedural Human</h3>
+    <div class="row"><label>Seed</label><input id="seed" type="number" value="42" style="width:110px"/></div>
+    <div class="row"><label>Height</label><input id="height" type="range" min="1.4" max="2.2" step="0.01" value="1.8"/><div class="small" id="heightVal">1.80m</div></div>
+    <div class="row"><label>Torso ratio</label><input id="torso" type="range" min="0.3" max="0.6" step="0.01" value="0.45"/><div class="small" id="torsoVal">0.45</div></div>
+    <div class="row"><label>Arm length</label><input id="arm" type="range" min="0.6" max="0.9" step="0.01" value="0.75"/><div class="small" id="armVal">0.75</div></div>
+    <div class="row"><label>Leg length</label><input id="leg" type="range" min="0.8" max="1.2" step="0.01" value="1.0"/><div class="small" id="legVal">1.00</div></div>
+    <div class="row"><label>Head scale</label><input id="head" type="range" min="0.6" max="1.4" step="0.01" value="1.0"/><div class="small" id="headVal">1.00</div></div>
+    <div class="row"><label>Noise</label><input id="noise" type="range" min="0" max="0.6" step="0.01" value="0.08"/><div class="small" id="noiseVal">0.08</div></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap">
+      <button id="regen" style="background:#00c6ff;color:#002">Regenerate</button>
+      <button id="randomPose" style="background:#ffd166;color:#222">Random Pose</button>
+      <button id="exportGLB" style="background:#7bd389;color:#042">Export GLB</button>
+      <button id="toggleWire" style="background:#eeeeee;color:#222">Wireframe</button>
+    </div>
+    <div style="margin-top:8px;font-size:12px;opacity:0.9">Simple procedural articulating human. Use seed for repeatability.</div>
+  </div>
+
+  <canvas id="renderer"></canvas>
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';
+    import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+    import { GLTFExporter } from 'https://unpkg.com/three@0.128.0/examples/jsm/exporters/GLTFExporter.js';
+
+    const canvas = document.getElementById('renderer');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x111217);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.set(0,1.6,3.5);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0,1,0);
+    controls.update();
+
+    const hemi = new THREE.HemisphereLight(0xbfd1ff, 0x444444, 0.6);
+    scene.add(hemi);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+    dir.position.set(3,8,5);
+    dir.castShadow = true;
+    scene.add(dir);
+
+    // ground
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(50,50), new THREE.MeshStandardMaterial({ color:0x0b0b0f, metalness:0.1, roughness:0.9 }));
+    ground.rotation.x = -Math.PI/2; ground.position.y = 0; scene.add(ground);
+
+    // Parameters and UI
+    const params = {
+      seed: 42,
+      height: 1.8,
+      torso: 0.45,
+      arm: 0.75,
+      leg: 1.0,
+      head: 1.0,
+      noise: 0.08,
+      wire: false
+    };
+
+    // random generator with seed
+    function rng(seed) {
+      let s = seed % 2147483647;
+      if (s <= 0) s += 2147483646;
+      return () => (s = s * 16807 % 2147483647) / 2147483647;
+    }
+
+    // Human group
+    let humanGroup = new THREE.Group();
+    scene.add(humanGroup);
+
+    // Simple material
+    const skinMat = new THREE.MeshStandardMaterial({ color:0xf1c28a, metalness:0.05, roughness:0.7 });
+
+    function clearHuman() {
+      if (humanGroup) {
+        humanGroup.traverse((c) => { if (c.isMesh) c.geometry.dispose(); });
+        scene.remove(humanGroup);
+      }
+      humanGroup = new THREE.Group();
+      scene.add(humanGroup);
+    }
+
+    function buildHuman(p) {
+      clearHuman();
+      const rnd = rng(p.seed);
+
+      // proportions
+      const H = p.height; // total height in meters
+      const torsoH = H * p.torso; // torso fraction
+      const headH = H * 0.125 * p.head; // approximate
+      const neck = headH * 0.25;
+      const legLen = p.leg; // absolute meter
+      const armLen = p.arm;
+
+      // Torso: use capsule (cylinder + spheres)
+      const chestRadius = H * 0.12 + (rnd()-0.5)*p.noise*0.05;
+      const torsoGeom = new THREE.CapsuleGeometry(chestRadius, Math.max(0.01, torsoH-2*chestRadius), 8, 12);
+      const torso = new THREE.Mesh(torsoGeom, skinMat.clone()); torso.castShadow=true; torso.receiveShadow=true;
+      torso.position.y = legLen + torsoH/2;
+      humanGroup.add(torso);
+
+      // Pelvis
+      const pelvisRadius = chestRadius * 0.85;
+      const pelvisGeom = new THREE.CylinderGeometry(pelvisRadius, pelvisRadius*1.05, chestRadius*0.7, 12);
+      const pelvis = new THREE.Mesh(pelvisGeom, skinMat.clone()); pelvis.position.y = legLen + pelvisRadius*0.35; pelvis.castShadow=true;
+      humanGroup.add(pelvis);
+
+      // Head
+      const headGeom = new THREE.SphereGeometry(headH/2, 16, 12);
+      const head = new THREE.Mesh(headGeom, skinMat.clone()); head.castShadow=true;
+      head.position.y = legLen + torsoH + neck + headH/2 - 0.02;
+      humanGroup.add(head);
+
+      // Arms (upper, lower, hand)
+      const shoulderY = legLen + torsoH - chestRadius*0.2;
+      const shoulderX = chestRadius + 0.05;
+      function makeArm(side=1) {
+        const armRoot = new THREE.Group(); armRoot.position.set(side*shoulderX, shoulderY, 0);
+        const upperLen = armLen * 0.55 * (0.9 + (rnd()-0.5)*p.noise);
+        const lowerLen = armLen * 0.45 * (1.05 + (rnd()-0.5)*p.noise);
+        const upperGeom = new THREE.CylinderGeometry(chestRadius*0.15, chestRadius*0.12, upperLen, 10);
+        const lowerGeom = new THREE.CylinderGeometry(chestRadius*0.12, chestRadius*0.1, lowerLen, 10);
+        const handGeom = new THREE.BoxGeometry(chestRadius*0.18, chestRadius*0.12, chestRadius*0.3);
+        const upper = new THREE.Mesh(upperGeom, skinMat.clone()); upper.position.y = -upperLen/2; upper.castShadow=true;
+        const elbow = new THREE.Group(); elbow.position.y = -upperLen;
+        const lower = new THREE.Mesh(lowerGeom, skinMat.clone()); lower.position.y = -lowerLen/2; lower.castShadow=true;
+        const hand = new THREE.Mesh(handGeom, skinMat.clone()); hand.position.y = -lowerLen - chestRadius*0.06; hand.position.x = side*0.03; hand.castShadow=true;
+        elbow.add(lower); elbow.add(hand);
+        armRoot.add(upper); armRoot.add(elbow);
+
+        // slight random pose
+        armRoot.rotation.z = (rnd()-0.5) * 0.25 * side;
+
+        humanGroup.add(armRoot);
+      }
+      makeArm(1); makeArm(-1);
+
+      // Legs
+      const hipY = legLen;
+      function makeLeg(side=1) {
+        const hipX = pelvisRadius * (0.5 + (rnd()-0.5)*0.1) * side;
+        const upperLen = legLen * 0.52 * (0.95 + (rnd()-0.5)*p.noise);
+        const lowerLen = legLen * 0.48 * (1.02 + (rnd()-0.5)*p.noise);
+        const upperGeom = new THREE.CylinderGeometry(chestRadius*0.16, chestRadius*0.14, upperLen, 10);
+        const lowerGeom = new THREE.CylinderGeometry(chestRadius*0.14, chestRadius*0.12, lowerLen, 10);
+        const footGeom = new THREE.BoxGeometry(chestRadius*0.2, chestRadius*0.07, chestRadius*0.35);
+        const legRoot = new THREE.Group(); legRoot.position.set(hipX, hipY, 0);
+        const upper = new THREE.Mesh(upperGeom, skinMat.clone()); upper.position.y = -upperLen/2; upper.castShadow=true;
+        const knee = new THREE.Group(); knee.position.y = -upperLen; const lower = new THREE.Mesh(lowerGeom, skinMat.clone()); lower.position.y = -lowerLen/2; lower.castShadow=true;
+        const foot = new THREE.Mesh(footGeom, skinMat.clone()); foot.position.y = -lowerLen - chestRadius*0.05; foot.position.z = chestRadius*0.15; foot.castShadow=true;
+        knee.add(lower); knee.add(foot);
+        legRoot.add(upper); legRoot.add(knee);
+        legRoot.rotation.z = (rnd()-0.5)*0.15*side;
+        humanGroup.add(legRoot);
+      }
+      makeLeg(1); makeLeg(-1);
+
+      // Add simple eyes
+      const eyeGeo = new THREE.SphereGeometry(headH*0.03,8,6);
+      const eyeMat = new THREE.MeshStandardMaterial({color:0x111111,roughness:0.4});
+      const leftEye = new THREE.Mesh(eyeGeo, eyeMat); leftEye.position.set(-headH*0.12, head.position.y, headH*0.42);
+      const rightEye = leftEye.clone(); rightEye.position.x *= -1;
+      humanGroup.add(leftEye); humanGroup.add(rightEye);
+
+      // shadow and receive
+      humanGroup.traverse((c) => { if (c.isMesh) { c.castShadow=true; c.receiveShadow=true; } });
+
+      // add a simple name tag or bounding box helper (debug)
+    }
+
+    // initial build
+    buildHuman(params);
+
+    // UI wiring
+    function $(id){return document.getElementById(id)}
+    $('height').addEventListener('input', e => { params.height = parseFloat(e.target.value); $('heightVal').textContent = params.height.toFixed(2)+'m'; });
+    $('torso').addEventListener('input', e => { params.torso = parseFloat(e.target.value); $('torsoVal').textContent = params.torso.toFixed(2); });
+    $('arm').addEventListener('input', e => { params.arm = parseFloat(e.target.value); $('armVal').textContent = params.arm.toFixed(2); });
+    $('leg').addEventListener('input', e => { params.leg = parseFloat(e.target.value); $('legVal').textContent = params.leg.toFixed(2); });
+    $('head').addEventListener('input', e => { params.head = parseFloat(e.target.value); $('headVal').textContent = params.head.toFixed(2); });
+    $('noise').addEventListener('input', e => { params.noise = parseFloat(e.target.value); $('noiseVal').textContent = params.noise.toFixed(2); });
+    $('seed').addEventListener('change', e => { params.seed = parseInt(e.target.value); });
+
+    $('regen').addEventListener('click', () => { params.seed = parseInt($('seed').value) || 42; buildHuman(params); });
+    $('randomPose').addEventListener('click', () => { randomPose(); });
+    $('toggleWire').addEventListener('click', () => { params.wire = !params.wire; setWireframe(params.wire); $('toggleWire').textContent = params.wire ? 'Solid' : 'Wireframe'; });
+
+    function setWireframe(flag) {
+      humanGroup.traverse(c => { if (c.isMesh) c.material.wireframe = flag; });
+    }
+
+    function randomPose() {
+      // shallow random adjustments to limbs
+      humanGroup.traverse((child) => {
+        if (child.type === 'Group' && child.children.length) {
+          child.rotation.x = (Math.random()-0.5)*0.8;
+          child.rotation.y = (Math.random()-0.5)*0.4;
+          child.rotation.z = (Math.random()-0.5)*0.4;
+        }
+      });
+    }
+
+    // Export GLB
+    $('exportGLB').addEventListener('click', () => {
+      const exporter = new GLTFExporter();
+      const options = { binary:true };
+      exporter.parse(humanGroup, (result) => {
+        if (result instanceof ArrayBuffer) {
+          saveArrayBuffer(result, 'procedural_human.glb');
+        } else {
+          const text = JSON.stringify(result, null, 2);
+          saveString(text, 'procedural_human.gltf');
+        }
+      }, options);
+    });
+
+    function saveString(text, filename) {
+      const link = document.createElement('a');
+      link.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(text);
+      link.download = filename;
+      link.click();
+    }
+    function saveArrayBuffer(buffer, filename) {
+      const blob = new Blob([buffer], {type:'application/octet-stream'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
+    // resize
+    window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+
+    // animation
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // expose build for console tinkering
+    window.buildHuman = buildHuman;
+
+  </script>
+</body>
+</html>
