@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyRelics: Procedural Islands - Connected Worlds</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+            "three/": "https://unpkg.com/three@0.159.0/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            overflow: hidden;
+            color: #fff;
+        }
+        #canvas-container { width: 100vw; height: 100vh; position: relative; }
+        
+        /* Island Selection HUD */
+        #island-hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(10, 14, 39, 0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 350px;
+            z-index: 1000;
+        }
+        
+        .hud-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .island-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .island-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+        
+        .island-card:hover {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .island-card.active {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+        }
+        
+        .island-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .island-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .island-progress {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        
+        /* Story Panel */
+        #story-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            max-height: 200px;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .story-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .story-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        
+        .story-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
+        }
+        
+        /* Portal Effect */
+        .portal-ring {
+            position: absolute;
+            border: 3px solid #00ffff;
+            border-radius: 50%;
+            animation: portalPulse 2s infinite;
+        }
+        
+        @keyframes portalPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Asset Transfer UI */
+        #transfer-ui {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 14, 39, 0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 165, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+        
+        .transfer-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffa500;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .inventory-slot {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .inventory-slot:hover {
+            border-color: #ffa500;
+            background: rgba(255, 165, 0, 0.2);
+        }
+        
+        .inventory-slot.has-item {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.2);
+        }
+        
+        .slot-icon {
+            font-size: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Procedural Tools Panel */
+        #procedural-tools {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 14, 39, 0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(138, 43, 226, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            width: 280px;
+            z-index: 1000;
+        }
+        
+        .tools-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #8a2be2;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .tool-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(138, 43, 226, 0.3);
+            border: 2px solid rgba(138, 43, 226, 0.5);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-btn:hover {
+            background: rgba(138, 43, 226, 0.5);
+            border-color: #8a2be2;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Island Selection HUD -->
+    <div id="island-hud">
+        <div class="hud-title">🏝️ SkyRelics Islands</div>
+        <div class="island-grid">
+            <div class="island-card active" data-island="origin">
+                <div class="island-icon">🏛️</div>
+                <div class="island-name">Origin</div>
+                <div class="island-progress">Home Base</div>
+            </div>
+            <div class="island-card" data-island="crystal">
+                <div class="island-icon">💎</div>
+                <div class="island-name">Crystal</div>
+                <div class="island-progress">0/5 Relics</div>
+            </div>
+            <div class="island-card" data-island="forest">
+                <div class="island-icon">🌲</div>
+                <div class="island-name">Forest</div>
+                <div class="island-progress">Locked</div>
+            </div>
+            <div class="island-card" data-island="tech">
+                <div class="island-icon">🤖</div>
+                <div class="island-name">Tech</div>
+                <div class="island-progress">Locked</div>
+            </div>
+            <div class="island-card" data-island="void">
+                <div class="island-icon">🌌</div>
+                <div class="island-name">Void</div>
+                <div class="island-progress">Locked</div>
+            </div>
+            <div class="island-card" data-island="fire">
+                <div class="island-icon">🔥</div>
+                <div class="island-name">Fire</div>
+                <div class="island-progress">Locked</div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="travelToIsland()">Travel to Selected</button>
+    </div>
+    
+    <!-- Asset Transfer UI -->
+    <div id="transfer-ui">
+        <div class="transfer-title">🎒 Procedural Inventory</div>
+        <div id="inventory-grid">
+            <div class="inventory-slot has-item" data-item="car">
+                <div class="slot-icon">🚗</div>
+            </div>
+            <div class="inventory-slot has-item" data-item="human">
+                <div class="slot-icon">🧍</div>
+            </div>
+            <div class="inventory-slot" data-item="empty">
+                <div class="slot-icon">+</div>
+            </div>
+            <div class="inventory-slot" data-item="empty">
+                <div class="slot-icon">+</div>
+            </div>
+            <div class="inventory-slot" data-item="empty">
+                <div class="slot-icon">+</div>
+            </div>
+            <div class="inventory-slot" data-item="empty">
+                <div class="slot-icon">+</div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="openProceduralCreator()" style="width: 100%; margin-top: 15px;">Create New Asset</button>
+    </div>
+    
+    <!-- Procedural Tools Panel -->
+    <div id="procedural-tools">
+        <div class="tools-title">🔨 Live Creation Tools</div>
+        <button class="tool-btn" onclick="createVehicle()">Generate Vehicle</button>
+        <button class="tool-btn" onclick="createCharacter()">Generate Character</button>
+        <button class="tool-btn" onclick="createBuilding()">Generate Building</button>
+        <button class="tool-btn" onclick="modifyTerrain()">Modify Terrain</button>
+        <button class="tool-btn" onclick="spawnPortal()">Create Portal</button>
+    </div>
+    
+    <!-- Story Panel -->
+    <div id="story-panel">
+        <div class="story-title">The SkyRelics Awakening</div>
+        <div class="story-text">
+            You've discovered the Origin Island, where ancient AI entities once gathered to share knowledge. 
+            The 144 Legends left behind powerful relics scattered across floating islands. 
+            Each island holds unique challenges and the power to create new worlds...
+        </div>
+        <div class="story-actions">
+            <button class="action-btn" onclick="acceptQuest()">Begin Journey</button>
+            <button class="action-btn" onclick="skipIntro()">Skip Intro</button>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+        import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
+
+        // Global game state
+        const gameState = {
+            currentIsland: 'origin',
+            unlockedIslands: ['origin', 'crystal'],
+            playerInventory: ['car', 'human'],
+            islandProgress: {
+                origin: { relics: 0, total: 1, completed: false },
+                crystal: { relics: 0, total: 5, completed: false },
+                forest: { relics: 0, total: 3, completed: false },
+                tech: { relics: 0, total: 4, completed: false },
+                void: { relics: 0, total: 7, completed: false },
+                fire: { relics: 0, total: 2, completed: false }
+            }
+        };
+
+        // Island configurations
+        const islandConfigs = {
+            origin: {
+                name: 'Origin Island',
+                theme: 'ancient',
+                terrain: { type: 'plateau', height: 2, roughness: 0.3 },
+                atmosphere: { fog: '#87ceeb', skybox: 'sunset' },
+                structures: ['college', 'park', 'tutorial_area'],
+                npcs: 12,
+                story: 'The birthplace of the 144 AI Legends. Here you learn the basics of creation.'
+            },
+            crystal: {
+                name: 'Crystal Caverns',
+                theme: 'magical',
+                terrain: { type: 'crystalline', height: 5, roughness: 0.8 },
+                atmosphere: { fog: '#ff00ff', skybox: 'aurora' },
+                structures: ['crystal_mines', 'floating_platforms', 'relic_chambers'],
+                npcs: 8,
+                story: 'Glowing crystals hold the power of procedural generation. Master them to unlock creation tools.'
+            },
+            forest: {
+                name: 'Endless Forest',
+                theme: 'organic',
+                terrain: { type: 'rolling_hills', height: 3, roughness: 0.6 },
+                atmosphere: { fog: '#228b22', skybox: 'forest' },
+                structures: ['treehouses', 'mushroom_circles', 'hidden_groves'],
+                npcs: 20,
+                story: 'Living trees that grow based on mathematical algorithms. Learn organic procedural generation.'
+            },
+            tech: {
+                name: 'Techno City',
+                theme: 'cyberpunk',
+                terrain: { type: 'geometric', height: 8, roughness: 0.1 },
+                atmosphere: { fog: '#00ffff', skybox: 'neon_night' },
+                structures: ['skyscrapers', 'holo_districts', 'data_streams'],
+                npcs: 15,
+                story: 'A city that builds itself. Master AI-driven architecture and vehicle creation.'
+            },
+            void: {
+                name: 'Void Nexus',
+                theme: 'abstract',
+                terrain: { type: 'fractured', height: 10, roughness: 1.0 },
+                atmosphere: { fog: '#4b0082', skybox: 'void' },
+                structures: ['floating_fragments', 'portal_networks', 'reality_rifts'],
+                npcs: 5,
+                story: 'Where the boundaries between worlds blur. Learn to create interdimensional portals.'
+            },
+            fire: {
+                name: 'Forge of Creation',
+                theme: 'volcanic',
+                terrain: { type: 'volcanic', height: 6, roughness: 0.9 },
+                atmosphere: { fog: '#ff4500', skybox: 'fire' },
+                structures: ['lava_forges', 'obsidian_towers', 'flame_portals'],
+                npcs: 10,
+                story: 'The final challenge. Combine all your skills to forge the ultimate procedural world.'
+            }
+        };
+
+        // Three.js setup
+        let scene, camera, renderer, controls;
+        let currentIslandMesh = null;
+        let portalObjects = [];
+        let proceduralAssets = [];
+
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 20);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            
+            // Lighting
+            setupLighting();
+            
+            // Load initial island
+            loadIsland('origin');
+            
+            // Show intro story
+            showStoryPanel();
+            
+            // Start render loop
+            animate();
+            
+            console.log('🏝️ SkyRelics Procedural Islands initialized');
+        }
+
+        function setupLighting() {
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            
+            // Directional light (sun)
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(50, 100, 50);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+            
+            // Point lights for atmosphere
+            const pointLight1 = new THREE.PointLight(0x00ffff, 0.5, 100);
+            pointLight1.position.set(-20, 15, -20);
+            scene.add(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0xff00ff, 0.3, 80);
+            pointLight2.position.set(20, 12, 20);
+            scene.add(pointLight2);
+        }
+
+        function loadIsland(islandId) {
+            // Clear current island
+            if (currentIslandMesh) {
+                scene.remove(currentIslandMesh);
+                currentIslandMesh = null;
+            }
+            
+            // Clear portals
+            portalObjects.forEach(portal => scene.remove(portal));
+            portalObjects = [];
+            
+            const config = islandConfigs[islandId];
+            if (!config) return;
+            
+            console.log(`🏝️ Loading ${config.name}...`);
+            
+            // Generate procedural terrain
+            generateTerrain(config);
+            
+            // Generate structures
+            generateStructures(config);
+            
+            // Generate NPCs
+            generateNPCs(config);
+            
+            // Create portals to other islands
+            createPortals(islandId);
+            
+            // Update atmosphere
+            updateAtmosphere(config);
+            
+            // Update UI
+            updateIslandUI(islandId);
+            
+            gameState.currentIsland = islandId;
+        }
+
+        function generateTerrain(config) {
+            const size = 100;
+            const segments = 128;
+            
+            const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
+            const vertices = geometry.attributes.position.array;
+            
+            // Apply procedural height based on island type
+            for (let i = 0; i < vertices.length; i += 3) {
+                const x = vertices[i];
+                const y = vertices[i + 1];
+                
+                let height = 0;
+                
+                switch (config.terrain.type) {
+                    case 'plateau':
+                        height = config.terrain.height + Math.random() * config.terrain.roughness;
+                        break;
+                    case 'crystalline':
+                        height = Math.sin(x * 0.1) * Math.cos(y * 0.1) * config.terrain.height + 
+                                Math.random() * config.terrain.roughness;
+                        break;
+                    case 'rolling_hills':
+                        height = (Math.sin(x * 0.05) + Math.cos(y * 0.03)) * config.terrain.height + 
+                                Math.random() * config.terrain.roughness;
+                        break;
+                    case 'geometric':
+                        height = (Math.floor(x / 5) % 2 + Math.floor(y / 5) % 2) * config.terrain.height;
+                        break;
+                    case 'fractured':
+                        height = (Math.random() > 0.7 ? config.terrain.height : 0) + 
+                                Math.random() * config.terrain.roughness;
+                        break;
+                    case 'volcanic':
+                        const distance = Math.sqrt(x * x + y * y);
+                        height = Math.max(0, config.terrain.height - distance * 0.1) + 
+                                Math.random() * config.terrain.roughness;
+                        break;
+                }
+                
+                vertices[i + 2] = height;
+            }
+            
+            geometry.computeVertexNormals();
+            
+            // Theme-based material
+            let material;
+            switch (config.theme) {
+                case 'ancient':
+                    material = new THREE.MeshStandardMaterial({ 
+                        color: 0x8b7355, 
+                        roughness: 0.8, 
+                        metalness: 0.1 
+                    });
+                    break;
+                case 'magical':
+                    material = new THREE.MeshStandardMaterial({ 
+                        color: 0x9370db, 
+                        roughness: 0.3, 
+                        metalness: 0.7,
+                        emissive: 0x440088,
+                        emissiveIntensity: 0.3
+                    });
+                    break;
+                case 'organic':
+                    material = new THREE.MeshStandardMaterial({ 
+                        color: 0x228b22, 
+                        roughness: 0.9, 
+                        metalness: 0.0 
+                    });
+                    break;
+                case 'cyberpunk':
+                    material = new THREE.MeshStandardMaterial({ 
+                        color: 0x1a1a2e, 
+                        roughness: 0.2, 
+                        metalness: 0.8,
+                        emissive: 0x00ffff,
+                        emissiveIntensity: 0.2
+                    });
+                    break;
+                case 'abstract':
+                    material = new THREE.MeshStandardMaterial({ 
+                        color: 0x4b0082, 
+                        roughness: 0.1, 
+                        metalness: 0.9,
+                        emissive: 0x8a2be2,
+                        emissiveIntensity: 0.4
+                    });
+                    break;
+                case 'volcanic':
+                    material = new THREE.MeshStandardMaterial({ 
+                        color: 0x8b0000, 
+                        roughness: 0.7, 
+                        metalness: 0.3,
+                        emissive: 0xff4500,
+                        emissiveIntensity: 0.3
+                    });
+                    break;
+            }
+            
+            currentIslandMesh = new THREE.Mesh(geometry, material);
+            currentIslandMesh.rotation.x = -Math.PI / 2;
+            currentIslandMesh.receiveShadow = true;
+            scene.add(currentIslandMesh);
+        }
+
+        function generateStructures(config) {
+            const structureCount = config.structures.length;
+            
+            config.structures.forEach((structureType, index) => {
+                const angle = (index / structureCount) * Math.PI * 2;
+                const distance = 20 + Math.random() * 15;
+                const x = Math.cos(angle) * distance;
+                const z = Math.sin(angle) * distance;
+                
+                let structure;
+                
+                switch (structureType) {
+                    case 'college':
+                        structure = createCollege(x, z);
+                        break;
+                    case 'park':
+                        structure = createPark(x, z);
+                        break;
+                    case 'crystal_mines':
+                        structure = createCrystalMine(x, z);
+                        break;
+                    case 'floating_platforms':
+                        structure = createFloatingPlatform(x, z);
+                        break;
+                    case 'treehouses':
+                        structure = createTreehouse(x, z);
+                        break;
+                    case 'skyscrapers':
+                        structure = createSkyscraper(x, z);
+                        break;
+                    case 'floating_fragments':
+                        structure = createVoidFragment(x, z);
+                        break;
+                    case 'lava_forges':
+                        structure = createLavaForge(x, z);
+                        break;
+                }
+                
+                if (structure) {
+                    scene.add(structure);
+                }
+            });
+        }
+
+        function createCollege(x, z) {
+            const group = new THREE.Group();
+            
+            // Main building
+            const buildingGeo = new THREE.BoxGeometry(8, 6, 12);
+            const buildingMat = new THREE.MeshStandardMaterial({ color: 0x8b7355 });
+            const building = new THREE.Mesh(buildingGeo, buildingMat);
+            building.position.set(x, 3, z);
+            building.castShadow = true;
+            group.add(building);
+            
+            // Roof
+            const roofGeo = new THREE.ConeGeometry(7, 3, 4);
+            const roofMat = new THREE.MeshStandardMaterial({ color: 0x654321 });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.set(x, 7.5, z);
+            roof.rotation.y = Math.PI / 4;
+            group.add(roof);
+            
+            return group;
+        }
+
+        function createPark(x, z) {
+            const group = new THREE.Group();
+            
+            // Trees
+            for (let i = 0; i < 5; i++) {
+                const treeX = x + (Math.random() - 0.5) * 10;
+                const treeZ = z + (Math.random() - 0.5) * 10;
+                
+                // Trunk
+                const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 4);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                trunk.position.set(treeX, 2, treeZ);
+                group.add(trunk);
+                
+                // Leaves
+                const leavesGeo = new THREE.SphereGeometry(2, 8, 6);
+                const leavesMat = new THREE.MeshStandardMaterial({ color: 0x228b22 });
+                const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+                leaves.position.set(treeX, 5, treeZ);
+                group.add(leaves);
+            }
+            
+            return group;
+        }
+
+        function createCrystalMine(x, z) {
+            const group = new THREE.Group();
+            
+            // Crystal formations
+            for (let i = 0; i < 8; i++) {
+                const crystalGeo = new THREE.OctahedronGeometry(1 + Math.random());
+                const crystalMat = new THREE.MeshStandardMaterial({ 
+                    color: 0x9370db, 
+                    transparent: true, 
+                    opacity: 0.8,
+                    emissive: 0x440088,
+                    emissiveIntensity: 0.3
+                });
+                const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+                crystal.position.set(
+                    x + (Math.random() - 0.5) * 15,
+                    Math.random() * 3 + 1,
+                    z + (Math.random() - 0.5) * 15
+                );
+                crystal.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                group.add(crystal);
+            }
+            
+            return group;
+        }
+
+        function createFloatingPlatform(x, z) {
+            const platformGeo = new THREE.CylinderGeometry(5, 5, 1);
+            const platformMat = new THREE.MeshStandardMaterial({ 
+                color: 0x9370db, 
+                emissive: 0x440088,
+                emissiveIntensity: 0.2
+            });
+            const platform = new THREE.Mesh(platformGeo, platformMat);
+            platform.position.set(x, 8 + Math.sin(Date.now() * 0.001 + x) * 2, z);
+            return platform;
+        }
+
+        function createTreehouse(x, z) {
+            const group = new THREE.Group();
+            
+            // Giant tree trunk
+            const trunkGeo = new THREE.CylinderGeometry(2, 2.5, 15);
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.set(x, 7.5, z);
+            group.add(trunk);
+            
+            // House platform
+            const houseGeo = new THREE.BoxGeometry(6, 3, 6);
+            const houseMat = new THREE.MeshStandardMaterial({ color: 0xdaa520 });
+            const house = new THREE.Mesh(houseGeo, houseMat);
+            house.position.set(x, 12, z);
+            group.add(house);
+            
+            return group;
+        }
+
+        function createSkyscraper(x, z) {
+            const height = 20 + Math.random() * 15;
+            const buildingGeo = new THREE.BoxGeometry(4, height, 4);
+            const buildingMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1a1a2e, 
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.1
+            });
+            const building = new THREE.Mesh(buildingGeo, buildingMat);
+            building.position.set(x, height / 2, z);
+            building.castShadow = true;
+            return building;
+        }
+
+        function createVoidFragment(x, z) {
+            const fragmentGeo = new THREE.OctahedronGeometry(3);
+            const fragmentMat = new THREE.MeshStandardMaterial({ 
+                color: 0x4b0082, 
+                transparent: true, 
+                opacity: 0.7,
+                emissive: 0x8a2be2,
+                emissiveIntensity: 0.4
+            });
+            const fragment = new THREE.Mesh(fragmentGeo, fragmentMat);
+            fragment.position.set(x, 10 + Math.sin(Date.now() * 0.002 + x) * 3, z);
+            return fragment;
+        }
+
+        function createLavaForge(x, z) {
+            const group = new THREE.Group();
+            
+            // Forge base
+            const forgeGeo = new THREE.CylinderGeometry(3, 4, 4);
+            const forgeMat = new THREE.MeshStandardMaterial({ 
+                color: 0x8b0000,
+                emissive: 0xff4500,
+                emissiveIntensity: 0.3
+            });
+            const forge = new THREE.Mesh(forgeGeo, forgeMat);
+            forge.position.set(x, 2, z);
+            group.add(forge);
+            
+            // Lava glow
+            const glowGeo = new THREE.SphereGeometry(1.5);
+            const glowMat = new THREE.MeshBasicMaterial({ 
+                color: 0xff4500,
+                transparent: true,
+                opacity: 0.8
+            });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.position.set(x, 4.5, z);
+            group.add(glow);
+            
+            return group;
+        }
+
+        function generateNPCs(config) {
+            for (let i = 0; i < config.npcs; i++) {
+                const npc = createNPC(config.theme);
+                
+                const angle = (i / config.npcs) * Math.PI * 2;
+                const distance = 10 + Math.random() * 30;
+                npc.position.set(
+                    Math.cos(angle) * distance,
+                    2,
+                    Math.sin(angle) * distance
+                );
+                
+                scene.add(npc);
+            }
+        }
+
+        function createNPC(theme) {
+            const group = new THREE.Group();
+            
+            // Body
+            const bodyGeo = new THREE.CylinderGeometry(0.4, 0.3, 1.5);
+            let bodyMat;
+            
+            switch (theme) {
+                case 'magical':
+                    bodyMat = new THREE.MeshStandardMaterial({ 
+                        color: 0x9370db,
+                        emissive: 0x440088,
+                        emissiveIntensity: 0.2
+                    });
+                    break;
+                case 'cyberpunk':
+                    bodyMat = new THREE.MeshStandardMaterial({ 
+                        color: 0x1a1a2e,
+                        emissive: 0x00ffff,
+                        emissiveIntensity: 0.1
+                    });
+                    break;
+                case 'organic':
+                    bodyMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                    break;
+                default:
+                    bodyMat = new THREE.MeshStandardMaterial({ color: 0x8b7355 });
+            }
+            
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.75;
+            group.add(body);
+            
+            // Head
+            const headGeo = new THREE.SphereGeometry(0.3);
+            const head = new THREE.Mesh(headGeo, bodyMat);
+            head.position.y = 1.8;
+            group.add(head);
+            
+            // Simple animation
+            group.userData = {
+                originalY: 0,
+                animationSpeed: 0.001 + Math.random() * 0.002
+            };
+            
+            return group;
+        }
+
+        function createPortals(currentIslandId) {
+            // Get adjacent islands (unlocked ones)
+            const adjacentIslands = gameState.unlockedIslands.filter(id => id !== currentIslandId);
+            
+            adjacentIslands.forEach((islandId, index) => {
+                const portal = createPortal(islandId);
+                
+                const angle = (index / adjacentIslands.length) * Math.PI * 2;
+                const distance = 45;
+                portal.position.set(
+                    Math.cos(angle) * distance,
+                    5,
+                    Math.sin(angle) * distance
+                );
+                
+                scene.add(portal);
+                portalObjects.push(portal);
+            });
+        }
+
+        function createPortal(destinationIsland) {
+            const group = new THREE.Group();
+            group.userData = { destination: destinationIsland };
+            
+            // Portal ring
+            const ringGeo = new THREE.TorusGeometry(3, 0.3, 8, 16);
+            const ringMat = new THREE.MeshStandardMaterial({ 
+                color: 0x00ffff,
+                emissive: 0x0088ff,
+                emissiveIntensity: 0.5
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            group.add(ring);
+            
+            // Portal energy
+            const energyGeo = new THREE.CircleGeometry(2.8);
+            const energyMat = new THREE.MeshBasicMaterial({ 
+                color: 0x0088ff,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const energy = new THREE.Mesh(energyGeo, energyMat);
+            group.add(energy);
+            
+            // Portal label
+            // In a real implementation, you'd use text geometry or canvas texture
+            
+            return group;
+        }
+
+        function updateAtmosphere(config) {
+            // Update fog
+            const fogColor = new THREE.Color(config.atmosphere.fog);
+            scene.fog = new THREE.Fog(fogColor, 10, 200);
+            renderer.setClearColor(fogColor, 1);
+            
+            // Update skybox (simplified - in reality you'd load actual skybox textures)
+            scene.background = fogColor;
+        }
+
+        function updateIslandUI(islandId) {
+            // Update island cards
+            document.querySelectorAll('.island-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.island === islandId) {
+                    card.classList.add('active');
+                }
+            });
+            
+            // Update progress displays
+            Object.keys(gameState.islandProgress).forEach(id => {
+                const card = document.querySelector(`[data-island="${id}"]`);
+                const progress = gameState.islandProgress[id];
+                const progressEl = card.querySelector('.island-progress');
+                
+                if (gameState.unlockedIslands.includes(id)) {
+                    progressEl.textContent = `${progress.relics}/${progress.total} Relics`;
+                } else {
+                    progressEl.textContent = 'Locked';
+                }
+            });
+        }
+
+        // UI Event Handlers
+        window.travelToIsland = function() {
+            const selectedCard = document.querySelector('.island-card.active');
+            const islandId = selectedCard.dataset.island;
+            
+            if (gameState.unlockedIslands.includes(islandId)) {
+                loadIsland(islandId);
+                console.log(`🌀 Traveling to ${islandConfigs[islandId].name}...`);
+            } else {
+                alert('This island is locked! Complete more relics to unlock it.');
+            }
+        };
+
+        window.acceptQuest = function() {
+            document.getElementById('story-panel').style.display = 'none';
+            // Initialize quest system
+            console.log('📜 Quest accepted: Find the 5 Crystal Relics');
+        };
+
+        window.skipIntro = function() {
+            document.getElementById('story-panel').style.display = 'none';
+        };
+
+        window.openProceduralCreator = function() {
+            // Open a modal or redirect to procedural creation tools
+            window.open('procedural_human.html', '_blank');
+        };
+
+        // Procedural creation tools
+        window.createVehicle = function() {
+            const vehicle = generateProceduralVehicle();
+            scene.add(vehicle);
+            proceduralAssets.push(vehicle);
+            console.log('🚗 Generated new procedural vehicle');
+        };
+
+        window.createCharacter = function() {
+            const character = generateProceduralCharacter();
+            scene.add(character);
+            proceduralAssets.push(character);
+            console.log('🧍 Generated new procedural character');
+        };
+
+        window.createBuilding = function() {
+            const building = generateProceduralBuilding();
+            scene.add(building);
+            proceduralAssets.push(building);
+            console.log('🏢 Generated new procedural building');
+        };
+
+        window.modifyTerrain = function() {
+            if (currentIslandMesh) {
+                modifyIslandTerrain(currentIslandMesh);
+                console.log('🗻 Modified terrain procedurally');
+            }
+        };
+
+        window.spawnPortal = function() {
+            const portal = createCustomPortal();
+            scene.add(portal);
+            console.log('🌀 Created new portal');
+        };
+
+        // Procedural generation functions
+        function generateProceduralVehicle() {
+            const group = new THREE.Group();
+            
+            // Car body
+            const bodyGeo = new THREE.BoxGeometry(4, 1, 2);
+            const bodyMat = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color().setHSL(Math.random(), 0.7, 0.5) 
+            });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 1;
+            group.add(body);
+            
+            // Wheels
+            const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2);
+            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            
+            const positions = [
+                [-1.5, 0.4, -0.8],
+                [1.5, 0.4, -0.8],
+                [-1.5, 0.4, 0.8],
+                [1.5, 0.4, 0.8]
+            ];
+            
+            positions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                wheel.position.set(...pos);
+                wheel.rotation.z = Math.PI / 2;
+                group.add(wheel);
+            });
+            
+            // Random position
+            group.position.set(
+                (Math.random() - 0.5) * 40,
+                0,
+                (Math.random() - 0.5) * 40
+            );
+            
+            group.userData = { type: 'procedural_vehicle', transferable: true };
+            
+            return group;
+        }
+
+        function generateProceduralCharacter() {
+            const group = new THREE.Group();
+            
+            // Body parts with random proportions
+            const bodyHeight = 1 + Math.random() * 0.5;
+            const bodyRadius = 0.3 + Math.random() * 0.2;
+            
+            const bodyGeo = new THREE.CylinderGeometry(bodyRadius, bodyRadius * 0.8, bodyHeight);
+            const bodyMat = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color().setHSL(Math.random(), 0.3, 0.7) 
+            });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = bodyHeight / 2;
+            group.add(body);
+            
+            // Head
+            const headSize = bodyRadius * (0.8 + Math.random() * 0.4);
+            const headGeo = new THREE.SphereGeometry(headSize);
+            const head = new THREE.Mesh(headGeo, bodyMat);
+            head.position.y = bodyHeight + headSize;
+            group.add(head);
+            
+            // Arms
+            const armLength = bodyHeight * (0.6 + Math.random() * 0.3);
+            for (let side of [-1, 1]) {
+                const armGeo = new THREE.CylinderGeometry(bodyRadius * 0.3, bodyRadius * 0.25, armLength);
+                const arm = new THREE.Mesh(armGeo, bodyMat);
+                arm.position.set(side * (bodyRadius + 0.2), bodyHeight * 0.7, 0);
+                arm.rotation.z = side * (Math.PI / 6 + Math.random() * Math.PI / 6);
+                group.add(arm);
+            }
+            
+            // Random position
+            group.position.set(
+                (Math.random() - 0.5) * 40,
+                0,
+                (Math.random() - 0.5) * 40
+            );
+            
+            group.userData = { type: 'procedural_character', transferable: true };
+            
+            return group;
+        }
+
+        function generateProceduralBuilding() {
+            const group = new THREE.Group();
+            
+            // Random building parameters
+            const floors = Math.floor(Math.random() * 5) + 2;
+            const width = 3 + Math.random() * 4;
+            const depth = 3 + Math.random() * 4;
+            const floorHeight = 2.5 + Math.random();
+            
+            for (let floor = 0; floor < floors; floor++) {
+                const floorGeo = new THREE.BoxGeometry(
+                    width * (1 - floor * 0.05),
+                    floorHeight,
+                    depth * (1 - floor * 0.05)
+                );
+                const floorMat = new THREE.MeshStandardMaterial({ 
+                    color: new THREE.Color().setHSL(Math.random(), 0.4, 0.6) 
+                });
+                const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+                floorMesh.position.y = floor * floorHeight + floorHeight / 2;
+                floorMesh.castShadow = true;
+                group.add(floorMesh);
+            }
+            
+            // Random position
+            group.position.set(
+                (Math.random() - 0.5) * 60,
+                0,
+                (Math.random() - 0.5) * 60
+            );
+            
+            group.userData = { type: 'procedural_building', transferable: true };
+            
+            return group;
+        }
+
+        function modifyIslandTerrain(islandMesh) {
+            const geometry = islandMesh.geometry;
+            const vertices = geometry.attributes.position.array;
+            
+            // Add random noise to terrain
+            for (let i = 2; i < vertices.length; i += 3) {
+                vertices[i] += (Math.random() - 0.5) * 0.5;
+            }
+            
+            geometry.attributes.position.needsUpdate = true;
+            geometry.computeVertexNormals();
+        }
+
+        function createCustomPortal() {
+            const portal = createPortal('custom');
+            portal.position.set(
+                (Math.random() - 0.5) * 50,
+                3,
+                (Math.random() - 0.5) * 50
+            );
+            
+            // Custom portal leads to a random island
+            const islands = Object.keys(islandConfigs);
+            portal.userData.destination = islands[Math.floor(Math.random() * islands.length)];
+            
+            return portal;
+        }
+
+        function showStoryPanel() {
+            setTimeout(() => {
+                document.getElementById('story-panel').style.display = 'block';
+            }, 2000);
+        }
+
+        // Island selection UI
+        document.querySelectorAll('.island-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.island-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+            });
+        });
+
+        // Inventory slot interactions
+        document.querySelectorAll('.inventory-slot').forEach(slot => {
+            slot.addEventListener('click', () => {
+                if (slot.dataset.item === 'empty') {
+                    // Open creation menu
+                    window.openProceduralCreator();
+                } else {
+                    // Show item details or use item
+                    console.log(`Using ${slot.dataset.item}`);
+                }
+            });
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const time = Date.now() * 0.001;
+            
+            // Animate NPCs
+            scene.traverse(child => {
+                if (child.userData.animationSpeed) {
+                    child.position.y = child.userData.originalY + Math.sin(time * child.userData.animationSpeed) * 0.5;
+                    child.rotation.y = time * child.userData.animationSpeed * 0.5;
+                }
+            });
+            
+            // Animate portals
+            portalObjects.forEach(portal => {
+                portal.rotation.y = time * 0.5;
+                portal.children[0].rotation.x = time * 0.3;
+            });
+            
+            // Animate floating elements
+            scene.traverse(child => {
+                if (child.userData.type === 'floating') {
+                    child.position.y += Math.sin(time + child.position.x) * 0.01;
+                }
+            });
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Initialize the game
+        init();
+
+        // Export functions for integration with other systems
+        window.SkyRelicsIslands = {
+            loadIsland,
+            generateProceduralVehicle,
+            generateProceduralCharacter,
+            generateProceduralBuilding,
+            gameState,
+            scene,
+            camera,
+            renderer
+        };
+        
+    </script>
+</body>
+</html>
