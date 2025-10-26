@@ -131,7 +131,7 @@
       humanGroup.add(nose);
 
       // Mouth
-      const mouthGeo = new THREE.CapsuleGeometry(0.008, 0.025, 4, 8);
+      const mouthGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.025, 8);
       const mouth = new THREE.Mesh(mouthGeo, lipMat);
       mouth.position.set(0, head.position.y - 0.05, 0.085);
       mouth.rotation.z = Math.PI/2;
@@ -147,7 +147,7 @@
       humanGroup.add(hair);
 
       // TORSO - more anatomical
-      const chestGeo = new THREE.CapsuleGeometry(0.18, torsoH*0.6, 12, 20);
+      const chestGeo = new THREE.CylinderGeometry(0.18, 0.16, torsoH*0.6, 16);
       const chest = new THREE.Mesh(chestGeo, skinMat);
       chest.position.set(0, legL + torsoH*0.7, 0);
       chest.scale.set(1.2, 1, 0.7); // broader shoulders, flatter
@@ -173,7 +173,7 @@
         humanGroup.add(shoulder);
         
         // Upper arm
-        const upperArmGeo = new THREE.CapsuleGeometry(0.055, armL*0.55, 10, 12);
+        const upperArmGeo = new THREE.CylinderGeometry(0.055, 0.05, armL*0.55, 12);
         const upperArm = new THREE.Mesh(upperArmGeo, skinMat);
         upperArm.position.set(side * 0.25, legL + torsoH - 0.1 - armL*0.55/2, 0);
         upperArm.castShadow = true;
@@ -187,7 +187,7 @@
         humanGroup.add(elbow);
         
         // Forearm
-        const forearmGeo = new THREE.CapsuleGeometry(0.045, armL*0.45, 10, 12);
+        const forearmGeo = new THREE.CylinderGeometry(0.045, 0.04, armL*0.45, 12);
         const forearm = new THREE.Mesh(forearmGeo, skinMat);
         forearm.position.set(side * 0.25, legL + torsoH - 0.1 - armL*0.55 - armL*0.45/2, 0);
         forearm.castShadow = true;
@@ -227,7 +227,7 @@
         humanGroup.add(hip);
         
         // Thigh
-        const thighGeo = new THREE.CapsuleGeometry(0.08, legL*0.55, 12, 16);
+        const thighGeo = new THREE.CylinderGeometry(0.08, 0.07, legL*0.55, 16);
         const thigh = new THREE.Mesh(thighGeo, skinMat);
         thigh.position.set(side * 0.12, legL - legL*0.55/2, 0);
         thigh.castShadow = true;
@@ -241,7 +241,7 @@
         humanGroup.add(knee);
         
         // Calf
-        const calfGeo = new THREE.CapsuleGeometry(0.06, legL*0.45, 12, 16);
+        const calfGeo = new THREE.CylinderGeometry(0.06, 0.05, legL*0.45, 16);
         const calf = new THREE.Mesh(calfGeo, skinMat);
         calf.position.set(side * 0.12, legL - legL*0.55 - legL*0.45/2, 0);
         calf.castShadow = true;
