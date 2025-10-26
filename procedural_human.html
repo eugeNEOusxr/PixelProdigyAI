@@ -4,6 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Procedural Human — EugeneousOS</title>
+  <!-- Import map to remap bare specifiers (fixes browser module import errors like `The specifier "three" was a bare specifier`) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+      "three/": "https://unpkg.com/three@0.128.0/"
+    }
+  }
+  </script>
   <style>
     html,body { height:100%; margin:0; font-family:Inter,Segoe UI,Roboto,Arial; overflow:hidden }
     #info { position: absolute; left: 20px; bottom: 20px; z-index: 10; background: rgba(0,0,0,0.7); color: #fff; padding:15px; border-radius:8px; font-size:14px }
@@ -24,6 +33,14 @@
   </div>
 
   <canvas id="renderer"></canvas>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+    }
+  }
+  </script>
 
   <script type="module">
     import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';
