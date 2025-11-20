@@ -146,6 +146,8 @@
         <div>SPACE - Jump</div>
         <div>SHIFT - Sprint</div>
         <div>1/2/3 - Beam Modes</div>
+        <div>Q - Switch Gun</div>
+        <div>E - Toggle Gun</div>
         <div>R - Reload Power</div>
         <div>ESC - Exit Pointer Lock</div>
     </div>
@@ -185,6 +187,248 @@
                 controls.lock();
             }
         });
+        
+        // Gun system
+        let currentGun = null;
+        let gunType = 'pistol'; // pistol, rifle, plasma
+        
+        class Gun {
+            constructor(type) {
+                this.type = type;
+                this.group = new THREE.Group();
+                
+                if (type === 'pistol') {
+                    this.buildPistol();
+                } else if (type === 'rifle') {
+                    this.buildRifle();
+                } else if (type === 'plasma') {
+                    this.buildPlasmaGun();
+                }
+                
+                // Position in front of camera
+                this.group.position.set(0.3, -0.3, -0.5);
+                camera.add(this.group);
+                
+                // Animation state
+                this.recoil = 0;
+                this.recoilSpeed = 0;
+            }
+            
+            buildPistol() {
+                // Pistol body
+                const bodyGeometry = new THREE.BoxGeometry(0.08, 0.15, 0.25);
+                const bodyMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x2a2a2a,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.set(0, 0, 0);
+                this.group.add(body);
+                
+                // Barrel
+                const barrelGeometry = new THREE.CylinderGeometry(0.015, 0.015, 0.15, 8);
+                const barrelMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x1a1a1a,
+                    metalness: 0.9,
+                    roughness: 0.1
+                });
+                const barrel = new THREE.Mesh(barrelGeometry, barrelMaterial);
+                barrel.position.set(0, 0.05, -0.2);
+                barrel.rotation.x = Math.PI / 2;
+                this.group.add(barrel);
+                
+                // Muzzle point
+                this.muzzlePoint = new THREE.Vector3(0, 0.05, -0.275);
+                
+                // Grip
+                const gripGeometry = new THREE.BoxGeometry(0.04, 0.1, 0.06);
+                const gripMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x3a2a1a,
+                    roughness: 0.8
+                });
+                const grip = new THREE.Mesh(gripGeometry, gripMaterial);
+                grip.position.set(0, -0.12, 0.05);
+                this.group.add(grip);
+                
+                // Sights
+                const sightGeometry = new THREE.BoxGeometry(0.01, 0.02, 0.01);
+                const sightMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+                const frontSight = new THREE.Mesh(sightGeometry, sightMaterial);
+                frontSight.position.set(0, 0.08, -0.2);
+                this.group.add(frontSight);
+            }
+            
+            buildRifle() {
+                // Rifle body
+                const bodyGeometry = new THREE.BoxGeometry(0.1, 0.12, 0.5);
+                const bodyMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x1a1a1a,
+                    metalness: 0.7,
+                    roughness: 0.3
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.set(0, 0, -0.1);
+                this.group.add(body);
+                
+                // Barrel
+                const barrelGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.25, 8);
+                const barrelMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x0a0a0a,
+                    metalness: 0.9,
+                    roughness: 0.1
+                });
+                const barrel = new THREE.Mesh(barrelGeometry, barrelMaterial);
+                barrel.position.set(0, 0.04, -0.475);
+                barrel.rotation.x = Math.PI / 2;
+                this.group.add(barrel);
+                
+                // Muzzle point
+                this.muzzlePoint = new THREE.Vector3(0, 0.04, -0.6);
+                
+                // Stock
+                const stockGeometry = new THREE.BoxGeometry(0.08, 0.1, 0.15);
+                const stockMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x3a2a1a,
+                    roughness: 0.7
+                });
+                const stock = new THREE.Mesh(stockGeometry, stockMaterial);
+                stock.position.set(0, -0.05, 0.2);
+                this.group.add(stock);
+                
+                // Magazine
+                const magGeometry = new THREE.BoxGeometry(0.05, 0.15, 0.08);
+                const magMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x2a2a2a,
+                    metalness: 0.6
+                });
+                const mag = new THREE.Mesh(magGeometry, magMaterial);
+                mag.position.set(0, -0.12, -0.05);
+                this.group.add(mag);
+                
+                // Scope
+                const scopeGeometry = new THREE.CylinderGeometry(0.015, 0.015, 0.15, 8);
+                const scopeMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x1a1a1a,
+                    metalness: 0.8
+                });
+                const scope = new THREE.Mesh(scopeGeometry, scopeMaterial);
+                scope.position.set(0, 0.09, -0.1);
+                scope.rotation.z = Math.PI / 2;
+                this.group.add(scope);
+            }
+            
+            buildPlasmaGun() {
+                // Plasma gun body
+                const bodyGeometry = new THREE.BoxGeometry(0.12, 0.15, 0.4);
+                const bodyMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x1a3a4a,
+                    metalness: 0.9,
+                    roughness: 0.2,
+                    emissive: 0x0088ff,
+                    emissiveIntensity: 0.2
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.set(0, 0, -0.05);
+                this.group.add(body);
+                
+                // Energy chamber
+                const chamberGeometry = new THREE.SphereGeometry(0.06, 16, 16);
+                const chamberMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x00ffff,
+                    metalness: 0.5,
+                    roughness: 0.1,
+                    emissive: 0x00ffff,
+                    emissiveIntensity: 0.5,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const chamber = new THREE.Mesh(chamberGeometry, chamberMaterial);
+                chamber.position.set(0, 0.05, 0);
+                this.group.add(chamber);
+                
+                // Pulsing light
+                this.chamberLight = new THREE.PointLight(0x00ffff, 1, 2);
+                this.chamberLight.position.copy(chamber.position);
+                this.group.add(this.chamberLight);
+                
+                // Barrel rings
+                for (let i = 0; i < 5; i++) {
+                    const ringGeometry = new THREE.TorusGeometry(0.04, 0.005, 8, 16);
+                    const ringMaterial = new THREE.MeshStandardMaterial({ 
+                        color: 0x00ffff,
+                        emissive: 0x00ffff,
+                        emissiveIntensity: 0.3
+                    });
+                    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                    ring.position.set(0, 0.02, -0.3 - i * 0.05);
+                    ring.rotation.x = Math.PI / 2;
+                    this.group.add(ring);
+                }
+                
+                // Muzzle point
+                this.muzzlePoint = new THREE.Vector3(0, 0.02, -0.55);
+                
+                // Energy coils
+                const coilGeometry = new THREE.CylinderGeometry(0.01, 0.01, 0.3, 6);
+                const coilMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x0088ff,
+                    emissive: 0x0088ff,
+                    emissiveIntensity: 0.4
+                });
+                for (let i = 0; i < 4; i++) {
+                    const angle = (i / 4) * Math.PI * 2;
+                    const coil = new THREE.Mesh(coilGeometry, coilMaterial);
+                    coil.position.set(Math.cos(angle) * 0.08, Math.sin(angle) * 0.08, -0.25);
+                    coil.rotation.x = Math.PI / 2;
+                    this.group.add(coil);
+                }
+            }
+            
+            fire() {
+                // Recoil animation
+                this.recoilSpeed = -0.3;
+            }
+            
+            update(delta) {
+                // Recoil spring back
+                this.recoilSpeed += delta * 20;
+                this.recoil += this.recoilSpeed * delta;
+                this.recoil *= 0.8; // Damping
+                
+                if (Math.abs(this.recoil) < 0.001) {
+                    this.recoil = 0;
+                    this.recoilSpeed = 0;
+                }
+                
+                // Apply recoil to gun position
+                this.group.position.z = -0.5 + this.recoil;
+                this.group.rotation.x = -this.recoil * 2;
+                
+                // Plasma gun glow pulse
+                if (this.type === 'plasma' && this.chamberLight) {
+                    this.chamberLight.intensity = 1 + Math.sin(Date.now() * 0.01) * 0.3;
+                }
+            }
+            
+            getMuzzlePosition() {
+                const muzzleWorld = new THREE.Vector3();
+                muzzleWorld.copy(this.muzzlePoint);
+                this.group.localToWorld(muzzleWorld);
+                return muzzleWorld;
+            }
+            
+            dispose() {
+                camera.remove(this.group);
+                this.group.traverse(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                });
+            }
+        }
+        
+        // Initialize pistol
+        currentGun = new Gun('pistol');
         
         // Lighting
         const ambientLight = new THREE.AmbientLight(0x404060, 0.3);
@@ -825,19 +1069,24 @@
             power -= 10;
             updatePowerBar();
             
-            // Fire beam
-            const origin = camera.position.clone();
+            // Fire gun animation
+            if (currentGun) {
+                currentGun.fire();
+            }
+            
+            // Fire beam from gun muzzle
+            const origin = currentGun ? currentGun.getMuzzlePosition() : camera.position.clone();
             const direction = new THREE.Vector3(0, 0, -1);
             direction.applyQuaternion(camera.quaternion);
             
             const beam = new LaserBeam(origin, direction.clone(), beamMode);
             activeBeams.push(beam);
             
-            // Add muzzle flash
+            // Add muzzle flash at gun tip
             const muzzleFlash = new MuzzleFlash(origin, direction.clone());
             activeMuzzleFlashes.push(muzzleFlash);
             
-            // Add shell casing
+            // Add shell casing from gun
             const shellCasing = new ShellCasing(origin, direction.clone());
             activeShellCasings.push(shellCasing);
             
@@ -935,6 +1184,27 @@
             } else if (e.key === 'r' || e.key === 'R') {
                 power = maxPower;
                 updatePowerBar();
+            } else if (e.key === 'q' || e.key === 'Q') {
+                // Switch gun type
+                if (currentGun) {
+                    currentGun.dispose();
+                }
+                if (gunType === 'pistol') {
+                    gunType = 'rifle';
+                    currentGun = new Gun('rifle');
+                } else if (gunType === 'rifle') {
+                    gunType = 'plasma';
+                    currentGun = new Gun('plasma');
+                } else {
+                    gunType = 'pistol';
+                    currentGun = new Gun('pistol');
+                }
+                console.log('Switched to:', gunType);
+            } else if (e.key === 'e' || e.key === 'E') {
+                // Toggle gun visibility
+                if (currentGun) {
+                    currentGun.group.visible = !currentGun.group.visible;
+                }
             }
         });
         
@@ -1000,6 +1270,11 @@
                 if (camera.position.y < 5) {
                     camera.position.y = 5;
                     velocity.y = 0;
+                }
+                
+                // Update gun
+                if (currentGun) {
+                    currentGun.update(delta);
                 }
             }
             
