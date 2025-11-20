@@ -205,8 +205,10 @@
                     this.buildPlasmaGun();
                 }
                 
-                // Position in front of camera
-                this.group.position.set(0.3, -0.3, -0.5);
+                // Position in front of camera (held by right hand)
+                this.group.position.set(0.2, -0.65, -0.45);
+                this.group.rotation.x = 0.1;
+                this.group.rotation.y = -0.1;
                 camera.add(this.group);
                 
                 // Animation state
@@ -234,12 +236,12 @@
                     roughness: 0.1
                 });
                 const barrel = new THREE.Mesh(barrelGeometry, barrelMaterial);
-                barrel.position.set(0, 0.05, -0.2);
+                barrel.position.set(0, 0.05, -0.15);
                 barrel.rotation.x = Math.PI / 2;
                 this.group.add(barrel);
                 
                 // Muzzle point
-                this.muzzlePoint = new THREE.Vector3(0, 0.05, -0.275);
+                this.muzzlePoint = new THREE.Vector3(0, 0.05, -0.225);
                 
                 // Grip
                 const gripGeometry = new THREE.BoxGeometry(0.04, 0.1, 0.06);
@@ -387,7 +389,7 @@
             
             fire() {
                 // Recoil animation
-                this.recoilSpeed = -0.3;
+                this.recoilSpeed = this.type === 'pistol' ? -0.4 : (this.type === 'rifle' ? -0.3 : -0.25);
             }
             
             update(delta) {
@@ -402,8 +404,8 @@
                 }
                 
                 // Apply recoil to gun position
-                this.group.position.z = -0.5 + this.recoil;
-                this.group.rotation.x = -this.recoil * 2;
+                this.group.position.z = -0.45 + this.recoil;
+                this.group.rotation.x = 0.1 - this.recoil * 2;
                 
                 // Plasma gun glow pulse
                 if (this.type === 'plasma' && this.chamberLight) {
@@ -426,6 +428,164 @@
                 });
             }
         }
+        
+        // First-person character arms
+        class FPSArms {
+            constructor() {
+                this.group = new THREE.Group();
+                camera.add(this.group);
+                
+                // Skin color
+                const skinColor = 0xf4a574;
+                const skinMaterial = new THREE.MeshStandardMaterial({ 
+                    color: skinColor,
+                    roughness: 0.8,
+                    metalness: 0.1
+                });
+                
+                // Build right arm
+                this.buildArm('right', skinMaterial);
+                
+                // Build left arm
+                this.buildArm('left', skinMaterial);
+                
+                // Animation state
+                this.bobTime = 0;
+                this.sway = new THREE.Vector2(0, 0);
+            }
+            
+            buildArm(side, skinMaterial) {
+                const armGroup = new THREE.Group();
+                const multiplier = side === 'right' ? 1 : -1;
+                
+                // Shoulder
+                const shoulderGeometry = new THREE.SphereGeometry(0.08, 16, 16);
+                const shoulder = new THREE.Mesh(shoulderGeometry, skinMaterial);
+                shoulder.position.set(multiplier * 0.15, -0.2, -0.3);
+                armGroup.add(shoulder);
+                
+                // Upper arm
+                const upperArmGeometry = new THREE.CylinderGeometry(0.06, 0.05, 0.25, 12);
+                const upperArm = new THREE.Mesh(upperArmGeometry, skinMaterial);
+                upperArm.position.set(multiplier * 0.15, -0.35, -0.3);
+                upperArm.rotation.z = multiplier * 0.1;
+                armGroup.add(upperArm);
+                
+                // Elbow
+                const elbowGeometry = new THREE.SphereGeometry(0.05, 12, 12);
+                const elbow = new THREE.Mesh(elbowGeometry, skinMaterial);
+                elbow.position.set(multiplier * 0.17, -0.48, -0.3);
+                armGroup.add(elbow);
+                
+                // Forearm
+                const forearmGeometry = new THREE.CylinderGeometry(0.05, 0.045, 0.22, 12);
+                const forearm = new THREE.Mesh(forearmGeometry, skinMaterial);
+                forearm.position.set(multiplier * 0.22, -0.62, -0.35);
+                forearm.rotation.z = multiplier * 0.15;
+                armGroup.add(forearm);
+                
+                // Wrist
+                const wristGeometry = new THREE.SphereGeometry(0.045, 12, 12);
+                const wrist = new THREE.Mesh(wristGeometry, skinMaterial);
+                wrist.position.set(multiplier * 0.25, -0.74, -0.38);
+                armGroup.add(wrist);
+                
+                // Hand
+                const handGeometry = new THREE.BoxGeometry(0.08, 0.12, 0.04);
+                const hand = new THREE.Mesh(handGeometry, skinMaterial);
+                hand.position.set(multiplier * 0.25, -0.82, -0.38);
+                hand.rotation.x = 0.2;
+                armGroup.add(hand);
+                
+                // Fingers (simplified)
+                for (let i = 0; i < 4; i++) {
+                    const fingerGeometry = new THREE.CylinderGeometry(0.008, 0.007, 0.05, 6);
+                    const finger = new THREE.Mesh(fingerGeometry, skinMaterial);
+                    const offsetX = (i - 1.5) * 0.015;
+                    finger.position.set(
+                        multiplier * 0.25 + multiplier * offsetX,
+                        -0.89,
+                        -0.38
+                    );
+                    finger.rotation.x = 0.3;
+                    armGroup.add(finger);
+                }
+                
+                // Thumb
+                const thumbGeometry = new THREE.CylinderGeometry(0.01, 0.008, 0.04, 6);
+                const thumb = new THREE.Mesh(thumbGeometry, skinMaterial);
+                thumb.position.set(
+                    multiplier * 0.29,
+                    -0.82,
+                    -0.42
+                );
+                thumb.rotation.x = 0.5;
+                thumb.rotation.z = multiplier * 0.8;
+                armGroup.add(thumb);
+                
+                // Store arm reference
+                if (side === 'right') {
+                    this.rightArm = armGroup;
+                    // Right hand holds gun
+                    armGroup.position.set(-0.1, 0.1, 0);
+                } else {
+                    this.leftArm = armGroup;
+                    // Left hand supports gun
+                    armGroup.position.set(0.05, 0.15, 0);
+                }
+                
+                this.group.add(armGroup);
+            }
+            
+            update(delta, moving, mouseMovement) {
+                // Walking bob
+                if (moving) {
+                    this.bobTime += delta * 8;
+                    const bobAmount = 0.015;
+                    this.group.position.y = Math.sin(this.bobTime) * bobAmount;
+                    this.group.position.x = Math.cos(this.bobTime * 0.5) * bobAmount * 0.5;
+                } else {
+                    this.bobTime = 0;
+                    this.group.position.y *= 0.9;
+                    this.group.position.x *= 0.9;
+                }
+                
+                // Mouse sway
+                if (mouseMovement) {
+                    this.sway.x += (mouseMovement.x * 0.001 - this.sway.x) * 0.1;
+                    this.sway.y += (mouseMovement.y * 0.001 - this.sway.y) * 0.1;
+                    
+                    this.group.rotation.y = this.sway.x * 0.5;
+                    this.group.rotation.x = this.sway.y * 0.5;
+                }
+                
+                // Breathing idle motion
+                const breathe = Math.sin(Date.now() * 0.001) * 0.003;
+                this.group.position.y += breathe;
+            }
+            
+            playFireAnimation() {
+                // Recoil both arms
+                this.rightArm.rotation.x = -0.2;
+                this.leftArm.rotation.x = -0.15;
+                
+                setTimeout(() => {
+                    this.rightArm.rotation.x = 0;
+                    this.leftArm.rotation.x = 0;
+                }, 100);
+            }
+            
+            dispose() {
+                camera.remove(this.group);
+                this.group.traverse(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                });
+            }
+        }
+        
+        // Initialize character arms
+        const fpsArms = new FPSArms();
         
         // Initialize pistol
         currentGun = new Gun('pistol');
@@ -1074,6 +1234,11 @@
                 currentGun.fire();
             }
             
+            // Fire arms animation
+            if (fpsArms) {
+                fpsArms.playFireAnimation();
+            }
+            
             // Fire beam from gun muzzle
             const origin = currentGun ? currentGun.getMuzzlePosition() : camera.position.clone();
             const direction = new THREE.Vector3(0, 0, -1);
@@ -1214,9 +1379,18 @@
         const velocity = new THREE.Vector3();
         const direction = new THREE.Vector3();
         const keys = {};
+        const mouseMovement = { x: 0, y: 0 };
         
         document.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
         document.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
+        
+        // Track mouse movement for arm sway
+        document.addEventListener('mousemove', (e) => {
+            if (controls.isLocked) {
+                mouseMovement.x = e.movementX || 0;
+                mouseMovement.y = e.movementY || 0;
+            }
+        });
         
         // FPS counter
         let lastTime = performance.now();
@@ -1247,6 +1421,7 @@
                 if (keys['a']) direction.x -= 1;
                 if (keys['d']) direction.x += 1;
                 
+                const isMoving = direction.length() > 0;
                 direction.normalize();
                 
                 const speed = keys['shift'] ? moveSpeed * sprintMultiplier : moveSpeed;
@@ -1275,6 +1450,14 @@
                 // Update gun
                 if (currentGun) {
                     currentGun.update(delta);
+                }
+                
+                // Update FPS arms
+                if (fpsArms) {
+                    fpsArms.update(delta, isMoving, mouseMovement);
+                    // Reset mouse movement after applying
+                    mouseMovement.x *= 0.9;
+                    mouseMovement.y *= 0.9;
                 }
             }
             
