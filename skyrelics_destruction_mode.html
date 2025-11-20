@@ -282,6 +282,302 @@
             createCube(x, y, z, size);
         }
         
+        // Muzzle flash
+        class MuzzleFlash {
+            constructor(position, direction) {
+                this.life = 0;
+                this.maxLife = 0.1;
+                
+                // Flash sphere
+                const flashGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+                const flashMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffff00,
+                    transparent: true,
+                    opacity: 1
+                });
+                this.flash = new THREE.Mesh(flashGeometry, flashMaterial);
+                this.flash.position.copy(position).add(direction.clone().multiplyScalar(0.5));
+                scene.add(this.flash);
+                
+                // Flash light
+                this.light = new THREE.PointLight(0xffff00, 3, 5);
+                this.light.position.copy(this.flash.position);
+                scene.add(this.light);
+                
+                // Flash particles
+                this.particles = [];
+                for (let i = 0; i < 8; i++) {
+                    const particleGeometry = new THREE.SphereGeometry(0.05, 4, 4);
+                    const particleMaterial = new THREE.MeshBasicMaterial({ 
+                        color: 0xffaa00,
+                        transparent: true
+                    });
+                    const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                    particle.position.copy(this.flash.position);
+                    
+                    const spread = new THREE.Vector3(
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2,
+                        (Math.random() - 0.5) * 2
+                    ).normalize();
+                    particle.userData.velocity = spread.multiplyScalar(3);
+                    
+                    scene.add(particle);
+                    this.particles.push(particle);
+                }
+            }
+            
+            update(delta) {
+                this.life += delta;
+                const progress = this.life / this.maxLife;
+                
+                this.flash.material.opacity = 1 - progress;
+                this.flash.scale.setScalar(1 + progress * 2);
+                this.light.intensity = 3 * (1 - progress);
+                
+                this.particles.forEach(particle => {
+                    particle.position.add(particle.userData.velocity.clone().multiplyScalar(delta));
+                    particle.material.opacity = 1 - progress;
+                });
+                
+                return this.life >= this.maxLife;
+            }
+            
+            dispose() {
+                scene.remove(this.flash);
+                this.flash.geometry.dispose();
+                this.flash.material.dispose();
+                scene.remove(this.light);
+                
+                this.particles.forEach(p => {
+                    scene.remove(p);
+                    p.geometry.dispose();
+                    p.material.dispose();
+                });
+            }
+        }
+        
+        const activeMuzzleFlashes = [];
+        
+        // Shell casing
+        class ShellCasing {
+            constructor(position, direction) {
+                this.life = 0;
+                this.maxLife = 2;
+                
+                // Casing geometry
+                const casingGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.15, 6);
+                const casingMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0xccaa44,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                this.casing = new THREE.Mesh(casingGeometry, casingMaterial);
+                this.casing.position.copy(position).add(new THREE.Vector3(0.3, -0.2, 0));
+                this.casing.castShadow = true;
+                scene.add(this.casing);
+                
+                // Eject to the right and slightly back
+                const rightDir = new THREE.Vector3(1, 0, 0);
+                rightDir.applyQuaternion(camera.quaternion);
+                const backDir = direction.clone().multiplyScalar(-1);
+                
+                this.velocity = rightDir.multiplyScalar(3).add(backDir.multiplyScalar(1));
+                this.velocity.y = 2 + Math.random();
+                
+                this.rotation = new THREE.Vector3(
+                    (Math.random() - 0.5) * 10,
+                    (Math.random() - 0.5) * 10,
+                    (Math.random() - 0.5) * 10
+                );
+                
+                this.bounced = false;
+            }
+            
+            update(delta) {
+                this.life += delta;
+                
+                // Physics
+                this.velocity.y -= 9.8 * delta;
+                this.casing.position.add(this.velocity.clone().multiplyScalar(delta));
+                
+                // Rotation
+                this.casing.rotation.x += this.rotation.x * delta;
+                this.casing.rotation.y += this.rotation.y * delta;
+                this.casing.rotation.z += this.rotation.z * delta;
+                
+                // Ground bounce
+                if (this.casing.position.y <= 0.1 && !this.bounced) {
+                    this.velocity.y *= -0.4;
+                    this.velocity.x *= 0.7;
+                    this.velocity.z *= 0.7;
+                    this.bounced = true;
+                    this.casing.position.y = 0.1;
+                }
+                
+                // Fade out near end
+                if (this.life > this.maxLife - 0.5) {
+                    const fadeProgress = (this.life - (this.maxLife - 0.5)) / 0.5;
+                    this.casing.material.opacity = 1 - fadeProgress;
+                    this.casing.material.transparent = true;
+                }
+                
+                return this.life >= this.maxLife;
+            }
+            
+            dispose() {
+                scene.remove(this.casing);
+                this.casing.geometry.dispose();
+                this.casing.material.dispose();
+            }
+        }
+        
+        const activeShellCasings = [];
+        
+        // Bullet tracer
+        class BulletTracer {
+            constructor(origin, target) {
+                this.life = 0;
+                this.maxLife = 0.15;
+                
+                const direction = target.clone().sub(origin);
+                const distance = direction.length();
+                
+                // Tracer line
+                const tracerGeometry = new THREE.CylinderGeometry(0.02, 0.02, distance, 4);
+                const tracerMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffff00,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                this.tracer = new THREE.Mesh(tracerGeometry, tracerMaterial);
+                
+                this.tracer.position.copy(origin).add(direction.multiplyScalar(0.5));
+                this.tracer.lookAt(target);
+                this.tracer.rotateX(Math.PI / 2);
+                
+                scene.add(this.tracer);
+                
+                // Tracer glow
+                const glowGeometry = new THREE.CylinderGeometry(0.05, 0.05, distance, 4);
+                const glowMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffff00,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                this.glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                this.tracer.add(this.glow);
+            }
+            
+            update(delta) {
+                this.life += delta;
+                const progress = this.life / this.maxLife;
+                
+                this.tracer.material.opacity = 0.9 * (1 - progress);
+                this.glow.material.opacity = 0.3 * (1 - progress);
+                
+                return this.life >= this.maxLife;
+            }
+            
+            dispose() {
+                scene.remove(this.tracer);
+                this.tracer.geometry.dispose();
+                this.tracer.material.dispose();
+                this.glow.geometry.dispose();
+                this.glow.material.dispose();
+            }
+        }
+        
+        const activeBulletTracers = [];
+        
+        // Impact effect
+        class ImpactEffect {
+            constructor(position, normal) {
+                this.life = 0;
+                this.maxLife = 0.5;
+                this.particles = [];
+                
+                // Impact flash
+                const flashGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+                const flashMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffaa00,
+                    transparent: true
+                });
+                this.flash = new THREE.Mesh(flashGeometry, flashMaterial);
+                this.flash.position.copy(position);
+                scene.add(this.flash);
+                
+                // Spark particles
+                for (let i = 0; i < 15; i++) {
+                    const sparkGeometry = new THREE.SphereGeometry(0.03, 4, 4);
+                    const sparkMaterial = new THREE.MeshBasicMaterial({ 
+                        color: i % 2 === 0 ? 0xffaa00 : 0xffff00,
+                        transparent: true
+                    });
+                    const spark = new THREE.Mesh(sparkGeometry, sparkMaterial);
+                    spark.position.copy(position);
+                    
+                    // Sparks fly in hemisphere toward normal
+                    const randomDir = new THREE.Vector3(
+                        (Math.random() - 0.5) * 2,
+                        Math.random(),
+                        (Math.random() - 0.5) * 2
+                    ).normalize();
+                    
+                    // Blend with surface normal
+                    const direction = normal.clone().multiplyScalar(0.5).add(randomDir.multiplyScalar(0.5)).normalize();
+                    spark.userData.velocity = direction.multiplyScalar(3 + Math.random() * 3);
+                    spark.userData.gravity = -9.8;
+                    
+                    scene.add(spark);
+                    this.particles.push(spark);
+                }
+                
+                // Impact light
+                this.light = new THREE.PointLight(0xffaa00, 2, 3);
+                this.light.position.copy(position);
+                scene.add(this.light);
+            }
+            
+            update(delta) {
+                this.life += delta;
+                const progress = this.life / this.maxLife;
+                
+                this.flash.material.opacity = 1 - progress;
+                this.flash.scale.setScalar(1 + progress);
+                this.light.intensity = 2 * (1 - progress);
+                
+                this.particles.forEach(spark => {
+                    spark.userData.velocity.y += spark.userData.gravity * delta;
+                    spark.position.add(spark.userData.velocity.clone().multiplyScalar(delta));
+                    spark.material.opacity = 1 - progress;
+                    
+                    // Bounce off ground
+                    if (spark.position.y < 0) {
+                        spark.position.y = 0;
+                        spark.userData.velocity.y *= -0.3;
+                    }
+                });
+                
+                return this.life >= this.maxLife;
+            }
+            
+            dispose() {
+                scene.remove(this.flash);
+                this.flash.geometry.dispose();
+                this.flash.material.dispose();
+                scene.remove(this.light);
+                
+                this.particles.forEach(p => {
+                    scene.remove(p);
+                    p.geometry.dispose();
+                    p.material.dispose();
+                });
+            }
+        }
+        
+        const activeImpactEffects = [];
+        
         // Laser beam system
         class LaserBeam {
             constructor(origin, direction, mode = 'laser') {
@@ -537,6 +833,14 @@
             const beam = new LaserBeam(origin, direction.clone(), beamMode);
             activeBeams.push(beam);
             
+            // Add muzzle flash
+            const muzzleFlash = new MuzzleFlash(origin, direction.clone());
+            activeMuzzleFlashes.push(muzzleFlash);
+            
+            // Add shell casing
+            const shellCasing = new ShellCasing(origin, direction.clone());
+            activeShellCasings.push(shellCasing);
+            
             // Raycast for hits
             raycaster.set(origin, direction);
             const intersects = raycaster.intersectObjects(destructibles);
@@ -544,6 +848,14 @@
             if (intersects.length > 0) {
                 const hit = intersects[0];
                 const object = hit.object;
+                
+                // Add bullet tracer
+                const bulletTracer = new BulletTracer(origin, hit.point);
+                activeBulletTracers.push(bulletTracer);
+                
+                // Add impact effect
+                const impactEffect = new ImpactEffect(hit.point, hit.face.normal);
+                activeImpactEffects.push(impactEffect);
                 
                 // Damage object
                 const damage = 30 + Math.random() * 20;
@@ -696,6 +1008,38 @@
                 if (activeBeams[i].update(delta)) {
                     activeBeams[i].dispose();
                     activeBeams.splice(i, 1);
+                }
+            }
+            
+            // Update muzzle flashes
+            for (let i = activeMuzzleFlashes.length - 1; i >= 0; i--) {
+                if (activeMuzzleFlashes[i].update(delta)) {
+                    activeMuzzleFlashes[i].dispose();
+                    activeMuzzleFlashes.splice(i, 1);
+                }
+            }
+            
+            // Update shell casings
+            for (let i = activeShellCasings.length - 1; i >= 0; i--) {
+                if (activeShellCasings[i].update(delta)) {
+                    activeShellCasings[i].dispose();
+                    activeShellCasings.splice(i, 1);
+                }
+            }
+            
+            // Update bullet tracers
+            for (let i = activeBulletTracers.length - 1; i >= 0; i--) {
+                if (activeBulletTracers[i].update(delta)) {
+                    activeBulletTracers[i].dispose();
+                    activeBulletTracers.splice(i, 1);
+                }
+            }
+            
+            // Update impact effects
+            for (let i = activeImpactEffects.length - 1; i >= 0; i--) {
+                if (activeImpactEffects[i].update(delta)) {
+                    activeImpactEffects[i].dispose();
+                    activeImpactEffects.splice(i, 1);
                 }
             }
             
