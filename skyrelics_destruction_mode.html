@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyRelics - Destruction Mode</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            background: #000;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+        }
+        
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        
+        #crosshair::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -10px;
+            right: -10px;
+            height: 2px;
+            background: #00ffff;
+            transform: translateY(-50%);
+        }
+        
+        #crosshair::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: -10px;
+            bottom: -10px;
+            width: 2px;
+            background: #00ffff;
+            transform: translateX(-50%);
+        }
+        
+        #powerBar {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            border-radius: 15px;
+            overflow: hidden;
+            z-index: 100;
+        }
+        
+        #powerFill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #0088ff, #ff00ff);
+            transition: width 0.1s;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+        
+        #instructions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #00ffff;
+            font-size: 12px;
+            text-align: right;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .damage-number {
+            position: fixed;
+            color: #ff0000;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            pointer-events: none;
+            animation: damageFloat 1s ease-out forwards;
+            z-index: 200;
+        }
+        
+        @keyframes damageFloat {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <div><strong>🎯 DESTRUCTION MODE</strong></div>
+        <div>Destroyed: <span id="destroyCount">0</span></div>
+        <div>Power: <span id="power">100</span>%</div>
+        <div>Beam Mode: <span id="beamMode">LASER</span></div>
+        <div>FPS: <span id="fps">60</span></div>
+    </div>
+    
+    <div id="crosshair"></div>
+    
+    <div id="powerBar">
+        <div id="powerFill"></div>
+    </div>
+    
+    <div id="instructions">
+        <div><strong>🎮 CONTROLS</strong></div>
+        <div>WASD - Move</div>
+        <div>Mouse - Look</div>
+        <div>CLICK - Fire Laser</div>
+        <div>SPACE - Jump</div>
+        <div>SHIFT - Sprint</div>
+        <div>1/2/3 - Beam Modes</div>
+        <div>R - Reload Power</div>
+        <div>ESC - Exit Pointer Lock</div>
+    </div>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+        
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a1a);
+        scene.fog = new THREE.FogExp2(0x0a0a1a, 0.015);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 20);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+        
+        // Pointer lock controls
+        const controls = new PointerLockControls(camera, document.body);
+        
+        document.body.addEventListener('click', () => {
+            if (!controls.isLocked) {
+                controls.lock();
+            }
+        });
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404060, 0.3);
+        scene.add(ambientLight);
+        
+        const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+        sun.position.set(50, 100, 50);
+        sun.castShadow = true;
+        sun.shadow.camera.left = -100;
+        sun.shadow.camera.right = 100;
+        sun.shadow.camera.top = 100;
+        sun.shadow.camera.bottom = -100;
+        sun.shadow.mapSize.width = 2048;
+        sun.shadow.mapSize.height = 2048;
+        scene.add(sun);
+        
+        // Ground with grid
+        const groundGeometry = new THREE.PlaneGeometry(200, 200, 50, 50);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1a2e,
+            roughness: 0.8,
+            metalness: 0.2,
+            wireframe: false
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Add grid overlay
+        const gridHelper = new THREE.GridHelper(200, 50, 0x00ffff, 0x004444);
+        gridHelper.position.y = 0.01;
+        scene.add(gridHelper);
+        
+        // Destructible objects array
+        const destructibles = [];
+        let destroyCount = 0;
+        
+        // Create destructible buildings
+        function createBuilding(x, z, width, height, depth) {
+            const geometry = new THREE.BoxGeometry(width, height, depth);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color().setHSL(Math.random(), 0.3, 0.4),
+                roughness: 0.7,
+                metalness: 0.3
+            });
+            const building = new THREE.Mesh(geometry, material);
+            building.position.set(x, height / 2, z);
+            building.castShadow = true;
+            building.receiveShadow = true;
+            building.userData.health = height * 10;
+            building.userData.maxHealth = height * 10;
+            building.userData.type = 'building';
+            scene.add(building);
+            destructibles.push(building);
+            return building;
+        }
+        
+        // Create destructible cubes
+        function createCube(x, y, z, size) {
+            const geometry = new THREE.BoxGeometry(size, size, size);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color().setHSL(Math.random(), 0.7, 0.5),
+                roughness: 0.5,
+                metalness: 0.5
+            });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.set(x, y, z);
+            cube.castShadow = true;
+            cube.receiveShadow = true;
+            cube.userData.health = size * 20;
+            cube.userData.maxHealth = size * 20;
+            cube.userData.type = 'cube';
+            scene.add(cube);
+            destructibles.push(cube);
+            return cube;
+        }
+        
+        // Generate city
+        for (let i = 0; i < 20; i++) {
+            const x = (Math.random() - 0.5) * 150;
+            const z = (Math.random() - 0.5) * 150;
+            const width = 3 + Math.random() * 5;
+            const height = 5 + Math.random() * 20;
+            const depth = 3 + Math.random() * 5;
+            createBuilding(x, z, width, height, depth);
+        }
+        
+        // Generate cubes
+        for (let i = 0; i < 30; i++) {
+            const x = (Math.random() - 0.5) * 100;
+            const y = 1 + Math.random() * 3;
+            const z = (Math.random() - 0.5) * 100;
+            const size = 1 + Math.random() * 2;
+            createCube(x, y, z, size);
+        }
+        
+        // Laser beam system
+        class LaserBeam {
+            constructor(origin, direction, mode = 'laser') {
+                this.mode = mode;
+                this.particles = [];
+                this.life = 0;
+                this.maxLife = mode === 'laser' ? 0.3 : 0.5;
+                
+                // Create beam geometry
+                const beamLength = 100;
+                let geometry;
+                
+                if (mode === 'laser') {
+                    // Straight laser
+                    geometry = new THREE.CylinderGeometry(0.1, 0.1, beamLength, 8);
+                } else if (mode === 'wave') {
+                    // Sine wave beam
+                    const points = [];
+                    for (let i = 0; i < 100; i++) {
+                        const t = i / 100;
+                        points.push(new THREE.Vector3(
+                            Math.sin(t * Math.PI * 4) * 0.5,
+                            0,
+                            t * beamLength - beamLength / 2
+                        ));
+                    }
+                    geometry = new THREE.TubeGeometry(
+                        new THREE.CatmullRomCurve3(points),
+                        100,
+                        0.1,
+                        8,
+                        false
+                    );
+                } else {
+                    // Spiral beam
+                    const points = [];
+                    for (let i = 0; i < 100; i++) {
+                        const t = i / 100;
+                        points.push(new THREE.Vector3(
+                            Math.cos(t * Math.PI * 8) * 0.3,
+                            Math.sin(t * Math.PI * 8) * 0.3,
+                            t * beamLength - beamLength / 2
+                        ));
+                    }
+                    geometry = new THREE.TubeGeometry(
+                        new THREE.CatmullRomCurve3(points),
+                        100,
+                        0.1,
+                        8,
+                        false
+                    );
+                }
+                
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ffff,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.copy(origin);
+                
+                // Align beam with direction
+                const targetPosition = origin.clone().add(direction.multiplyScalar(beamLength / 2));
+                this.mesh.lookAt(targetPosition);
+                this.mesh.rotateX(Math.PI / 2);
+                
+                scene.add(this.mesh);
+                
+                // Add glow effect
+                const glowGeometry = geometry.clone();
+                const glowMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ffff,
+                    transparent: true,
+                    opacity: 0.3,
+                    side: THREE.BackSide
+                });
+                this.glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                this.glow.scale.multiplyScalar(2);
+                this.mesh.add(this.glow);
+                
+                // Create particles along beam
+                this.createParticles(origin, direction);
+            }
+            
+            createParticles(origin, direction) {
+                const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const particleMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ffff,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                for (let i = 0; i < 20; i++) {
+                    const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                    const distance = Math.random() * 50;
+                    particle.position.copy(origin).add(direction.clone().multiplyScalar(distance));
+                    particle.userData.velocity = new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.5,
+                        (Math.random() - 0.5) * 0.5,
+                        (Math.random() - 0.5) * 0.5
+                    );
+                    scene.add(particle);
+                    this.particles.push(particle);
+                }
+            }
+            
+            update(delta) {
+                this.life += delta;
+                
+                // Fade out
+                const fadeProgress = this.life / this.maxLife;
+                this.mesh.material.opacity = 1 - fadeProgress;
+                this.glow.material.opacity = (1 - fadeProgress) * 0.3;
+                
+                // Update particles
+                this.particles.forEach(particle => {
+                    particle.position.add(particle.userData.velocity);
+                    particle.material.opacity = 1 - fadeProgress;
+                });
+                
+                return this.life >= this.maxLife;
+            }
+            
+            dispose() {
+                scene.remove(this.mesh);
+                this.mesh.geometry.dispose();
+                this.mesh.material.dispose();
+                this.particles.forEach(p => {
+                    scene.remove(p);
+                    p.geometry.dispose();
+                    p.material.dispose();
+                });
+            }
+        }
+        
+        const activeBeams = [];
+        
+        // Explosion system
+        class Explosion {
+            constructor(position, size = 1) {
+                this.particles = [];
+                this.life = 0;
+                this.maxLife = 1.5;
+                
+                // Create shockwave
+                const shockGeometry = new THREE.SphereGeometry(1, 32, 32);
+                const shockMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xff4400,
+                    transparent: true,
+                    opacity: 0.6,
+                    wireframe: true
+                });
+                this.shockwave = new THREE.Mesh(shockGeometry, shockMaterial);
+                this.shockwave.position.copy(position);
+                scene.add(this.shockwave);
+                
+                // Create explosion particles
+                for (let i = 0; i < 30; i++) {
+                    const particleGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+                    const particleMaterial = new THREE.MeshBasicMaterial({ 
+                        color: i % 2 === 0 ? 0xff4400 : 0xffaa00,
+                        transparent: true,
+                        opacity: 1
+                    });
+                    const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                    particle.position.copy(position);
+                    
+                    const direction = new THREE.Vector3(
+                        Math.random() - 0.5,
+                        Math.random() - 0.5,
+                        Math.random() - 0.5
+                    ).normalize();
+                    
+                    particle.userData.velocity = direction.multiplyScalar(5 + Math.random() * 5);
+                    particle.userData.gravity = -9.8;
+                    
+                    scene.add(particle);
+                    this.particles.push(particle);
+                }
+                
+                // Light flash
+                this.light = new THREE.PointLight(0xff4400, 5, 20);
+                this.light.position.copy(position);
+                scene.add(this.light);
+            }
+            
+            update(delta) {
+                this.life += delta;
+                const progress = this.life / this.maxLife;
+                
+                // Expand shockwave
+                this.shockwave.scale.setScalar(1 + progress * 10);
+                this.shockwave.material.opacity = 0.6 * (1 - progress);
+                
+                // Update particles
+                this.particles.forEach(particle => {
+                    particle.userData.velocity.y += particle.userData.gravity * delta;
+                    particle.position.add(particle.userData.velocity.clone().multiplyScalar(delta));
+                    particle.material.opacity = 1 - progress;
+                });
+                
+                // Fade light
+                this.light.intensity = 5 * (1 - progress);
+                
+                return this.life >= this.maxLife;
+            }
+            
+            dispose() {
+                scene.remove(this.shockwave);
+                this.shockwave.geometry.dispose();
+                this.shockwave.material.dispose();
+                
+                scene.remove(this.light);
+                
+                this.particles.forEach(p => {
+                    scene.remove(p);
+                    p.geometry.dispose();
+                    p.material.dispose();
+                });
+            }
+        }
+        
+        const activeExplosions = [];
+        
+        // Raycasting
+        const raycaster = new THREE.Raycaster();
+        let beamMode = 'laser'; // laser, wave, spiral
+        let power = 100;
+        const maxPower = 100;
+        
+        // Shooting
+        let canShoot = true;
+        let shootCooldown = 0.1;
+        let lastShootTime = 0;
+        
+        document.addEventListener('click', (e) => {
+            if (!controls.isLocked) return;
+            if (power < 10) return;
+            
+            const now = performance.now() / 1000;
+            if (now - lastShootTime < shootCooldown) return;
+            
+            lastShootTime = now;
+            power -= 10;
+            updatePowerBar();
+            
+            // Fire beam
+            const origin = camera.position.clone();
+            const direction = new THREE.Vector3(0, 0, -1);
+            direction.applyQuaternion(camera.quaternion);
+            
+            const beam = new LaserBeam(origin, direction.clone(), beamMode);
+            activeBeams.push(beam);
+            
+            // Raycast for hits
+            raycaster.set(origin, direction);
+            const intersects = raycaster.intersectObjects(destructibles);
+            
+            if (intersects.length > 0) {
+                const hit = intersects[0];
+                const object = hit.object;
+                
+                // Damage object
+                const damage = 30 + Math.random() * 20;
+                object.userData.health -= damage;
+                
+                // Show damage number
+                showDamageNumber(damage, hit.point);
+                
+                // Visual feedback
+                object.material.emissive.setHex(0xff0000);
+                setTimeout(() => {
+                    if (object.material) {
+                        object.material.emissive.setHex(0x000000);
+                    }
+                }, 100);
+                
+                // Destroy if health depleted
+                if (object.userData.health <= 0) {
+                    const explosion = new Explosion(object.position.clone(), 2);
+                    activeExplosions.push(explosion);
+                    
+                    scene.remove(object);
+                    const index = destructibles.indexOf(object);
+                    if (index > -1) destructibles.splice(index, 1);
+                    
+                    object.geometry.dispose();
+                    object.material.dispose();
+                    
+                    destroyCount++;
+                    document.getElementById('destroyCount').textContent = destroyCount;
+                }
+            }
+        });
+        
+        // Show damage numbers
+        function showDamageNumber(damage, position) {
+            const screenPos = position.clone().project(camera);
+            const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (screenPos.y * -0.5 + 0.5) * window.innerHeight;
+            
+            const damageDiv = document.createElement('div');
+            damageDiv.className = 'damage-number';
+            damageDiv.textContent = `-${Math.floor(damage)}`;
+            damageDiv.style.left = x + 'px';
+            damageDiv.style.top = y + 'px';
+            document.body.appendChild(damageDiv);
+            
+            setTimeout(() => damageDiv.remove(), 1000);
+        }
+        
+        // Power regeneration
+        setInterval(() => {
+            if (power < maxPower) {
+                power = Math.min(maxPower, power + 2);
+                updatePowerBar();
+            }
+        }, 100);
+        
+        function updatePowerBar() {
+            const powerFill = document.getElementById('powerFill');
+            const powerText = document.getElementById('power');
+            powerFill.style.width = (power / maxPower * 100) + '%';
+            powerText.textContent = Math.floor(power);
+        }
+        
+        // Beam mode switching
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '1') {
+                beamMode = 'laser';
+                document.getElementById('beamMode').textContent = 'LASER';
+            } else if (e.key === '2') {
+                beamMode = 'wave';
+                document.getElementById('beamMode').textContent = 'WAVE';
+            } else if (e.key === '3') {
+                beamMode = 'spiral';
+                document.getElementById('beamMode').textContent = 'SPIRAL';
+            } else if (e.key === 'r' || e.key === 'R') {
+                power = maxPower;
+                updatePowerBar();
+            }
+        });
+        
+        // Movement
+        const moveSpeed = 15;
+        const sprintMultiplier = 2;
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
+        const keys = {};
+        
+        document.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
+        document.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
+        
+        // FPS counter
+        let lastTime = performance.now();
+        let frames = 0;
+        let fps = 60;
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const currentTime = performance.now();
+            const delta = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            
+            // FPS calculation
+            frames++;
+            if (frames % 60 === 0) {
+                fps = Math.round(1 / delta);
+                document.getElementById('fps').textContent = fps;
+            }
+            
+            if (controls.isLocked) {
+                // Movement
+                direction.set(0, 0, 0);
+                
+                if (keys['w']) direction.z -= 1;
+                if (keys['s']) direction.z += 1;
+                if (keys['a']) direction.x -= 1;
+                if (keys['d']) direction.x += 1;
+                
+                direction.normalize();
+                
+                const speed = keys['shift'] ? moveSpeed * sprintMultiplier : moveSpeed;
+                
+                velocity.x = direction.x * speed;
+                velocity.z = direction.z * speed;
+                
+                controls.moveRight(velocity.x * delta);
+                controls.moveForward(velocity.z * delta);
+                
+                // Jumping
+                if (keys[' '] && camera.position.y <= 5.1) {
+                    velocity.y = 10;
+                }
+                
+                // Gravity
+                velocity.y -= 9.8 * delta;
+                camera.position.y += velocity.y * delta;
+                
+                // Ground collision
+                if (camera.position.y < 5) {
+                    camera.position.y = 5;
+                    velocity.y = 0;
+                }
+            }
+            
+            // Update beams
+            for (let i = activeBeams.length - 1; i >= 0; i--) {
+                if (activeBeams[i].update(delta)) {
+                    activeBeams[i].dispose();
+                    activeBeams.splice(i, 1);
+                }
+            }
+            
+            // Update explosions
+            for (let i = activeExplosions.length - 1; i >= 0; i--) {
+                if (activeExplosions[i].update(delta)) {
+                    activeExplosions[i].dispose();
+                    activeExplosions.splice(i, 1);
+                }
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        console.log('💥 Destruction Mode Ready!');
+        console.log('Click to lock pointer and start destroying!');
+    </script>
+</body>
+</html>
